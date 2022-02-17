@@ -79,6 +79,9 @@
     "Texture Accessor in EXT_feature_metadata": {
       "overrideName": "TextureAccessor"
     },
+    "EXT_instance_features glTF Node extension": {
+      "overrideName": "ExtensionNodeExtMeshFeatures"
+    },
     "EXT_mesh_features glTF Mesh Primitive extension": {
       "overrideName": "ExtensionMeshPrimitiveExtMeshFeatures"
     },
@@ -163,6 +166,10 @@
     {
       "extensionName": "EXT_feature_metadata",
       "schema": "Vendor/EXT_feature_metadata/schema/mesh.primitive.EXT_feature_metadata.schema.json"
+    },
+    {
+      "extensionName": "EXT_instance_features",
+      "schema": "Vendor/EXT_instance_features/schema/node.EXT_instance_features.schema.json"
     },
     {
       "extensionName": "EXT_mesh_features",
