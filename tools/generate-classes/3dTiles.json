@@ -21,7 +21,7 @@
     "3DTILES_metadata tile extension": {
       "overrideName": "ExtensionTile3dTilesMetadata"
     },
-    "3DTILES_metadata content extension": {
+    "3DTILES_metadata tile content extension": {
       "overrideName": "ExtensionContent3dTilesMetadata"
     },
     "Metadata Entity": {
