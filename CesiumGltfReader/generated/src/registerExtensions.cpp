@@ -9,6 +9,7 @@
 #include "ExtensionCesiumTileEdgesJsonHandler.h"
 #include "ExtensionExtInstanceFeaturesJsonHandler.h"
 #include "ExtensionExtMeshFeaturesJsonHandler.h"
+#include "ExtensionExtMeshGpuInstancingExtFeatureMetadataJsonHandler.h"
 #include "ExtensionExtMeshGpuInstancingJsonHandler.h"
 #include "ExtensionKhrDracoMeshCompressionJsonHandler.h"
 #include "ExtensionKhrMaterialsUnlitJsonHandler.h"
@@ -23,6 +24,7 @@
 
 #include <CesiumGltf/Buffer.h>
 #include <CesiumGltf/BufferView.h>
+#include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
 #include <CesiumGltf/Material.h>
 #include <CesiumGltf/MeshPrimitive.h>
 #include <CesiumGltf/Model.h>
@@ -60,6 +62,9 @@ void registerExtensions(CesiumJsonReader::ExtensionReaderContext& context) {
   context.registerExtension<
       CesiumGltf::MeshPrimitive,
       ExtensionKhrDracoMeshCompressionJsonHandler>();
+  context.registerExtension<
+      CesiumGltf::ExtensionExtMeshGpuInstancing,
+      ExtensionExtMeshGpuInstancingExtFeatureMetadataJsonHandler>();
   context.registerExtension<
       CesiumGltf::Node,
       ExtensionExtInstanceFeaturesJsonHandler>();
