@@ -173,6 +173,9 @@
     },
     "EXT_feature_metadata extension for EXT_mesh_gpu_instancing": {
       "overrideName": "ExtensionExtMeshGpuInstancingExtFeatureMetadata"
+    },
+    "EXT_primitive_voxels glTF Mesh Primitive extension": {
+      "overrideName": "ExtensionExtPrimitiveVoxels"
     }
   },
   "extensions": [
@@ -253,6 +256,10 @@
       "extensionName": "KHR_texture_transform",
       "schema": "Khronos/KHR_texture_transform/schema/KHR_texture_transform.textureInfo.schema.json",
       "attachTo": "textureInfo"
+    },
+    {
+      "extensionName": "EXT_primitive_voxels",
+      "schema": "Vendor/EXT_primitive_voxels/schema/mesh.primitive.EXT_primitive_voxels.schema.json"
     }
   ]
 }

@@ -11,6 +11,7 @@
 #include "ExtensionExtMeshFeaturesJsonHandler.h"
 #include "ExtensionExtMeshGpuInstancingExtFeatureMetadataJsonHandler.h"
 #include "ExtensionExtMeshGpuInstancingJsonHandler.h"
+#include "ExtensionExtPrimitiveVoxelsJsonHandler.h"
 #include "ExtensionKhrDracoMeshCompressionJsonHandler.h"
 #include "ExtensionKhrMaterialsUnlitJsonHandler.h"
 #include "ExtensionKhrTextureBasisuJsonHandler.h"
@@ -62,6 +63,9 @@ void registerExtensions(CesiumJsonReader::ExtensionReaderContext& context) {
   context.registerExtension<
       CesiumGltf::MeshPrimitive,
       ExtensionKhrDracoMeshCompressionJsonHandler>();
+  context.registerExtension<
+      CesiumGltf::MeshPrimitive,
+      ExtensionExtPrimitiveVoxelsJsonHandler>();
   context.registerExtension<
       CesiumGltf::ExtensionExtMeshGpuInstancing,
       ExtensionExtMeshGpuInstancingExtFeatureMetadataJsonHandler>();
