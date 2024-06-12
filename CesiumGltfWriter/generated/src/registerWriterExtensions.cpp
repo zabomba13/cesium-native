@@ -12,9 +12,11 @@
 #include <CesiumGltf/ExtensionCesiumPrimitiveOutline.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionCesiumTileEdges.h>
+#include <CesiumGltf/ExtensionExtImplicitGeometry.h>
 #include <CesiumGltf/ExtensionExtInstanceFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
+#include <CesiumGltf/ExtensionExtPrimitiveVoxels.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
 #include <CesiumGltf/ExtensionKhrTextureBasisu.h>
@@ -54,6 +56,9 @@ void registerWriterExtensions(
       CesiumGltf::Model,
       ExtensionModelMaxarMeshVariantsJsonWriter>();
   context.registerExtension<
+      CesiumGltf::Model,
+      ExtensionExtImplicitGeometryJsonWriter>();
+  context.registerExtension<
       CesiumGltf::MeshPrimitive,
       ExtensionCesiumTileEdgesJsonWriter>();
   context.registerExtension<
@@ -71,6 +76,9 @@ void registerWriterExtensions(
   context.registerExtension<
       CesiumGltf::MeshPrimitive,
       ExtensionCesiumPrimitiveOutlineJsonWriter>();
+  context.registerExtension<
+      CesiumGltf::MeshPrimitive,
+      ExtensionExtPrimitiveVoxelsJsonWriter>();
   context.registerExtension<
       CesiumGltf::Node,
       ExtensionExtInstanceFeaturesJsonWriter>();

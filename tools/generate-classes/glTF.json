@@ -131,6 +131,15 @@
     },
     "CESIUM_primitive_outline glTF primitive extension": {
       "overrideName": "ExtensionCesiumPrimitiveOutline"
+    },
+    "EXT_implicit_geometry glTF extension": {
+      "overrideName": "ExtensionExtImplicitGeometry"
+    },
+    "Geometry in EXT_implicit_geometry": {
+      "overrideName": "Geometry"
+    },
+    "EXT_primitive_voxels glTF Mesh Primitive extension": {
+      "overrideName": "ExtensionExtPrimitiveVoxels"
     }
   },
   "extensions": [
@@ -228,6 +237,15 @@
       "attachTo": [
         "mesh.primitive"
       ]
+    },
+    {
+      "extensionName": "EXT_implicit_geometry",
+      "schema": "Vendor/EXT_implicit_geometry/schema/glTF.EXT_implicit_geometry.schema.json"
+    },
+    {
+      "extensionName": "EXT_primitive_voxels",
+      "schema": "Vendor/EXT_primitive_voxels/schema/mesh.primitive.EXT_primitive_voxels.schema.json"
+      
     }
   ]
 }
