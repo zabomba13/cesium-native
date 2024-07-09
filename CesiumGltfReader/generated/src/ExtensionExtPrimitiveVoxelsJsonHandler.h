@@ -45,6 +45,7 @@ protected:
 
 private:
   CesiumGltf::ExtensionExtPrimitiveVoxels* _pObject = nullptr;
+  CesiumJsonReader::IntegerJsonHandler<int32_t> _shape;
   CesiumJsonReader::
       ArrayJsonHandler<int64_t, CesiumJsonReader::IntegerJsonHandler<int64_t>>
           _dimensions;

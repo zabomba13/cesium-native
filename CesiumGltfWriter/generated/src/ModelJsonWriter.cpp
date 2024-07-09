@@ -1042,6 +1042,11 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
+  if (obj.shape > -1) {
+    jsonWriter.Key("shape");
+    writeJson(obj.shape, jsonWriter, context);
+  }
+
   if (!obj.dimensions.empty()) {
     jsonWriter.Key("dimensions");
     writeJson(obj.dimensions, jsonWriter, context);

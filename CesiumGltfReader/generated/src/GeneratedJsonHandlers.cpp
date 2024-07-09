@@ -2177,6 +2177,7 @@ namespace CesiumGltfReader {
 ExtensionExtPrimitiveVoxelsJsonHandler::ExtensionExtPrimitiveVoxelsJsonHandler(
     const CesiumJsonReader::JsonReaderOptions& options) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
+      _shape(),
       _dimensions(),
       _padding(options) {}
 
@@ -2217,6 +2218,8 @@ CesiumJsonReader::IJsonHandler* ExtensionExtPrimitiveVoxelsJsonHandler::
         CesiumGltf::ExtensionExtPrimitiveVoxels& o) {
   using namespace std::string_literals;
 
+  if ("shape"s == str)
+    return property("shape", this->_shape, o.shape);
   if ("dimensions"s == str)
     return property("dimensions", this->_dimensions, o.dimensions);
   if ("padding"s == str)
