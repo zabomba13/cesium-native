@@ -3,9 +3,12 @@
 
 #include "registerReaderExtensions.h"
 
+#include "Extension3dTilesBoundingVolumeCylinderJsonHandler.h"
 #include "Extension3dTilesBoundingVolumeS2JsonHandler.h"
+#include "ExtensionContent3dTilesContentVoxelsJsonHandler.h"
 
 #include <Cesium3DTiles/BoundingVolume.h>
+#include <Cesium3DTiles/Content.h>
 #include <CesiumJsonReader/JsonReaderOptions.h>
 
 namespace Cesium3DTilesReader {
@@ -15,5 +18,11 @@ void registerReaderExtensions(CesiumJsonReader::JsonReaderOptions& options) {
   options.registerExtension<
       Cesium3DTiles::BoundingVolume,
       Extension3dTilesBoundingVolumeS2JsonHandler>();
+  options.registerExtension<
+      Cesium3DTiles::BoundingVolume,
+      Extension3dTilesBoundingVolumeCylinderJsonHandler>();
+  options.registerExtension<
+      Cesium3DTiles::Content,
+      ExtensionContent3dTilesContentVoxelsJsonHandler>();
 }
 } // namespace Cesium3DTilesReader
