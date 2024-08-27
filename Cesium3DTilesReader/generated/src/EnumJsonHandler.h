@@ -27,7 +27,8 @@ protected:
   IJsonHandler* readObjectKeyEnum(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::Enum& o);
+      Cesium3DTiles::Enum& o
+  );
 
 private:
   Cesium3DTiles::Enum* _pObject = nullptr;

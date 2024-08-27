@@ -17,8 +17,8 @@ class EnumValueJsonHandler
 public:
   using ValueType = Cesium3DTiles::EnumValue;
 
-  EnumValueJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  EnumValueJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, Cesium3DTiles::EnumValue* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -27,7 +27,8 @@ protected:
   IJsonHandler* readObjectKeyEnumValue(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::EnumValue& o);
+      Cesium3DTiles::EnumValue& o
+  );
 
 private:
   Cesium3DTiles::EnumValue* _pObject = nullptr;

@@ -21,7 +21,8 @@ public:
   void reset(
       IJsonHandler* pParent,
       CesiumUtility::ExtensibleObject* pObject,
-      const std::string& objectType);
+      const std::string& objectType
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 

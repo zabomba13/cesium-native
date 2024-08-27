@@ -15,7 +15,8 @@ public:
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) = 0;
+      const std::string_view& extensionName
+  ) = 0;
   virtual IJsonHandler& getHandler() = 0;
 };
 

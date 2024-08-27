@@ -33,8 +33,9 @@ JsonValue* JsonValue::getValuePtrForKey(const std::string& key) {
 }
 
 } // namespace CesiumUtility
-std::vector<std::string> CesiumUtility::JsonValue::getArrayOfStrings(
-    const std::string& defaultString) const {
+std::vector<std::string>
+CesiumUtility::JsonValue::getArrayOfStrings(const std::string& defaultString
+) const {
   if (!this->isArray())
     return std::vector<std::string>();
 
@@ -46,6 +47,7 @@ std::vector<std::string> CesiumUtility::JsonValue::getArrayOfStrings(
       result.begin(),
       [&defaultString](const JsonValue& arrayValue) {
         return arrayValue.getStringOrDefault(defaultString);
-      });
+      }
+  );
   return result;
 }

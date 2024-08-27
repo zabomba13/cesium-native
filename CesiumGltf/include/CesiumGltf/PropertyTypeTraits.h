@@ -411,7 +411,8 @@ propertyValueViewToCopy(const std::optional<T>& view) {
   if constexpr (IsMetadataNumericArray<T>::value) {
     if (view) {
       return std::make_optional<PropertyValueViewToCopy<T>>(
-          std::vector(view->begin(), view->end()));
+          std::vector(view->begin(), view->end())
+      );
     } else {
       return std::nullopt;
     }

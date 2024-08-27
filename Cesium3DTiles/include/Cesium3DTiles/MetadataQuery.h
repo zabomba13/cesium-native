@@ -68,7 +68,8 @@ public:
   static std::optional<FoundMetadataProperty> findFirstPropertyWithSemantic(
       const Schema& schema,
       const MetadataEntity& entity,
-      const std::string& semantic);
+      const std::string& semantic
+  );
 };
 
 } // namespace Cesium3DTiles

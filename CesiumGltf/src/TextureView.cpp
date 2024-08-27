@@ -19,7 +19,8 @@ TextureView::TextureView() noexcept
 TextureView::TextureView(
     const Model& model,
     const TextureInfo& textureInfo,
-    const TextureViewOptions& options) noexcept
+    const TextureViewOptions& options
+) noexcept
     : _textureViewStatus(TextureViewStatus::ErrorUninitialized),
       _pSampler(nullptr),
       _pImage(nullptr),
@@ -82,7 +83,8 @@ TextureView::TextureView(
     const ImageCesium& image,
     int64_t textureCoordinateSetIndex,
     const ExtensionKhrTextureTransform* pKhrTextureTransformExtension,
-    const TextureViewOptions& options) noexcept
+    const TextureViewOptions& options
+) noexcept
     : _textureViewStatus(TextureViewStatus::ErrorUninitialized),
       _pSampler(&sampler),
       _pImage(&image),
@@ -113,7 +115,8 @@ TextureView::TextureView(
 std::vector<uint8_t> TextureView::sampleNearestPixel(
     double u,
     double v,
-    const std::vector<int64_t>& channels) const noexcept {
+    const std::vector<int64_t>& channels
+) const noexcept {
   CESIUM_ASSERT(this->_textureViewStatus == TextureViewStatus::Valid);
   std::vector<uint8_t> result(channels.size());
 
@@ -146,11 +149,13 @@ std::vector<uint8_t> TextureView::sampleNearestPixel(
   int64_t x = glm::clamp(
       static_cast<int64_t>(xCoord),
       static_cast<int64_t>(0),
-      static_cast<int64_t>(image.width) - 1);
+      static_cast<int64_t>(image.width) - 1
+  );
   int64_t y = glm::clamp(
       static_cast<int64_t>(yCoord),
       static_cast<int64_t>(0),
-      static_cast<int64_t>(image.height) - 1);
+      static_cast<int64_t>(image.height) - 1
+  );
 
   int64_t pixelIndex =
       image.bytesPerChannel * image.channels * (y * image.width + x);

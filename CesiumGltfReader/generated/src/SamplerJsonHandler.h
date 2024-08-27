@@ -16,8 +16,8 @@ class SamplerJsonHandler : public CesiumGltfReader::NamedObjectJsonHandler {
 public:
   using ValueType = CesiumGltf::Sampler;
 
-  SamplerJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  SamplerJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::Sampler* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -26,7 +26,8 @@ protected:
   IJsonHandler* readObjectKeySampler(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Sampler& o);
+      CesiumGltf::Sampler& o
+  );
 
 private:
   CesiumGltf::Sampler* _pObject = nullptr;

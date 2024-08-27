@@ -7,8 +7,8 @@
 using namespace CesiumGltf;
 using namespace CesiumUtility;
 
-TEST_CASE(
-    "Can deserialize EXT_structural_metadata example with propertyTables") {
+TEST_CASE("Can deserialize EXT_structural_metadata example with propertyTables"
+) {
   const std::string s = R"(
     {
       "asset": {
@@ -66,7 +66,8 @@ TEST_CASE(
   CesiumGltfReader::GltfReader reader;
   CesiumGltfReader::GltfReaderResult readerResult = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   REQUIRE(readerResult.errors.empty());
   REQUIRE(readerResult.model.has_value());

@@ -26,7 +26,8 @@ protected:
   IJsonHandler* readObjectKeyImage(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Image& o);
+      CesiumGltf::Image& o
+  );
 
 private:
   CesiumGltf::Image* _pObject = nullptr;

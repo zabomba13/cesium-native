@@ -8,10 +8,11 @@
 namespace CesiumJsonWriter {
 PrettyJsonWriter::PrettyJsonWriter() noexcept {
   auto writer = rapidjson::PrettyWriter<rapidjson::StringBuffer>(_prettyBuffer);
-  writer.SetFormatOptions(
-      rapidjson::PrettyFormatOptions::kFormatSingleLineArray);
+  writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatSingleLineArray
+  );
   pretty = std::make_unique<rapidjson::PrettyWriter<rapidjson::StringBuffer>>(
-      std::move(writer));
+      std::move(writer)
+  );
   pretty->SetIndent(' ', 2);
 }
 
@@ -32,14 +33,16 @@ bool PrettyJsonWriter::Double(double d) { return pretty->Double(d); }
 bool PrettyJsonWriter::RawNumber(
     const char* str,
     unsigned int length,
-    bool copy) {
+    bool copy
+) {
   return pretty->RawNumber(str, length, copy);
 }
 
 bool PrettyJsonWriter::String(std::string_view string) {
   return pretty->String(
       string.data(),
-      static_cast<unsigned int>(string.size()));
+      static_cast<unsigned int>(string.size())
+  );
 }
 
 bool PrettyJsonWriter::Key(std::string_view key) {
@@ -77,35 +80,40 @@ void PrettyJsonWriter::Primitive(std::string_view string) {
 // Integral
 void PrettyJsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::int32_t value) {
+    std::int32_t value
+) {
   Key(keyName);
   Primitive(value);
 }
 
 void PrettyJsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::uint32_t value) {
+    std::uint32_t value
+) {
   Key(keyName);
   Primitive(value);
 }
 
 void PrettyJsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::int64_t value) {
+    std::int64_t value
+) {
   Key(keyName);
   Primitive(value);
 }
 
 void PrettyJsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::uint64_t value) {
+    std::uint64_t value
+) {
   Key(keyName);
   Primitive(value);
 }
 
 void PrettyJsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::string_view value) {
+    std::string_view value
+) {
   Key(keyName);
   Primitive(value);
 }
@@ -124,7 +132,8 @@ void PrettyJsonWriter::KeyPrimitive(std::string_view keyName, double value) {
 // Null
 void PrettyJsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::nullptr_t value) {
+    std::nullptr_t value
+) {
   Key(keyName);
   Primitive(value);
 }
@@ -132,7 +141,8 @@ void PrettyJsonWriter::KeyPrimitive(
 // Array / Objects
 void PrettyJsonWriter::KeyArray(
     std::string_view keyName,
-    std::function<void(void)> insideArray) {
+    std::function<void(void)> insideArray
+) {
   Key(keyName);
   pretty->StartArray();
   insideArray();
@@ -141,7 +151,8 @@ void PrettyJsonWriter::KeyArray(
 
 void PrettyJsonWriter::KeyObject(
     std::string_view keyName,
-    std::function<void(void)> insideObject) {
+    std::function<void(void)> insideObject
+) {
   Key(keyName);
   pretty->StartObject();
   insideObject();

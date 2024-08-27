@@ -14,7 +14,8 @@
 namespace CesiumQuantizedMeshTerrain {
 
 LayerJsonHandler::LayerJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _attribution(),
       _available(options),
@@ -34,7 +35,8 @@ LayerJsonHandler::LayerJsonHandler(
 
 void LayerJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    CesiumQuantizedMeshTerrain::Layer* pObject) {
+    CesiumQuantizedMeshTerrain::Layer* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -45,13 +47,15 @@ LayerJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyLayer(
       CesiumQuantizedMeshTerrain::Layer::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* LayerJsonHandler::readObjectKeyLayer(
     const std::string& objectType,
     const std::string_view& str,
-    CesiumQuantizedMeshTerrain::Layer& o) {
+    CesiumQuantizedMeshTerrain::Layer& o
+) {
   using namespace std::string_literals;
 
   if ("attribution"s == str)
@@ -66,7 +70,8 @@ CesiumJsonReader::IJsonHandler* LayerJsonHandler::readObjectKeyLayer(
     return property(
         "extensions",
         this->_extensionsProperty,
-        o.extensionsProperty);
+        o.extensionsProperty
+    );
   if ("format"s == str)
     return property("format", this->_format, o.format);
   if ("maxzoom"s == str)
@@ -77,7 +82,8 @@ CesiumJsonReader::IJsonHandler* LayerJsonHandler::readObjectKeyLayer(
     return property(
         "metadataAvailability",
         this->_metadataAvailability,
-        o.metadataAvailability);
+        o.metadataAvailability
+    );
   if ("name"s == str)
     return property("name", this->_name, o.name);
   if ("parentUrl"s == str)
@@ -141,7 +147,8 @@ LayerReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace CesiumQuantizedMeshTerrain {
 
 AvailabilityRectangleJsonHandler::AvailabilityRectangleJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _startX(),
       _startY(),
@@ -150,7 +157,8 @@ AvailabilityRectangleJsonHandler::AvailabilityRectangleJsonHandler(
 
 void AvailabilityRectangleJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    CesiumQuantizedMeshTerrain::AvailabilityRectangle* pObject) {
+    CesiumQuantizedMeshTerrain::AvailabilityRectangle* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -161,14 +169,16 @@ AvailabilityRectangleJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyAvailabilityRectangle(
       CesiumQuantizedMeshTerrain::AvailabilityRectangle::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 AvailabilityRectangleJsonHandler::readObjectKeyAvailabilityRectangle(
     const std::string& objectType,
     const std::string_view& str,
-    CesiumQuantizedMeshTerrain::AvailabilityRectangle& o) {
+    CesiumQuantizedMeshTerrain::AvailabilityRectangle& o
+) {
   using namespace std::string_literals;
 
   if ("startX"s == str)
@@ -198,8 +208,8 @@ AvailabilityRectangleReader::getOptions() const {
 
 CesiumJsonReader::ReadJsonResult<
     CesiumQuantizedMeshTerrain::AvailabilityRectangle>
-AvailabilityRectangleReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+AvailabilityRectangleReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   AvailabilityRectangleJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -213,8 +223,8 @@ AvailabilityRectangleReader::readFromJson(const rapidjson::Value& value) const {
 
 CesiumJsonReader::ReadJsonResult<
     std::vector<CesiumQuantizedMeshTerrain::AvailabilityRectangle>>
-AvailabilityRectangleReader::readArrayFromJson(
-    const rapidjson::Value& value) const {
+AvailabilityRectangleReader::readArrayFromJson(const rapidjson::Value& value
+) const {
   CesiumJsonReader::ArrayJsonHandler<
       CesiumQuantizedMeshTerrain::AvailabilityRectangle,
       AvailabilityRectangleJsonHandler>

@@ -24,7 +24,8 @@ protected:
   IJsonHandler* readObjectKeyAsset(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::Asset& o);
+      Cesium3DTiles::Asset& o
+  );
 
 private:
   Cesium3DTiles::Asset* _pObject = nullptr;

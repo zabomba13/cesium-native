@@ -32,8 +32,8 @@ double Plane::getPointDistance(const glm::dvec3& point) const noexcept {
   return glm::dot(this->_normal, point) + this->_distance;
 }
 
-glm::dvec3
-Plane::projectPointOntoPlane(const glm::dvec3& point) const noexcept {
+glm::dvec3 Plane::projectPointOntoPlane(const glm::dvec3& point
+) const noexcept {
   // projectedPoint = point - (normal.point + scale) * normal
   const double pointDistance = this->getPointDistance(point);
   const glm::dvec3 scaledNormal = this->_normal * pointDistance;

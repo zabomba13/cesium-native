@@ -7,7 +7,8 @@ void ErrorList::merge(const ErrorList& errorList) {
   warnings.insert(
       warnings.end(),
       errorList.warnings.begin(),
-      errorList.warnings.end());
+      errorList.warnings.end()
+  );
 }
 
 void ErrorList::merge(ErrorList&& errorList) {

@@ -59,8 +59,8 @@ public:
    *
    * @snippet TestBoundingSphere.cpp distanceSquaredTo
    */
-  double
-  computeDistanceSquaredToPosition(const glm::dvec3& position) const noexcept;
+  double computeDistanceSquaredToPosition(const glm::dvec3& position
+  ) const noexcept;
 
   /**
    * @brief Computes whether the given position is contained within the bounding

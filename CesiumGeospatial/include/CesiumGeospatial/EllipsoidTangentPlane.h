@@ -29,7 +29,8 @@ public:
    */
   EllipsoidTangentPlane(
       const glm::dvec3& origin,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Creates a new instance.
@@ -40,7 +41,8 @@ public:
    */
   EllipsoidTangentPlane(
       const glm::dmat4& eastNorthUpToFixedFrame,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Returns the {@link Ellipsoid}.
@@ -89,8 +91,8 @@ public:
    * @return The 2D representation of the point on the plane that is closest to
    * the given position.
    */
-  glm::dvec2
-  projectPointToNearestOnPlane(const glm::dvec3& cartesian) const noexcept;
+  glm::dvec2 projectPointToNearestOnPlane(const glm::dvec3& cartesian
+  ) const noexcept;
 
 private:
   /**
@@ -100,7 +102,8 @@ private:
    */
   static glm::dmat4 computeEastNorthUpToFixedFrame(
       const glm::dvec3& origin,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   Ellipsoid _ellipsoid;
   glm::dvec3 _origin;

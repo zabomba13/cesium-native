@@ -21,7 +21,8 @@ public:
   static inline constexpr const char* ExtensionName = "CESIUM_RTC";
 
   ExtensionCesiumRTCJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::ExtensionCesiumRTC* pObject);
 
@@ -30,7 +31,8 @@ public:
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -38,7 +40,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionCesiumRTC(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionCesiumRTC& o);
+      CesiumGltf::ExtensionCesiumRTC& o
+  );
 
 private:
   CesiumGltf::ExtensionCesiumRTC* _pObject = nullptr;

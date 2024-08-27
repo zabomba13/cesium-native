@@ -17,7 +17,8 @@ public:
   using ValueType = CesiumGltf::CameraPerspective;
 
   CameraPerspectiveJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::CameraPerspective* pObject);
 
@@ -27,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyCameraPerspective(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::CameraPerspective& o);
+      CesiumGltf::CameraPerspective& o
+  );
 
 private:
   CesiumGltf::CameraPerspective* _pObject = nullptr;

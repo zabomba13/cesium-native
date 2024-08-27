@@ -113,7 +113,8 @@ CartographicPolygon::CartographicPolygon(const std::vector<glm::dvec2>& polygon)
 
 /*static*/ bool CartographicPolygon::rectangleIsWithinPolygons(
     const CesiumGeospatial::GlobeRectangle& rectangle,
-    const std::vector<CartographicPolygon>& cartographicPolygons) noexcept {
+    const std::vector<CartographicPolygon>& cartographicPolygons
+) noexcept {
 
   glm::dvec2 rectangleCorners[] = {
       glm::dvec2(rectangle.getWest(), rectangle.getSouth()),
@@ -149,7 +150,8 @@ CartographicPolygon::CartographicPolygon(const std::vector<glm::dvec2>& polygon)
               rectangleCorners[0],
               vertices[indices[j - 2]],
               vertices[indices[j - 1]],
-              vertices[indices[j]])) {
+              vertices[indices[j]]
+          )) {
         inside = true;
         break;
       }
@@ -205,7 +207,8 @@ CartographicPolygon::CartographicPolygon(const std::vector<glm::dvec2>& polygon)
 /*static*/ bool CartographicPolygon::rectangleIsOutsidePolygons(
     const CesiumGeospatial::GlobeRectangle& rectangle,
     const std::vector<CesiumGeospatial::CartographicPolygon>&
-        cartographicPolygons) noexcept {
+        cartographicPolygons
+) noexcept {
 
   glm::dvec2 rectangleCorners[] = {
       glm::dvec2(rectangle.getWest(), rectangle.getSouth()),
@@ -238,12 +241,14 @@ CartographicPolygon::CartographicPolygon(const std::vector<glm::dvec2>& polygon)
             vertices[0],
             rectangleCorners[0],
             rectangleCorners[1],
-            rectangleCorners[2]) ||
+            rectangleCorners[2]
+        ) ||
         IntersectionTests::pointInTriangle(
             vertices[0],
             rectangleCorners[0],
             rectangleCorners[2],
-            rectangleCorners[3])) {
+            rectangleCorners[3]
+        )) {
       return false;
     }
 
@@ -254,7 +259,8 @@ CartographicPolygon::CartographicPolygon(const std::vector<glm::dvec2>& polygon)
               rectangleCorners[0],
               vertices[indices[j - 2]],
               vertices[indices[j - 1]],
-              vertices[indices[j]])) {
+              vertices[indices[j]]
+          )) {
         return false;
       }
     }

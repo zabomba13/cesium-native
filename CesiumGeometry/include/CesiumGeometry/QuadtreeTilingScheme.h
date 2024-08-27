@@ -28,7 +28,8 @@ public:
   QuadtreeTilingScheme(
       const CesiumGeometry::Rectangle& rectangle,
       uint32_t rootTilesX,
-      uint32_t rootTilesY) noexcept;
+      uint32_t rootTilesY
+  ) noexcept;
 
   /**
    * @brief Return the overall rectangle that is tiled.

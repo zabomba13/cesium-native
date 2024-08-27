@@ -26,17 +26,20 @@ public:
   static inline constexpr const char* ExtensionName = "EXT_structural_metadata";
 
   ExtensionModelExtStructuralMetadataJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionModelExtStructuralMetadata* pObject);
+      CesiumGltf::ExtensionModelExtStructuralMetadata* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -44,7 +47,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionModelExtStructuralMetadata(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionModelExtStructuralMetadata& o);
+      CesiumGltf::ExtensionModelExtStructuralMetadata& o
+  );
 
 private:
   CesiumGltf::ExtensionModelExtStructuralMetadata* _pObject = nullptr;

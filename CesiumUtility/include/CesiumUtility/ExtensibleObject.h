@@ -56,8 +56,8 @@ struct CESIUMUTILITY_API ExtensibleObject {
    * @return The generic extension, or nullptr if the generic extension doesn't
    * exist.
    */
-  const JsonValue*
-  getGenericExtension(const std::string& extensionName) const noexcept;
+  const JsonValue* getGenericExtension(const std::string& extensionName
+  ) const noexcept;
 
   /** @copydoc ExtensibleObject::getGenericExtension */
   JsonValue* getGenericExtension(const std::string& extensionName) noexcept;

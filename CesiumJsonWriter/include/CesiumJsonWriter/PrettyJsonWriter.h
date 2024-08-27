@@ -69,7 +69,8 @@ public:
 
   void KeyObject(
       std::string_view keyName,
-      std::function<void(void)> insideObject) override;
+      std::function<void(void)> insideObject
+  ) override;
 
   std::string toString() override;
   std::string_view toStringView() override;

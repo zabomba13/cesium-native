@@ -40,11 +40,13 @@ TEST_CASE("LayerJsonUtilities") {
     CHECK(
         maybeTilingScheme->getRectangle().getLowerLeft() ==
         GeographicProjection::computeMaximumProjectedRectangle(Ellipsoid::WGS84)
-            .getLowerLeft());
+            .getLowerLeft()
+    );
     CHECK(
         maybeTilingScheme->getRectangle().getUpperRight() ==
         GeographicProjection::computeMaximumProjectedRectangle(Ellipsoid::WGS84)
-            .getUpperRight());
+            .getUpperRight()
+    );
 
     layer.projection = "EPSG:3857";
     maybeTilingScheme = layer.getTilingScheme(Ellipsoid::WGS84);
@@ -53,16 +55,18 @@ TEST_CASE("LayerJsonUtilities") {
     CHECK(maybeTilingScheme->getRootTilesY() == 1);
     CHECK(Math::equalsEpsilon(
         maybeTilingScheme->getRectangle().getLowerLeft(),
-        WebMercatorProjection::computeMaximumProjectedRectangle(
-            Ellipsoid::WGS84)
+        WebMercatorProjection::computeMaximumProjectedRectangle(Ellipsoid::WGS84
+        )
             .getLowerLeft(),
-        1e-14));
+        1e-14
+    ));
     CHECK(Math::equalsEpsilon(
         maybeTilingScheme->getRectangle().getUpperRight(),
-        WebMercatorProjection::computeMaximumProjectedRectangle(
-            Ellipsoid::WGS84)
+        WebMercatorProjection::computeMaximumProjectedRectangle(Ellipsoid::WGS84
+        )
             .getUpperRight(),
-        1e-14));
+        1e-14
+    ));
 
     layer.projection = "foo";
     maybeTilingScheme = layer.getTilingScheme(Ellipsoid::WGS84);
@@ -78,16 +82,20 @@ TEST_CASE("LayerJsonUtilities") {
     REQUIRE(maybeBoundingRegion);
     CHECK(
         maybeBoundingRegion->getRectangle().getWest() ==
-        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getWest());
+        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getWest()
+    );
     CHECK(
         maybeBoundingRegion->getRectangle().getSouth() ==
-        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getSouth());
+        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getSouth()
+    );
     CHECK(
         maybeBoundingRegion->getRectangle().getEast() ==
-        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getEast());
+        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getEast()
+    );
     CHECK(
         maybeBoundingRegion->getRectangle().getNorth() ==
-        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getNorth());
+        GeographicProjection::MAXIMUM_GLOBE_RECTANGLE.getNorth()
+    );
     CHECK(maybeBoundingRegion->getMinimumHeight() == -1000.0);
     CHECK(maybeBoundingRegion->getMaximumHeight() == 9000.0);
 
@@ -96,16 +104,20 @@ TEST_CASE("LayerJsonUtilities") {
     REQUIRE(maybeBoundingRegion);
     CHECK(
         maybeBoundingRegion->getRectangle().getWest() ==
-        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getWest());
+        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getWest()
+    );
     CHECK(
         maybeBoundingRegion->getRectangle().getSouth() ==
-        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getSouth());
+        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getSouth()
+    );
     CHECK(
         maybeBoundingRegion->getRectangle().getEast() ==
-        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getEast());
+        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getEast()
+    );
     CHECK(
         maybeBoundingRegion->getRectangle().getNorth() ==
-        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getNorth());
+        WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE.getNorth()
+    );
     CHECK(maybeBoundingRegion->getMinimumHeight() == -1000.0);
     CHECK(maybeBoundingRegion->getMaximumHeight() == 9000.0);
 

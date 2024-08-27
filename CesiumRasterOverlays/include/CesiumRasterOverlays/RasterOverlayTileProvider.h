@@ -150,8 +150,8 @@ public:
       const CesiumUtility::IntrusivePointer<const RasterOverlay>& pOwner,
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) noexcept;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) noexcept;
 
   /**
    * @brief Creates a new instance.
@@ -178,7 +178,8 @@ public:
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
       const CesiumGeospatial::Projection& projection,
-      const CesiumGeometry::Rectangle& coverageRectangle) noexcept;
+      const CesiumGeometry::Rectangle& coverageRectangle
+  ) noexcept;
 
   /** @brief Default destructor. */
   virtual ~RasterOverlayTileProvider() noexcept;
@@ -280,7 +281,8 @@ public:
    */
   CesiumUtility::IntrusivePointer<RasterOverlayTile> getTile(
       const CesiumGeometry::Rectangle& rectangle,
-      const glm::dvec2& targetScreenPixels);
+      const glm::dvec2& targetScreenPixels
+  );
 
   /**
    * @brief Gets the number of bytes of tile data that are currently loaded.
@@ -378,7 +380,8 @@ protected:
   CesiumAsync::Future<LoadedRasterOverlayImage> loadTileImageFromUrl(
       const std::string& url,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& headers = {},
-      LoadTileImageFromUrlOptions&& options = {}) const;
+      LoadTileImageFromUrlOptions&& options = {}
+  ) const;
 
 private:
   CesiumAsync::Future<TileProviderAndTile>
@@ -419,7 +422,8 @@ private:
   int32_t _throttledTilesCurrentlyLoading;
   CESIUM_TRACE_DECLARE_TRACK_SET(
       _loadingSlots,
-      "Raster Overlay Tile Loading Slot");
+      "Raster Overlay Tile Loading Slot"
+  );
 
   static CesiumGltfReader::GltfReader _gltfReader;
 };

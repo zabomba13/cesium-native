@@ -6,7 +6,8 @@ std::optional<FoundMetadataProperty>
 MetadataQuery::findFirstPropertyWithSemantic(
     const Schema& schema,
     const MetadataEntity& entity,
-    const std::string& semantic) {
+    const std::string& semantic
+) {
   auto classIt = schema.classes.find(entity.classProperty);
   if (classIt == schema.classes.end()) {
     return std::nullopt;

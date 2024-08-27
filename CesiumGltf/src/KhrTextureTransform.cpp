@@ -12,7 +12,8 @@ KhrTextureTransform::KhrTextureTransform() noexcept
       _rotationSineCosine({0, 1}) {}
 
 KhrTextureTransform::KhrTextureTransform(
-    const ExtensionKhrTextureTransform& extension) noexcept
+    const ExtensionKhrTextureTransform& extension
+) noexcept
     : _status(KhrTextureTransformStatus::Valid),
       _offset({0, 0}),
       _rotation(0),

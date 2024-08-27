@@ -26,7 +26,8 @@ public:
    */
   QuadtreeRectangleAvailability(
       const QuadtreeTilingScheme& tilingScheme,
-      uint32_t maximumLevel) noexcept;
+      uint32_t maximumLevel
+  ) noexcept;
 
   /**
    * @brief Adds the specified range to the set of available tiles.
@@ -34,8 +35,8 @@ public:
    * @param range The {@link QuadtreeTileRectangularRange} that describes
    * the range of available tiles.
    */
-  void
-  addAvailableTileRange(const QuadtreeTileRectangularRange& range) noexcept;
+  void addAvailableTileRange(const QuadtreeTileRectangularRange& range
+  ) noexcept;
 
   /**
    * @brief Computes the maximum level for the given 2D position.
@@ -48,8 +49,8 @@ public:
    * @return The maximum level at the given position. This may be 0 if
    * the position is not covered by the quadtree at all.
    */
-  uint32_t
-  computeMaximumLevelAtPosition(const glm::dvec2& position) const noexcept;
+  uint32_t computeMaximumLevelAtPosition(const glm::dvec2& position
+  ) const noexcept;
 
   /**
    * @brief Returns whether a certain tile is available.
@@ -74,7 +75,8 @@ private:
     QuadtreeNode(
         const QuadtreeTileID& id_,
         const Rectangle& extent_,
-        QuadtreeNode* pParent_) noexcept
+        QuadtreeNode* pParent_
+    ) noexcept
         : id(id_),
           extent(extent_),
           pParent(pParent_),
@@ -105,17 +107,20 @@ private:
       const QuadtreeTilingScheme& tilingScheme,
       uint32_t maximumLevel,
       QuadtreeRectangleAvailability::QuadtreeNode& node,
-      const QuadtreeRectangleAvailability::RectangleWithLevel&
-          rectangle) noexcept;
+      const QuadtreeRectangleAvailability::RectangleWithLevel& rectangle
+  ) noexcept;
   static bool rectangleLevelComparator(
       const QuadtreeRectangleAvailability::RectangleWithLevel& a,
-      const QuadtreeRectangleAvailability::RectangleWithLevel& b) noexcept;
+      const QuadtreeRectangleAvailability::RectangleWithLevel& b
+  ) noexcept;
   static uint32_t findMaxLevelFromNode(
       QuadtreeNode* pStopNode,
       QuadtreeNode& node,
-      const glm::dvec2& position) noexcept;
+      const glm::dvec2& position
+  ) noexcept;
   static void createNodeChildrenIfNecessary(
       QuadtreeNode& node,
-      const QuadtreeTilingScheme& tilingScheme) noexcept;
+      const QuadtreeTilingScheme& tilingScheme
+  ) noexcept;
 };
 } // namespace CesiumGeometry

@@ -23,8 +23,8 @@ class MaterialJsonHandler : public CesiumGltfReader::NamedObjectJsonHandler {
 public:
   using ValueType = CesiumGltf::Material;
 
-  MaterialJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  MaterialJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::Material* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -33,7 +33,8 @@ protected:
   IJsonHandler* readObjectKeyMaterial(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Material& o);
+      CesiumGltf::Material& o
+  );
 
 private:
   CesiumGltf::Material* _pObject = nullptr;

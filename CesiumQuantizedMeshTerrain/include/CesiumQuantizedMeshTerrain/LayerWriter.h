@@ -74,7 +74,8 @@ public:
    */
   LayerWriterResult write(
       const CesiumQuantizedMeshTerrain::Layer& layer,
-      const LayerWriterOptions& options = LayerWriterOptions()) const;
+      const LayerWriterOptions& options = LayerWriterOptions()
+  ) const;
 
 private:
   CesiumJsonWriter::ExtensionWriterContext _context;

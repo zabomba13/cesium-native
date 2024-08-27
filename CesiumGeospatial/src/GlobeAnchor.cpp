@@ -10,7 +10,8 @@ glm::dmat4 adjustOrientationForMove(
     const CesiumGeospatial::Ellipsoid& ellipsoid,
     const glm::dvec3& oldPosition,
     const glm::dvec3& newPosition,
-    const glm::dmat4& anchorToFixed) {
+    const glm::dmat4& anchorToFixed
+) {
   if (oldPosition == newPosition)
     return anchorToFixed;
 
@@ -26,7 +27,8 @@ glm::dmat4 adjustOrientationForMove(
       glm::dvec4(newRotationScale[0], 0.0),
       glm::dvec4(newRotationScale[1], 0.0),
       glm::dvec4(newRotationScale[2], 0.0),
-      anchorToFixed[3]);
+      anchorToFixed[3]
+  );
 }
 
 } // namespace
@@ -35,9 +37,11 @@ namespace CesiumGeospatial {
 
 GlobeAnchor GlobeAnchor::fromAnchorToLocalTransform(
     const LocalHorizontalCoordinateSystem& localCoordinateSystem,
-    const glm::dmat4& anchorToLocal) {
+    const glm::dmat4& anchorToLocal
+) {
   return fromAnchorToFixedTransform(
-      localCoordinateSystem.getLocalToEcefTransformation() * anchorToLocal);
+      localCoordinateSystem.getLocalToEcefTransformation() * anchorToLocal
+  );
 }
 
 GlobeAnchor
@@ -55,7 +59,8 @@ const glm::dmat4& GlobeAnchor::getAnchorToFixedTransform() const {
 void GlobeAnchor::setAnchorToFixedTransform(
     const glm::dmat4& newAnchorToFixed,
     bool adjustOrientation,
-    const Ellipsoid& ellipsoid) {
+    const Ellipsoid& ellipsoid
+) {
   if (adjustOrientation) {
     glm::dvec3 oldPosition = glm::dvec3(this->_anchorToFixed[3]);
     glm::dvec3 newPosition = glm::dvec3(newAnchorToFixed[3]);
@@ -63,14 +68,16 @@ void GlobeAnchor::setAnchorToFixedTransform(
         ellipsoid,
         oldPosition,
         newPosition,
-        newAnchorToFixed);
+        newAnchorToFixed
+    );
   } else {
     this->_anchorToFixed = newAnchorToFixed;
   }
 }
 
 glm::dmat4 GlobeAnchor::getAnchorToLocalTransform(
-    const LocalHorizontalCoordinateSystem& localCoordinateSystem) const {
+    const LocalHorizontalCoordinateSystem& localCoordinateSystem
+) const {
   return localCoordinateSystem.getEcefToLocalTransformation() *
          this->_anchorToFixed;
 }
@@ -79,11 +86,13 @@ void GlobeAnchor::setAnchorToLocalTransform(
     const LocalHorizontalCoordinateSystem& localCoordinateSystem,
     const glm::dmat4& newAnchorToLocal,
     bool adjustOrientation,
-    const Ellipsoid& ellipsoid) {
+    const Ellipsoid& ellipsoid
+) {
   this->setAnchorToFixedTransform(
       localCoordinateSystem.getLocalToEcefTransformation() * newAnchorToLocal,
       adjustOrientation,
-      ellipsoid);
+      ellipsoid
+  );
 }
 
 } // namespace CesiumGeospatial

@@ -69,7 +69,8 @@ struct CESIUMGLTFCONTENT_API GltfUtilities {
    */
   static glm::dmat4x4 applyRtcCenter(
       const CesiumGltf::Model& gltf,
-      const glm::dmat4x4& rootTransform);
+      const glm::dmat4x4& rootTransform
+  );
 
   /**
    * @brief Applies the glTF's `gltfUpAxis`, if any, to the given transform.
@@ -91,7 +92,8 @@ struct CESIUMGLTFCONTENT_API GltfUtilities {
    */
   static glm::dmat4x4 applyGltfUpAxisTransform(
       const CesiumGltf::Model& model,
-      const glm::dmat4x4& rootTransform);
+      const glm::dmat4x4& rootTransform
+  );
 
   /**
    * @brief Computes a bounding region from the vertex positions in a glTF
@@ -113,7 +115,8 @@ struct CESIUMGLTFCONTENT_API GltfUtilities {
   static CesiumGeospatial::BoundingRegion computeBoundingRegion(
       const CesiumGltf::Model& gltf,
       const glm::dmat4& transform,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Parse the copyright field of a glTF model and return the individual
@@ -154,32 +157,41 @@ struct CESIUMGLTFCONTENT_API GltfUtilities {
   static void moveBufferContent(
       CesiumGltf::Model& gltf,
       CesiumGltf::Buffer& destination,
-      CesiumGltf::Buffer& source);
+      CesiumGltf::Buffer& source
+  );
 
   static void removeUnusedTextures(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedTextureIndices = {});
+      const std::vector<int32_t>& extraUsedTextureIndices = {}
+  );
   static void removeUnusedSamplers(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedSamplerIndices = {});
+      const std::vector<int32_t>& extraUsedSamplerIndices = {}
+  );
   static void removeUnusedImages(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedImageIndices = {});
+      const std::vector<int32_t>& extraUsedImageIndices = {}
+  );
   static void removeUnusedAccessors(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedAccessorIndices = {});
+      const std::vector<int32_t>& extraUsedAccessorIndices = {}
+  );
   static void removeUnusedBufferViews(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedBufferViewIndices = {});
+      const std::vector<int32_t>& extraUsedBufferViewIndices = {}
+  );
   static void removeUnusedBuffers(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedBufferIndices = {});
+      const std::vector<int32_t>& extraUsedBufferIndices = {}
+  );
   static void removeUnusedMeshes(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedMeshIndices = {});
+      const std::vector<int32_t>& extraUsedMeshIndices = {}
+  );
   static void removeUnusedMaterials(
       CesiumGltf::Model& gltf,
-      const std::vector<int32_t>& extraUsedMaterialIndices = {});
+      const std::vector<int32_t>& extraUsedMaterialIndices = {}
+  );
 
   /**
    * @brief Shrink buffers by removing any sections that are not referenced by
@@ -266,6 +278,7 @@ struct CESIUMGLTFCONTENT_API GltfUtilities {
       const CesiumGeometry::Ray& ray,
       const CesiumGltf::Model& gltf,
       bool cullBackFaces = true,
-      const glm::dmat4x4& gltfTransform = glm::dmat4(1.0));
+      const glm::dmat4x4& gltfTransform = glm::dmat4(1.0)
+  );
 };
 } // namespace CesiumGltfContent

@@ -3,8 +3,8 @@
 BasedOnStyle: LLVM
 
 # Always add a line break after an opening bracket if the parameters
-# do not fit on a single line
-AlignAfterOpenBracket: AlwaysBreak
+# do not fit on a single line. Closing brackets will be placed on a new line.
+AlignAfterOpenBracket: BlockIndent
 
 # If arguments don't all fit on a single line, place each one in
 # a new line

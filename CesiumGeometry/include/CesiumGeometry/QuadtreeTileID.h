@@ -54,8 +54,8 @@ struct CESIUMGEOMETRY_API QuadtreeTileID final {
    * @param tilingScheme The {@link QuadtreeTilingScheme}.
    * @return The inverted y-coordinate.
    */
-  uint32_t
-  computeInvertedY(const QuadtreeTilingScheme& tilingScheme) const noexcept;
+  uint32_t computeInvertedY(const QuadtreeTilingScheme& tilingScheme
+  ) const noexcept;
 
   /**
    * @brief Gets the ID of the parent of the tile with this ID.

@@ -107,7 +107,8 @@ public:
       std::function<void(const std::string&)>&& openUrlCallback,
       const CesiumIonClient::ApplicationData& appData,
       const std::string& ionApiUrl = "https://api.cesium.com/",
-      const std::string& ionAuthorizeUrl = "https://ion.cesium.com/oauth");
+      const std::string& ionAuthorizeUrl = "https://ion.cesium.com/oauth"
+  );
 
   /**
    * @brief Retrieves information about the ion API server.
@@ -117,12 +118,14 @@ public:
   static CesiumAsync::Future<Response<ApplicationData>> appData(
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const std::string& apiUrl = "https://api.cesium.com");
+      const std::string& apiUrl = "https://api.cesium.com"
+  );
 
   static CesiumAsync::Future<std::optional<std::string>> getApiUrl(
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const std::string& ionUrl);
+      const std::string& ionUrl
+  );
 
   /**
    * @brief Creates a connection to Cesium ion using the provided access token.
@@ -139,7 +142,8 @@ public:
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
       const std::string& accessToken,
       const CesiumIonClient::ApplicationData& appData,
-      const std::string& apiUrl = "https://api.cesium.com");
+      const std::string& apiUrl = "https://api.cesium.com"
+  );
 
   /**
    * @brief Gets the async system used by this connection to do work in threads.
@@ -268,8 +272,8 @@ public:
       const std::string& name,
       const std::vector<std::string>& scopes,
       const std::optional<std::vector<int64_t>>& assetIds = std::nullopt,
-      const std::optional<std::vector<std::string>>& allowedUrls =
-          std::nullopt) const;
+      const std::optional<std::vector<std::string>>& allowedUrls = std::nullopt
+  ) const;
 
   /**
    * @brief Modifies a token.
@@ -289,7 +293,8 @@ public:
       const std::string& newName,
       const std::optional<std::vector<int64_t>>& newAssetIDs,
       const std::vector<std::string>& newScopes,
-      const std::optional<std::vector<std::string>>& newAllowedUrls) const;
+      const std::optional<std::vector<std::string>>& newAllowedUrls
+  ) const;
 
   /**
    * @brief Decodes a token ID from a token.
@@ -309,7 +314,8 @@ private:
       const CesiumIonClient::ApplicationData& appData,
       const std::string& code,
       const std::string& redirectUrl,
-      const std::string& codeVerifier);
+      const std::string& codeVerifier
+  );
 
   CesiumAsync::Future<Response<TokenList>> tokens(const std::string& url) const;
 

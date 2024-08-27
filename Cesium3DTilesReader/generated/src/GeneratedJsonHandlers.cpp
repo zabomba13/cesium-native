@@ -15,7 +15,8 @@ namespace Cesium3DTilesReader {
 
 Extension3dTilesBoundingVolumeS2JsonHandler::
     Extension3dTilesBoundingVolumeS2JsonHandler(
-        const CesiumJsonReader::JsonReaderOptions& options) noexcept
+        const CesiumJsonReader::JsonReaderOptions& options
+    ) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _token(),
       _minimumHeight(),
@@ -23,40 +24,47 @@ Extension3dTilesBoundingVolumeS2JsonHandler::
 
 void Extension3dTilesBoundingVolumeS2JsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Extension3dTilesBoundingVolumeS2* pObject) {
+    Cesium3DTiles::Extension3dTilesBoundingVolumeS2* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
 
 CesiumJsonReader::IJsonHandler*
 Extension3dTilesBoundingVolumeS2JsonHandler::readObjectKey(
-    const std::string_view& str) {
+    const std::string_view& str
+) {
   CESIUM_ASSERT(this->_pObject);
   return this->readObjectKeyExtension3dTilesBoundingVolumeS2(
       Cesium3DTiles::Extension3dTilesBoundingVolumeS2::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 void Extension3dTilesBoundingVolumeS2JsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
     CesiumUtility::ExtensibleObject& o,
-    const std::string_view& extensionName) {
+    const std::string_view& extensionName
+) {
   std::any& value = o.extensions
                         .emplace(
                             extensionName,
-                            Cesium3DTiles::Extension3dTilesBoundingVolumeS2())
+                            Cesium3DTiles::Extension3dTilesBoundingVolumeS2()
+                        )
                         .first->second;
   this->reset(
       pParentHandler,
-      &std::any_cast<Cesium3DTiles::Extension3dTilesBoundingVolumeS2&>(value));
+      &std::any_cast<Cesium3DTiles::Extension3dTilesBoundingVolumeS2&>(value)
+  );
 }
 
 CesiumJsonReader::IJsonHandler* Extension3dTilesBoundingVolumeS2JsonHandler::
     readObjectKeyExtension3dTilesBoundingVolumeS2(
         const std::string& objectType,
         const std::string_view& str,
-        Cesium3DTiles::Extension3dTilesBoundingVolumeS2& o) {
+        Cesium3DTiles::Extension3dTilesBoundingVolumeS2& o
+    ) {
   using namespace std::string_literals;
 
   if ("token"s == str)
@@ -69,8 +77,8 @@ CesiumJsonReader::IJsonHandler* Extension3dTilesBoundingVolumeS2JsonHandler::
   return this->readObjectKeyExtensibleObject(objectType, str, *this->_pObject);
 }
 
-Extension3dTilesBoundingVolumeS2Reader::
-    Extension3dTilesBoundingVolumeS2Reader() {
+Extension3dTilesBoundingVolumeS2Reader::Extension3dTilesBoundingVolumeS2Reader(
+) {
   registerReaderExtensions(this->_options);
 }
 
@@ -87,7 +95,8 @@ Extension3dTilesBoundingVolumeS2Reader::getOptions() const {
 CesiumJsonReader::ReadJsonResult<
     Cesium3DTiles::Extension3dTilesBoundingVolumeS2>
 Extension3dTilesBoundingVolumeS2Reader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+    const gsl::span<const std::byte>& data
+) const {
   Extension3dTilesBoundingVolumeS2JsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -95,7 +104,8 @@ Extension3dTilesBoundingVolumeS2Reader::readFromJson(
 CesiumJsonReader::ReadJsonResult<
     Cesium3DTiles::Extension3dTilesBoundingVolumeS2>
 Extension3dTilesBoundingVolumeS2Reader::readFromJson(
-    const rapidjson::Value& value) const {
+    const rapidjson::Value& value
+) const {
   Extension3dTilesBoundingVolumeS2JsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(value, handler);
 }
@@ -103,7 +113,8 @@ Extension3dTilesBoundingVolumeS2Reader::readFromJson(
 CesiumJsonReader::ReadJsonResult<
     std::vector<Cesium3DTiles::Extension3dTilesBoundingVolumeS2>>
 Extension3dTilesBoundingVolumeS2Reader::readArrayFromJson(
-    const rapidjson::Value& value) const {
+    const rapidjson::Value& value
+) const {
   CesiumJsonReader::ArrayJsonHandler<
       Cesium3DTiles::Extension3dTilesBoundingVolumeS2,
       Extension3dTilesBoundingVolumeS2JsonHandler>
@@ -128,13 +139,15 @@ Extension3dTilesBoundingVolumeS2Reader::readArrayFromJson(
 namespace Cesium3DTilesReader {
 
 StatisticsJsonHandler::StatisticsJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _classes(options) {}
 
 void StatisticsJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Statistics* pObject) {
+    Cesium3DTiles::Statistics* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -145,13 +158,15 @@ StatisticsJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyStatistics(
       Cesium3DTiles::Statistics::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* StatisticsJsonHandler::readObjectKeyStatistics(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Statistics& o) {
+    Cesium3DTiles::Statistics& o
+) {
   using namespace std::string_literals;
 
   if ("classes"s == str)
@@ -210,14 +225,16 @@ StatisticsReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 ClassStatisticsJsonHandler::ClassStatisticsJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _count(),
       _properties(options) {}
 
 void ClassStatisticsJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::ClassStatistics* pObject) {
+    Cesium3DTiles::ClassStatistics* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -228,14 +245,16 @@ ClassStatisticsJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyClassStatistics(
       Cesium3DTiles::ClassStatistics::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 ClassStatisticsJsonHandler::readObjectKeyClassStatistics(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::ClassStatistics& o) {
+    Cesium3DTiles::ClassStatistics& o
+) {
   using namespace std::string_literals;
 
   if ("count"s == str)
@@ -260,8 +279,8 @@ ClassStatisticsReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::ClassStatistics>
-ClassStatisticsReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+ClassStatisticsReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   ClassStatisticsJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -298,7 +317,8 @@ ClassStatisticsReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 PropertyStatisticsJsonHandler::PropertyStatisticsJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _min(),
       _max(),
@@ -311,7 +331,8 @@ PropertyStatisticsJsonHandler::PropertyStatisticsJsonHandler(
 
 void PropertyStatisticsJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::PropertyStatistics* pObject) {
+    Cesium3DTiles::PropertyStatistics* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -322,14 +343,16 @@ PropertyStatisticsJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyPropertyStatistics(
       Cesium3DTiles::PropertyStatistics::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 PropertyStatisticsJsonHandler::readObjectKeyPropertyStatistics(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::PropertyStatistics& o) {
+    Cesium3DTiles::PropertyStatistics& o
+) {
   using namespace std::string_literals;
 
   if ("min"s == str)
@@ -344,7 +367,8 @@ PropertyStatisticsJsonHandler::readObjectKeyPropertyStatistics(
     return property(
         "standardDeviation",
         this->_standardDeviation,
-        o.standardDeviation);
+        o.standardDeviation
+    );
   if ("variance"s == str)
     return property("variance", this->_variance, o.variance);
   if ("sum"s == str)
@@ -369,8 +393,8 @@ PropertyStatisticsReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::PropertyStatistics>
-PropertyStatisticsReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+PropertyStatisticsReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   PropertyStatisticsJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -382,8 +406,8 @@ PropertyStatisticsReader::readFromJson(const rapidjson::Value& value) const {
 }
 
 CesiumJsonReader::ReadJsonResult<std::vector<Cesium3DTiles::PropertyStatistics>>
-PropertyStatisticsReader::readArrayFromJson(
-    const rapidjson::Value& value) const {
+PropertyStatisticsReader::readArrayFromJson(const rapidjson::Value& value
+) const {
   CesiumJsonReader::ArrayJsonHandler<
       Cesium3DTiles::PropertyStatistics,
       PropertyStatisticsJsonHandler>
@@ -408,7 +432,8 @@ PropertyStatisticsReader::readArrayFromJson(
 namespace Cesium3DTilesReader {
 
 SchemaJsonHandler::SchemaJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _id(),
       _name(),
@@ -419,7 +444,8 @@ SchemaJsonHandler::SchemaJsonHandler(
 
 void SchemaJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Schema* pObject) {
+    Cesium3DTiles::Schema* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -430,13 +456,15 @@ SchemaJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeySchema(
       Cesium3DTiles::Schema::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* SchemaJsonHandler::readObjectKeySchema(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Schema& o) {
+    Cesium3DTiles::Schema& o
+) {
   using namespace std::string_literals;
 
   if ("id"s == str)
@@ -501,7 +529,8 @@ SchemaReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 EnumJsonHandler::EnumJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _name(),
       _description(),
@@ -510,7 +539,8 @@ EnumJsonHandler::EnumJsonHandler(
 
 void EnumJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Enum* pObject) {
+    Cesium3DTiles::Enum* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -518,16 +548,15 @@ void EnumJsonHandler::reset(
 CesiumJsonReader::IJsonHandler*
 EnumJsonHandler::readObjectKey(const std::string_view& str) {
   CESIUM_ASSERT(this->_pObject);
-  return this->readObjectKeyEnum(
-      Cesium3DTiles::Enum::TypeName,
-      str,
-      *this->_pObject);
+  return this
+      ->readObjectKeyEnum(Cesium3DTiles::Enum::TypeName, str, *this->_pObject);
 }
 
 CesiumJsonReader::IJsonHandler* EnumJsonHandler::readObjectKeyEnum(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Enum& o) {
+    Cesium3DTiles::Enum& o
+) {
   using namespace std::string_literals;
 
   if ("name"s == str)
@@ -588,7 +617,8 @@ EnumReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 EnumValueJsonHandler::EnumValueJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _name(),
       _description(),
@@ -596,7 +626,8 @@ EnumValueJsonHandler::EnumValueJsonHandler(
 
 void EnumValueJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::EnumValue* pObject) {
+    Cesium3DTiles::EnumValue* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -607,13 +638,15 @@ EnumValueJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyEnumValue(
       Cesium3DTiles::EnumValue::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* EnumValueJsonHandler::readObjectKeyEnumValue(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::EnumValue& o) {
+    Cesium3DTiles::EnumValue& o
+) {
   using namespace std::string_literals;
 
   if ("name"s == str)
@@ -673,7 +706,8 @@ EnumValueReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 ClassJsonHandler::ClassJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _name(),
       _description(),
@@ -681,7 +715,8 @@ ClassJsonHandler::ClassJsonHandler(
 
 void ClassJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Class* pObject) {
+    Cesium3DTiles::Class* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -692,13 +727,15 @@ ClassJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyClass(
       Cesium3DTiles::Class::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* ClassJsonHandler::readObjectKeyClass(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Class& o) {
+    Cesium3DTiles::Class& o
+) {
   using namespace std::string_literals;
 
   if ("name"s == str)
@@ -757,7 +794,8 @@ ClassReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 ClassPropertyJsonHandler::ClassPropertyJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _name(),
       _description(),
@@ -778,7 +816,8 @@ ClassPropertyJsonHandler::ClassPropertyJsonHandler(
 
 void ClassPropertyJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::ClassProperty* pObject) {
+    Cesium3DTiles::ClassProperty* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -789,14 +828,16 @@ ClassPropertyJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyClassProperty(
       Cesium3DTiles::ClassProperty::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 ClassPropertyJsonHandler::readObjectKeyClassProperty(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::ClassProperty& o) {
+    Cesium3DTiles::ClassProperty& o
+) {
   using namespace std::string_literals;
 
   if ("name"s == str)
@@ -849,8 +890,8 @@ ClassPropertyReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::ClassProperty>
-ClassPropertyReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+ClassPropertyReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   ClassPropertyJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -886,7 +927,8 @@ ClassPropertyReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 SubtreeJsonHandler::SubtreeJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _buffers(options),
       _bufferViews(options),
@@ -900,7 +942,8 @@ SubtreeJsonHandler::SubtreeJsonHandler(
 
 void SubtreeJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Subtree* pObject) {
+    Cesium3DTiles::Subtree* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -911,13 +954,15 @@ SubtreeJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeySubtree(
       Cesium3DTiles::Subtree::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* SubtreeJsonHandler::readObjectKeySubtree(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Subtree& o) {
+    Cesium3DTiles::Subtree& o
+) {
   using namespace std::string_literals;
 
   if ("buffers"s == str)
@@ -930,29 +975,34 @@ CesiumJsonReader::IJsonHandler* SubtreeJsonHandler::readObjectKeySubtree(
     return property(
         "tileAvailability",
         this->_tileAvailability,
-        o.tileAvailability);
+        o.tileAvailability
+    );
   if ("contentAvailability"s == str)
     return property(
         "contentAvailability",
         this->_contentAvailability,
-        o.contentAvailability);
+        o.contentAvailability
+    );
   if ("childSubtreeAvailability"s == str)
     return property(
         "childSubtreeAvailability",
         this->_childSubtreeAvailability,
-        o.childSubtreeAvailability);
+        o.childSubtreeAvailability
+    );
   if ("tileMetadata"s == str)
     return property("tileMetadata", this->_tileMetadata, o.tileMetadata);
   if ("contentMetadata"s == str)
     return property(
         "contentMetadata",
         this->_contentMetadata,
-        o.contentMetadata);
+        o.contentMetadata
+    );
   if ("subtreeMetadata"s == str)
     return property(
         "subtreeMetadata",
         this->_subtreeMetadata,
-        o.subtreeMetadata);
+        o.subtreeMetadata
+    );
 
   return this->readObjectKeyExtensibleObject(objectType, str, *this->_pObject);
 }
@@ -1003,14 +1053,16 @@ SubtreeReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 MetadataEntityJsonHandler::MetadataEntityJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _classProperty(),
       _properties() {}
 
 void MetadataEntityJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::MetadataEntity* pObject) {
+    Cesium3DTiles::MetadataEntity* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1021,14 +1073,16 @@ MetadataEntityJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyMetadataEntity(
       Cesium3DTiles::MetadataEntity::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 MetadataEntityJsonHandler::readObjectKeyMetadataEntity(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::MetadataEntity& o) {
+    Cesium3DTiles::MetadataEntity& o
+) {
   using namespace std::string_literals;
 
   if ("class"s == str)
@@ -1053,8 +1107,8 @@ MetadataEntityReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::MetadataEntity>
-MetadataEntityReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+MetadataEntityReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   MetadataEntityJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -1090,7 +1144,8 @@ MetadataEntityReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 AvailabilityJsonHandler::AvailabilityJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _bitstream(),
       _availableCount(),
@@ -1098,7 +1153,8 @@ AvailabilityJsonHandler::AvailabilityJsonHandler(
 
 void AvailabilityJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Availability* pObject) {
+    Cesium3DTiles::Availability* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1109,14 +1165,16 @@ AvailabilityJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyAvailability(
       Cesium3DTiles::Availability::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 AvailabilityJsonHandler::readObjectKeyAvailability(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Availability& o) {
+    Cesium3DTiles::Availability& o
+) {
   using namespace std::string_literals;
 
   if ("bitstream"s == str)
@@ -1179,7 +1237,8 @@ AvailabilityReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 PropertyTableJsonHandler::PropertyTableJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _name(),
       _classProperty(),
@@ -1188,7 +1247,8 @@ PropertyTableJsonHandler::PropertyTableJsonHandler(
 
 void PropertyTableJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::PropertyTable* pObject) {
+    Cesium3DTiles::PropertyTable* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1199,14 +1259,16 @@ PropertyTableJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyPropertyTable(
       Cesium3DTiles::PropertyTable::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 PropertyTableJsonHandler::readObjectKeyPropertyTable(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::PropertyTable& o) {
+    Cesium3DTiles::PropertyTable& o
+) {
   using namespace std::string_literals;
 
   if ("name"s == str)
@@ -1235,8 +1297,8 @@ PropertyTableReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::PropertyTable>
-PropertyTableReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+PropertyTableReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   PropertyTableJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -1272,7 +1334,8 @@ PropertyTableReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 PropertyTablePropertyJsonHandler::PropertyTablePropertyJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _values(),
       _arrayOffsets(),
@@ -1286,7 +1349,8 @@ PropertyTablePropertyJsonHandler::PropertyTablePropertyJsonHandler(
 
 void PropertyTablePropertyJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::PropertyTableProperty* pObject) {
+    Cesium3DTiles::PropertyTableProperty* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1297,14 +1361,16 @@ PropertyTablePropertyJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyPropertyTableProperty(
       Cesium3DTiles::PropertyTableProperty::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 PropertyTablePropertyJsonHandler::readObjectKeyPropertyTableProperty(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::PropertyTableProperty& o) {
+    Cesium3DTiles::PropertyTableProperty& o
+) {
   using namespace std::string_literals;
 
   if ("values"s == str)
@@ -1317,12 +1383,14 @@ PropertyTablePropertyJsonHandler::readObjectKeyPropertyTableProperty(
     return property(
         "arrayOffsetType",
         this->_arrayOffsetType,
-        o.arrayOffsetType);
+        o.arrayOffsetType
+    );
   if ("stringOffsetType"s == str)
     return property(
         "stringOffsetType",
         this->_stringOffsetType,
-        o.stringOffsetType);
+        o.stringOffsetType
+    );
   if ("offset"s == str)
     return property("offset", this->_offset, o.offset);
   if ("scale"s == str)
@@ -1349,8 +1417,8 @@ PropertyTablePropertyReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::PropertyTableProperty>
-PropertyTablePropertyReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+PropertyTablePropertyReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   PropertyTablePropertyJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -1363,8 +1431,8 @@ PropertyTablePropertyReader::readFromJson(const rapidjson::Value& value) const {
 
 CesiumJsonReader::ReadJsonResult<
     std::vector<Cesium3DTiles::PropertyTableProperty>>
-PropertyTablePropertyReader::readArrayFromJson(
-    const rapidjson::Value& value) const {
+PropertyTablePropertyReader::readArrayFromJson(const rapidjson::Value& value
+) const {
   CesiumJsonReader::ArrayJsonHandler<
       Cesium3DTiles::PropertyTableProperty,
       PropertyTablePropertyJsonHandler>
@@ -1389,7 +1457,8 @@ PropertyTablePropertyReader::readArrayFromJson(
 namespace Cesium3DTilesReader {
 
 BufferViewJsonHandler::BufferViewJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _buffer(),
       _byteOffset(),
@@ -1398,7 +1467,8 @@ BufferViewJsonHandler::BufferViewJsonHandler(
 
 void BufferViewJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::BufferView* pObject) {
+    Cesium3DTiles::BufferView* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1409,13 +1479,15 @@ BufferViewJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyBufferView(
       Cesium3DTiles::BufferView::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* BufferViewJsonHandler::readObjectKeyBufferView(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::BufferView& o) {
+    Cesium3DTiles::BufferView& o
+) {
   using namespace std::string_literals;
 
   if ("buffer"s == str)
@@ -1480,7 +1552,8 @@ BufferViewReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 BufferJsonHandler::BufferJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _uri(),
       _byteLength(),
@@ -1488,7 +1561,8 @@ BufferJsonHandler::BufferJsonHandler(
 
 void BufferJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Buffer* pObject) {
+    Cesium3DTiles::Buffer* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1499,13 +1573,15 @@ BufferJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyBuffer(
       Cesium3DTiles::Buffer::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* BufferJsonHandler::readObjectKeyBuffer(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Buffer& o) {
+    Cesium3DTiles::Buffer& o
+) {
   using namespace std::string_literals;
 
   if ("uri"s == str)
@@ -1564,7 +1640,8 @@ BufferReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 TilesetJsonHandler::TilesetJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _asset(options),
       _properties(options),
@@ -1580,7 +1657,8 @@ TilesetJsonHandler::TilesetJsonHandler(
 
 void TilesetJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Tileset* pObject) {
+    Cesium3DTiles::Tileset* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1591,13 +1669,15 @@ TilesetJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyTileset(
       Cesium3DTiles::Tileset::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* TilesetJsonHandler::readObjectKeyTileset(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Tileset& o) {
+    Cesium3DTiles::Tileset& o
+) {
   using namespace std::string_literals;
 
   if ("asset"s == str)
@@ -1624,7 +1704,8 @@ CesiumJsonReader::IJsonHandler* TilesetJsonHandler::readObjectKeyTileset(
     return property(
         "extensionsRequired",
         this->_extensionsRequired,
-        o.extensionsRequired);
+        o.extensionsRequired
+    );
 
   return this->readObjectKeyExtensibleObject(objectType, str, *this->_pObject);
 }
@@ -1675,7 +1756,8 @@ TilesetReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 TileJsonHandler::TileJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _boundingVolume(options),
       _viewerRequestVolume(options),
@@ -1690,7 +1772,8 @@ TileJsonHandler::TileJsonHandler(
 
 void TileJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Tile* pObject) {
+    Cesium3DTiles::Tile* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1698,16 +1781,15 @@ void TileJsonHandler::reset(
 CesiumJsonReader::IJsonHandler*
 TileJsonHandler::readObjectKey(const std::string_view& str) {
   CESIUM_ASSERT(this->_pObject);
-  return this->readObjectKeyTile(
-      Cesium3DTiles::Tile::TypeName,
-      str,
-      *this->_pObject);
+  return this
+      ->readObjectKeyTile(Cesium3DTiles::Tile::TypeName, str, *this->_pObject);
 }
 
 CesiumJsonReader::IJsonHandler* TileJsonHandler::readObjectKeyTile(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Tile& o) {
+    Cesium3DTiles::Tile& o
+) {
   using namespace std::string_literals;
 
   if ("boundingVolume"s == str)
@@ -1716,7 +1798,8 @@ CesiumJsonReader::IJsonHandler* TileJsonHandler::readObjectKeyTile(
     return property(
         "viewerRequestVolume",
         this->_viewerRequestVolume,
-        o.viewerRequestVolume);
+        o.viewerRequestVolume
+    );
   if ("geometricError"s == str)
     return property("geometricError", this->_geometricError, o.geometricError);
   if ("refine"s == str)
@@ -1783,7 +1866,8 @@ TileReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 ImplicitTilingJsonHandler::ImplicitTilingJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _subdivisionScheme(),
       _subtreeLevels(),
@@ -1792,7 +1876,8 @@ ImplicitTilingJsonHandler::ImplicitTilingJsonHandler(
 
 void ImplicitTilingJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::ImplicitTiling* pObject) {
+    Cesium3DTiles::ImplicitTiling* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1803,28 +1888,32 @@ ImplicitTilingJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyImplicitTiling(
       Cesium3DTiles::ImplicitTiling::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 ImplicitTilingJsonHandler::readObjectKeyImplicitTiling(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::ImplicitTiling& o) {
+    Cesium3DTiles::ImplicitTiling& o
+) {
   using namespace std::string_literals;
 
   if ("subdivisionScheme"s == str)
     return property(
         "subdivisionScheme",
         this->_subdivisionScheme,
-        o.subdivisionScheme);
+        o.subdivisionScheme
+    );
   if ("subtreeLevels"s == str)
     return property("subtreeLevels", this->_subtreeLevels, o.subtreeLevels);
   if ("availableLevels"s == str)
     return property(
         "availableLevels",
         this->_availableLevels,
-        o.availableLevels);
+        o.availableLevels
+    );
   if ("subtrees"s == str)
     return property("subtrees", this->_subtrees, o.subtrees);
 
@@ -1845,8 +1934,8 @@ ImplicitTilingReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::ImplicitTiling>
-ImplicitTilingReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+ImplicitTilingReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   ImplicitTilingJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -1882,12 +1971,14 @@ ImplicitTilingReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 SubtreesJsonHandler::SubtreesJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options), _uri() {}
 
 void SubtreesJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Subtrees* pObject) {
+    Cesium3DTiles::Subtrees* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1898,13 +1989,15 @@ SubtreesJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeySubtrees(
       Cesium3DTiles::Subtrees::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* SubtreesJsonHandler::readObjectKeySubtrees(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Subtrees& o) {
+    Cesium3DTiles::Subtrees& o
+) {
   using namespace std::string_literals;
 
   if ("uri"s == str)
@@ -1960,7 +2053,8 @@ SubtreesReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 ContentJsonHandler::ContentJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _boundingVolume(options),
       _uri(),
@@ -1969,7 +2063,8 @@ ContentJsonHandler::ContentJsonHandler(
 
 void ContentJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Content* pObject) {
+    Cesium3DTiles::Content* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -1980,13 +2075,15 @@ ContentJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyContent(
       Cesium3DTiles::Content::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* ContentJsonHandler::readObjectKeyContent(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Content& o) {
+    Cesium3DTiles::Content& o
+) {
   using namespace std::string_literals;
 
   if ("boundingVolume"s == str)
@@ -2047,7 +2144,8 @@ ContentReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 BoundingVolumeJsonHandler::BoundingVolumeJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _box(),
       _region(),
@@ -2055,7 +2153,8 @@ BoundingVolumeJsonHandler::BoundingVolumeJsonHandler(
 
 void BoundingVolumeJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::BoundingVolume* pObject) {
+    Cesium3DTiles::BoundingVolume* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -2066,14 +2165,16 @@ BoundingVolumeJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyBoundingVolume(
       Cesium3DTiles::BoundingVolume::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 BoundingVolumeJsonHandler::readObjectKeyBoundingVolume(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::BoundingVolume& o) {
+    Cesium3DTiles::BoundingVolume& o
+) {
   using namespace std::string_literals;
 
   if ("box"s == str)
@@ -2100,8 +2201,8 @@ BoundingVolumeReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::BoundingVolume>
-BoundingVolumeReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+BoundingVolumeReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   BoundingVolumeJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -2137,12 +2238,14 @@ BoundingVolumeReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 GroupMetadataJsonHandler::GroupMetadataJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : MetadataEntityJsonHandler(options) {}
 
 void GroupMetadataJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::GroupMetadata* pObject) {
+    Cesium3DTiles::GroupMetadata* pObject
+) {
   MetadataEntityJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -2153,14 +2256,16 @@ GroupMetadataJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyGroupMetadata(
       Cesium3DTiles::GroupMetadata::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler*
 GroupMetadataJsonHandler::readObjectKeyGroupMetadata(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::GroupMetadata& o) {
+    Cesium3DTiles::GroupMetadata& o
+) {
   using namespace std::string_literals;
 
   (void)o;
@@ -2182,8 +2287,8 @@ GroupMetadataReader::getOptions() const {
 }
 
 CesiumJsonReader::ReadJsonResult<Cesium3DTiles::GroupMetadata>
-GroupMetadataReader::readFromJson(
-    const gsl::span<const std::byte>& data) const {
+GroupMetadataReader::readFromJson(const gsl::span<const std::byte>& data
+) const {
   GroupMetadataJsonHandler handler(this->_options);
   return CesiumJsonReader::JsonReader::readJson(data, handler);
 }
@@ -2219,14 +2324,16 @@ GroupMetadataReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 PropertiesJsonHandler::PropertiesJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _maximum(),
       _minimum() {}
 
 void PropertiesJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Properties* pObject) {
+    Cesium3DTiles::Properties* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -2237,13 +2344,15 @@ PropertiesJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyProperties(
       Cesium3DTiles::Properties::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* PropertiesJsonHandler::readObjectKeyProperties(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Properties& o) {
+    Cesium3DTiles::Properties& o
+) {
   using namespace std::string_literals;
 
   if ("maximum"s == str)
@@ -2304,14 +2413,16 @@ PropertiesReader::readArrayFromJson(const rapidjson::Value& value) const {
 namespace Cesium3DTilesReader {
 
 AssetJsonHandler::AssetJsonHandler(
-    const CesiumJsonReader::JsonReaderOptions& options) noexcept
+    const CesiumJsonReader::JsonReaderOptions& options
+) noexcept
     : CesiumJsonReader::ExtensibleObjectJsonHandler(options),
       _version(),
       _tilesetVersion() {}
 
 void AssetJsonHandler::reset(
     CesiumJsonReader::IJsonHandler* pParentHandler,
-    Cesium3DTiles::Asset* pObject) {
+    Cesium3DTiles::Asset* pObject
+) {
   CesiumJsonReader::ExtensibleObjectJsonHandler::reset(pParentHandler, pObject);
   this->_pObject = pObject;
 }
@@ -2322,13 +2433,15 @@ AssetJsonHandler::readObjectKey(const std::string_view& str) {
   return this->readObjectKeyAsset(
       Cesium3DTiles::Asset::TypeName,
       str,
-      *this->_pObject);
+      *this->_pObject
+  );
 }
 
 CesiumJsonReader::IJsonHandler* AssetJsonHandler::readObjectKeyAsset(
     const std::string& objectType,
     const std::string_view& str,
-    Cesium3DTiles::Asset& o) {
+    Cesium3DTiles::Asset& o
+) {
   using namespace std::string_literals;
 
   if ("version"s == str)

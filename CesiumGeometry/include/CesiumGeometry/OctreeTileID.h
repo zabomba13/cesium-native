@@ -34,7 +34,8 @@ struct CESIUMGEOMETRY_API OctreeTileID {
       uint32_t level,
       uint32_t x,
       uint32_t y,
-      uint32_t z) noexcept
+      uint32_t z
+  ) noexcept
       : level(level), x(x), y(y), z(z) {}
 
   /**

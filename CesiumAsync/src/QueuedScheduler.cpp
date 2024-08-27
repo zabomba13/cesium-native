@@ -28,7 +28,8 @@ public:
     // Resize queue if it is full
     if (head == ((tail + 1) & (items.size() - 1))) {
       async::detail::aligned_array<void*, LIBASYNC_CACHELINE_SIZE> new_items(
-          items.size() * 2);
+          items.size() * 2
+      );
       for (std::size_t i = 0; i != items.size(); i++)
         new_items[i] = items[(i + head) & (items.size() - 1)];
       head = 0;

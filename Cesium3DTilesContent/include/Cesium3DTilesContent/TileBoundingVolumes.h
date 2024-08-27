@@ -41,7 +41,8 @@ public:
    */
   static void setOrientedBoundingBox(
       Cesium3DTiles::BoundingVolume& boundingVolume,
-      const CesiumGeometry::OrientedBoundingBox& boundingBox);
+      const CesiumGeometry::OrientedBoundingBox& boundingBox
+  );
 
   /**
    * @brief Gets the bounding region defined in a
@@ -53,7 +54,8 @@ public:
    */
   static std::optional<CesiumGeospatial::BoundingRegion> getBoundingRegion(
       const Cesium3DTiles::BoundingVolume& boundingVolume,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Sets the `region` property in a {@link Cesium3DTiles::BoundingVolume}
@@ -66,7 +68,8 @@ public:
    */
   static void setBoundingRegion(
       Cesium3DTiles::BoundingVolume& boundingVolume,
-      const CesiumGeospatial::BoundingRegion& boundingRegion);
+      const CesiumGeospatial::BoundingRegion& boundingRegion
+  );
 
   /**
    * @brief Gets the bounding sphere defined in a
@@ -90,7 +93,8 @@ public:
    */
   static void setBoundingSphere(
       Cesium3DTiles::BoundingVolume& boundingVolume,
-      const CesiumGeometry::BoundingSphere& boundingSphere);
+      const CesiumGeometry::BoundingSphere& boundingSphere
+  );
 
   /**
    * @brief Gets the S2 cell bounding volume defined in the
@@ -106,7 +110,8 @@ public:
   static std::optional<CesiumGeospatial::S2CellBoundingVolume>
   getS2CellBoundingVolume(
       const Cesium3DTiles::BoundingVolume& boundingVolume,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Adds the `3DTILES_bounding_volume_S2` extension to a
@@ -121,7 +126,8 @@ public:
    */
   static void setS2CellBoundingVolume(
       Cesium3DTiles::BoundingVolume& boundingVolume,
-      const CesiumGeospatial::S2CellBoundingVolume& s2BoundingVolume);
+      const CesiumGeospatial::S2CellBoundingVolume& s2BoundingVolume
+  );
 };
 
 } // namespace Cesium3DTilesContent

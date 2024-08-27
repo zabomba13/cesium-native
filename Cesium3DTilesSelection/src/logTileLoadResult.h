@@ -11,5 +11,6 @@ namespace Cesium3DTilesSelection {
 void logTileLoadResult(
     const std::shared_ptr<spdlog::logger>& pLogger,
     const std::string& url,
-    const CesiumUtility::ErrorList& errorLists);
+    const CesiumUtility::ErrorList& errorLists
+);
 }

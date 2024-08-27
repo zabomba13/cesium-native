@@ -18,7 +18,8 @@ rapidjson::Value createEmptyArray() {
 
 BatchTableHierarchyPropertyValues::BatchTableHierarchyPropertyValues(
     const rapidjson::Value& batchTableHierarchy,
-    int64_t batchLength)
+    int64_t batchLength
+)
     : _batchTableHierarchy(batchTableHierarchy),
       _batchLength(batchLength),
       _pClassIDs(nullptr),
@@ -85,7 +86,8 @@ BatchTableHierarchyPropertyValues::BatchTableHierarchyPropertyValues(
 }
 
 void BatchTableHierarchyPropertyValues::setProperty(
-    const std::string& propertyName) {
+    const std::string& propertyName
+) {
   this->_propertyInClass.clear();
 
   auto classesIt = this->_batchTableHierarchy.FindMember("classes");
@@ -99,7 +101,8 @@ void BatchTableHierarchyPropertyValues::setProperty(
   rapidjson::Value propertyNameValue;
   propertyNameValue.SetString(
       propertyName.data(),
-      rapidjson::SizeType(propertyName.size()));
+      rapidjson::SizeType(propertyName.size())
+  );
 
   for (auto it = classes.Begin(); it != classes.End(); ++it) {
     auto instancesIt = it->FindMember("instances");
@@ -144,7 +147,8 @@ BatchTableHierarchyPropertyValues::createIterator(int64_t index) const {
       *this->_pClassIDs,
       *this->_pParentIDs,
       this->_instanceIndices,
-      index);
+      index
+  );
 }
 
 BatchTableHierarchyPropertyValues::const_iterator::const_iterator(
@@ -152,7 +156,8 @@ BatchTableHierarchyPropertyValues::const_iterator::const_iterator(
     const rapidjson::Value& classIds,
     const rapidjson::Value& parentIds,
     const std::vector<uint32_t>& instanceIndices,
-    int64_t currentIndex)
+    int64_t currentIndex
+)
     : _propertyInClass(propertyInClass),
       _classIds(classIds),
       _parentIds(parentIds),
@@ -168,12 +173,14 @@ BatchTableHierarchyPropertyValues::const_iterator::operator++() {
 }
 
 bool BatchTableHierarchyPropertyValues::const_iterator::operator==(
-    const const_iterator& rhs) const {
+    const const_iterator& rhs
+) const {
   return this->_currentIndex == rhs._currentIndex;
 }
 
 bool BatchTableHierarchyPropertyValues::const_iterator::operator!=(
-    const const_iterator& rhs) const {
+    const const_iterator& rhs
+) const {
   return this->_currentIndex != rhs._currentIndex;
 }
 
@@ -230,8 +237,8 @@ BatchTableHierarchyPropertyValues::const_iterator::operator->() const {
 }
 
 const rapidjson::Value*
-BatchTableHierarchyPropertyValues::const_iterator::getValue(
-    int64_t index) const {
+BatchTableHierarchyPropertyValues::const_iterator::getValue(int64_t index
+) const {
   CESIUM_ASSERT(index < this->_classIds.Size());
   const rapidjson::Value& classIdValue =
       this->_classIds[rapidjson::SizeType(index)];

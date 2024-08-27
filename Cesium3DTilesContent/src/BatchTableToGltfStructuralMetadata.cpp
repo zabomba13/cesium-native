@@ -109,7 +109,8 @@ struct MaskedArrayType {
   MaskedArrayType(
       MaskedType inElementType,
       uint32_t inMinArrayCount,
-      uint32_t inMaxArrayCount)
+      uint32_t inMaxArrayCount
+  )
       : elementType(inElementType),
         minArrayCount(inMinArrayCount),
         maxArrayCount(inMaxArrayCount) {}
@@ -479,9 +480,7 @@ int64_t roundUp(int64_t num, int64_t multiple) noexcept {
 
 template <typename T> bool isInRangeForSignedInteger(int64_t value) noexcept {
   // This only works if sizeof(T) is smaller than int64_t
-  static_assert(
-      !std::is_same_v<T, uint64_t> && !std::is_same_v<T, float> &&
-      !std::is_same_v<T, double>);
+  static_assert(!std::is_same_v<T, uint64_t> && !std::is_same_v<T, float> && !std::is_same_v<T, double>);
 
   return value >= static_cast<int64_t>(std::numeric_limits<T>::lowest()) &&
          value <= static_cast<int64_t>(std::numeric_limits<T>::max());
@@ -500,7 +499,8 @@ void copyStringBuffer(
     const rapidjson::StringBuffer& rapidjsonStrBuffer,
     const std::vector<uint64_t>& rapidjsonOffsets,
     std::vector<std::byte>& buffer,
-    std::vector<std::byte>& offsetBuffer) {
+    std::vector<std::byte>& offsetBuffer
+) {
   buffer.resize(rapidjsonStrBuffer.GetLength());
   std::memcpy(buffer.data(), rapidjsonStrBuffer.GetString(), buffer.size());
 
@@ -682,7 +682,8 @@ void updateExtensionWithJsonStringProperty(
     ClassProperty& classProperty,
     const PropertyTable& propertyTable,
     PropertyTableProperty& propertyTableProperty,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
 
   rapidjson::StringBuffer rapidjsonStrBuffer;
   std::vector<uint64_t> rapidjsonOffsets;
@@ -727,7 +728,8 @@ void updateExtensionWithJsonStringProperty(
         rapidjsonStrBuffer,
         rapidjsonOffsets,
         buffer,
-        offsetBuffer);
+        offsetBuffer
+    );
     propertyTableProperty.stringOffsetType =
         PropertyTableProperty::StringOffsetType::UINT8;
   } else if (isInRangeForUnsignedInteger<uint16_t>(totalSize)) {
@@ -735,7 +737,8 @@ void updateExtensionWithJsonStringProperty(
         rapidjsonStrBuffer,
         rapidjsonOffsets,
         buffer,
-        offsetBuffer);
+        offsetBuffer
+    );
     propertyTableProperty.stringOffsetType =
         PropertyTableProperty::StringOffsetType::UINT16;
   } else if (isInRangeForUnsignedInteger<uint32_t>(totalSize)) {
@@ -743,7 +746,8 @@ void updateExtensionWithJsonStringProperty(
         rapidjsonStrBuffer,
         rapidjsonOffsets,
         buffer,
-        offsetBuffer);
+        offsetBuffer
+    );
     propertyTableProperty.stringOffsetType =
         PropertyTableProperty::StringOffsetType::UINT32;
   } else {
@@ -751,7 +755,8 @@ void updateExtensionWithJsonStringProperty(
         rapidjsonStrBuffer,
         rapidjsonOffsets,
         buffer,
-        offsetBuffer);
+        offsetBuffer
+    );
     propertyTableProperty.stringOffsetType =
         PropertyTableProperty::StringOffsetType::UINT64;
   }
@@ -770,7 +775,8 @@ void updateExtensionWithJsonScalarProperty(
     const PropertyTable& propertyTable,
     PropertyTableProperty& propertyTableProperty,
     const TValueGetter& propertyValue,
-    const std::string& componentTypeName) {
+    const std::string& componentTypeName
+) {
   CESIUM_ASSERT(propertyValue.size() >= propertyTable.count);
 
   classProperty.type = ClassProperty::Type::SCALAR;
@@ -806,11 +812,13 @@ void updateExtensionWithJsonBooleanProperty(
     ClassProperty& classProperty,
     const PropertyTable& propertyTable,
     PropertyTableProperty& propertyTableProperty,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   CESIUM_ASSERT(propertyValue.size() >= propertyTable.count);
 
   std::vector<std::byte> buffer(static_cast<size_t>(
-      glm::ceil(static_cast<double>(propertyTable.count) / 8.0)));
+      glm::ceil(static_cast<double>(propertyTable.count) / 8.0)
+  ));
   auto it = propertyValue.begin();
   for (rapidjson::SizeType i = 0;
        i < static_cast<rapidjson::SizeType>(propertyTable.count);
@@ -837,10 +845,12 @@ void copyVariableLengthScalarArraysToBuffers(
     std::vector<std::byte>& offsetBuffer,
     size_t numOfElements,
     const PropertyTable& propertyTable,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   valueBuffer.resize(sizeof(ValueType) * numOfElements);
   offsetBuffer.resize(
-      sizeof(OffsetType) * static_cast<size_t>(propertyTable.count + 1));
+      sizeof(OffsetType) * static_cast<size_t>(propertyTable.count + 1)
+  );
   ValueType* value = reinterpret_cast<ValueType*>(valueBuffer.data());
   OffsetType* offsetValue = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   OffsetType prevOffset = 0;
@@ -869,13 +879,15 @@ void updateScalarArrayProperty(
     PropertyTableProperty& propertyTableProperty,
     const PropertyTable& propertyTable,
     const MaskedArrayType& arrayType,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   CESIUM_ASSERT(propertyValue.size() >= propertyTable.count);
 
   classProperty.type = ClassProperty::Type::SCALAR;
   classProperty.componentType =
       convertPropertyComponentTypeToString(static_cast<PropertyComponentType>(
-          TypeToPropertyType<ValueType>::component));
+          TypeToPropertyType<ValueType>::component
+      ));
   classProperty.array = true;
 
   // Handle fixed-length arrays.
@@ -922,7 +934,8 @@ void updateScalarArrayProperty(
         offsetBuffer,
         totalNumElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint8;
   } else if (isInRangeForUnsignedInteger<uint16_t>(maxOffsetValue)) {
     copyVariableLengthScalarArraysToBuffers<TRapidjson, ValueType, uint16_t>(
@@ -930,7 +943,8 @@ void updateScalarArrayProperty(
         offsetBuffer,
         totalNumElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint16;
   } else if (isInRangeForUnsignedInteger<uint32_t>(maxOffsetValue)) {
     copyVariableLengthScalarArraysToBuffers<TRapidjson, ValueType, uint32_t>(
@@ -938,7 +952,8 @@ void updateScalarArrayProperty(
         offsetBuffer,
         totalNumElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint32;
   } else if (isInRangeForUnsignedInteger<uint64_t>(maxOffsetValue)) {
     copyVariableLengthScalarArraysToBuffers<TRapidjson, ValueType, uint64_t>(
@@ -946,7 +961,8 @@ void updateScalarArrayProperty(
         offsetBuffer,
         totalNumElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint64;
   }
 
@@ -964,7 +980,8 @@ void copyStringsToBuffers(
     size_t totalByteLength,
     size_t numOfString,
     const PropertyTable& propertyTable,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   valueBuffer.resize(totalByteLength);
   offsetBuffer.resize((numOfString + 1) * sizeof(OffsetType));
   OffsetType offset = 0;
@@ -974,12 +991,14 @@ void copyStringsToBuffers(
     const auto& arrayMember = *it;
     for (const auto& str : arrayMember.GetArray()) {
       OffsetType byteLength = static_cast<OffsetType>(
-          str.GetStringLength() * sizeof(rapidjson::Value::Ch));
+          str.GetStringLength() * sizeof(rapidjson::Value::Ch)
+      );
       std::memcpy(valueBuffer.data() + offset, str.GetString(), byteLength);
       std::memcpy(
           offsetBuffer.data() + offsetIndex * sizeof(OffsetType),
           &offset,
-          sizeof(OffsetType));
+          sizeof(OffsetType)
+      );
       offset = static_cast<OffsetType>(offset + byteLength);
       ++offsetIndex;
     }
@@ -989,24 +1008,28 @@ void copyStringsToBuffers(
   std::memcpy(
       offsetBuffer.data() + offsetIndex * sizeof(OffsetType),
       &offset,
-      sizeof(OffsetType));
+      sizeof(OffsetType)
+  );
 }
 
 template <typename OffsetType, typename TValueGetter>
 void copyArrayOffsetsForStringArraysToBuffer(
     std::vector<std::byte>& offsetBuffer,
     const PropertyTable& propertyTable,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   OffsetType prevOffset = 0;
   offsetBuffer.resize(
-      static_cast<size_t>(propertyTable.count + 1) * sizeof(OffsetType));
+      static_cast<size_t>(propertyTable.count + 1) * sizeof(OffsetType)
+  );
   OffsetType* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   auto it = propertyValue.begin();
   for (int64_t i = 0; i < propertyTable.count; ++i) {
     const auto& arrayMember = *it;
     *offset = prevOffset;
     prevOffset = static_cast<OffsetType>(
-        prevOffset + arrayMember.Size() * sizeof(OffsetType));
+        prevOffset + arrayMember.Size() * sizeof(OffsetType)
+    );
     ++offset;
     ++it;
   }
@@ -1021,7 +1044,8 @@ void updateStringArrayProperty(
     PropertyTableProperty& propertyTableProperty,
     const PropertyTable& propertyTable,
     const MaskedArrayType& arrayType,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   CESIUM_ASSERT(propertyValue.size() >= propertyTable.count);
 
   size_t stringCount = 0;
@@ -1048,7 +1072,8 @@ void updateStringArrayProperty(
         totalByteLength,
         stringCount,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     stringOffsetType = PropertyComponentType::Uint8;
   } else if (isInRangeForUnsignedInteger<uint16_t>(totalByteLength)) {
     copyStringsToBuffers<uint16_t>(
@@ -1057,7 +1082,8 @@ void updateStringArrayProperty(
         totalByteLength,
         stringCount,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     stringOffsetType = PropertyComponentType::Uint16;
   } else if (isInRangeForUnsignedInteger<uint32_t>(totalByteLength)) {
     copyStringsToBuffers<uint32_t>(
@@ -1066,7 +1092,8 @@ void updateStringArrayProperty(
         totalByteLength,
         stringCount,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     stringOffsetType = PropertyComponentType::Uint32;
   } else {
     copyStringsToBuffers<uint64_t>(
@@ -1075,7 +1102,8 @@ void updateStringArrayProperty(
         totalByteLength,
         stringCount,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     stringOffsetType = PropertyComponentType::Uint64;
   }
 
@@ -1103,25 +1131,29 @@ void updateStringArrayProperty(
     copyArrayOffsetsForStringArraysToBuffer<uint8_t>(
         arrayOffsetBuffer,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     arrayOffsetType = PropertyComponentType::Uint8;
   } else if (isInRangeForUnsignedInteger<uint16_t>(stringCount + 1)) {
     copyArrayOffsetsForStringArraysToBuffer<uint16_t>(
         arrayOffsetBuffer,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     arrayOffsetType = PropertyComponentType::Uint16;
   } else if (isInRangeForUnsignedInteger<uint32_t>(stringCount + 1)) {
     copyArrayOffsetsForStringArraysToBuffer<uint32_t>(
         arrayOffsetBuffer,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     arrayOffsetType = PropertyComponentType::Uint32;
   } else {
     copyArrayOffsetsForStringArraysToBuffer<uint64_t>(
         arrayOffsetBuffer,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     arrayOffsetType = PropertyComponentType::Uint64;
   }
 
@@ -1137,13 +1169,15 @@ void copyVariableLengthBooleanArraysToBuffers(
     std::vector<std::byte>& offsetBuffer,
     size_t numOfElements,
     const PropertyTable& propertyTable,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   size_t currentIndex = 0;
   const size_t totalByteLength =
       static_cast<size_t>(glm::ceil(static_cast<double>(numOfElements) / 8.0));
   valueBuffer.resize(totalByteLength);
   offsetBuffer.resize(
-      static_cast<size_t>(propertyTable.count + 1) * sizeof(OffsetType));
+      static_cast<size_t>(propertyTable.count + 1) * sizeof(OffsetType)
+  );
   OffsetType* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   OffsetType prevOffset = 0;
   auto it = propertyValue.begin();
@@ -1175,7 +1209,8 @@ void updateBooleanArrayProperty(
     PropertyTableProperty& propertyTableProperty,
     const PropertyTable& propertyTable,
     const MaskedArrayType& arrayType,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   CESIUM_ASSERT(propertyValue.size() >= propertyTable.count);
 
   classProperty.type = ClassProperty::Type::BOOLEAN;
@@ -1186,8 +1221,9 @@ void updateBooleanArrayProperty(
     const size_t arrayCount = static_cast<size_t>(arrayType.minArrayCount);
     const size_t numOfElements =
         static_cast<size_t>(propertyTable.count) * arrayCount;
-    const size_t totalByteLength = static_cast<size_t>(
-        glm::ceil(static_cast<double>(numOfElements) / 8.0));
+    const size_t totalByteLength =
+        static_cast<size_t>(glm::ceil(static_cast<double>(numOfElements) / 8.0)
+        );
     std::vector<std::byte> valueBuffer(totalByteLength);
     size_t currentIndex = 0;
     auto it = propertyValue.begin();
@@ -1229,7 +1265,8 @@ void updateBooleanArrayProperty(
         offsetBuffer,
         numOfElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint8;
   } else if (isInRangeForUnsignedInteger<uint16_t>(numOfElements + 1)) {
     copyVariableLengthBooleanArraysToBuffers<uint16_t>(
@@ -1237,7 +1274,8 @@ void updateBooleanArrayProperty(
         offsetBuffer,
         numOfElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint16;
   } else if (isInRangeForUnsignedInteger<uint32_t>(numOfElements + 1)) {
     copyVariableLengthBooleanArraysToBuffers<uint32_t>(
@@ -1245,7 +1283,8 @@ void updateBooleanArrayProperty(
         offsetBuffer,
         numOfElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint32;
   } else {
     copyVariableLengthBooleanArraysToBuffers<uint64_t>(
@@ -1253,7 +1292,8 @@ void updateBooleanArrayProperty(
         offsetBuffer,
         numOfElements,
         propertyTable,
-        propertyValue);
+        propertyValue
+    );
     offsetType = PropertyComponentType::Uint64;
   }
 
@@ -1271,7 +1311,8 @@ void updateExtensionWithArrayProperty(
     const PropertyTable& propertyTable,
     PropertyTableProperty& propertyTableProperty,
     const MaskedArrayType& arrayType,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
   CESIUM_ASSERT(propertyValue.size() >= propertyTable.count);
 
   const MaskedType& elementType = arrayType.elementType;
@@ -1282,7 +1323,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isInt8) {
     updateScalarArrayProperty<int32_t, int8_t>(
         gltf,
@@ -1290,7 +1332,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isUint8) {
     updateScalarArrayProperty<uint32_t, uint8_t>(
         gltf,
@@ -1298,7 +1341,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isInt16) {
     updateScalarArrayProperty<int32_t, int16_t>(
         gltf,
@@ -1306,7 +1350,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isUint16) {
     updateScalarArrayProperty<uint32_t, uint16_t>(
         gltf,
@@ -1314,7 +1359,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isInt32) {
     updateScalarArrayProperty<int32_t, int32_t>(
         gltf,
@@ -1322,7 +1368,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isUint32) {
     updateScalarArrayProperty<uint32_t, uint32_t>(
         gltf,
@@ -1330,7 +1377,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isInt64) {
     updateScalarArrayProperty<int64_t, int64_t>(
         gltf,
@@ -1338,7 +1386,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isUint64) {
     updateScalarArrayProperty<uint64_t, uint64_t>(
         gltf,
@@ -1346,7 +1395,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isFloat32) {
     updateScalarArrayProperty<float, float>(
         gltf,
@@ -1354,7 +1404,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else if (elementType.isFloat64) {
     updateScalarArrayProperty<double, double>(
         gltf,
@@ -1362,7 +1413,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   } else {
     updateStringArrayProperty(
         gltf,
@@ -1370,7 +1422,8 @@ void updateExtensionWithArrayProperty(
         propertyTableProperty,
         propertyTable,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
   }
 }
 
@@ -1382,7 +1435,8 @@ void updateExtensionWithJsonProperty(
     ClassProperty& classProperty,
     const PropertyTable& propertyTable,
     PropertyTableProperty& propertyTableProperty,
-    const TValueGetter& propertyValue) {
+    const TValueGetter& propertyValue
+) {
 
   if (propertyValue.size() == 0 || propertyValue.size() < propertyTable.count) {
     // No property to infer the type from, so assume string.
@@ -1391,7 +1445,8 @@ void updateExtensionWithJsonProperty(
         classProperty,
         propertyTable,
         propertyTableProperty,
-        propertyValue);
+        propertyValue
+    );
     return;
   }
 
@@ -1412,7 +1467,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         arrayType,
-        propertyValue);
+        propertyValue
+    );
     return;
   }
 
@@ -1441,7 +1497,8 @@ void updateExtensionWithJsonProperty(
         classProperty,
         propertyTable,
         propertyTableProperty,
-        propertyValue);
+        propertyValue
+    );
   } else if (type.isInt8) {
     updateExtensionWithJsonScalarProperty<int8_t, int32_t>(
         gltf,
@@ -1449,7 +1506,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::INT8);
+        ClassProperty::ComponentType::INT8
+    );
   } else if (type.isUint8) {
     updateExtensionWithJsonScalarProperty<uint8_t, uint32_t>(
         gltf,
@@ -1457,7 +1515,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::UINT8);
+        ClassProperty::ComponentType::UINT8
+    );
   } else if (type.isInt16) {
     updateExtensionWithJsonScalarProperty<int16_t, int32_t>(
         gltf,
@@ -1465,7 +1524,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::INT16);
+        ClassProperty::ComponentType::INT16
+    );
   } else if (type.isUint16) {
     updateExtensionWithJsonScalarProperty<uint16_t, uint32_t>(
         gltf,
@@ -1473,7 +1533,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::UINT16);
+        ClassProperty::ComponentType::UINT16
+    );
   } else if (type.isInt32) {
     updateExtensionWithJsonScalarProperty<int32_t>(
         gltf,
@@ -1481,7 +1542,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::INT32);
+        ClassProperty::ComponentType::INT32
+    );
   } else if (type.isUint32) {
     updateExtensionWithJsonScalarProperty<uint32_t>(
         gltf,
@@ -1489,7 +1551,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::UINT32);
+        ClassProperty::ComponentType::UINT32
+    );
   } else if (type.isInt64) {
     updateExtensionWithJsonScalarProperty<int64_t>(
         gltf,
@@ -1497,7 +1560,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::INT64);
+        ClassProperty::ComponentType::INT64
+    );
   } else if (type.isUint64) {
     updateExtensionWithJsonScalarProperty<uint64_t>(
         gltf,
@@ -1505,7 +1569,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::UINT64);
+        ClassProperty::ComponentType::UINT64
+    );
   } else if (type.isFloat32) {
     updateExtensionWithJsonScalarProperty<float>(
         gltf,
@@ -1513,7 +1578,8 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::FLOAT32);
+        ClassProperty::ComponentType::FLOAT32
+    );
   } else if (type.isFloat64) {
     updateExtensionWithJsonScalarProperty<double>(
         gltf,
@@ -1521,14 +1587,16 @@ void updateExtensionWithJsonProperty(
         propertyTable,
         propertyTableProperty,
         propertyValue,
-        ClassProperty::ComponentType::FLOAT64);
+        ClassProperty::ComponentType::FLOAT64
+    );
   } else {
     updateExtensionWithJsonStringProperty(
         gltf,
         classProperty,
         propertyTable,
         propertyTableProperty,
-        propertyValue);
+        propertyValue
+    );
   }
 }
 
@@ -1542,11 +1610,13 @@ void updateExtensionWithBinaryProperty(
     const PropertyTable& propertyTable,
     const std::string& propertyName,
     const rapidjson::Value& propertyValue,
-    ErrorList& result) {
+    ErrorList& result
+) {
   CESIUM_ASSERT(
       gltfBufferIndex >= 0 &&
       "gltfBufferIndex is negative. Need to allocate buffer before "
-      "converting the binary property");
+      "converting the binary property"
+  );
 
   const auto& byteOffsetIt = propertyValue.FindMember("byteOffset");
   if (byteOffsetIt == propertyValue.MemberEnd() ||
@@ -1554,7 +1624,8 @@ void updateExtensionWithBinaryProperty(
     result.emplaceWarning(fmt::format(
         "Skip converting {}. The binary property doesn't have a valid "
         "byteOffset.",
-        propertyName));
+        propertyName
+    ));
     return;
   }
 
@@ -1564,7 +1635,8 @@ void updateExtensionWithBinaryProperty(
     result.emplaceWarning(fmt::format(
         "Skip converting {}. The binary property doesn't have a valid "
         "componentType.",
-        propertyName));
+        propertyName
+    ));
     return;
   }
 
@@ -1572,7 +1644,8 @@ void updateExtensionWithBinaryProperty(
   if (typeIt == propertyValue.MemberEnd() || !typeIt->value.IsString()) {
     result.emplaceWarning(fmt::format(
         "Skip converting {}. The binary property doesn't have a valid type.",
-        propertyName));
+        propertyName
+    ));
     return;
   }
 
@@ -1585,7 +1658,8 @@ void updateExtensionWithBinaryProperty(
   if (convertedTypeIt == batchTableTypeToGltfType.end()) {
     result.emplaceWarning(fmt::format(
         "Skip converting {}. The binary property doesn't have a valid type.",
-        propertyName));
+        propertyName
+    ));
     return;
   }
   auto convertedComponentTypeIt =
@@ -1595,7 +1669,8 @@ void updateExtensionWithBinaryProperty(
     result.emplaceWarning(fmt::format(
         "Skip converting {}. The binary property doesn't have a valid "
         "componentType.",
-        propertyName));
+        propertyName
+    ));
     return;
   }
 
@@ -1614,7 +1689,8 @@ void updateExtensionWithBinaryProperty(
   bufferView.byteOffset = gltfBufferOffset;
   bufferView.byteLength = static_cast<int64_t>(
       componentTypeSize * componentCount *
-      static_cast<size_t>(propertyTable.count));
+      static_cast<size_t>(propertyTable.count)
+  );
 
   propertyTableProperty.values =
       static_cast<int32_t>(gltf.bufferViews.size() - 1);
@@ -1629,7 +1705,8 @@ void updateExtensionWithBatchTableHierarchy(
     Class& classDefinition,
     PropertyTable& propertyTable,
     ErrorList& result,
-    const rapidjson::Value& batchTableHierarchy) {
+    const rapidjson::Value& batchTableHierarchy
+) {
   // EXT_structural_metadata can't support hierarchy, so we need to flatten
   // it. It also can't support multiple classes with a single set of feature
   // IDs, because IDs can only specify one property table. So essentially
@@ -1638,7 +1715,8 @@ void updateExtensionWithBatchTableHierarchy(
   if (classesIt == batchTableHierarchy.MemberEnd()) {
     result.emplaceWarning(
         "3DTILES_batch_table_hierarchy does not contain required \"classes\" "
-        "property.");
+        "property."
+    );
     return;
   }
 
@@ -1650,7 +1728,8 @@ void updateExtensionWithBatchTableHierarchy(
         result.emplaceWarning(
             "3DTILES_batch_table_hierarchy with a \"parentCounts\" property "
             "is not currently supported. All instances must have at most one "
-            "parent.");
+            "parent."
+        );
         return;
       }
     }
@@ -1671,7 +1750,8 @@ void updateExtensionWithBatchTableHierarchy(
             "Property {} uses binary values. Only JSON-based "
             "3DTILES_batch_table_hierarchy properties are currently "
             "supported.",
-            propertyIt->name.GetString()));
+            propertyIt->name.GetString()
+        ));
       } else {
         properties.insert(propertyIt->name.GetString());
       }
@@ -1680,7 +1760,8 @@ void updateExtensionWithBatchTableHierarchy(
 
   BatchTableHierarchyPropertyValues batchTableHierarchyValues(
       batchTableHierarchy,
-      propertyTable.count);
+      propertyTable.count
+  );
 
   for (const std::string& name : properties) {
     ClassProperty& classProperty =
@@ -1698,7 +1779,8 @@ void updateExtensionWithBatchTableHierarchy(
         classProperty,
         propertyTable,
         propertyTableProperty,
-        batchTableHierarchyValues);
+        batchTableHierarchyValues
+    );
     if (propertyTableProperty.values < 0) {
       // Don't include properties without _any_ values.
       propertyTable.properties.erase(name);
@@ -1711,7 +1793,8 @@ void convertBatchTableToGltfStructuralMetadataExtension(
     const gsl::span<const std::byte>& batchTableBinaryData,
     CesiumGltf::Model& gltf,
     const int64_t featureCount,
-    ErrorList& result) {
+    ErrorList& result
+) {
   // Add the binary part of the batch table - if any - to the glTF as a
   // buffer. We will reallign this buffer later on
   int32_t gltfBufferIndex = -1;
@@ -1763,7 +1846,8 @@ void convertBatchTableToGltfStructuralMetadataExtension(
           classProperty,
           propertyTable,
           propertyTableProperty,
-          ArrayOfPropertyValues(propertyValue));
+          ArrayOfPropertyValues(propertyValue)
+      );
     } else {
       BinaryProperty& binaryProperty = binaryProperties.emplace_back();
       updateExtensionWithBinaryProperty(
@@ -1776,7 +1860,8 @@ void convertBatchTableToGltfStructuralMetadataExtension(
           propertyTable,
           name,
           propertyValue,
-          result);
+          result
+      );
       gltfBufferOffset += roundUp(binaryProperty.byteLength, 8);
     }
 
@@ -1797,7 +1882,8 @@ void convertBatchTableToGltfStructuralMetadataExtension(
           classDefinition,
           propertyTable,
           result,
-          bthIt->value);
+          bthIt->value
+      );
     }
   }
 
@@ -1810,7 +1896,8 @@ void convertBatchTableToGltfStructuralMetadataExtension(
       std::memcpy(
           buffer.cesium.data.data() + binaryProperty.gltfByteOffset,
           batchTableBinaryData.data() + binaryProperty.batchTableByteOffset,
-          static_cast<size_t>(binaryProperty.byteLength));
+          static_cast<size_t>(binaryProperty.byteLength)
+      );
     }
   }
 }
@@ -1821,11 +1908,13 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromB3dm(
     const rapidjson::Document& featureTableJson,
     const rapidjson::Document& batchTableJson,
     const gsl::span<const std::byte>& batchTableBinaryData,
-    CesiumGltf::Model& gltf) {
+    CesiumGltf::Model& gltf
+) {
   // Check to make sure a char of rapidjson is 1 byte
   static_assert(
       sizeof(rapidjson::Value::Ch) == 1,
-      "RapidJson::Value::Ch is not 1 byte");
+      "RapidJson::Value::Ch is not 1 byte"
+  );
 
   ErrorList result;
 
@@ -1840,7 +1929,8 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromB3dm(
     result.emplaceWarning(
         "The B3DM has a batch table, but it is being ignored because there is "
         "no BATCH_LENGTH semantic in the feature table or it is not an "
-        "integer.");
+        "integer."
+    );
     return result;
   }
 
@@ -1851,7 +1941,8 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromB3dm(
       batchTableBinaryData,
       gltf,
       batchLength,
-      result);
+      result
+  );
 
   // Create an EXT_mesh_features extension for each primitive with a _BATCHID
   // attribute.
@@ -1900,11 +1991,13 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromPnts(
     const rapidjson::Document& featureTableJson,
     const rapidjson::Document& batchTableJson,
     const gsl::span<const std::byte>& batchTableBinaryData,
-    CesiumGltf::Model& gltf) {
+    CesiumGltf::Model& gltf
+) {
   // Check to make sure a char of rapidjson is 1 byte
   static_assert(
       sizeof(rapidjson::Value::Ch) == 1,
-      "RapidJson::Value::Ch is not 1 byte");
+      "RapidJson::Value::Ch is not 1 byte"
+  );
 
   ErrorList result;
 
@@ -1928,13 +2021,12 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromPnts(
   if (batchLengthIt != featureTableJson.MemberEnd() &&
       batchLengthIt->value.IsInt64()) {
     featureCount = batchLengthIt->value.GetInt64();
-  } else if (
-      batchIdIt != featureTableJson.MemberEnd() &&
-      batchIdIt->value.IsObject()) {
+  } else if (batchIdIt != featureTableJson.MemberEnd() && batchIdIt->value.IsObject()) {
     result.emplaceWarning(
         "The PNTS has a batch table, but it is being ignored because there "
         "is no valid BATCH_LENGTH in the feature table even though BATCH_ID is "
-        "defined.");
+        "defined."
+    );
     return result;
   } else {
     featureCount = pointsLengthIt->value.GetInt64();
@@ -1945,7 +2037,8 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromPnts(
       batchTableBinaryData,
       gltf,
       featureCount,
-      result);
+      result
+  );
 
   // Create the EXT_mesh_features extension for the single mesh primitive.
   CESIUM_ASSERT(gltf.meshes.size() == 1);

@@ -47,8 +47,10 @@ TEST_CASE("Add raster overlay to glTF") {
   // Place the glTF in Philly and make it huge.
   glm::dmat4 enuToFixed = GlobeTransforms::eastNorthUpToFixedFrame(
       Ellipsoid::WGS84.cartographicToCartesian(
-          Cartographic::fromDegrees(-75.14777, 39.95021, 200.0)),
-      Ellipsoid::WGS84);
+          Cartographic::fromDegrees(-75.14777, 39.95021, 200.0)
+      ),
+      Ellipsoid::WGS84
+  );
   glm::dmat4 scale =
       glm::scale(glm::dmat4(1.0), glm::dvec3(100000.0, 100000.0, 100000.0));
   glm::dmat4 modelToEcef = enuToFixed * scale;
@@ -59,8 +61,8 @@ TEST_CASE("Add raster overlay to glTF") {
   for (const Mesh& mesh : gltf.meshes) {
     for (const MeshPrimitive& primitive : mesh.primitives) {
       while (primitive.attributes.find(
-                 "TEXCOORD_" + std::to_string(textureCoordinateIndex)) !=
-             primitive.attributes.end()) {
+                 "TEXCOORD_" + std::to_string(textureCoordinateIndex)
+             ) != primitive.attributes.end()) {
         ++textureCoordinateIndex;
       }
     }
@@ -72,20 +74,23 @@ TEST_CASE("Add raster overlay to glTF") {
 
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
-           dataDir / "Cesium_Logo_Color")) {
+           dataDir / "Cesium_Logo_Color"
+       )) {
     if (!entry.is_regular_file())
       continue;
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
         CesiumAsync::HttpHeaders{},
-        readFile(entry.path()));
+        readFile(entry.path())
+    );
     std::string url = "file:///" + entry.path().generic_u8string();
     auto pRequest = std::make_unique<SimpleAssetRequest>(
         "GET",
         url,
         CesiumAsync::HttpHeaders{},
-        std::move(pResponse));
+        std::move(pResponse)
+    );
     mapUrlToRequest[url] = std::move(pRequest);
   }
 
@@ -95,7 +100,8 @@ TEST_CASE("Add raster overlay to glTF") {
   // Create the raster overlay to drape over the glTF.
   std::string tmr =
       "file:///" + std::filesystem::directory_entry(
-                       dataDir / "Cesium_Logo_Color" / "tilemapresource.xml")
+                       dataDir / "Cesium_Logo_Color" / "tilemapresource.xml"
+                   )
                        .path()
                        .generic_u8string();
   IntrusivePointer<TileMapServiceRasterOverlay> pRasterOverlay =
@@ -109,10 +115,12 @@ TEST_CASE("Add raster overlay to glTF") {
               nullptr,
               nullptr,
               spdlog::default_logger(),
-              nullptr)
+              nullptr
+          )
           .thenInMainThread([&gltf, &modelToEcef, textureCoordinateIndex](
                                 RasterOverlay::CreateTileProviderResult&&
-                                    tileProviderResult) {
+                                    tileProviderResult
+                            ) {
             REQUIRE(tileProviderResult);
 
             IntrusivePointer<RasterOverlayTileProvider> pTileProvider =
@@ -126,7 +134,8 @@ TEST_CASE("Add raster overlay to glTF") {
                     {pTileProvider->getProjection()},
                     true,
                     "TEXCOORD_",
-                    textureCoordinateIndex);
+                    textureCoordinateIndex
+                );
             REQUIRE(details);
             REQUIRE(details->rasterOverlayProjections.size() == 1);
             REQUIRE(details->rasterOverlayRectangles.size() == 1);
@@ -142,111 +151,119 @@ TEST_CASE("Add raster overlay to glTF") {
                     geometricError,
                     16.0, // the Max SSE used to render the geometry
                     details->rasterOverlayProjections[0],
-                    details->rasterOverlayRectangles[0]);
+                    details->rasterOverlayRectangles[0]
+                );
 
             // Get a raster overlay texture of the proper dimensions.
             IntrusivePointer<RasterOverlayTile> pRasterTile =
                 pTileProvider->getTile(
                     details->rasterOverlayRectangles[0],
-                    targetScreenPixels);
+                    targetScreenPixels
+                );
 
             glm::dvec4 textureTranslationAndScale =
                 RasterOverlayUtilities::computeTranslationAndScale(
                     details->rasterOverlayRectangles[0],
-                    pRasterTile->getRectangle());
+                    pRasterTile->getRectangle()
+                );
 
             // Go load the texture.
             return pTileProvider->loadTile(*pRasterTile)
                 .thenPassThrough(std::move(textureTranslationAndScale));
           })
-          .thenInMainThread([&gltf, textureCoordinateIndex](
-                                std::tuple<glm::dvec4, TileProviderAndTile>&&
-                                    tuple) {
-            auto& [textureTranslationAndScale, loadResult] = tuple;
+          .thenInMainThread(
+              [&gltf, textureCoordinateIndex](
+                  std::tuple<glm::dvec4, TileProviderAndTile>&& tuple
+              ) {
+                auto& [textureTranslationAndScale, loadResult] = tuple;
 
-            // Create the image, sampler, and texture for the raster overlay
-            Image& image = gltf.images.emplace_back();
-            image.mimeType = Image::MimeType::image_png;
+                // Create the image, sampler, and texture for the raster overlay
+                Image& image = gltf.images.emplace_back();
+                image.mimeType = Image::MimeType::image_png;
 
-            Sampler& sampler = gltf.samplers.emplace_back();
-            sampler.magFilter = Sampler::MagFilter::LINEAR;
-            sampler.minFilter = Sampler::MinFilter::LINEAR_MIPMAP_LINEAR;
-            sampler.wrapS = Sampler::WrapS::CLAMP_TO_EDGE;
-            sampler.wrapT = Sampler::WrapT::CLAMP_TO_EDGE;
+                Sampler& sampler = gltf.samplers.emplace_back();
+                sampler.magFilter = Sampler::MagFilter::LINEAR;
+                sampler.minFilter = Sampler::MinFilter::LINEAR_MIPMAP_LINEAR;
+                sampler.wrapS = Sampler::WrapS::CLAMP_TO_EDGE;
+                sampler.wrapT = Sampler::WrapT::CLAMP_TO_EDGE;
 
-            Texture& texture = gltf.textures.emplace_back();
-            texture.sampler = int32_t(gltf.samplers.size() - 1);
-            texture.source = int32_t(gltf.images.size() - 1);
+                Texture& texture = gltf.textures.emplace_back();
+                texture.sampler = int32_t(gltf.samplers.size() - 1);
+                texture.source = int32_t(gltf.images.size() - 1);
 
-            Buffer& buffer = !gltf.buffers.empty()
-                                 ? gltf.buffers.front()
-                                 : gltf.buffers.emplace_back();
-            size_t imageStart = buffer.cesium.data.size();
+                Buffer& buffer = !gltf.buffers.empty()
+                                     ? gltf.buffers.front()
+                                     : gltf.buffers.emplace_back();
+                size_t imageStart = buffer.cesium.data.size();
 
-            // PNG-encode the raster overlay image and store it in the main
-            // buffer.
-            ImageManipulation::savePng(
-                loadResult.pTile->getImage(),
-                buffer.cesium.data);
+                // PNG-encode the raster overlay image and store it in the main
+                // buffer.
+                ImageManipulation::savePng(
+                    loadResult.pTile->getImage(),
+                    buffer.cesium.data
+                );
 
-            BufferView& bufferView = gltf.bufferViews.emplace_back();
-            bufferView.buffer = 0;
-            bufferView.byteOffset = int64_t(imageStart);
-            bufferView.byteLength =
-                int64_t(buffer.cesium.data.size() - imageStart);
+                BufferView& bufferView = gltf.bufferViews.emplace_back();
+                bufferView.buffer = 0;
+                bufferView.byteOffset = int64_t(imageStart);
+                bufferView.byteLength =
+                    int64_t(buffer.cesium.data.size() - imageStart);
 
-            buffer.byteLength = int64_t(buffer.cesium.data.size());
+                buffer.byteLength = int64_t(buffer.cesium.data.size());
 
-            image.bufferView = int32_t(gltf.bufferViews.size() - 1);
+                image.bufferView = int32_t(gltf.bufferViews.size() - 1);
 
-            // The below will replace any existing color texture with
-            // the raster overlay, because glTF only allows one color
-            // texture. However, it doesn't clean up previous textures or
-            // texture coordinates, leaving the model bigger than it needs
-            // to be. If this were production code (not just a test/demo), we
-            // would want to address this.
+                // The below will replace any existing color texture with
+                // the raster overlay, because glTF only allows one color
+                // texture. However, it doesn't clean up previous textures or
+                // texture coordinates, leaving the model bigger than it needs
+                // to be. If this were production code (not just a test/demo),
+                // we would want to address this.
 
-            int32_t newMaterialIndex = -1;
+                int32_t newMaterialIndex = -1;
 
-            for (Mesh& mesh : gltf.meshes) {
-              for (MeshPrimitive& primitive : mesh.primitives) {
-                if (primitive.material < 0 ||
-                    size_t(primitive.material) >= gltf.materials.size()) {
-                  // This primitive didn't previous have a material so
-                  // assign one (creating it if needed).
-                  if (newMaterialIndex < 0) {
-                    newMaterialIndex = int32_t(gltf.materials.size());
-                    Material& material = gltf.materials.emplace_back();
-                    MaterialPBRMetallicRoughness& pbr =
-                        material.pbrMetallicRoughness.emplace();
-                    pbr.metallicFactor = 0.0;
-                    pbr.roughnessFactor = 1.0;
+                for (Mesh& mesh : gltf.meshes) {
+                  for (MeshPrimitive& primitive : mesh.primitives) {
+                    if (primitive.material < 0 ||
+                        size_t(primitive.material) >= gltf.materials.size()) {
+                      // This primitive didn't previous have a material so
+                      // assign one (creating it if needed).
+                      if (newMaterialIndex < 0) {
+                        newMaterialIndex = int32_t(gltf.materials.size());
+                        Material& material = gltf.materials.emplace_back();
+                        MaterialPBRMetallicRoughness& pbr =
+                            material.pbrMetallicRoughness.emplace();
+                        pbr.metallicFactor = 0.0;
+                        pbr.roughnessFactor = 1.0;
+                      }
+                      primitive.material = newMaterialIndex;
+                    }
+
+                    Material& material =
+                        gltf.materials[size_t(primitive.material)];
+                    if (!material.pbrMetallicRoughness)
+                      material.pbrMetallicRoughness.emplace();
+                    if (!material.pbrMetallicRoughness->baseColorTexture)
+                      material.pbrMetallicRoughness->baseColorTexture.emplace();
+
+                    TextureInfo& colorTexture =
+                        *material.pbrMetallicRoughness->baseColorTexture;
+                    colorTexture.index = int32_t(gltf.textures.size() - 1);
+                    colorTexture.texCoord = textureCoordinateIndex;
+
+                    ExtensionKhrTextureTransform& textureTransform =
+                        colorTexture.addExtension<ExtensionKhrTextureTransform>(
+                        );
+                    textureTransform.offset = {
+                        textureTranslationAndScale.x,
+                        textureTranslationAndScale.y};
+                    textureTransform.scale = {
+                        textureTranslationAndScale.z,
+                        textureTranslationAndScale.w};
                   }
-                  primitive.material = newMaterialIndex;
                 }
-
-                Material& material = gltf.materials[size_t(primitive.material)];
-                if (!material.pbrMetallicRoughness)
-                  material.pbrMetallicRoughness.emplace();
-                if (!material.pbrMetallicRoughness->baseColorTexture)
-                  material.pbrMetallicRoughness->baseColorTexture.emplace();
-
-                TextureInfo& colorTexture =
-                    *material.pbrMetallicRoughness->baseColorTexture;
-                colorTexture.index = int32_t(gltf.textures.size() - 1);
-                colorTexture.texCoord = textureCoordinateIndex;
-
-                ExtensionKhrTextureTransform& textureTransform =
-                    colorTexture.addExtension<ExtensionKhrTextureTransform>();
-                textureTransform.offset = {
-                    textureTranslationAndScale.x,
-                    textureTranslationAndScale.y};
-                textureTransform.scale = {
-                    textureTranslationAndScale.z,
-                    textureTranslationAndScale.w};
               }
-            }
-          });
+          );
 
   waitForFuture(asyncSystem, std::move(future));
 

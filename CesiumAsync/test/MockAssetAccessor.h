@@ -15,9 +15,10 @@ public:
   get(const CesiumAsync::AsyncSystem& asyncSystem,
       const std::string& /* url */,
       const std::vector<THeader>& /* headers */
-      ) override {
+  ) override {
     return asyncSystem.createResolvedFuture(
-        std::shared_ptr<CesiumAsync::IAssetRequest>(testRequest));
+        std::shared_ptr<CesiumAsync::IAssetRequest>(testRequest)
+    );
   }
 
   virtual CesiumAsync::Future<std::shared_ptr<CesiumAsync::IAssetRequest>>
@@ -27,9 +28,10 @@ public:
       const std::string& /* url */,
       const std::vector<THeader>& /* headers */,
       const gsl::span<const std::byte>& /* contentPayload */
-      ) override {
+  ) override {
     return asyncSystem.createResolvedFuture(
-        std::shared_ptr<CesiumAsync::IAssetRequest>(testRequest));
+        std::shared_ptr<CesiumAsync::IAssetRequest>(testRequest)
+    );
   }
 
   virtual void tick() noexcept override {}

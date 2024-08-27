@@ -117,8 +117,8 @@ TEST_CASE("GlobeRectangle::equalsEpsilon") {
 
   SECTION("returns true for exactly equal rectangle") {
     GlobeRectangle equalRectangle(0.1, 0.2, 0.3, 0.4);
-    CHECK(
-        GlobeRectangle::equalsEpsilon(simple, equalRectangle, Math::Epsilon6));
+    CHECK(GlobeRectangle::equalsEpsilon(simple, equalRectangle, Math::Epsilon6)
+    );
   }
 
   SECTION("returns true for rectangle within epsilon") {
@@ -164,7 +164,8 @@ TEST_CASE("GlobeRectangle::computeCenter") {
       center.longitude,
       expectedLongitude,
       0.0,
-      Math::Epsilon14));
+      Math::Epsilon14
+  ));
   CHECK(Math::equalsEpsilon(center.latitude, 0.3, 0.0, Math::Epsilon14));
 
   GlobeRectangle wrapping2(3.1, 0.2, -3.0, 0.4);
@@ -175,7 +176,8 @@ TEST_CASE("GlobeRectangle::computeCenter") {
       center.longitude,
       expectedLongitude,
       0.0,
-      Math::Epsilon14));
+      Math::Epsilon14
+  ));
   CHECK(Math::equalsEpsilon(center.latitude, 0.3, 0.0, Math::Epsilon14));
 }
 

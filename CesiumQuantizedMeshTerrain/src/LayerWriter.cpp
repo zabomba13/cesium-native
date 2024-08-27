@@ -22,7 +22,8 @@ LayerWriter::getExtensions() const {
 
 LayerWriterResult LayerWriter::write(
     const Layer& layer,
-    const LayerWriterOptions& options) const {
+    const LayerWriterOptions& options
+) const {
   CESIUM_TRACE("LayerWriter::write");
 
   const CesiumJsonWriter::ExtensionWriterContext& context =

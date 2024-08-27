@@ -27,7 +27,8 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context = std::vector<std::string>()) override;
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) override;
 
 protected:
   void reset(IJsonHandler* pParent);

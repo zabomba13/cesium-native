@@ -59,7 +59,8 @@ public:
       double west,
       double south,
       double east,
-      double north) noexcept
+      double north
+  ) noexcept
       : _west(west), _south(south), _east(east), _north(north) {}
 
   /**
@@ -82,12 +83,14 @@ public:
       double westDegrees,
       double southDegrees,
       double eastDegrees,
-      double northDegrees) noexcept {
+      double northDegrees
+  ) noexcept {
     return GlobeRectangle(
         CesiumUtility::Math::degreesToRadians(westDegrees),
         CesiumUtility::Math::degreesToRadians(southDegrees),
         CesiumUtility::Math::degreesToRadians(eastDegrees),
-        CesiumUtility::Math::degreesToRadians(northDegrees));
+        CesiumUtility::Math::degreesToRadians(northDegrees)
+    );
   }
 
   /**
@@ -166,7 +169,8 @@ public:
         this->getWest(),
         this->getSouth(),
         this->getEast(),
-        this->getNorth());
+        this->getNorth()
+    );
   }
 
   /**
@@ -230,8 +234,8 @@ public:
    * @returns The intersection rectangle, or `std::nullopt` if there is no
    * intersection.
    */
-  std::optional<GlobeRectangle>
-  computeIntersection(const GlobeRectangle& other) const noexcept;
+  std::optional<GlobeRectangle> computeIntersection(const GlobeRectangle& other
+  ) const noexcept;
 
   /**
    * @brief Computes the union of this globe rectangle with another.
@@ -276,7 +280,8 @@ public:
   static bool equalsEpsilon(
       const GlobeRectangle& left,
       const GlobeRectangle& right,
-      double relativeEpsilon) noexcept;
+      double relativeEpsilon
+  ) noexcept;
 
 private:
   double _west;

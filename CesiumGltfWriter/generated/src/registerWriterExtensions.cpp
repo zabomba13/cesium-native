@@ -40,8 +40,8 @@
 
 namespace CesiumGltfWriter {
 
-void registerWriterExtensions(
-    CesiumJsonWriter::ExtensionWriterContext& context) {
+void registerWriterExtensions(CesiumJsonWriter::ExtensionWriterContext& context
+) {
   (void)context;
   context.registerExtension<CesiumGltf::Model, ExtensionCesiumRTCJsonWriter>();
   context.registerExtension<

@@ -101,7 +101,8 @@ public:
    * {@link AccessorViewStatus::InvalidAccessorIndex}.
    */
   AccessorView(
-      AccessorViewStatus status = AccessorViewStatus::InvalidAccessorIndex)
+      AccessorViewStatus status = AccessorViewStatus::InvalidAccessorIndex
+  )
       : _pData(nullptr), _stride(0), _offset(0), _size(0), _status(status) {}
 
   /**
@@ -119,7 +120,8 @@ public:
       const std::byte* pData,
       int64_t stride,
       int64_t offset,
-      int64_t size)
+      int64_t size
+  )
       : _pData(pData),
         _stride(stride),
         _offset(offset),
@@ -179,7 +181,8 @@ public:
     }
 
     return *reinterpret_cast<const T*>(
-        this->_pData + i * this->_stride + this->_offset);
+        this->_pData + i * this->_stride + this->_offset
+    );
   }
 
   /**
@@ -372,38 +375,41 @@ std::invoke_result_t<TCallback, AccessorView<AccessorTypes::SCALAR<TElement>>>
 createAccessorView(
     const Model& model,
     const Accessor& accessor,
-    TCallback&& callback) {
+    TCallback&& callback
+) {
   if (accessor.type == Accessor::Type::SCALAR) {
     return callback(
-        AccessorView<AccessorTypes::SCALAR<TElement>>(model, accessor));
+        AccessorView<AccessorTypes::SCALAR<TElement>>(model, accessor)
+    );
   }
   if (accessor.type == Accessor::Type::VEC2) {
-    return callback(
-        AccessorView<AccessorTypes::VEC2<TElement>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC2<TElement>>(model, accessor)
+    );
   }
   if (accessor.type == Accessor::Type::VEC3) {
-    return callback(
-        AccessorView<AccessorTypes::VEC3<TElement>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC3<TElement>>(model, accessor)
+    );
   }
   if (accessor.type == Accessor::Type::VEC4) {
-    return callback(
-        AccessorView<AccessorTypes::VEC4<TElement>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC4<TElement>>(model, accessor)
+    );
   }
   if (accessor.type == Accessor::Type::MAT2) {
-    return callback(
-        AccessorView<AccessorTypes::MAT2<TElement>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::MAT2<TElement>>(model, accessor)
+    );
   }
   if (accessor.type == Accessor::Type::MAT3) {
-    return callback(
-        AccessorView<AccessorTypes::MAT3<TElement>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::MAT3<TElement>>(model, accessor)
+    );
   }
   if (accessor.type == Accessor::Type::MAT4) {
-    return callback(
-        AccessorView<AccessorTypes::MAT4<TElement>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::MAT4<TElement>>(model, accessor)
+    );
   }
   // TODO Print a warning here???
   return callback(AccessorView<AccessorTypes::SCALAR<TElement>>(
-      AccessorViewStatus::InvalidType));
+      AccessorViewStatus::InvalidType
+  ));
 }
 } // namespace CesiumImpl
 
@@ -427,41 +433,49 @@ std::invoke_result_t<TCallback, AccessorView<AccessorTypes::SCALAR<float>>>
 createAccessorView(
     const Model& model,
     const Accessor& accessor,
-    TCallback&& callback) {
+    TCallback&& callback
+) {
   switch (accessor.componentType) {
   case Accessor::ComponentType::BYTE:
     return ::CesiumGltf::CesiumImpl::createAccessorView<TCallback, int8_t>(
         model,
         accessor,
-        std::forward<TCallback>(callback));
+        std::forward<TCallback>(callback)
+    );
   case Accessor::ComponentType::UNSIGNED_BYTE:
     return ::CesiumGltf::CesiumImpl::createAccessorView<TCallback, uint8_t>(
         model,
         accessor,
-        std::forward<TCallback>(callback));
+        std::forward<TCallback>(callback)
+    );
   case Accessor::ComponentType::SHORT:
     return ::CesiumGltf::CesiumImpl::createAccessorView<TCallback, int16_t>(
         model,
         accessor,
-        std::forward<TCallback>(callback));
+        std::forward<TCallback>(callback)
+    );
   case Accessor::ComponentType::UNSIGNED_SHORT:
     return ::CesiumGltf::CesiumImpl::createAccessorView<TCallback, uint16_t>(
         model,
         accessor,
-        std::forward<TCallback>(callback));
+        std::forward<TCallback>(callback)
+    );
   case Accessor::ComponentType::UNSIGNED_INT:
     return ::CesiumGltf::CesiumImpl::createAccessorView<TCallback, uint32_t>(
         model,
         accessor,
-        std::forward<TCallback>(callback));
+        std::forward<TCallback>(callback)
+    );
   case Accessor::ComponentType::FLOAT:
     return ::CesiumGltf::CesiumImpl::createAccessorView<TCallback, float>(
         model,
         accessor,
-        std::forward<TCallback>(callback));
+        std::forward<TCallback>(callback)
+    );
   default:
     return callback(AccessorView<AccessorTypes::SCALAR<float>>(
-        AccessorViewStatus::InvalidComponentType));
+        AccessorViewStatus::InvalidComponentType
+    ));
   }
 }
 
@@ -486,11 +500,13 @@ std::invoke_result_t<TCallback, AccessorView<AccessorTypes::SCALAR<float>>>
 createAccessorView(
     const Model& model,
     int32_t accessorIndex,
-    TCallback&& callback) {
+    TCallback&& callback
+) {
   const Accessor* pAccessor = Model::getSafe(&model.accessors, accessorIndex);
   if (!pAccessor) {
     return callback(AccessorView<AccessorTypes::SCALAR<float>>(
-        AccessorViewStatus::InvalidComponentType));
+        AccessorViewStatus::InvalidComponentType
+    ));
   }
 
   return createAccessorView(model, *pAccessor, callback);

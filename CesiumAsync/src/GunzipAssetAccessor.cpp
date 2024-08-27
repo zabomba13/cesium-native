@@ -14,7 +14,8 @@ public:
       : _pAssetResponse{pOther} {
     this->_dataValid = CesiumUtility::gunzip(
         this->_pAssetResponse->data(),
-        this->_gunzippedData);
+        this->_gunzippedData
+    );
   }
 
   virtual uint16_t statusCode() const noexcept override {
@@ -68,15 +69,18 @@ private:
 
 Future<std::shared_ptr<IAssetRequest>> gunzipIfNeeded(
     const AsyncSystem& asyncSystem,
-    std::shared_ptr<IAssetRequest>&& pCompletedRequest) {
+    std::shared_ptr<IAssetRequest>&& pCompletedRequest
+) {
   const IAssetResponse* pResponse = pCompletedRequest->response();
   if (pResponse && CesiumUtility::isGzip(pResponse->data())) {
     return asyncSystem.runInWorkerThread(
-        [pCompletedRequest = std::move(
-             pCompletedRequest)]() mutable -> std::shared_ptr<IAssetRequest> {
+        [pCompletedRequest = std::move(pCompletedRequest)](
+        ) mutable -> std::shared_ptr<IAssetRequest> {
           return std::make_shared<GunzippedAssetRequest>(
-              std::move(pCompletedRequest));
-        });
+              std::move(pCompletedRequest)
+          );
+        }
+    );
   }
   return asyncSystem.createResolvedFuture(std::move(pCompletedRequest));
 }
@@ -84,7 +88,8 @@ Future<std::shared_ptr<IAssetRequest>> gunzipIfNeeded(
 } // namespace
 
 GunzipAssetAccessor::GunzipAssetAccessor(
-    const std::shared_ptr<IAssetAccessor>& pAssetAccessor)
+    const std::shared_ptr<IAssetAccessor>& pAssetAccessor
+)
     : _pAssetAccessor(pAssetAccessor) {}
 
 GunzipAssetAccessor::~GunzipAssetAccessor() noexcept {}
@@ -92,12 +97,14 @@ GunzipAssetAccessor::~GunzipAssetAccessor() noexcept {}
 Future<std::shared_ptr<IAssetRequest>> GunzipAssetAccessor::get(
     const AsyncSystem& asyncSystem,
     const std::string& url,
-    const std::vector<THeader>& headers) {
+    const std::vector<THeader>& headers
+) {
   return this->_pAssetAccessor->get(asyncSystem, url, headers)
       .thenImmediately(
           [asyncSystem](std::shared_ptr<IAssetRequest>&& pCompletedRequest) {
             return gunzipIfNeeded(asyncSystem, std::move(pCompletedRequest));
-          });
+          }
+      );
 }
 
 Future<std::shared_ptr<IAssetRequest>> GunzipAssetAccessor::request(
@@ -105,13 +112,15 @@ Future<std::shared_ptr<IAssetRequest>> GunzipAssetAccessor::request(
     const std::string& verb,
     const std::string& url,
     const std::vector<THeader>& headers,
-    const gsl::span<const std::byte>& contentPayload) {
+    const gsl::span<const std::byte>& contentPayload
+) {
   return this->_pAssetAccessor
       ->request(asyncSystem, verb, url, headers, contentPayload)
       .thenImmediately(
           [asyncSystem](std::shared_ptr<IAssetRequest>&& pCompletedRequest) {
             return gunzipIfNeeded(asyncSystem, std::move(pCompletedRequest));
-          });
+          }
+      );
 }
 
 void GunzipAssetAccessor::tick() noexcept { _pAssetAccessor->tick(); }

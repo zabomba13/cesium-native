@@ -108,7 +108,8 @@ public:
       const std::string& culture = "",
       const CesiumGeospatial::Ellipsoid& ellipsoid =
           CesiumGeospatial::Ellipsoid::WGS84,
-      const RasterOverlayOptions& overlayOptions = {});
+      const RasterOverlayOptions& overlayOptions = {}
+  );
   virtual ~BingMapsRasterOverlay() override;
 
   virtual CesiumAsync::Future<CreateTileProviderResult> createTileProvider(
@@ -118,8 +119,8 @@ public:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner)
-      const override;
+      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+  ) const override;
 
 private:
   static const std::string BING_LOGO_HTML;

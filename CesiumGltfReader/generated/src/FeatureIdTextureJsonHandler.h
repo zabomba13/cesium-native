@@ -17,8 +17,8 @@ class FeatureIdTextureJsonHandler : public TextureInfoJsonHandler {
 public:
   using ValueType = CesiumGltf::FeatureIdTexture;
 
-  FeatureIdTextureJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  FeatureIdTextureJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::FeatureIdTexture* pObject);
 
@@ -28,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyFeatureIdTexture(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::FeatureIdTexture& o);
+      CesiumGltf::FeatureIdTexture& o
+  );
 
 private:
   CesiumGltf::FeatureIdTexture* _pObject = nullptr;

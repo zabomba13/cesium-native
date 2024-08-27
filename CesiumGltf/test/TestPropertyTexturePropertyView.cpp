@@ -16,7 +16,8 @@ namespace {
 template <typename T>
 void checkTextureValues(
     const std::vector<uint8_t>& data,
-    const std::vector<T>& expected) {
+    const std::vector<T>& expected
+) {
   PropertyTextureProperty property;
   ClassProperty classProperty;
   classProperty.type =
@@ -83,7 +84,8 @@ void checkTextureValues(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   PropertyTextureProperty property;
   ClassProperty classProperty;
   classProperty.type =
@@ -155,7 +157,8 @@ void checkNormalizedTextureValues(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   PropertyTextureProperty property;
   ClassProperty classProperty;
   classProperty.type =
@@ -188,11 +191,8 @@ void checkNormalizedTextureValues(
     property.channels[i] = static_cast<int64_t>(i);
   }
 
-  PropertyTexturePropertyView<T, true> view(
-      property,
-      classProperty,
-      sampler,
-      image);
+  PropertyTexturePropertyView<T, true>
+      view(property, classProperty, sampler, image);
   switch (sizeof(T)) {
   case 1:
     CHECK(view.getSwizzle() == "r");
@@ -229,7 +229,8 @@ template <typename T>
 void checkTextureArrayValues(
     const std::vector<uint8_t>& data,
     const int64_t count,
-    const std::vector<std::vector<T>>& expected) {
+    const std::vector<std::vector<T>>& expected
+) {
   PropertyTextureProperty property;
   ClassProperty classProperty;
   classProperty.type =
@@ -259,11 +260,8 @@ void checkTextureArrayValues(
     property.channels[i] = static_cast<int64_t>(i);
   }
 
-  PropertyTexturePropertyView<PropertyArrayView<T>> view(
-      property,
-      classProperty,
-      sampler,
-      image);
+  PropertyTexturePropertyView<PropertyArrayView<T>>
+      view(property, classProperty, sampler, image);
   switch (image.channels) {
   case 1:
     CHECK(view.getSwizzle() == "r");
@@ -313,7 +311,8 @@ void checkTextureArrayValues(
     const std::vector<std::vector<T>>& expectedRaw,
     const std::vector<std::optional<std::vector<T>>>& expectedTransformed,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   PropertyTextureProperty property;
   ClassProperty classProperty;
   classProperty.type =
@@ -345,11 +344,8 @@ void checkTextureArrayValues(
     property.channels[i] = static_cast<int64_t>(i);
   }
 
-  PropertyTexturePropertyView<PropertyArrayView<T>> view(
-      property,
-      classProperty,
-      sampler,
-      image);
+  PropertyTexturePropertyView<PropertyArrayView<T>>
+      view(property, classProperty, sampler, image);
   switch (count) {
   case 1:
     CHECK(view.getSwizzle() == "r");
@@ -410,7 +406,8 @@ void checkNormalizedTextureArrayValues(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   PropertyTextureProperty property;
   ClassProperty classProperty;
   classProperty.type =
@@ -445,11 +442,8 @@ void checkNormalizedTextureArrayValues(
     property.channels[i] = static_cast<int64_t>(i);
   }
 
-  PropertyTexturePropertyView<PropertyArrayView<T>, true> view(
-      property,
-      classProperty,
-      sampler,
-      image);
+  PropertyTexturePropertyView<PropertyArrayView<T>, true>
+      view(property, classProperty, sampler, image);
   switch (image.channels) {
   case 1:
     CHECK(view.getSwizzle() == "r");
@@ -623,7 +617,8 @@ TEST_CASE("Check scalar PropertyTexturePropertyView") {
         expected,
         std::nullopt,
         std::nullopt,
-        noData);
+        noData
+    );
   }
 
   SECTION("uint8_t with noData and defaultValue") {
@@ -645,7 +640,8 @@ TEST_CASE("Check scalar PropertyTexturePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -726,7 +722,8 @@ TEST_CASE("Check scalar PropertyTexturePropertyView (normalized)") {
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -887,7 +884,8 @@ TEST_CASE("Check vecN PropertyTexturePropertyView") {
         expectedTransformed,
         std::nullopt,
         std::nullopt,
-        noData);
+        noData
+    );
   }
 
   SECTION("glm::i8vec2 with defaultValue") {
@@ -920,7 +918,8 @@ TEST_CASE("Check vecN PropertyTexturePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -1039,7 +1038,8 @@ TEST_CASE("Check vecN PropertyTexturePropertyView (normalized)") {
         expectedRaw,
         expectedTransformed,
         JsonValue::Array{offset[0], offset[1]},
-        JsonValue::Array{scale[0], scale[1]});
+        JsonValue::Array{scale[0], scale[1]}
+    );
   }
 
   SECTION("glm::i8vec2 with all properties") {
@@ -1076,7 +1076,8 @@ TEST_CASE("Check vecN PropertyTexturePropertyView (normalized)") {
         JsonValue::Array{offset[0], offset[1]},
         JsonValue::Array{scale[0], scale[1]},
         JsonValue::Array{noData[0], noData[1]},
-        JsonValue::Array{defaultValue[0], defaultValue[1]});
+        JsonValue::Array{defaultValue[0], defaultValue[1]}
+    );
   }
 }
 
@@ -1196,7 +1197,8 @@ TEST_CASE("Check array PropertyTexturePropertyView") {
         expectedRaw,
         expectedTransformed,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -1215,7 +1217,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         {7, 8, 9, 3},
         {0, 5, 2, 27}};
     std::vector<std::optional<std::vector<double>>> expectedTransformed(
-        expectedRaw.size());
+        expectedRaw.size()
+    );
 
     for (size_t i = 0; i < expectedRaw.size(); i++) {
       auto rawValues = expectedRaw[i];
@@ -1229,7 +1232,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         data,
         4,
         expectedRaw,
-        expectedTransformed);
+        expectedTransformed
+    );
   }
 
   SECTION("int16_t array") {
@@ -1246,7 +1250,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         {532, 2},
         {-248, 256}};
     std::vector<std::optional<std::vector<double>>> expectedTransformed(
-        expectedRaw.size());
+        expectedRaw.size()
+    );
 
     for (size_t i = 0; i < expectedRaw.size(); i++) {
       auto rawValues = expectedRaw[i];
@@ -1261,7 +1266,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         data,
         2,
         expectedRaw,
-        expectedTransformed);
+        expectedTransformed
+    );
   }
 
   SECTION("uint8_t array with offset / scale") {
@@ -1281,7 +1287,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         {7, 8, 9, 3},
         {0, 0, 0, 0}};
     std::vector<std::optional<std::vector<double>>> expectedTransformed(
-        expectedRaw.size());
+        expectedRaw.size()
+    );
 
     for (size_t i = 0; i < expectedRaw.size(); i++) {
       auto rawValues = expectedRaw[i];
@@ -1298,7 +1305,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         expectedRaw,
         expectedTransformed,
         JsonValue::Array{offset[0], offset[1], offset[2], offset[3]},
-        JsonValue::Array{scale[0], scale[1], scale[2], scale[3]});
+        JsonValue::Array{scale[0], scale[1], scale[2], scale[3]}
+    );
   }
 
   SECTION("uint8_t array with noData") {
@@ -1317,7 +1325,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         {7, 8, 9, 3},
         {0, 0, 0, 0}};
     std::vector<std::optional<std::vector<double>>> expectedTransformed(
-        expectedRaw.size());
+        expectedRaw.size()
+    );
 
     for (size_t i = 0; i < expectedRaw.size() - 1; i++) {
       auto rawValues = expectedRaw[i];
@@ -1337,7 +1346,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         expectedTransformed,
         std::nullopt,
         std::nullopt,
-        noData);
+        noData
+    );
   }
 
   SECTION("uint8_t array with all properties") {
@@ -1360,7 +1370,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         {7, 8, 9, 3},
         {0, 0, 0, 0}};
     std::vector<std::optional<std::vector<double>>> expectedTransformed(
-        expectedRaw.size());
+        expectedRaw.size()
+    );
 
     for (size_t i = 0; i < expectedRaw.size() - 1; i++) {
       auto rawValues = expectedRaw[i];
@@ -1381,7 +1392,8 @@ TEST_CASE("Check array PropertyTexturePropertyView (normalized)") {
         JsonValue::Array{offset[0], offset[1], offset[2], offset[3]},
         JsonValue::Array{scale[0], scale[1], scale[2], scale[3]},
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -1433,11 +1445,8 @@ TEST_CASE("Check that PropertyTextureProperty values override class property "
   property.max = std::numeric_limits<float>::max();
   property.channels = {0, 1, 2, 3};
 
-  PropertyTexturePropertyView<float> view(
-      property,
-      classProperty,
-      sampler,
-      image);
+  PropertyTexturePropertyView<float>
+      view(property, classProperty, sampler, image);
   CHECK(view.getSwizzle() == "rgba");
 
   REQUIRE(view.offset() == offset);
@@ -1492,11 +1501,8 @@ TEST_CASE("Check that non-adjacent channels resolve to expected output") {
     imageData.resize(data.size());
     std::memcpy(imageData.data(), data.data(), data.size());
 
-    PropertyTexturePropertyView<uint8_t> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<uint8_t>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "a");
 
     std::vector<uint8_t> expected{3, 4, 0, 1};
@@ -1533,11 +1539,8 @@ TEST_CASE("Check that non-adjacent channels resolve to expected output") {
     imageData.resize(data.size());
     std::memcpy(imageData.data(), data.data(), data.size());
 
-    PropertyTexturePropertyView<uint16_t> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<uint16_t>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "br");
 
     std::vector<uint16_t> expected{2, 259, 257, 520};
@@ -1574,11 +1577,8 @@ TEST_CASE("Check that non-adjacent channels resolve to expected output") {
     imageData.resize(data.size());
     std::memcpy(imageData.data(), data.data(), data.size());
 
-    PropertyTexturePropertyView<glm::u8vec3> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<glm::u8vec3>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "abg");
 
     std::vector<glm::u8vec3> expected{
@@ -1621,11 +1621,8 @@ TEST_CASE("Check that non-adjacent channels resolve to expected output") {
     imageData.resize(data.size());
     std::memcpy(imageData.data(), data.data(), data.size());
 
-    PropertyTexturePropertyView<PropertyArrayView<uint8_t>> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<PropertyArrayView<uint8_t>>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "grab");
 
     std::vector<std::vector<uint8_t>> expected{
@@ -1676,11 +1673,8 @@ TEST_CASE("Check sampling with different sampler values") {
     sampler.wrapS = Sampler::WrapS::REPEAT;
     sampler.wrapT = Sampler::WrapT::REPEAT;
 
-    PropertyTexturePropertyView<uint8_t> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<uint8_t>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "r");
 
     std::vector<glm::dvec2> uvs{
@@ -1703,11 +1697,8 @@ TEST_CASE("Check sampling with different sampler values") {
     // MIRRORED: | 1 2 3 | 3 2 1 |
     // Sampling 0.6 is equal to sampling 1.4 or -0.6.
 
-    PropertyTexturePropertyView<uint8_t> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<uint8_t>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "r");
 
     std::vector<glm::dvec2> uvs{
@@ -1727,11 +1718,8 @@ TEST_CASE("Check sampling with different sampler values") {
     sampler.wrapS = Sampler::WrapS::CLAMP_TO_EDGE;
     sampler.wrapT = Sampler::WrapT::CLAMP_TO_EDGE;
 
-    PropertyTexturePropertyView<uint8_t> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<uint8_t>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "r");
 
     std::vector<glm::dvec2> uvs{
@@ -1751,11 +1739,8 @@ TEST_CASE("Check sampling with different sampler values") {
     sampler.wrapS = Sampler::WrapS::REPEAT;
     sampler.wrapT = Sampler::WrapT::CLAMP_TO_EDGE;
 
-    PropertyTexturePropertyView<uint8_t> view(
-        property,
-        classProperty,
-        sampler,
-        image);
+    PropertyTexturePropertyView<uint8_t>
+        view(property, classProperty, sampler, image);
     CHECK(view.getSwizzle() == "r");
 
     std::vector<glm::dvec2> uvs{
@@ -1820,7 +1805,8 @@ TEST_CASE("Test PropertyTextureProperty constructs with "
 
   // Texcoord is overridden by value in KHR_texture_transform.
   REQUIRE(
-      view.getTexCoordSetIndex() == textureTransform->getTexCoordSetIndex());
+      view.getTexCoordSetIndex() == textureTransform->getTexCoordSetIndex()
+  );
   REQUIRE(textureTransform->getTexCoordSetIndex() == 10);
 
   // This transforms to the following UV values:
@@ -1893,7 +1879,8 @@ TEST_CASE("Test normalized PropertyTextureProperty constructs with "
 
   // Texcoord is overridden by value in KHR_texture_transform.
   REQUIRE(
-      view.getTexCoordSetIndex() == textureTransform->getTexCoordSetIndex());
+      view.getTexCoordSetIndex() == textureTransform->getTexCoordSetIndex()
+  );
   REQUIRE(textureTransform->getTexCoordSetIndex() == 10);
 
   // This transforms to the following UV values:
@@ -1913,8 +1900,8 @@ TEST_CASE("Test normalized PropertyTextureProperty constructs with "
     glm::dvec2 uv = texCoords[i];
     REQUIRE(view.getRaw(uv[0], uv[1]) == expectedValues[i]);
     REQUIRE(
-        view.get(uv[0], uv[1]) ==
-        static_cast<double>(expectedValues[i]) / 255.0);
+        view.get(uv[0], uv[1]) == static_cast<double>(expectedValues[i]) / 255.0
+    );
   }
 }
 

@@ -13,10 +13,12 @@ namespace {
 void primitiveWriter(const CesiumUtility::JsonValue& item, JsonWriter& j);
 void recursiveArrayWriter(
     const CesiumUtility::JsonValue::Array& array,
-    JsonWriter& j);
+    JsonWriter& j
+);
 void recursiveObjectWriter(
     const CesiumUtility::JsonValue::Object& object,
-    JsonWriter& j);
+    JsonWriter& j
+);
 
 void primitiveWriter(const CesiumUtility::JsonValue& item, JsonWriter& j) {
   if (item.isBool()) {
@@ -46,7 +48,8 @@ void primitiveWriter(const CesiumUtility::JsonValue& item, JsonWriter& j) {
 
 void recursiveArrayWriter(
     const CesiumUtility::JsonValue::Array& array,
-    JsonWriter& j) {
+    JsonWriter& j
+) {
   j.StartArray();
   for (const auto& item : array) {
     if (item.isArray()) {
@@ -66,7 +69,8 @@ void recursiveArrayWriter(
 
 void recursiveObjectWriter(
     const CesiumUtility::JsonValue::Object& object,
-    JsonWriter& j) {
+    JsonWriter& j
+) {
 
   j.StartObject();
 
@@ -75,13 +79,15 @@ void recursiveObjectWriter(
     if (item.isArray()) {
       recursiveArrayWriter(
           std::get<CesiumUtility::JsonValue::Array>(item.value),
-          j);
+          j
+      );
     }
 
     if (item.isObject()) {
       recursiveObjectWriter(
           std::get<CesiumUtility::JsonValue::Object>(item.value),
-          j);
+          j
+      );
     }
 
     else {
@@ -95,16 +101,19 @@ void recursiveObjectWriter(
 
 void writeJsonValue(
     const CesiumUtility::JsonValue& value,
-    JsonWriter& jsonWriter) {
+    JsonWriter& jsonWriter
+) {
 
   if (value.isArray()) {
     recursiveArrayWriter(
         std::get<CesiumUtility::JsonValue::Array>(value.value),
-        jsonWriter);
+        jsonWriter
+    );
   } else if (value.isObject()) {
     recursiveObjectWriter(
         std::get<CesiumUtility::JsonValue::Object>(value.value),
-        jsonWriter);
+        jsonWriter
+    );
   } else {
     primitiveWriter(value, jsonWriter);
   }

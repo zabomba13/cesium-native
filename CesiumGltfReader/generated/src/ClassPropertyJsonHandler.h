@@ -19,8 +19,8 @@ class ClassPropertyJsonHandler
 public:
   using ValueType = CesiumGltf::ClassProperty;
 
-  ClassPropertyJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  ClassPropertyJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::ClassProperty* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -29,7 +29,8 @@ protected:
   IJsonHandler* readObjectKeyClassProperty(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ClassProperty& o);
+      CesiumGltf::ClassProperty& o
+  );
 
 private:
   CesiumGltf::ClassProperty* _pObject = nullptr;

@@ -10,8 +10,8 @@
 #include <stdexcept>
 
 namespace CesiumGeometry {
-CullingResult
-OrientedBoundingBox::intersectPlane(const Plane& plane) const noexcept {
+CullingResult OrientedBoundingBox::intersectPlane(const Plane& plane
+) const noexcept {
   const glm::dvec3 normal = plane.getNormal();
 
   const glm::dmat3& halfAxes = this->getHalfAxes();
@@ -24,15 +24,18 @@ OrientedBoundingBox::intersectPlane(const Plane& plane) const noexcept {
   const double radEffective = glm::abs(
                                   normal.x * xAxisDirectionAndHalfLength.x +
                                   normal.y * xAxisDirectionAndHalfLength.y +
-                                  normal.z * xAxisDirectionAndHalfLength.z) +
+                                  normal.z * xAxisDirectionAndHalfLength.z
+                              ) +
                               glm::abs(
                                   normal.x * yAxisDirectionAndHalfLength.x +
                                   normal.y * yAxisDirectionAndHalfLength.y +
-                                  normal.z * yAxisDirectionAndHalfLength.z) +
+                                  normal.z * yAxisDirectionAndHalfLength.z
+                              ) +
                               glm::abs(
                                   normal.x * zAxisDirectionAndHalfLength.x +
                                   normal.y * zAxisDirectionAndHalfLength.y +
-                                  normal.z * zAxisDirectionAndHalfLength.z);
+                                  normal.z * zAxisDirectionAndHalfLength.z
+                              );
 
   const double distanceToPlane =
       ::glm::dot(normal, this->getCenter()) + plane.getDistance();
@@ -48,8 +51,9 @@ OrientedBoundingBox::intersectPlane(const Plane& plane) const noexcept {
   return CullingResult::Intersecting;
 }
 
-double OrientedBoundingBox::computeDistanceSquaredToPosition(
-    const glm::dvec3& position) const noexcept {
+double
+OrientedBoundingBox::computeDistanceSquaredToPosition(const glm::dvec3& position
+) const noexcept {
   const glm::dvec3 offset = position - this->getCenter();
 
   const glm::dmat3& halfAxes = this->getHalfAxes();
@@ -68,7 +72,8 @@ double OrientedBoundingBox::computeDistanceSquaredToPosition(
   const glm::dvec3 pPrime(
       glm::dot(offset, u),
       glm::dot(offset, v),
-      glm::dot(offset, w));
+      glm::dot(offset, w)
+  );
 
   double distanceSquared = 0.0;
   double d;
@@ -107,11 +112,13 @@ bool OrientedBoundingBox::contains(const glm::dvec3& position) const noexcept {
          glm::abs(localPosition.z) <= 1.0;
 }
 
-OrientedBoundingBox OrientedBoundingBox::transform(
-    const glm::dmat4& transformation) const noexcept {
+OrientedBoundingBox
+OrientedBoundingBox::transform(const glm::dmat4& transformation
+) const noexcept {
   return OrientedBoundingBox(
       glm::dvec3(transformation * glm::dvec4(this->_center, 1.0)),
-      glm::dmat3(transformation) * this->_halfAxes);
+      glm::dmat3(transformation) * this->_halfAxes
+  );
 }
 
 AxisAlignedBox OrientedBoundingBox::toAxisAligned() const noexcept {
@@ -131,14 +138,17 @@ BoundingSphere OrientedBoundingBox::toSphere() const noexcept {
   return BoundingSphere(this->_center, sphereRadius);
 }
 
-/*static*/ OrientedBoundingBox OrientedBoundingBox::fromAxisAligned(
-    const AxisAlignedBox& axisAligned) noexcept {
+/*static*/ OrientedBoundingBox
+OrientedBoundingBox::fromAxisAligned(const AxisAlignedBox& axisAligned
+) noexcept {
   return OrientedBoundingBox(
       axisAligned.center,
       glm::dmat3(
           glm::dvec3(axisAligned.lengthX * 0.5, 0.0, 0.0),
           glm::dvec3(0.0, axisAligned.lengthY * 0.5, 0.0),
-          glm::dvec3(0.0, 0.0, axisAligned.lengthZ * 0.5)));
+          glm::dvec3(0.0, 0.0, axisAligned.lengthZ * 0.5)
+      )
+  );
 }
 
 /*static*/ OrientedBoundingBox

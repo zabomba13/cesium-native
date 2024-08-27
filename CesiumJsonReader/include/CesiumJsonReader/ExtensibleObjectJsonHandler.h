@@ -13,15 +13,16 @@ namespace CesiumJsonReader {
 
 class ExtensibleObjectJsonHandler : public CesiumJsonReader::ObjectJsonHandler {
 public:
-  explicit ExtensibleObjectJsonHandler(
-      const JsonReaderOptions& context) noexcept;
+  explicit ExtensibleObjectJsonHandler(const JsonReaderOptions& context
+  ) noexcept;
 
 protected:
   void reset(IJsonHandler* pParent, CesiumUtility::ExtensibleObject* pObject);
   IJsonHandler* readObjectKeyExtensibleObject(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumUtility::ExtensibleObject& o);
+      CesiumUtility::ExtensibleObject& o
+  );
 
 private:
   CesiumJsonReader::DictionaryJsonHandler<

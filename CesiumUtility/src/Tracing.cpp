@@ -80,7 +80,8 @@ void Tracer::writeAsyncEvent(
     const char* category,
     const char* name,
     char type,
-    int64_t id) {
+    int64_t id
+) {
 
   bool isAsync = true;
   if (id < 0) {
@@ -143,16 +144,18 @@ void ScopedTrace::reset() {
     CESIUM_TRACE_END(_name.c_str());
   } else {
     auto endTimePoint = std::chrono::steady_clock::now();
-    int64_t start = std::chrono::time_point_cast<std::chrono::microseconds>(
-                        this->_startTime)
-                        .time_since_epoch()
-                        .count();
+    int64_t start =
+        std::chrono::time_point_cast<std::chrono::microseconds>(this->_startTime
+        )
+            .time_since_epoch()
+            .count();
     int64_t end =
         std::chrono::time_point_cast<std::chrono::microseconds>(endTimePoint)
             .time_since_epoch()
             .count();
     Tracer::instance().writeCompleteEvent(
-        {this->_name, start, end - start, this->_threadId});
+        {this->_name, start, end - start, this->_threadId}
+    );
   }
 }
 
@@ -164,7 +167,8 @@ TrackSet::~TrackSet() {
     CESIUM_ASSERT(!track.inUse);
     Tracer::instance().writeAsyncEventEnd(
         (this->name + " " + std::to_string(track.id)).c_str(),
-        track.id);
+        track.id
+    );
   }
 }
 
@@ -183,7 +187,8 @@ size_t TrackSet::acquireTrack() {
     Track track{Tracer::instance().allocateTrackID(), true};
     Tracer::instance().writeAsyncEventBegin(
         (this->name + " " + std::to_string(track.id)).c_str(),
-        track.id);
+        track.id
+    );
     size_t index = this->tracks.size();
     this->tracks.emplace_back(track);
     return index;
@@ -258,8 +263,8 @@ LambdaCaptureTrack::~LambdaCaptureTrack() {
   }
 }
 
-LambdaCaptureTrack&
-LambdaCaptureTrack::operator=(const LambdaCaptureTrack& rhs) noexcept {
+LambdaCaptureTrack& LambdaCaptureTrack::operator=(const LambdaCaptureTrack& rhs
+) noexcept {
   if (rhs.pSet) {
     rhs.pSet->addReference(rhs.index);
   }
@@ -273,8 +278,8 @@ LambdaCaptureTrack::operator=(const LambdaCaptureTrack& rhs) noexcept {
   return *this;
 }
 
-LambdaCaptureTrack&
-LambdaCaptureTrack::operator=(LambdaCaptureTrack&& rhs) noexcept {
+LambdaCaptureTrack& LambdaCaptureTrack::operator=(LambdaCaptureTrack&& rhs
+) noexcept {
   if (this->pSet) {
     this->pSet->releaseReference(this->index);
   }
@@ -346,7 +351,8 @@ void TrackReference::dismissCurrentThread() {
 
   CESIUM_ASSERT(
       TrackReference::_threadEnlistedTracks.size() > 0 &&
-      TrackReference::_threadEnlistedTracks.back() == this);
+      TrackReference::_threadEnlistedTracks.back() == this
+  );
 
   TrackReference::_threadEnlistedTracks.pop_back();
 }

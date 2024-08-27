@@ -53,14 +53,16 @@ LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
     LocalDirection yAxisDirection,
     LocalDirection zAxisDirection,
     double scaleToMeters,
-    const Ellipsoid& ellipsoid)
+    const Ellipsoid& ellipsoid
+)
     : LocalHorizontalCoordinateSystem(
           ellipsoid.cartographicToCartesian(origin),
           xAxisDirection,
           yAxisDirection,
           zAxisDirection,
           scaleToMeters,
-          ellipsoid) {}
+          ellipsoid
+      ) {}
 
 LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
     const glm::dvec3& originEcef,
@@ -68,14 +70,18 @@ LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
     LocalDirection yAxisDirection,
     LocalDirection zAxisDirection,
     double scaleToMeters,
-    const Ellipsoid& ellipsoid) {
+    const Ellipsoid& ellipsoid
+) {
   // The three axes must be orthogonal
   CESIUM_ASSERT(
-      directionToAxis(xAxisDirection) != directionToAxis(yAxisDirection));
+      directionToAxis(xAxisDirection) != directionToAxis(yAxisDirection)
+  );
   CESIUM_ASSERT(
-      directionToAxis(xAxisDirection) != directionToAxis(zAxisDirection));
+      directionToAxis(xAxisDirection) != directionToAxis(zAxisDirection)
+  );
   CESIUM_ASSERT(
-      directionToAxis(yAxisDirection) != directionToAxis(zAxisDirection));
+      directionToAxis(yAxisDirection) != directionToAxis(zAxisDirection)
+  );
 
   // Construct a local horizontal system with East-North-Up axes (right-handed)
   glm::dmat4 enuToFixed =
@@ -85,7 +91,8 @@ LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
   glm::dmat3 localToEnuAndScale(
       scaleToMeters * directionToEnuVector(xAxisDirection),
       scaleToMeters * directionToEnuVector(yAxisDirection),
-      scaleToMeters * directionToEnuVector(zAxisDirection));
+      scaleToMeters * directionToEnuVector(zAxisDirection)
+  );
 
   this->_localToEcef = enuToFixed * glm::dmat4(localToEnuAndScale);
   this->_ecefToLocal = glm::affineInverse(this->_localToEcef);
@@ -99,31 +106,37 @@ CesiumGeospatial::LocalHorizontalCoordinateSystem::
 CesiumGeospatial::LocalHorizontalCoordinateSystem::
     LocalHorizontalCoordinateSystem(
         const glm::dmat4& localToEcef,
-        const glm::dmat4& ecefToLocal)
+        const glm::dmat4& ecefToLocal
+    )
     : _ecefToLocal(ecefToLocal), _localToEcef(localToEcef) {}
 
 glm::dvec3 LocalHorizontalCoordinateSystem::localPositionToEcef(
-    const glm::dvec3& localPosition) const noexcept {
+    const glm::dvec3& localPosition
+) const noexcept {
   return glm::dvec3(this->_localToEcef * glm::dvec4(localPosition, 1.0));
 }
 
 glm::dvec3 LocalHorizontalCoordinateSystem::ecefPositionToLocal(
-    const glm::dvec3& ecefPosition) const noexcept {
+    const glm::dvec3& ecefPosition
+) const noexcept {
   return glm::dvec3(this->_ecefToLocal * glm::dvec4(ecefPosition, 1.0));
 }
 
 glm::dvec3 LocalHorizontalCoordinateSystem::localDirectionToEcef(
-    const glm::dvec3& localDirection) const noexcept {
+    const glm::dvec3& localDirection
+) const noexcept {
   return glm::dvec3(this->_localToEcef * glm::dvec4(localDirection, 0.0));
 }
 
 glm::dvec3 LocalHorizontalCoordinateSystem::ecefDirectionToLocal(
-    const glm::dvec3& ecefDirection) const noexcept {
+    const glm::dvec3& ecefDirection
+) const noexcept {
   return glm::dvec3(this->_ecefToLocal * glm::dvec4(ecefDirection, 0.0));
 }
 
 glm::dmat4 LocalHorizontalCoordinateSystem::computeTransformationToAnotherLocal(
-    const LocalHorizontalCoordinateSystem& target) const noexcept {
+    const LocalHorizontalCoordinateSystem& target
+) const noexcept {
   return target.getEcefToLocalTransformation() *
          this->getLocalToEcefTransformation();
 }

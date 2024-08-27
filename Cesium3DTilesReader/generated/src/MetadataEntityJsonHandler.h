@@ -18,8 +18,8 @@ class MetadataEntityJsonHandler
 public:
   using ValueType = Cesium3DTiles::MetadataEntity;
 
-  MetadataEntityJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  MetadataEntityJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, Cesium3DTiles::MetadataEntity* pObject);
 
@@ -29,7 +29,8 @@ protected:
   IJsonHandler* readObjectKeyMetadataEntity(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::MetadataEntity& o);
+      Cesium3DTiles::MetadataEntity& o
+  );
 
 private:
   Cesium3DTiles::MetadataEntity* _pObject = nullptr;

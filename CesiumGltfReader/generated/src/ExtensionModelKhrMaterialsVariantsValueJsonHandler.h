@@ -18,10 +18,12 @@ public:
   using ValueType = CesiumGltf::ExtensionModelKhrMaterialsVariantsValue;
 
   ExtensionModelKhrMaterialsVariantsValueJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionModelKhrMaterialsVariantsValue* pObject);
+      CesiumGltf::ExtensionModelKhrMaterialsVariantsValue* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -29,7 +31,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionModelKhrMaterialsVariantsValue(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionModelKhrMaterialsVariantsValue& o);
+      CesiumGltf::ExtensionModelKhrMaterialsVariantsValue& o
+  );
 
 private:
   CesiumGltf::ExtensionModelKhrMaterialsVariantsValue* _pObject = nullptr;

@@ -17,7 +17,8 @@ std::unique_ptr<SimpleAssetResponse> readFileUri(const std::string& uri) {
         errorCode,
         contentType,
         headers,
-        std::move(result));
+        std::move(result)
+    );
   };
   auto protocolPos = uri.find("file:///");
   if (protocolPos != 0) {
@@ -46,7 +47,8 @@ CesiumAsync::Future<std::shared_ptr<CesiumAsync::IAssetRequest>>
 FileAccessor::get(
     const CesiumAsync::AsyncSystem& asyncSystem,
     const std::string& url,
-    const std::vector<CesiumAsync::IAssetAccessor::THeader>& headers) {
+    const std::vector<CesiumAsync::IAssetAccessor::THeader>& headers
+) {
   return asyncSystem.createFuture<std::shared_ptr<CesiumAsync::IAssetRequest>>(
       [&](const auto& promise) {
         auto response = readFileUri(url);
@@ -55,25 +57,23 @@ FileAccessor::get(
             "GET",
             url,
             cesiumHeaders,
-            std::move(response));
+            std::move(response)
+        );
         promise.resolve(request);
-      });
+      }
+  );
 }
 
 // Can we do anything with a request that isn't a GET?
-CesiumAsync::Future<std::shared_ptr<CesiumAsync::IAssetRequest>>
-FileAccessor::request(
-    const CesiumAsync::AsyncSystem& asyncSystem,
-    const std::string& verb,
-    const std::string& url,
-    const std::vector<THeader>& headers,
-    const gsl::span<const std::byte>&) {
+CesiumAsync::Future<std::shared_ptr<CesiumAsync::IAssetRequest>> FileAccessor::
+    request(const CesiumAsync::AsyncSystem& asyncSystem, const std::string& verb, const std::string& url, const std::vector<THeader>& headers, const gsl::span<const std::byte>&) {
   if (verb == "GET") {
     return get(asyncSystem, url, headers);
   }
   return asyncSystem.createFuture<std::shared_ptr<CesiumAsync::IAssetRequest>>(
       [&](const auto& promise) {
         promise.reject(std::runtime_error("unsupported operation"));
-      });
+      }
+  );
 }
 } // namespace CesiumNativeTests

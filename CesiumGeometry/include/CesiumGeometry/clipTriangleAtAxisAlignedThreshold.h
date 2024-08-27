@@ -92,5 +92,6 @@ void clipTriangleAtAxisAlignedThreshold(
     double u0,
     double u1,
     double u2,
-    std::vector<TriangleClipVertex>& result) noexcept;
+    std::vector<TriangleClipVertex>& result
+) noexcept;
 } // namespace CesiumGeometry

@@ -47,7 +47,8 @@ getAccessorComponentTypeAsPropertyComponentType(const Accessor& accessor) {
 
 PropertyAttributeView::PropertyAttributeView(
     const Model& model,
-    const PropertyAttribute& propertyAttribute) noexcept
+    const PropertyAttribute& propertyAttribute
+) noexcept
     : _pModel(&model),
       _pPropertyAttribute(&propertyAttribute),
       _pClass(nullptr),

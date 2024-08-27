@@ -35,7 +35,9 @@ struct CatchFunction {
           .then(
               scheduler,
               unwrapFuture<decltype(ptrToException), std::exception_ptr>(
-                  std::move(ptrToException)));
+                  std::move(ptrToException)
+              )
+          );
     }
   }
 };
@@ -65,7 +67,9 @@ struct CatchFunction<Func, void, Scheduler, TaskParameter> {
           .then(
               scheduler,
               unwrapFuture<decltype(ptrToException), std::exception_ptr>(
-                  std::move(ptrToException)));
+                  std::move(ptrToException)
+              )
+          );
     }
   }
 };

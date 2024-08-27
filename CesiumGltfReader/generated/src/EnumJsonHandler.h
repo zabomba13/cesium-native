@@ -27,7 +27,8 @@ protected:
   IJsonHandler* readObjectKeyEnum(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Enum& o);
+      CesiumGltf::Enum& o
+  );
 
 private:
   CesiumGltf::Enum* _pObject = nullptr;

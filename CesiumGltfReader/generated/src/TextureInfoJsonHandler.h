@@ -16,8 +16,8 @@ class TextureInfoJsonHandler
 public:
   using ValueType = CesiumGltf::TextureInfo;
 
-  TextureInfoJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  TextureInfoJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::TextureInfo* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -26,7 +26,8 @@ protected:
   IJsonHandler* readObjectKeyTextureInfo(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::TextureInfo& o);
+      CesiumGltf::TextureInfo& o
+  );
 
 private:
   CesiumGltf::TextureInfo* _pObject = nullptr;

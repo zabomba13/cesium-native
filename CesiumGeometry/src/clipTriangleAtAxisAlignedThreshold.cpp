@@ -14,7 +14,7 @@ void clipTriangleAtAxisAlignedThreshold(
     double u2, // Coordinate of third vertex in triangle (CCW order)
     std::vector<TriangleClipVertex>&
         result // The aray into which to copy the result.
-    ) noexcept {
+) noexcept {
   bool u0Behind, u1Behind, u2Behind;
   if (keepAbove) {
     u0Behind = u0 < threshold;

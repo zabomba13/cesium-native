@@ -18,10 +18,12 @@ public:
   using ValueType = Cesium3DTiles::PropertyStatistics;
 
   PropertyStatisticsJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      Cesium3DTiles::PropertyStatistics* pObject);
+      Cesium3DTiles::PropertyStatistics* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -29,7 +31,8 @@ protected:
   IJsonHandler* readObjectKeyPropertyStatistics(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::PropertyStatistics& o);
+      Cesium3DTiles::PropertyStatistics& o
+  );
 
 private:
   Cesium3DTiles::PropertyStatistics* _pObject = nullptr;

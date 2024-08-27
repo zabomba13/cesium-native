@@ -76,7 +76,8 @@ public:
   static bool rectangleIsWithinPolygons(
       const CesiumGeospatial::GlobeRectangle& rectangle,
       const std::vector<CesiumGeospatial::CartographicPolygon>&
-          cartographicPolygons) noexcept;
+          cartographicPolygons
+  ) noexcept;
 
   /**
    * @brief Determines whether a globe rectangle is completely outside all the
@@ -90,7 +91,8 @@ public:
   static bool rectangleIsOutsidePolygons(
       const CesiumGeospatial::GlobeRectangle& rectangle,
       const std::vector<CesiumGeospatial::CartographicPolygon>&
-          cartographicPolygons) noexcept;
+          cartographicPolygons
+  ) noexcept;
 
 private:
   std::vector<glm::dvec2> _vertices;

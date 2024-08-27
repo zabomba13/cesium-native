@@ -75,7 +75,8 @@ IJsonHandler* JsonHandler::ignoreAndContinue() {
 
 void JsonHandler::reportWarning(
     const std::string& warning,
-    std::vector<std::string>&& context) {
+    std::vector<std::string>&& context
+) {
   this->parent()->reportWarning(warning, std::move(context));
 }
 

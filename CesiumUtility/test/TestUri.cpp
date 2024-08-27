@@ -14,11 +14,12 @@ TEST_CASE("Uri::getPath") {
   SECTION("ignores path parameters") {
     CHECK(Uri::getPath("https://example.com/?some=parameter") == "/");
     CHECK(
-        Uri::getPath("https://example.com/foo/bar?some=parameter") ==
-        "/foo/bar");
+        Uri::getPath("https://example.com/foo/bar?some=parameter") == "/foo/bar"
+    );
     CHECK(
         Uri::getPath("https://example.com/foo/bar/?some=parameter") ==
-        "/foo/bar/");
+        "/foo/bar/"
+    );
   }
 
   SECTION("returns empty path for nonexistent paths") {
@@ -40,41 +41,52 @@ TEST_CASE("Uri::setPath") {
     CHECK(Uri::setPath("https://example.com", "/") == "https://example.com/");
     CHECK(
         Uri::setPath("https://example.com/foo", "/bar") ==
-        "https://example.com/bar");
+        "https://example.com/bar"
+    );
     CHECK(
         Uri::setPath("https://example.com/foo/", "/bar") ==
-        "https://example.com/bar");
+        "https://example.com/bar"
+    );
     CHECK(
         Uri::setPath("https://example.com/foo", "/bar/") ==
-        "https://example.com/bar/");
+        "https://example.com/bar/"
+    );
   }
 
   SECTION("preserves path parameters") {
     CHECK(
         Uri::setPath("https://example.com?some=parameter", "") ==
-        "https://example.com?some=parameter");
+        "https://example.com?some=parameter"
+    );
     CHECK(
         Uri::setPath("https://example.com?some=parameter", "/") ==
-        "https://example.com/?some=parameter");
+        "https://example.com/?some=parameter"
+    );
     CHECK(
         Uri::setPath("https://example.com/foo?some=parameter", "/bar") ==
-        "https://example.com/bar?some=parameter");
+        "https://example.com/bar?some=parameter"
+    );
     CHECK(
         Uri::setPath("https://example.com/foo/?some=parameter", "/bar") ==
-        "https://example.com/bar?some=parameter");
+        "https://example.com/bar?some=parameter"
+    );
     CHECK(
         Uri::setPath("https://example.com/foo?some=parameter", "/bar/") ==
-        "https://example.com/bar/?some=parameter");
+        "https://example.com/bar/?some=parameter"
+    );
   }
 
   SECTION("sets same path") {
     CHECK(
         Uri::setPath("https://example.com/foo/bar", "/foo/bar") ==
-        "https://example.com/foo/bar");
+        "https://example.com/foo/bar"
+    );
     CHECK(
         Uri::setPath(
             "https://example.com/foo/bar?some=parameter",
-            "/foo/bar") == "https://example.com/foo/bar?some=parameter");
+            "/foo/bar"
+        ) == "https://example.com/foo/bar?some=parameter"
+    );
   }
 
   SECTION("returns empty path for invalid uri") {
@@ -85,16 +97,20 @@ TEST_CASE("Uri::setPath") {
 TEST_CASE("Uri::resolve") {
   CHECK(
       CesiumUtility::Uri::resolve("https://www.example.com/", "/page/test") ==
-      "https://www.example.com/page/test");
+      "https://www.example.com/page/test"
+  );
   CHECK(
       CesiumUtility::Uri::resolve("//www.example.com", "/page/test") ==
-      "https://www.example.com/page/test");
+      "https://www.example.com/page/test"
+  );
   CHECK(
       CesiumUtility::Uri::resolve(
           "//www.example.com",
           "/page/test",
           false,
-          false) == "http://www.example.com/page/test");
+          false
+      ) == "http://www.example.com/page/test"
+  );
 }
 
 TEST_CASE("Uri::escape") {
@@ -127,13 +143,16 @@ TEST_CASE("Uri::windowsPathToUriPath") {
   CHECK(Uri::windowsPathToUriPath("e:\\some:file") == "/e:/some%3Afile");
   CHECK(
       Uri::windowsPathToUriPath("c:/🤞/😱/") ==
-      "/c:/%F0%9F%A4%9E/%F0%9F%98%B1/");
+      "/c:/%F0%9F%A4%9E/%F0%9F%98%B1/"
+  );
   CHECK(
       Uri::windowsPathToUriPath("notadriveletter:\\file") ==
-      "notadriveletter%3A/file");
+      "notadriveletter%3A/file"
+  );
   CHECK(
       Uri::windowsPathToUriPath("\\notadriveletter:\\file") ==
-      "/notadriveletter%3A/file");
+      "/notadriveletter%3A/file"
+  );
 }
 
 TEST_CASE("Uri::uriPathToUnixPath") {
@@ -153,8 +172,10 @@ TEST_CASE("Uri::uriPathToWindowsPath") {
   CHECK(Uri::uriPathToWindowsPath("/e:/some%3Afile") == "e:\\some:file");
   CHECK(
       Uri::uriPathToWindowsPath("/c:/%F0%9F%A4%9E/%F0%9F%98%B1/") ==
-      "c:\\🤞\\😱\\");
+      "c:\\🤞\\😱\\"
+  );
   CHECK(
       Uri::uriPathToWindowsPath("/notadriveletter:/file") ==
-      "\\notadriveletter:\\file");
+      "\\notadriveletter:\\file"
+  );
 }

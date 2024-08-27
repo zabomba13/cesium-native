@@ -14,7 +14,8 @@ ThreadPool::Scheduler::Scheduler(int32_t numberOfThreads)
     : scheduler(
           size_t(numberOfThreads <= 0 ? 1 : numberOfThreads),
           createPreRun(this),
-          createPostRun()) {}
+          createPostRun()
+      ) {}
 
 void ThreadPool::Scheduler::schedule(async::task_run_handle t) {
   this->scheduler.schedule(std::move(t));

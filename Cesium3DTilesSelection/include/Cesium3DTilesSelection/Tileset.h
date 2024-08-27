@@ -44,7 +44,8 @@ public:
       const TilesetExternals& externals,
       std::unique_ptr<TilesetContentLoader>&& pCustomLoader,
       std::unique_ptr<Tile>&& pRootTile,
-      const TilesetOptions& options = TilesetOptions());
+      const TilesetOptions& options = TilesetOptions()
+  );
 
   /**
    * @brief Constructs a new instance with a given `tileset.json` URL.
@@ -55,7 +56,8 @@ public:
   Tileset(
       const TilesetExternals& externals,
       const std::string& url,
-      const TilesetOptions& options = TilesetOptions());
+      const TilesetOptions& options = TilesetOptions()
+  );
 
   /**
    * @brief Constructs a new instance with the given asset ID on <a
@@ -73,7 +75,8 @@ public:
       int64_t ionAssetID,
       const std::string& ionAccessToken,
       const TilesetOptions& options = TilesetOptions(),
-      const std::string& ionAssetEndpointUrl = "https://api.cesium.com/");
+      const std::string& ionAssetEndpointUrl = "https://api.cesium.com/"
+  );
 
   /**
    * @brief Destroys this tileset.
@@ -339,11 +342,13 @@ private:
       const FrameState& frameState,
       Tile& tile,
       double tilePriority,
-      ViewUpdateResult& result);
+      ViewUpdateResult& result
+  );
   TraversalDetails _renderInnerTile(
       const FrameState& frameState,
       Tile& tile,
-      ViewUpdateResult& result);
+      ViewUpdateResult& result
+  );
   bool _kickDescendantsAndRenderTile(
       const FrameState& frameState,
       Tile& tile,
@@ -353,7 +358,8 @@ private:
       size_t workerThreadLoadQueueIndex,
       size_t mainThreadLoadQueueIndex,
       bool queuedForLoad,
-      double tilePriority);
+      double tilePriority
+  );
   TileOcclusionState
   _checkOcclusion(const Tile& tile, const FrameState& frameState);
 
@@ -364,7 +370,8 @@ private:
       bool ancestorMeetsSse,
       Tile& tile,
       double tilePriority,
-      ViewUpdateResult& result);
+      ViewUpdateResult& result
+  );
 
   struct CullResult {
     // whether we should visit this tile
@@ -378,29 +385,34 @@ private:
       const Tile& tile,
       const FrameState& frameState,
       bool cullWithChildrenBounds,
-      CullResult& cullResult);
+      CullResult& cullResult
+  );
   void _fogCull(
       const FrameState& frameState,
       const std::vector<double>& distances,
-      CullResult& cullResult);
+      CullResult& cullResult
+  );
   bool _meetsSse(
       const std::vector<ViewState>& frustums,
       const Tile& tile,
       const std::vector<double>& distances,
-      bool culled) const noexcept;
+      bool culled
+  ) const noexcept;
 
   TraversalDetails _visitTileIfNeeded(
       const FrameState& frameState,
       uint32_t depth,
       bool ancestorMeetsSse,
       Tile& tile,
-      ViewUpdateResult& result);
+      ViewUpdateResult& result
+  );
   TraversalDetails _visitVisibleChildrenNearToFar(
       const FrameState& frameState,
       uint32_t depth,
       bool ancestorMeetsSse,
       Tile& tile,
-      ViewUpdateResult& result);
+      ViewUpdateResult& result
+  );
 
   /**
    * @brief When called on an additive-refined tile, queues it for load and adds
@@ -421,7 +433,8 @@ private:
       Tile& tile,
       ViewUpdateResult& result,
       double tilePriority,
-      bool queuedForLoad);
+      bool queuedForLoad
+  );
 
   void _processWorkerThreadLoadQueue();
   void _processMainThreadLoadQueue();
@@ -432,7 +445,8 @@ private:
   void _updateLodTransitions(
       const FrameState& frameState,
       float deltaTime,
-      ViewUpdateResult& result) const noexcept;
+      ViewUpdateResult& result
+  ) const noexcept;
 
   TilesetExternals _externals;
   CesiumAsync::AsyncSystem _asyncSystem;
@@ -512,12 +526,14 @@ private:
   void addTileToLoadQueue(
       Tile& tile,
       TileLoadPriorityGroup priorityGroup,
-      double priority);
+      double priority
+  );
 
   static TraversalDetails createTraversalDetailsForSingleTile(
       const FrameState& frameState,
       const Tile& tile,
-      const TileSelectionState& lastFrameSelectionState);
+      const TileSelectionState& lastFrameSelectionState
+  );
 
   Tileset(const Tileset& rhs) = delete;
   Tileset& operator=(const Tileset& rhs) = delete;

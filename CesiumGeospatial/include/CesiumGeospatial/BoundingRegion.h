@@ -33,7 +33,8 @@ public:
       const GlobeRectangle& rectangle,
       double minimumHeight,
       double maximumHeight,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Gets the bounding rectangle of the region.
@@ -89,7 +90,8 @@ public:
    */
   double computeDistanceSquaredToPosition(
       const glm::dvec3& position,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) const noexcept;
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const noexcept;
 
   /**
    * @brief Computes the distance-squared from a longitude-latitude-height
@@ -102,7 +104,8 @@ public:
    */
   double computeDistanceSquaredToPosition(
       const Cartographic& position,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) const noexcept;
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const noexcept;
 
   /**
    * @brief Computes the distance-squared from a position to the closest point
@@ -118,7 +121,8 @@ public:
    */
   double computeDistanceSquaredToPosition(
       const Cartographic& cartographicPosition,
-      const glm::dvec3& cartesianPosition) const noexcept;
+      const glm::dvec3& cartesianPosition
+  ) const noexcept;
 
   /**
    * @brief Computes the union of this bounding region with another.
@@ -128,15 +132,16 @@ public:
    */
   BoundingRegion computeUnion(
       const BoundingRegion& other,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) const noexcept;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const noexcept;
 
 private:
   static CesiumGeometry::OrientedBoundingBox _computeBoundingBox(
       const GlobeRectangle& rectangle,
       double minimumHeight,
       double maximumHeight,
-      const Ellipsoid& ellipsoid);
+      const Ellipsoid& ellipsoid
+  );
 
   GlobeRectangle _rectangle;
   double _minimumHeight;

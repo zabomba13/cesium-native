@@ -22,7 +22,8 @@ void rasterizePolygons(
     const CesiumGeospatial::GlobeRectangle& rectangle,
     const glm::dvec2& textureSize,
     const std::vector<CartographicPolygon>& cartographicPolygons,
-    bool invertSelection) {
+    bool invertSelection
+) {
 
   CesiumGltf::ImageCesium& image = loaded.image.emplace();
 
@@ -40,7 +41,8 @@ void rasterizePolygons(
   // create a 1x1 mask if the rectangle is completely inside a polygon
   if (CartographicPolygon::rectangleIsWithinPolygons(
           rectangle,
-          cartographicPolygons)) {
+          cartographicPolygons
+      )) {
     loaded.moreDetailAvailable = false;
     image.width = 1;
     image.height = 1;
@@ -102,11 +104,8 @@ void rasterizePolygons(
       const double maxX = glm::max(a.x, glm::max(b.x, c.x));
       const double maxY = glm::max(a.y, glm::max(b.y, c.y));
 
-      const CesiumGeospatial::GlobeRectangle triangleBounds(
-          minX,
-          minY,
-          maxX,
-          maxY);
+      const CesiumGeospatial::GlobeRectangle
+          triangleBounds(minX, minY, maxX, maxY);
 
       // skip this triangle if it is entirely outside the tile bounds
       if (!rectangle.computeIntersection(triangleBounds)) {
@@ -171,7 +170,8 @@ public:
       const std::shared_ptr<spdlog::logger>& pLogger,
       const CesiumGeospatial::Projection& projection,
       const std::vector<CartographicPolygon>& polygons,
-      bool invertSelection)
+      bool invertSelection
+  )
       : RasterOverlayTileProvider(
             pOwner,
             asyncSystem,
@@ -183,7 +183,9 @@ public:
             // computeCoverageRectangle(projection, polygons)),
             projectRectangleSimple(
                 projection,
-                CesiumGeospatial::GlobeRectangle::MAXIMUM)),
+                CesiumGeospatial::GlobeRectangle::MAXIMUM
+            )
+        ),
         _polygons(polygons),
         _invertSelection(invertSelection) {}
 
@@ -194,7 +196,8 @@ public:
     const RasterOverlayOptions& options = this->getOwner().getOptions();
     glm::dvec2 textureSize = glm::min(
         overlayTile.getTargetScreenPixels() / options.maximumScreenSpaceError,
-        glm::dvec2(options.maximumTextureSize));
+        glm::dvec2(options.maximumTextureSize)
+    );
 
     return this->getAsyncSystem().runInWorkerThread(
         [&polygons = this->_polygons,
@@ -213,10 +216,12 @@ public:
               tileRectangle,
               textureSize,
               polygons,
-              invertSelection);
+              invertSelection
+          );
 
           return result;
-        });
+        }
+    );
   }
 };
 
@@ -226,7 +231,8 @@ RasterizedPolygonsOverlay::RasterizedPolygonsOverlay(
     bool invertSelection,
     const CesiumGeospatial::Ellipsoid& ellipsoid,
     const CesiumGeospatial::Projection& projection,
-    const RasterOverlayOptions& overlayOptions)
+    const RasterOverlayOptions& overlayOptions
+)
     : RasterOverlay(name, overlayOptions),
       _polygons(polygons),
       _invertSelection(invertSelection),
@@ -243,7 +249,8 @@ RasterizedPolygonsOverlay::createTileProvider(
     const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
         pPrepareRendererResources,
     const std::shared_ptr<spdlog::logger>& pLogger,
-    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner) const {
+    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+) const {
 
   pOwner = pOwner ? pOwner : this;
 
@@ -257,7 +264,10 @@ RasterizedPolygonsOverlay::createTileProvider(
               pLogger,
               this->_projection,
               this->_polygons,
-              this->_invertSelection)));
+              this->_invertSelection
+          )
+      )
+  );
 }
 
 } // namespace CesiumRasterOverlays

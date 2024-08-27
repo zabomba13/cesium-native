@@ -20,8 +20,8 @@ class PropertyTableJsonHandler
 public:
   using ValueType = CesiumGltf::PropertyTable;
 
-  PropertyTableJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  PropertyTableJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::PropertyTable* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -30,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyPropertyTable(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::PropertyTable& o);
+      CesiumGltf::PropertyTable& o
+  );
 
 private:
   CesiumGltf::PropertyTable* _pObject = nullptr;

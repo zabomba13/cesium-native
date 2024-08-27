@@ -39,7 +39,8 @@ struct CESIUMGEOMETRY_API Rectangle final {
       double minimumX_,
       double minimumY_,
       double maximumX_,
-      double maximumY_) noexcept
+      double maximumY_
+  ) noexcept
       : minimumX(minimumX_),
         minimumY(minimumY_),
         maximumX(maximumX_),
@@ -164,7 +165,8 @@ struct CESIUMGEOMETRY_API Rectangle final {
   constexpr glm::dvec2 getCenter() const noexcept {
     return glm::dvec2(
         (this->minimumX + this->maximumX) * 0.5,
-        (this->minimumY + this->maximumY) * 0.5);
+        (this->minimumY + this->maximumY) * 0.5
+    );
   }
 
   /**
@@ -192,8 +194,8 @@ struct CESIUMGEOMETRY_API Rectangle final {
    * @returns The intersection rectangle, or `std::nullopt` if there is no
    * intersection.
    */
-  std::optional<Rectangle>
-  computeIntersection(const Rectangle& other) const noexcept;
+  std::optional<Rectangle> computeIntersection(const Rectangle& other
+  ) const noexcept;
 
   /**
    * @brief Computes the union of this rectangle with another.

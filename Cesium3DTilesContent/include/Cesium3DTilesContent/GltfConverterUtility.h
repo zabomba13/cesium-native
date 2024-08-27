@@ -25,7 +25,8 @@ namespace GltfConverterUtility {
 std::optional<uint32_t> parseOffsetForSemantic(
     const rapidjson::Document& document,
     const char* semantic,
-    CesiumUtility::ErrorList& errorList);
+    CesiumUtility::ErrorList& errorList
+);
 
 typedef bool (rapidjson::Value::*ValuePredicate)() const;
 
@@ -69,7 +70,8 @@ template <> inline uint32_t getValue<uint32_t>(const rapidjson::Value& value) {
 bool validateJsonArrayValues(
     const rapidjson::Value& arrayValue,
     uint32_t expectedLength,
-    ValuePredicate predicate);
+    ValuePredicate predicate
+);
 
 std::optional<glm::dvec3>
 parseArrayValueDVec3(const rapidjson::Value& arrayValue);
@@ -84,14 +86,16 @@ int32_t createBufferViewInGltf(
     CesiumGltf::Model& gltf,
     const int32_t bufferId,
     const int64_t byteLength,
-    const int64_t byteStride);
+    const int64_t byteStride
+);
 
 int32_t createAccessorInGltf(
     CesiumGltf::Model& gltf,
     const int32_t bufferViewId,
     const int32_t componentType,
     const int64_t count,
-    const std::string type);
+    const std::string type
+);
 
 /**
  * Applies the given relative-to-center (RTC) translation to the transforms of
@@ -111,20 +115,22 @@ GlmType toGlm(const CesiumGltf::AccessorTypes::VEC3<ComponentType>& gltfVal) {
 }
 
 template <typename GlmType, typename ComponentType>
-GlmType
-toGlmQuat(const CesiumGltf::AccessorTypes::VEC4<ComponentType>& gltfVal) {
+GlmType toGlmQuat(const CesiumGltf::AccessorTypes::VEC4<ComponentType>& gltfVal
+) {
   if constexpr (std::is_same<ComponentType, float>()) {
     return GlmType(
         gltfVal.value[3],
         gltfVal.value[0],
         gltfVal.value[1],
-        gltfVal.value[2]);
+        gltfVal.value[2]
+    );
   } else {
     return GlmType(
         CesiumGltf::normalize(gltfVal.value[3]),
         CesiumGltf::normalize(gltfVal.value[0]),
         CesiumGltf::normalize(gltfVal.value[1]),
-        CesiumGltf::normalize(gltfVal.value[2]));
+        CesiumGltf::normalize(gltfVal.value[2])
+    );
   }
 }
 

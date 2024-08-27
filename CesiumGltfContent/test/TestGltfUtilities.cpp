@@ -99,22 +99,26 @@ TEST_CASE("GltfUtilities::getNodeTransform") {
         someVector.x * 2.0,
         someVector.y * 4.0,
         someVector.z * 8.0,
-        1.0);
+        1.0
+    );
     glm::dvec4 expectedAfterRotating(
         expectedAfterScaling.x,
         -expectedAfterScaling.z,
         expectedAfterScaling.y,
-        1.0);
+        1.0
+    );
     glm::dvec4 expectedAfterTranslating(
         expectedAfterRotating.x + 1.0,
         expectedAfterRotating.y + 2.0,
         expectedAfterRotating.z + 3.0,
-        1.0);
+        1.0
+    );
 
     CHECK(Math::equalsEpsilon(
         transformed,
         expectedAfterTranslating,
-        Math::Epsilon14));
+        Math::Epsilon14
+    ));
   }
 
   SECTION("returns std::nullopt if translation has too few elements") {
@@ -147,7 +151,8 @@ TEST_CASE("GltfUtilities::setNodeTransform") {
         glm::dvec4(1.0, 2.0, 3.0, 4.0),
         glm::dvec4(5.0, 6.0, 7.0, 8.0),
         glm::dvec4(9.0, 10.0, 11.0, 12.0),
-        glm::dvec4(13.0, 14.0, 15.0, 16.0));
+        glm::dvec4(13.0, 14.0, 15.0, 16.0)
+    );
 
     GltfUtilities::setNodeTransform(node, m);
 
@@ -179,7 +184,8 @@ TEST_CASE("GltfUtilities::setNodeTransform") {
         glm::dvec4(1.0, 2.0, 3.0, 4.0),
         glm::dvec4(5.0, 6.0, 7.0, 8.0),
         glm::dvec4(9.0, 10.0, 11.0, 12.0),
-        glm::dvec4(13.0, 14.0, 15.0, 16.0));
+        glm::dvec4(13.0, 14.0, 15.0, 16.0)
+    );
 
     GltfUtilities::setNodeTransform(node, m);
     REQUIRE(node.matrix.size() == 16);

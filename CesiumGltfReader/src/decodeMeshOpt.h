@@ -20,5 +20,6 @@ namespace CesiumGltfReader {
  **/
 void decodeMeshOpt(
     CesiumGltf::Model& model,
-    CesiumGltfReader::GltfReaderResult& readGltf);
+    CesiumGltfReader::GltfReaderResult& readGltf
+);
 } // namespace CesiumGltfReader

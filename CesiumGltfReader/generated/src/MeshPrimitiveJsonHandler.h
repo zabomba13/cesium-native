@@ -18,8 +18,8 @@ class MeshPrimitiveJsonHandler
 public:
   using ValueType = CesiumGltf::MeshPrimitive;
 
-  MeshPrimitiveJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  MeshPrimitiveJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::MeshPrimitive* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -28,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyMeshPrimitive(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::MeshPrimitive& o);
+      CesiumGltf::MeshPrimitive& o
+  );
 
 private:
   CesiumGltf::MeshPrimitive* _pObject = nullptr;

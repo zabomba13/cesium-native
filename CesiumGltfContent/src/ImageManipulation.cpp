@@ -25,7 +25,8 @@ void ImageManipulation::unsafeBlitImage(
     size_t sourceRowStride,
     size_t sourceWidth,
     size_t sourceHeight,
-    size_t bytesPerPixel) {
+    size_t bytesPerPixel
+) {
   const size_t bytesToCopyPerRow = bytesPerPixel * sourceWidth;
 
   if (bytesToCopyPerRow == targetRowStride &&
@@ -46,7 +47,8 @@ bool ImageManipulation::blitImage(
     CesiumGltf::ImageCesium& target,
     const PixelRectangle& targetPixels,
     const CesiumGltf::ImageCesium& source,
-    const PixelRectangle& sourcePixels) {
+    const PixelRectangle& sourcePixels
+) {
 
   if (sourcePixels.x < 0 || sourcePixels.y < 0 || sourcePixels.width < 0 ||
       sourcePixels.height < 0 ||
@@ -100,7 +102,8 @@ bool ImageManipulation::blitImage(
         bytesPerSourceRow,
         size_t(sourcePixels.width),
         size_t(sourcePixels.height),
-        bytesPerPixel);
+        bytesPerPixel
+    );
   } else {
     if (target.bytesPerChannel != 1) {
       // We currently only support resizing images that use 1 byte per channel.
@@ -117,7 +120,8 @@ bool ImageManipulation::blitImage(
         targetPixels.width,
         targetPixels.height,
         int(bytesPerTargetRow),
-        target.channels);
+        target.channels
+    );
   }
 
   return true;
@@ -135,7 +139,8 @@ void writePngToVector(void* context, void* data, int size) {
 
 /*static*/ void ImageManipulation::savePng(
     const CesiumGltf::ImageCesium& image,
-    std::vector<std::byte>& output) {
+    std::vector<std::byte>& output
+) {
   if (image.bytesPerChannel != 1) {
     // Only 8-bit images can be written.
     return;
@@ -148,7 +153,8 @@ void writePngToVector(void* context, void* data, int size) {
       image.height,
       image.channels,
       image.pixelData.data(),
-      0);
+      0
+  );
 }
 
 /*static*/ std::vector<std::byte>

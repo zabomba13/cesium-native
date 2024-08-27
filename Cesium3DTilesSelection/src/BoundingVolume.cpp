@@ -12,7 +12,8 @@ namespace Cesium3DTilesSelection {
 
 BoundingVolume transformBoundingVolume(
     const glm::dmat4x4& transform,
-    const BoundingVolume& boundingVolume) {
+    const BoundingVolume& boundingVolume
+) {
   struct Operation {
     const glm::dmat4x4& transform;
 
@@ -29,14 +30,15 @@ BoundingVolume transformBoundingVolume(
       return boundingSphere.transform(transform);
     }
 
-    BoundingVolume operator()(
-        const BoundingRegionWithLooseFittingHeights& boundingRegion) noexcept {
+    BoundingVolume
+    operator()(const BoundingRegionWithLooseFittingHeights& boundingRegion
+    ) noexcept {
       // Regions are not transformed.
       return boundingRegion;
     }
 
-    BoundingVolume
-    operator()(const S2CellBoundingVolume& s2CellBoundingVolume) noexcept {
+    BoundingVolume operator()(const S2CellBoundingVolume& s2CellBoundingVolume
+    ) noexcept {
       // S2 Cells are not transformed.
       return s2CellBoundingVolume;
     }
@@ -59,8 +61,9 @@ glm::dvec3 getBoundingVolumeCenter(const BoundingVolume& boundingVolume) {
       return boundingSphere.getCenter();
     }
 
-    glm::dvec3 operator()(
-        const BoundingRegionWithLooseFittingHeights& boundingRegion) noexcept {
+    glm::dvec3
+    operator()(const BoundingRegionWithLooseFittingHeights& boundingRegion
+    ) noexcept {
       return boundingRegion.getBoundingRegion().getBoundingBox().getCenter();
     }
 
@@ -74,7 +77,8 @@ glm::dvec3 getBoundingVolumeCenter(const BoundingVolume& boundingVolume) {
 
 std::optional<GlobeRectangle> estimateGlobeRectangle(
     const BoundingVolume& boundingVolume,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   struct Operation {
     const CesiumGeospatial::Ellipsoid& ellipsoid;
 
@@ -105,7 +109,8 @@ std::optional<GlobeRectangle> estimateGlobeRectangle(
                                               0.0,
                                               -radius,
                                               0.0,
-                                              1.0);
+                                              1.0
+                                          );
 
       std::optional<Cartographic> east =
           this->ellipsoid.cartesianToCartographic(glm::dvec3(ecefBounds[0]));
@@ -124,7 +129,8 @@ std::optional<GlobeRectangle> estimateGlobeRectangle(
           west->longitude,
           south->latitude,
           east->longitude,
-          north->latitude);
+          north->latitude
+      );
     }
 
     std::optional<GlobeRectangle>
@@ -186,8 +192,8 @@ std::optional<GlobeRectangle> estimateGlobeRectangle(
           .getRectangle();
     }
 
-    std::optional<GlobeRectangle>
-    operator()(const S2CellBoundingVolume& s2Cell) {
+    std::optional<GlobeRectangle> operator()(const S2CellBoundingVolume& s2Cell
+    ) {
       return s2Cell.getCellID().computeBoundingRectangle();
     }
   };
@@ -210,7 +216,8 @@ getBoundingRegionFromBoundingVolume(const BoundingVolume& boundingVolume) {
 
 OrientedBoundingBox getOrientedBoundingBoxFromBoundingVolume(
     const BoundingVolume& boundingVolume,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   struct Operation {
     const CesiumGeospatial::Ellipsoid& ellipsoid;
 
@@ -229,8 +236,8 @@ OrientedBoundingBox getOrientedBoundingBoxFromBoundingVolume(
     }
 
     OrientedBoundingBox operator()(
-        const CesiumGeospatial::BoundingRegionWithLooseFittingHeights& region)
-        const {
+        const CesiumGeospatial::BoundingRegionWithLooseFittingHeights& region
+    ) const {
       return region.getBoundingRegion().getBoundingBox();
     }
 

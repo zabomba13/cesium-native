@@ -69,7 +69,8 @@ struct CESIUMGEOMETRY_API AvailabilityNode {
    */
   void setLoadedSubtree(
       AvailabilitySubtree&& subtree_,
-      uint32_t maxChildrenSubtrees) noexcept;
+      uint32_t maxChildrenSubtrees
+  ) noexcept;
 };
 
 struct CESIUMGEOMETRY_API AvailabilityTree {
@@ -80,7 +81,8 @@ class CESIUMGEOMETRY_API AvailabilityAccessor {
 public:
   AvailabilityAccessor(
       const AvailabilityView& view,
-      const AvailabilitySubtree& subtree) noexcept;
+      const AvailabilitySubtree& subtree
+  ) noexcept;
 
   bool isBufferView() const noexcept {
     return pBufferView != nullptr && bufferAccessor;

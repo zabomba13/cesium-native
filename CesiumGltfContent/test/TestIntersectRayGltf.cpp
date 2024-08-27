@@ -24,13 +24,15 @@ void checkIntersection(
     bool cullBackFaces,
     const glm::dmat4x4& modelToWorld,
     bool shouldHit,
-    const glm::dvec3& expectedHit) {
+    const glm::dvec3& expectedHit
+) {
   GltfUtilities::IntersectResult hitResult =
       GltfUtilities::intersectRayGltfModel(
           ray,
           model,
           cullBackFaces,
-          modelToWorld);
+          modelToWorld
+      );
 
   if (shouldHit) {
     CHECK(hitResult.hit.has_value());
@@ -44,7 +46,8 @@ void checkIntersection(
   // Validate hit point
   CHECK(glm::all(glm::lessThan(
       glm::abs(hitResult.hit->worldPoint - expectedHit),
-      glm::dvec3(CesiumUtility::Math::Epsilon6))));
+      glm::dvec3(CesiumUtility::Math::Epsilon6)
+  )));
 
   // Use results to dive into model
   CHECK(hitResult.hit->meshId > -1);
@@ -54,7 +57,8 @@ void checkIntersection(
 
   CHECK(hitResult.hit->primitiveId > -1);
   CHECK(
-      static_cast<size_t>(hitResult.hit->primitiveId) < mesh.primitives.size());
+      static_cast<size_t>(hitResult.hit->primitiveId) < mesh.primitives.size()
+  );
   const CesiumGltf::MeshPrimitive& primitive =
       mesh.primitives[static_cast<size_t>(hitResult.hit->primitiveId)];
 
@@ -81,7 +85,8 @@ void checkBadUnitCube(const std::string& testModelName, bool shouldHitAnyway) {
       *reader
            .readGltf(readFile(
                std::filesystem::path(CesiumGltfContent_TEST_DATA_DIR) /
-               testModelName))
+               testModelName
+           ))
            .model;
 
   // Do an intersection with top side of the cube
@@ -90,7 +95,8 @@ void checkBadUnitCube(const std::string& testModelName, bool shouldHitAnyway) {
           Ray(glm::dvec3(0.0, 0.0, 2.0), glm::dvec3(0.0, 0.0, -1.0)),
           testModel,
           true,
-          glm::dmat4x4(1.0));
+          glm::dmat4x4(1.0)
+      );
 
   // We're expecting a bad model, so it shouldn't crash or assert
   // and we should get some warnings about that
@@ -110,7 +116,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       *reader
            .readGltf(readFile(
                std::filesystem::path(CesiumGltfContent_TEST_DATA_DIR) /
-               testModelName))
+               testModelName
+           ))
            .model;
 
   // intersects the top side of the cube
@@ -120,7 +127,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       true,
       glm::dmat4x4(1.0),
       true,
-      glm::dvec3(0.0, 0.0, 0.5));
+      glm::dvec3(0.0, 0.0, 0.5)
+  );
 
   // misses the top side of the cube to the right
   checkIntersection(
@@ -129,7 +137,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       true,
       glm::dmat4x4(1.0),
       false,
-      {});
+      {}
+  );
 
   // misses the top side of the cube because it's behind it (avoid backfaces)
   checkIntersection(
@@ -138,7 +147,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       true,
       glm::dmat4x4(1.0),
       false,
-      {});
+      {}
+  );
 
   // hits backface triangles
   checkIntersection(
@@ -147,7 +157,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       false,
       glm::dmat4x4(1.0),
       true,
-      glm::dvec3(0.0, 0.0, -0.5));
+      glm::dvec3(0.0, 0.0, -0.5)
+  );
 
   // tests against backfaces, and picks first hit (top)
   checkIntersection(
@@ -156,7 +167,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       false,
       glm::dmat4x4(1.0),
       true,
-      glm::dvec3(0.0, 0.0, 0.5));
+      glm::dvec3(0.0, 0.0, 0.5)
+  );
 
   // tests against backfaces, and picks first hit (bottom)
   checkIntersection(
@@ -165,7 +177,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       false,
       glm::dmat4x4(1.0),
       true,
-      glm::dvec3(0.0, 0.0, -0.5));
+      glm::dvec3(0.0, 0.0, -0.5)
+  );
 
   // just misses the top side of a cube translated to the right
   glm::dmat4x4 translationMatrix(1.0);
@@ -176,7 +189,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       true,
       translationMatrix,
       false,
-      {});
+      {}
+  );
 
   // just hits the top side of a cube translated to the right
   checkIntersection(
@@ -185,21 +199,24 @@ void checkValidUnitCube(const std::string& testModelName) {
       true,
       translationMatrix,
       true,
-      glm::dvec3(0.6, 0.0, 0.5));
+      glm::dvec3(0.6, 0.0, 0.5)
+  );
 
   // correctly hits a scaled cube
   glm::dmat4x4 scaleMatrix = glm::dmat4(
       glm::dvec4(2.0, 0.0, 0.0, 0.0),
       glm::dvec4(0.0, 2.0, 0.0, 0.0),
       glm::dvec4(0.0, 0.0, 2.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
   checkIntersection(
       Ray(glm::dvec3(0.0, 0.0, 2.0), glm::dvec3(0.0, 0.0, -1.0)),
       testModel,
       true,
       scaleMatrix,
       true,
-      glm::dvec3(0.0, 0.0, 1.0));
+      glm::dvec3(0.0, 0.0, 1.0)
+  );
 
   // just misses a scaled cube to the right
   checkIntersection(
@@ -208,7 +225,8 @@ void checkValidUnitCube(const std::string& testModelName) {
       true,
       scaleMatrix,
       false,
-      {});
+      {}
+  );
 }
 
 TEST_CASE("GltfUtilities::intersectRayGltfModel") {

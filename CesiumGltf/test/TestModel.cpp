@@ -54,7 +54,8 @@ TEST_CASE("Test forEachPrimitive") {
       3.7,
       0.0,
       0.0,
-      1.0);
+      1.0
+  );
 
   glm::dmat4 childNodeMatrix(
       4.0,
@@ -72,7 +73,8 @@ TEST_CASE("Test forEachPrimitive") {
       0.0,
       5.3,
       0.0,
-      1.0);
+      1.0
+  );
 
   glm::dmat4 expectedNodeTransform = parentNodeMatrix * childNodeMatrix;
 
@@ -116,26 +118,32 @@ TEST_CASE("Test forEachPrimitive") {
             Node& /*node*/,
             Mesh& /*mesh*/,
             MeshPrimitive& primitive,
-            const glm::dmat4& /*transform*/) {
-          iteratedPrimitives.push_back(&primitive);
-        });
+            const glm::dmat4& /*transform*/
+        ) { iteratedPrimitives.push_back(&primitive); }
+    );
 
     REQUIRE(iteratedPrimitives.size() == 3);
     REQUIRE(
         std::find(
             iteratedPrimitives.begin(),
             iteratedPrimitives.end(),
-            &primitive0) != iteratedPrimitives.end());
+            &primitive0
+        ) != iteratedPrimitives.end()
+    );
     REQUIRE(
         std::find(
             iteratedPrimitives.begin(),
             iteratedPrimitives.end(),
-            &primitive1) != iteratedPrimitives.end());
+            &primitive1
+        ) != iteratedPrimitives.end()
+    );
     REQUIRE(
         std::find(
             iteratedPrimitives.begin(),
             iteratedPrimitives.end(),
-            &primitive2) != iteratedPrimitives.end());
+            &primitive2
+        ) != iteratedPrimitives.end()
+    );
 
     iteratedPrimitives.clear();
 
@@ -146,26 +154,32 @@ TEST_CASE("Test forEachPrimitive") {
             Node& /*node*/,
             Mesh& /*mesh*/,
             MeshPrimitive& primitive,
-            const glm::dmat4& /*transform*/) {
-          iteratedPrimitives.push_back(&primitive);
-        });
+            const glm::dmat4& /*transform*/
+        ) { iteratedPrimitives.push_back(&primitive); }
+    );
 
     REQUIRE(iteratedPrimitives.size() == 3);
     REQUIRE(
         std::find(
             iteratedPrimitives.begin(),
             iteratedPrimitives.end(),
-            &primitive0) != iteratedPrimitives.end());
+            &primitive0
+        ) != iteratedPrimitives.end()
+    );
     REQUIRE(
         std::find(
             iteratedPrimitives.begin(),
             iteratedPrimitives.end(),
-            &primitive1) != iteratedPrimitives.end());
+            &primitive1
+        ) != iteratedPrimitives.end()
+    );
     REQUIRE(
         std::find(
             iteratedPrimitives.begin(),
             iteratedPrimitives.end(),
-            &primitive2) != iteratedPrimitives.end());
+            &primitive2
+        ) != iteratedPrimitives.end()
+    );
 
     iteratedPrimitives.clear();
 
@@ -176,9 +190,9 @@ TEST_CASE("Test forEachPrimitive") {
             Node& /*node*/,
             Mesh& /*mesh*/,
             MeshPrimitive& primitive,
-            const glm::dmat4& /*transform*/) {
-          iteratedPrimitives.push_back(&primitive);
-        });
+            const glm::dmat4& /*transform*/
+        ) { iteratedPrimitives.push_back(&primitive); }
+    );
 
     REQUIRE(iteratedPrimitives.size() == 1);
     REQUIRE(iteratedPrimitives[0] == &primitive3);
@@ -194,9 +208,9 @@ TEST_CASE("Test forEachPrimitive") {
             Node& /*node*/,
             Mesh& /*mesh*/,
             MeshPrimitive& /*primitive*/,
-            const glm::dmat4& transform) {
-          nodeTransforms.push_back(transform);
-        });
+            const glm::dmat4& transform
+        ) { nodeTransforms.push_back(transform); }
+    );
 
     REQUIRE(nodeTransforms.size() == 1);
     REQUIRE(nodeTransforms[0] == expectedNodeTransform);
@@ -239,7 +253,8 @@ static Model createCubeGltf() {
   std::memcpy(
       vertexBuffer.cesium.data.data(),
       &cubeVertices[0],
-      vertexByteLength);
+      vertexByteLength
+  );
 
   BufferView& vertexBufferView = model.bufferViews.emplace_back();
   vertexBufferView.buffer = 0;
@@ -412,14 +427,16 @@ TEST_CASE("Test smooth normal generation") {
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
-        glm::epsilonEqual(vertex0Normal, expectedNormal, DEFAULT_EPSILON)));
+        glm::epsilonEqual(vertex0Normal, expectedNormal, DEFAULT_EPSILON)
+    ));
 
     const glm::vec3& vertex6Normal = normalView[6];
     expectedNormal = glm::vec3(1.0f, 1.0f, 1.0f);
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
-        glm::epsilonEqual(vertex6Normal, expectedNormal, DEFAULT_EPSILON)));
+        glm::epsilonEqual(vertex6Normal, expectedNormal, DEFAULT_EPSILON)
+    ));
   }
 
   SECTION("Test normal generation for TRIANGLE_STRIP") {
@@ -451,9 +468,11 @@ TEST_CASE("Test smooth normal generation") {
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
-        glm::epsilonEqual(vertex1Normal, expectedNormal, DEFAULT_EPSILON)));
+        glm::epsilonEqual(vertex1Normal, expectedNormal, DEFAULT_EPSILON)
+    ));
     REQUIRE(glm::all(
-        glm::epsilonEqual(vertex2Normal, expectedNormal, DEFAULT_EPSILON)));
+        glm::epsilonEqual(vertex2Normal, expectedNormal, DEFAULT_EPSILON)
+    ));
   }
 
   SECTION("Test normal generation for TRIANGLE_STRIP") {
@@ -484,7 +503,8 @@ TEST_CASE("Test smooth normal generation") {
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
-        glm::epsilonEqual(vertex0Normal, expectedNormal, DEFAULT_EPSILON)));
+        glm::epsilonEqual(vertex0Normal, expectedNormal, DEFAULT_EPSILON)
+    ));
   }
 }
 
@@ -498,10 +518,12 @@ TEST_CASE("Model::addExtensionUsed") {
     CHECK(m.extensionsUsed.size() == 2);
     CHECK(
         std::find(m.extensionsUsed.begin(), m.extensionsUsed.end(), "Foo") !=
-        m.extensionsUsed.end());
+        m.extensionsUsed.end()
+    );
     CHECK(
         std::find(m.extensionsUsed.begin(), m.extensionsUsed.end(), "Bar") !=
-        m.extensionsUsed.end());
+        m.extensionsUsed.end()
+    );
   }
 
   SECTION("does not add a duplicate extension") {
@@ -514,10 +536,12 @@ TEST_CASE("Model::addExtensionUsed") {
     CHECK(m.extensionsUsed.size() == 2);
     CHECK(
         std::find(m.extensionsUsed.begin(), m.extensionsUsed.end(), "Foo") !=
-        m.extensionsUsed.end());
+        m.extensionsUsed.end()
+    );
     CHECK(
         std::find(m.extensionsUsed.begin(), m.extensionsUsed.end(), "Bar") !=
-        m.extensionsUsed.end());
+        m.extensionsUsed.end()
+    );
   }
 
   SECTION("does not also add the extension to extensionsRequired") {
@@ -539,12 +563,16 @@ TEST_CASE("Model::addExtensionRequired") {
         std::find(
             m.extensionsRequired.begin(),
             m.extensionsRequired.end(),
-            "Foo") != m.extensionsRequired.end());
+            "Foo"
+        ) != m.extensionsRequired.end()
+    );
     CHECK(
         std::find(
             m.extensionsRequired.begin(),
             m.extensionsRequired.end(),
-            "Bar") != m.extensionsRequired.end());
+            "Bar"
+        ) != m.extensionsRequired.end()
+    );
   }
 
   SECTION("does not add a duplicate extension") {
@@ -559,12 +587,16 @@ TEST_CASE("Model::addExtensionRequired") {
         std::find(
             m.extensionsRequired.begin(),
             m.extensionsRequired.end(),
-            "Foo") != m.extensionsRequired.end());
+            "Foo"
+        ) != m.extensionsRequired.end()
+    );
     CHECK(
         std::find(
             m.extensionsRequired.begin(),
             m.extensionsRequired.end(),
-            "Bar") != m.extensionsRequired.end());
+            "Bar"
+        ) != m.extensionsRequired.end()
+    );
   }
 
   SECTION("also adds the extension to extensionsUsed if not already present") {
@@ -577,10 +609,12 @@ TEST_CASE("Model::addExtensionRequired") {
     CHECK(m.extensionsUsed.size() == 2);
     CHECK(
         std::find(m.extensionsUsed.begin(), m.extensionsUsed.end(), "Foo") !=
-        m.extensionsUsed.end());
+        m.extensionsUsed.end()
+    );
     CHECK(
         std::find(m.extensionsUsed.begin(), m.extensionsUsed.end(), "Bar") !=
-        m.extensionsUsed.end());
+        m.extensionsUsed.end()
+    );
   }
 }
 
@@ -911,8 +945,8 @@ TEST_CASE("Model::merge") {
           CHECK(pExtension->propertyTables[1].classProperty == "foo_1");
         }
 
-        SECTION(
-            "it updates PropertyAttributes to reference the renamed class") {
+        SECTION("it updates PropertyAttributes to reference the renamed class"
+        ) {
           PropertyAttribute& propertyAttribute1 =
               metadata1.propertyAttributes.emplace_back();
           propertyAttribute1.classProperty = "foo";
@@ -1473,7 +1507,8 @@ TEST_CASE("Model::forEachNodeInScene") {
         3.7,
         0.0,
         0.0,
-        1.0);
+        1.0
+    );
 
     glm::dmat4 childNodeMatrix(
         4.0,
@@ -1491,14 +1526,16 @@ TEST_CASE("Model::forEachNodeInScene") {
         0.0,
         5.3,
         0.0,
-        1.0);
+        1.0
+    );
 
     glm::dmat4 expectedNodeTransform = parentNodeMatrix * childNodeMatrix;
 
     std::memcpy(
         m.nodes[2].matrix.data(),
         &parentNodeMatrix,
-        sizeof(glm::dmat4));
+        sizeof(glm::dmat4)
+    );
     std::memcpy(m.nodes[3].matrix.data(), &childNodeMatrix, sizeof(glm::dmat4));
 
     SECTION("it enumerates a specified scene") {
@@ -1509,7 +1546,8 @@ TEST_CASE("Model::forEachNodeInScene") {
            &m](Model& model, Node& node, const glm::dmat4& /* transform */) {
             CHECK(&m == &model);
             visited.push_back(&node);
-          });
+          }
+      );
 
       REQUIRE(visited.size() == 2);
       CHECK(visited[0] == &m.nodes[2]);
@@ -1524,7 +1562,8 @@ TEST_CASE("Model::forEachNodeInScene") {
            &m](Model& model, Node& node, const glm::dmat4& /* transform */) {
             CHECK(&m == &model);
             visited.push_back(&node);
-          });
+          }
+      );
 
       REQUIRE(visited.size() == 2);
       CHECK(visited[0] == &m.nodes[0]);
@@ -1541,7 +1580,8 @@ TEST_CASE("Model::forEachNodeInScene") {
            &m](Model& model, Node& node, const glm::dmat4& /* transform */) {
             CHECK(&m == &model);
             visited.push_back(&node);
-          });
+          }
+      );
 
       REQUIRE(visited.size() == 2);
       CHECK(visited[0] == &m.nodes[0]);
@@ -1555,9 +1595,9 @@ TEST_CASE("Model::forEachNodeInScene") {
           [&transforms](
               Model& /* model */,
               Node& /* node */,
-              const glm::dmat4& transform) {
-            transforms.push_back(transform);
-          });
+              const glm::dmat4& transform
+          ) { transforms.push_back(transform); }
+      );
 
       REQUIRE(transforms.size() == 2);
       CHECK(transforms[0] == parentNodeMatrix);
@@ -1578,7 +1618,8 @@ TEST_CASE("Model::forEachNodeInScene") {
          &m](Model& model, Node& node, const glm::dmat4& /* transform */) {
           CHECK(&m == &model);
           visited.push_back(&node);
-        });
+        }
+    );
 
     REQUIRE(visited.size() == 1);
     CHECK(visited[0] == &m.nodes[0]);
@@ -1593,6 +1634,7 @@ TEST_CASE("Model::forEachNodeInScene") {
            const glm::dmat4& /* transform */) {
           // This should not be called.
           CHECK(false);
-        });
+        }
+    );
   }
 }

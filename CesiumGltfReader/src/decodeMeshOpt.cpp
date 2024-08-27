@@ -20,7 +20,8 @@ namespace {
 
 void decodeFilter(
     std::byte* buffer,
-    const ExtensionBufferViewExtMeshoptCompression& meshOpt) {
+    const ExtensionBufferViewExtMeshoptCompression& meshOpt
+) {
   if (meshOpt.filter ==
       ExtensionBufferViewExtMeshoptCompression::Filter::NONE) {
     return;
@@ -30,21 +31,20 @@ void decodeFilter(
     meshopt_decodeFilterOct(
         buffer,
         static_cast<size_t>(meshOpt.count),
-        static_cast<size_t>(meshOpt.byteStride));
-  } else if (
-      meshOpt.filter ==
-      ExtensionBufferViewExtMeshoptCompression::Filter::QUATERNION) {
+        static_cast<size_t>(meshOpt.byteStride)
+    );
+  } else if (meshOpt.filter == ExtensionBufferViewExtMeshoptCompression::Filter::QUATERNION) {
     meshopt_decodeFilterQuat(
         buffer,
         static_cast<size_t>(meshOpt.count),
-        static_cast<size_t>(meshOpt.byteStride));
-  } else if (
-      meshOpt.filter ==
-      ExtensionBufferViewExtMeshoptCompression::Filter::EXPONENTIAL) {
+        static_cast<size_t>(meshOpt.byteStride)
+    );
+  } else if (meshOpt.filter == ExtensionBufferViewExtMeshoptCompression::Filter::EXPONENTIAL) {
     meshopt_decodeFilterExp(
         buffer,
         static_cast<size_t>(meshOpt.count),
-        static_cast<size_t>(meshOpt.byteStride));
+        static_cast<size_t>(meshOpt.byteStride)
+    );
   }
 }
 
@@ -52,21 +52,23 @@ template <typename T>
 int decodeIndices(
     T* data,
     const gsl::span<const std::byte>& buffer,
-    const ExtensionBufferViewExtMeshoptCompression& meshOpt) {
+    const ExtensionBufferViewExtMeshoptCompression& meshOpt
+) {
   if (meshOpt.mode ==
       ExtensionBufferViewExtMeshoptCompression::Mode::TRIANGLES) {
     return meshopt_decodeIndexBuffer<T>(
         data,
         static_cast<size_t>(meshOpt.count),
         reinterpret_cast<const unsigned char*>(buffer.data()),
-        buffer.size());
-  } else if (
-      meshOpt.mode == ExtensionBufferViewExtMeshoptCompression::Mode::INDICES) {
+        buffer.size()
+    );
+  } else if (meshOpt.mode == ExtensionBufferViewExtMeshoptCompression::Mode::INDICES) {
     return meshopt_decodeIndexSequence<T>(
         data,
         static_cast<size_t>(meshOpt.count),
         reinterpret_cast<const unsigned char*>(buffer.data()),
-        buffer.size());
+        buffer.size()
+    );
   }
   return -1; // invalid mode;
 }
@@ -74,7 +76,8 @@ int decodeIndices(
 int decodeBufferView(
     void* data,
     const gsl::span<const std::byte>& buffer,
-    const ExtensionBufferViewExtMeshoptCompression& meshOpt) {
+    const ExtensionBufferViewExtMeshoptCompression& meshOpt
+) {
   if (meshOpt.mode ==
       ExtensionBufferViewExtMeshoptCompression::Mode::ATTRIBUTES) {
     return meshopt_decodeVertexBuffer(
@@ -82,18 +85,21 @@ int decodeBufferView(
         static_cast<size_t>(meshOpt.count),
         static_cast<size_t>(meshOpt.byteStride),
         reinterpret_cast<const unsigned char*>(buffer.data()),
-        buffer.size());
+        buffer.size()
+    );
   } else {
     if (meshOpt.byteStride == sizeof(std::uint16_t)) {
       return decodeIndices(
           reinterpret_cast<std::uint16_t*>(data),
           buffer,
-          meshOpt);
+          meshOpt
+      );
     } else if (meshOpt.byteStride == sizeof(std::uint32_t)) {
       return decodeIndices(
           reinterpret_cast<std::uint32_t*>(data),
           buffer,
-          meshOpt);
+          meshOpt
+      );
     } else {
       return -1;
     }
@@ -110,7 +116,8 @@ void decodeMeshOpt(Model& model, CesiumGltfReader::GltfReaderResult& readGltf) {
       if (!pBuffer) {
         readGltf.warnings.emplace_back(
             "The EXT_meshopt_compression extension has an invalid buffer "
-            "index.");
+            "index."
+        );
         continue;
       }
 
@@ -119,7 +126,8 @@ void decodeMeshOpt(Model& model, CesiumGltfReader::GltfReaderResult& readGltf) {
               pBuffer->cesium.data.size()) {
         readGltf.warnings.emplace_back(
             "The EXT_meshopt_compression extension has a bufferView that "
-            "extends beyond its buffer.");
+            "extends beyond its buffer."
+        );
         continue;
       }
       int64_t byteLength = pMeshOpt->byteStride * pMeshOpt->count;
@@ -135,11 +143,14 @@ void decodeMeshOpt(Model& model, CesiumGltfReader::GltfReaderResult& readGltf) {
               data.data(),
               gsl::span<const std::byte>(
                   pBuffer->cesium.data.data() + pMeshOpt->byteOffset,
-                  static_cast<size_t>(pMeshOpt->byteLength)),
-              *pMeshOpt) != 0) {
+                  static_cast<size_t>(pMeshOpt->byteLength)
+              ),
+              *pMeshOpt
+          ) != 0) {
         readGltf.warnings.emplace_back(
             "The EXT_meshopt_compression extension has a corrupted or "
-            "incompatible meshopt compression buffer.");
+            "incompatible meshopt compression buffer."
+        );
         continue;
       }
       decodeFilter(data.data(), *pMeshOpt);
@@ -151,11 +162,13 @@ void decodeMeshOpt(Model& model, CesiumGltfReader::GltfReaderResult& readGltf) {
       bufferView.byteOffset = 0;
       bufferView.byteLength = byteLength;
       bufferView.extensions.erase(
-          ExtensionBufferViewExtMeshoptCompression::ExtensionName);
+          ExtensionBufferViewExtMeshoptCompression::ExtensionName
+      );
     }
   }
 
   model.removeExtensionRequired(
-      CesiumGltf::ExtensionBufferViewExtMeshoptCompression::ExtensionName);
+      CesiumGltf::ExtensionBufferViewExtMeshoptCompression::ExtensionName
+  );
 }
 } // namespace CesiumGltfReader

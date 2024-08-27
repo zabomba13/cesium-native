@@ -22,14 +22,15 @@ TEST_CASE("BoundingRegion") {
 
     const double offset = 0.0001;
 
-    auto updateDistance = [](TestCase testCase,
-                             double longitude,
-                             double latitude,
-                             double height) -> TestCase {
+    auto updateDistance =
+        [](TestCase testCase, double longitude, double latitude, double height
+        ) -> TestCase {
       glm::dvec3 boxPosition = Ellipsoid::WGS84.cartographicToCartesian(
-          Cartographic(longitude, latitude, height));
+          Cartographic(longitude, latitude, height)
+      );
       glm::dvec3 position = Ellipsoid::WGS84.cartographicToCartesian(
-          Cartographic(testCase.longitude, testCase.latitude, testCase.height));
+          Cartographic(testCase.longitude, testCase.latitude, testCase.height)
+      );
       testCase.expectedDistance = glm::distance(boxPosition, position);
       return testCase;
     };
@@ -38,7 +39,8 @@ TEST_CASE("BoundingRegion") {
         GlobeRectangle(-0.001, -0.001, 0.001, 0.001),
         0.0,
         10.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     const GlobeRectangle& rectangle = region.getRectangle();
 
@@ -68,7 +70,8 @@ TEST_CASE("BoundingRegion") {
                 0.0},
             rectangle.getEast(),
             rectangle.getNorth(),
-            0.0),
+            0.0
+        ),
         // From northeast
         updateDistance(
             TestCase{
@@ -78,15 +81,19 @@ TEST_CASE("BoundingRegion") {
                 0.0},
             rectangle.getWest(),
             rectangle.getSouth(),
-            0.0));
+            0.0
+        )
+    );
 
     glm::dvec3 position = Ellipsoid::WGS84.cartographicToCartesian(
-        Cartographic(testCase.longitude, testCase.latitude, testCase.height));
+        Cartographic(testCase.longitude, testCase.latitude, testCase.height)
+    );
     CHECK(Math::equalsEpsilon(
-        sqrt(region
-                 .computeDistanceSquaredToPosition(position, Ellipsoid::WGS84)),
+        sqrt(region.computeDistanceSquaredToPosition(position, Ellipsoid::WGS84)
+        ),
         testCase.expectedDistance,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
   }
 
   SECTION("computeDistanceSquaredToPosition with degenerate region") {
@@ -97,14 +104,15 @@ TEST_CASE("BoundingRegion") {
       double expectedDistance;
     };
 
-    auto updateDistance = [](TestCase testCase,
-                             double longitude,
-                             double latitude,
-                             double height) -> TestCase {
+    auto updateDistance =
+        [](TestCase testCase, double longitude, double latitude, double height
+        ) -> TestCase {
       glm::dvec3 boxPosition = Ellipsoid::WGS84.cartographicToCartesian(
-          Cartographic(longitude, latitude, height));
+          Cartographic(longitude, latitude, height)
+      );
       glm::dvec3 position = Ellipsoid::WGS84.cartographicToCartesian(
-          Cartographic(testCase.longitude, testCase.latitude, testCase.height));
+          Cartographic(testCase.longitude, testCase.latitude, testCase.height)
+      );
       testCase.expectedDistance = glm::distance(boxPosition, position);
       return testCase;
     };
@@ -113,37 +121,41 @@ TEST_CASE("BoundingRegion") {
         GlobeRectangle(-1.03, 0.2292, -1.03, 0.2292),
         0.0,
         3.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     auto testCase = GENERATE_COPY(
         TestCase{-1.03, 0.2292, 4.0, 1.0},
         TestCase{-1.03, 0.2292, 3.0, 0.0},
         TestCase{-1.03, 0.2292, 2.0, 0.0},
-        updateDistance(TestCase{-1.02, 0.2291, 2.0, 0.0}, -1.03, 0.2292, 2.0));
+        updateDistance(TestCase{-1.02, 0.2291, 2.0, 0.0}, -1.03, 0.2292, 2.0)
+    );
 
     glm::dvec3 position = Ellipsoid::WGS84.cartographicToCartesian(
-        Cartographic(testCase.longitude, testCase.latitude, testCase.height));
+        Cartographic(testCase.longitude, testCase.latitude, testCase.height)
+    );
     CHECK(Math::equalsEpsilon(
-        sqrt(region
-                 .computeDistanceSquaredToPosition(position, Ellipsoid::WGS84)),
+        sqrt(region.computeDistanceSquaredToPosition(position, Ellipsoid::WGS84)
+        ),
         testCase.expectedDistance,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
   }
 
   SECTION("intersectPlane") {
-    BoundingRegion region(
-        GlobeRectangle(0.0, 0.0, 1.0, 1.0),
-        0.0,
-        1.0,
-        Ellipsoid::WGS84);
+    BoundingRegion
+        region(GlobeRectangle(0.0, 0.0, 1.0, 1.0), 0.0, 1.0, Ellipsoid::WGS84);
 
     Plane plane(
         glm::normalize(Ellipsoid::WGS84.cartographicToCartesian(
-            Cartographic(0.0, 0.0, 1.0))),
+            Cartographic(0.0, 0.0, 1.0)
+        )),
         -glm::distance(
             glm::dvec3(0.0),
-            Ellipsoid::WGS84.cartographicToCartesian(
-                Cartographic(0.0, 0.0, 0.0))));
+            Ellipsoid::WGS84.cartographicToCartesian(Cartographic(0.0, 0.0, 0.0)
+            )
+        )
+    );
 
     CHECK(region.intersectPlane(plane) == CullingResult::Intersecting);
   }

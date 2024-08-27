@@ -3,7 +3,8 @@
 using namespace CesiumAsync::CesiumImpl;
 
 TaskScheduler::TaskScheduler(
-    const std::shared_ptr<CesiumAsync::ITaskProcessor>& pTaskProcessor)
+    const std::shared_ptr<CesiumAsync::ITaskProcessor>& pTaskProcessor
+)
     : _pTaskProcessor(pTaskProcessor) {}
 
 void TaskScheduler::schedule(async::task_run_handle t) {

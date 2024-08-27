@@ -7,8 +7,8 @@
 
 namespace CesiumGeometry {
 
-CullingResult
-BoundingSphere::intersectPlane(const Plane& plane) const noexcept {
+CullingResult BoundingSphere::intersectPlane(const Plane& plane
+) const noexcept {
   const double distanceToPlane =
       glm::dot(plane.getNormal(), this->_center) + plane.getDistance();
 
@@ -25,8 +25,9 @@ BoundingSphere::intersectPlane(const Plane& plane) const noexcept {
   return CullingResult::Inside;
 }
 
-double BoundingSphere::computeDistanceSquaredToPosition(
-    const glm::dvec3& position) const noexcept {
+double
+BoundingSphere::computeDistanceSquaredToPosition(const glm::dvec3& position
+) const noexcept {
   const glm::dvec3 diff = this->_center - position;
   auto distance = glm::length(diff) - this->_radius;
   if (distance <= 0) {
@@ -39,16 +40,18 @@ bool BoundingSphere::contains(const glm::dvec3& position) const noexcept {
   return glm::distance(this->_center, position) <= this->_radius;
 }
 
-BoundingSphere
-BoundingSphere::transform(const glm::dmat4& transformation) const noexcept {
+BoundingSphere BoundingSphere::transform(const glm::dmat4& transformation
+) const noexcept {
   const glm::dvec3 center =
       glm::dvec3(transformation * glm::dvec4(this->getCenter(), 1.0));
 
   const double uniformScale = glm::max(
       glm::max(
           glm::length(glm::dvec3(transformation[0])),
-          glm::length(glm::dvec3(transformation[1]))),
-      glm::length(glm::dvec3(transformation[2])));
+          glm::length(glm::dvec3(transformation[1]))
+      ),
+      glm::length(glm::dvec3(transformation[2]))
+  );
 
   return BoundingSphere(center, this->getRadius() * uniformScale);
 }

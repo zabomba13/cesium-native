@@ -20,17 +20,20 @@ public:
   static inline constexpr const char* ExtensionName = "CESIUM_tile_edges";
 
   ExtensionCesiumTileEdgesJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionCesiumTileEdges* pObject);
+      CesiumGltf::ExtensionCesiumTileEdges* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -38,7 +41,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionCesiumTileEdges(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionCesiumTileEdges& o);
+      CesiumGltf::ExtensionCesiumTileEdges& o
+  );
 
 private:
   CesiumGltf::ExtensionCesiumTileEdges* _pObject = nullptr;

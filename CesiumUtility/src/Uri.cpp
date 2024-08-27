@@ -26,7 +26,8 @@ std::string Uri::resolve(
     const std::string& base,
     const std::string& relative,
     bool useBaseQuery,
-    bool assumeHttpsDefault) {
+    bool assumeHttpsDefault
+) {
   const std::string conformedBase = cesiumConformUrl(base, assumeHttpsDefault);
   const std::string conformedRelative =
       cesiumConformUrl(relative, assumeHttpsDefault);
@@ -77,7 +78,8 @@ std::string Uri::resolve(
           const_cast<char*>(result.c_str()),
           &resolvedUri,
           charsRequired + 1,
-          nullptr) != URI_SUCCESS) {
+          nullptr
+      ) != URI_SUCCESS) {
     uriFreeUriMembersA(&resolvedUri);
     uriFreeUriMembersA(&relativeUri);
     uriFreeUriMembersA(&baseUri);
@@ -105,7 +107,8 @@ std::string Uri::resolve(
 std::string Uri::addQuery(
     const std::string& uri,
     const std::string& key,
-    const std::string& value) {
+    const std::string& value
+) {
   // TODO
   if (uri.find('?') != std::string::npos) {
     return uri + "&" + key + "=" + value;
@@ -137,7 +140,8 @@ std::string Uri::getQueryValue(const std::string& url, const std::string& key) {
           &queryList,
           &itemCount,
           uri.query.first,
-          uri.query.afterLast) != URI_SUCCESS) {
+          uri.query.afterLast
+      ) != URI_SUCCESS) {
     uriFreeUriMembersA(&uri);
     return "";
   }
@@ -159,7 +163,8 @@ std::string Uri::getQueryValue(const std::string& url, const std::string& key) {
 
 std::string Uri::substituteTemplateParameters(
     const std::string& templateUri,
-    const std::function<SubstitutionCallbackSignature>& substitutionCallback) {
+    const std::function<SubstitutionCallbackSignature>& substitutionCallback
+) {
   std::string result;
   std::string placeholder;
 
@@ -196,7 +201,8 @@ std::string Uri::escape(const std::string& s) {
       s.data() + s.size(),
       result.data(),
       URI_FALSE,
-      URI_FALSE);
+      URI_FALSE
+  );
   result.resize(size_t(pTerminator - result.data()));
   return result;
 }
@@ -242,7 +248,8 @@ std::string Uri::windowsPathToUriPath(const std::string& windowsPath) {
       windowsPath.end(),
       windowsPathClean.begin(),
       '/',
-      '\\');
+      '\\'
+  );
 
   // UriParser docs:
   //   The destination buffer must be large enough to hold 8 + 3 * len(filename)
@@ -341,7 +348,8 @@ std::string Uri::getPath(const std::string& uri) {
   while (pCurrent != nullptr) {
     parts.emplace_back(std::string(
         pCurrent->text.first,
-        size_t(pCurrent->text.afterLast - pCurrent->text.first)));
+        size_t(pCurrent->text.afterLast - pCurrent->text.first)
+    ));
     pCurrent = pCurrent->next;
   }
 
@@ -417,7 +425,8 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
           const_cast<char*>(result.c_str()),
           &parsedUri,
           charsRequired + 1,
-          nullptr) != URI_SUCCESS) {
+          nullptr
+      ) != URI_SUCCESS) {
     uriFreeUriMembersA(&parsedUri);
     return uri;
   }

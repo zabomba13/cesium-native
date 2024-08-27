@@ -10,8 +10,8 @@ using namespace CesiumAsync;
 
 namespace CesiumRasterOverlays {
 
-RasterOverlayTile::RasterOverlayTile(
-    RasterOverlayTileProvider& tileProvider) noexcept
+RasterOverlayTile::RasterOverlayTile(RasterOverlayTileProvider& tileProvider
+) noexcept
     : _pTileProvider(&tileProvider),
       _targetScreenPixels(0.0),
       _rectangle(CesiumGeometry::Rectangle(0.0, 0.0, 0.0, 0.0)),
@@ -24,7 +24,8 @@ RasterOverlayTile::RasterOverlayTile(
 RasterOverlayTile::RasterOverlayTile(
     RasterOverlayTileProvider& tileProvider,
     const glm::dvec2& targetScreenPixels,
-    const CesiumGeometry::Rectangle& rectangle) noexcept
+    const CesiumGeometry::Rectangle& rectangle
+) noexcept
     : _pTileProvider(&tileProvider),
       _targetScreenPixels(targetScreenPixels),
       _rectangle(rectangle),
@@ -52,10 +53,8 @@ RasterOverlayTile::~RasterOverlayTile() {
             ? this->_pRendererResources
             : nullptr;
 
-    pPrepareRendererResources->freeRaster(
-        *this,
-        pLoadThreadResult,
-        pMainThreadResult);
+    pPrepareRendererResources
+        ->freeRaster(*this, pLoadThreadResult, pMainThreadResult);
   }
 }
 
@@ -80,7 +79,8 @@ void RasterOverlayTile::loadInMainThread() {
   this->_pRendererResources =
       tileProvider.getPrepareRendererResources()->prepareRasterInMainThread(
           *this,
-          this->_pRendererResources);
+          this->_pRendererResources
+      );
 
   this->setState(LoadState::Done);
 }

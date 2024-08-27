@@ -20,9 +20,11 @@ TEST_CASE("I3dmToGltfConverter") {
 
     REQUIRE(result.model);
     CHECK(result.model->isExtensionUsed(
-        ExtensionExtMeshGpuInstancing::ExtensionName));
+        ExtensionExtMeshGpuInstancing::ExtensionName
+    ));
     CHECK(result.model->isExtensionRequired(
-        ExtensionExtMeshGpuInstancing::ExtensionName));
+        ExtensionExtMeshGpuInstancing::ExtensionName
+    ));
     REQUIRE(result.model->nodes.size() == 1);
 
     ExtensionExtMeshGpuInstancing* pExtension =
@@ -46,9 +48,11 @@ TEST_CASE("I3dmToGltfConverter") {
 
     REQUIRE(result.model);
     CHECK(result.model->isExtensionUsed(
-        ExtensionExtMeshGpuInstancing::ExtensionName));
+        ExtensionExtMeshGpuInstancing::ExtensionName
+    ));
     CHECK(result.model->isExtensionRequired(
-        ExtensionExtMeshGpuInstancing::ExtensionName));
+        ExtensionExtMeshGpuInstancing::ExtensionName
+    ));
     REQUIRE(result.model->nodes.size() == 1);
 
     ExtensionExtMeshGpuInstancing* pExtension =

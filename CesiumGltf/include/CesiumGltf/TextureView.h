@@ -108,7 +108,8 @@ public:
   TextureView(
       const Model& model,
       const TextureInfo& textureInfo,
-      const TextureViewOptions& options = TextureViewOptions()) noexcept;
+      const TextureViewOptions& options = TextureViewOptions()
+  ) noexcept;
 
   /**
    * @brief Constructs a view of the texture specified by the given {@link Sampler}
@@ -128,7 +129,8 @@ public:
       int64_t textureCoordinateSetIndex,
       const ExtensionKhrTextureTransform* pKhrTextureTransformExtension =
           nullptr,
-      const TextureViewOptions& options = TextureViewOptions()) noexcept;
+      const TextureViewOptions& options = TextureViewOptions()
+  ) noexcept;
 
   /**
    * @brief Get the status of this texture view.
@@ -150,7 +152,8 @@ public:
   int64_t getTexCoordSetIndex() const noexcept {
     if (this->_applyTextureTransform && this->_textureTransform) {
       return this->_textureTransform->getTexCoordSetIndex().value_or(
-          this->_texCoordSetIndex);
+          this->_texCoordSetIndex
+      );
     }
     return this->_texCoordSetIndex;
   }
@@ -201,10 +204,9 @@ public:
    * must be supplied to specify how many image channels are needed, and in what
    * order the bytes should be retrieved.
    */
-  std::vector<uint8_t> sampleNearestPixel(
-      double u,
-      double v,
-      const std::vector<int64_t>& channels) const noexcept;
+  std::vector<uint8_t>
+  sampleNearestPixel(double u, double v, const std::vector<int64_t>& channels)
+      const noexcept;
 
 private:
   TextureViewStatus _textureViewStatus;

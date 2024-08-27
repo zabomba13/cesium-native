@@ -35,7 +35,8 @@ public:
       -CesiumUtility::Math::OnePi,
       -CesiumUtility::Math::PiOverTwo,
       CesiumUtility::Math::OnePi,
-      CesiumUtility::Math::PiOverTwo);
+      CesiumUtility::Math::PiOverTwo
+  );
 
   /**
    * @brief Computes the maximum rectangle that can be covered with this
@@ -46,7 +47,8 @@ public:
    * @return The rectangle
    */
   static constexpr CesiumGeometry::Rectangle computeMaximumProjectedRectangle(
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) noexcept {
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) noexcept {
     const double longitudeValue =
         ellipsoid.getMaximumRadius() * CesiumUtility::Math::OnePi;
     const double latitudeValue =
@@ -55,7 +57,8 @@ public:
         -longitudeValue,
         -latitudeValue,
         longitudeValue,
-        latitudeValue);
+        latitudeValue
+    );
   }
 
   /**
@@ -63,8 +66,8 @@ public:
    *
    * @param ellipsoid The {@link Ellipsoid}.
    */
-  GeographicProjection(
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) noexcept;
+  GeographicProjection(const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) noexcept;
 
   /**
    * @brief Gets the {@link Ellipsoid}.

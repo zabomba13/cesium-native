@@ -12,7 +12,8 @@ public:
       uint16_t statusCode,
       const std::string& contentType,
       const CesiumAsync::HttpHeaders& headers,
-      const std::vector<std::byte>& data)
+      const std::vector<std::byte>& data
+  )
       : mockStatusCode{statusCode},
         mockContentType{contentType},
         mockHeaders{headers},

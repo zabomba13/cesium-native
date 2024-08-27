@@ -31,7 +31,8 @@ TEST_CASE("Test implicit quadtree loader") {
   Cesium3DTilesContent::registerAllTileContentTypes();
 
   auto pMockedAssetAccessor = std::make_shared<SimpleAssetAccessor>(
-      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{});
+      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{}
+  );
 
   CesiumAsync::AsyncSystem asyncSystem{std::make_shared<SimpleTaskProcessor>()};
 
@@ -73,7 +74,8 @@ TEST_CASE("Test implicit quadtree loader") {
             SubtreeAvailability::SubtreeConstantAvailability{true},
             SubtreeAvailability::SubtreeConstantAvailability{false},
             {SubtreeAvailability::SubtreeConstantAvailability{false}},
-            {}});
+            {}}
+    );
 
     // check that this tile will have empty content
     Tile tile(&loader);
@@ -109,23 +111,27 @@ TEST_CASE("Test implicit quadtree loader") {
             SubtreeAvailability::SubtreeConstantAvailability{true},
             SubtreeAvailability::SubtreeConstantAvailability{false},
             {SubtreeAvailability::SubtreeConstantAvailability{true}},
-            {}});
+            {}}
+    );
 
     // mock tile content b3dm
     auto pMockCompletedResponse = std::make_unique<SimpleAssetResponse>(
         static_cast<uint16_t>(200),
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        readFile(testDataPath / "BatchTables" / "batchedWithJson.b3dm"));
+        readFile(testDataPath / "BatchTables" / "batchedWithJson.b3dm")
+    );
 
     auto pMockCompletedRequest = std::make_shared<SimpleAssetRequest>(
         "GET",
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        std::move(pMockCompletedResponse));
+        std::move(pMockCompletedResponse)
+    );
 
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"content/2.1.1.b3dm", std::move(pMockCompletedRequest)});
+        {"content/2.1.1.b3dm", std::move(pMockCompletedRequest)}
+    );
 
     // check that this tile has render content
     Tile tile(&loader);
@@ -144,8 +150,8 @@ TEST_CASE("Test implicit quadtree loader") {
     asyncSystem.dispatchMainThreadTasks();
 
     auto tileLoadResult = tileLoadResultFuture.wait();
-    CHECK(
-        std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind));
+    CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind)
+    );
     CHECK(!tileLoadResult.updatedBoundingVolume);
     CHECK(!tileLoadResult.updatedContentBoundingVolume);
     CHECK(!tileLoadResult.tileInitializer);
@@ -162,23 +168,27 @@ TEST_CASE("Test implicit quadtree loader") {
             SubtreeAvailability::SubtreeConstantAvailability{true},
             SubtreeAvailability::SubtreeConstantAvailability{false},
             {SubtreeAvailability::SubtreeConstantAvailability{true}},
-            {}});
+            {}}
+    );
 
     // mock tile content b3dm
     auto pMockCompletedResponse = std::make_unique<SimpleAssetResponse>(
         static_cast<uint16_t>(200),
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        std::vector<std::byte>(20));
+        std::vector<std::byte>(20)
+    );
 
     auto pMockCompletedRequest = std::make_shared<SimpleAssetRequest>(
         "GET",
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        std::move(pMockCompletedResponse));
+        std::move(pMockCompletedResponse)
+    );
 
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"content/2.1.1.b3dm", std::move(pMockCompletedRequest)});
+        {"content/2.1.1.b3dm", std::move(pMockCompletedRequest)}
+    );
 
     // check that this tile has render content
     Tile tile(&loader);
@@ -214,7 +224,8 @@ findTile(const gsl::span<const Tile>& children, const QuadtreeTileID& tileID) {
         if (!pID)
           return false;
         return *pID == tileID;
-      });
+      }
+  );
   REQUIRE(it != children.end());
   return *it;
 }
@@ -230,7 +241,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
   Cesium3DTilesContent::registerAllTileContentTypes();
 
   auto pMockedAssetAccessor = std::make_shared<SimpleAssetAccessor>(
-      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{});
+      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{}
+  );
 
   CesiumAsync::AsyncSystem asyncSystem{std::make_shared<SimpleTaskProcessor>()};
 
@@ -253,7 +265,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
             SubtreeAvailability::SubtreeConstantAvailability{true},
             SubtreeAvailability::SubtreeConstantAvailability{false},
             {SubtreeAvailability::SubtreeConstantAvailability{true}},
-            {}});
+            {}}
+    );
 
     // check subdivide root tile first
     Tile tile(&loader);
@@ -372,7 +385,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
             SubtreeAvailability::SubtreeConstantAvailability{true},
             SubtreeAvailability::SubtreeConstantAvailability{false},
             {SubtreeAvailability::SubtreeConstantAvailability{true}},
-            {}});
+            {}}
+    );
 
     // check subdivide root tile first
     Tile tile(&loader);
@@ -445,7 +459,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
       CHECK(region_2_2_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
       CHECK(region_2_2_0.getRectangle().getEast() == Approx(Math::PiOverTwo));
       CHECK(
-          region_2_2_0.getRectangle().getNorth() == Approx(-Math::OnePi / 4.0));
+          region_2_2_0.getRectangle().getNorth() == Approx(-Math::OnePi / 4.0)
+      );
       CHECK(region_2_2_0.getMinimumHeight() == Approx(0.0));
       CHECK(region_2_2_0.getMaximumHeight() == Approx(100.0));
 
@@ -456,7 +471,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
       CHECK(region_2_3_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
       CHECK(region_2_3_0.getRectangle().getEast() == Approx(Math::OnePi));
       CHECK(
-          region_2_3_0.getRectangle().getNorth() == Approx(-Math::OnePi / 4.0));
+          region_2_3_0.getRectangle().getNorth() == Approx(-Math::OnePi / 4.0)
+      );
       CHECK(region_2_3_0.getMinimumHeight() == Approx(0.0));
       CHECK(region_2_3_0.getMaximumHeight() == Approx(100.0));
 
@@ -465,7 +481,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
           std::get<BoundingRegion>(tile_2_2_1.getBoundingVolume());
       CHECK(region_2_2_1.getRectangle().getWest() == Approx(0.0));
       CHECK(
-          region_2_2_1.getRectangle().getSouth() == Approx(-Math::OnePi / 4.0));
+          region_2_2_1.getRectangle().getSouth() == Approx(-Math::OnePi / 4.0)
+      );
       CHECK(region_2_2_1.getRectangle().getEast() == Approx(Math::OnePi / 2.0));
       CHECK(region_2_2_1.getRectangle().getNorth() == Approx(0.0));
       CHECK(region_2_2_1.getMinimumHeight() == Approx(0.0));
@@ -476,7 +493,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
           std::get<BoundingRegion>(tile_2_3_1.getBoundingVolume());
       CHECK(region_2_3_1.getRectangle().getWest() == Approx(Math::PiOverTwo));
       CHECK(
-          region_2_3_1.getRectangle().getSouth() == Approx(-Math::OnePi / 4.0));
+          region_2_3_1.getRectangle().getSouth() == Approx(-Math::OnePi / 4.0)
+      );
       CHECK(region_2_3_1.getRectangle().getEast() == Approx(Math::OnePi));
       CHECK(region_2_3_1.getRectangle().getNorth() == Approx(0.0));
       CHECK(region_2_3_1.getMinimumHeight() == Approx(0.0));
@@ -511,7 +529,8 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
             SubtreeAvailability::SubtreeConstantAvailability{true},
             SubtreeAvailability::SubtreeConstantAvailability{false},
             {SubtreeAvailability::SubtreeConstantAvailability{true}},
-            {}});
+            {}}
+    );
 
     Tile tile(&loader);
     tile.setTileID(QuadtreeTileID(0, 0, 0));

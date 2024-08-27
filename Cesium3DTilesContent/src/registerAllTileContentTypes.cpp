@@ -17,7 +17,8 @@ void registerAllTileContentTypes() {
 
   GltfConverters::registerFileExtension(
       ".gltf",
-      BinaryToGltfConverter::convert);
+      BinaryToGltfConverter::convert
+  );
   GltfConverters::registerFileExtension(".glb", BinaryToGltfConverter::convert);
 }
 

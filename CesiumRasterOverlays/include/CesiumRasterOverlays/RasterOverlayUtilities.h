@@ -82,7 +82,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayUtilities {
       bool invertVCoordinate = false,
       const std::string_view& textureCoordinateAttributeBaseName =
           DEFAULT_TEXTURE_COORDINATE_BASE_NAME,
-      int32_t firstTextureCoordinateID = 0);
+      int32_t firstTextureCoordinateID = 0
+  );
 
   /**
    * @brief Creates a new glTF model from one of the quadtree children of the
@@ -118,7 +119,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayUtilities {
           DEFAULT_TEXTURE_COORDINATE_BASE_NAME,
       int32_t textureCoordinateIndex = 0,
       const CesiumGeospatial::Ellipsoid& ellipsoid =
-          CesiumGeospatial::Ellipsoid::WGS84);
+          CesiumGeospatial::Ellipsoid::WGS84
+  );
 
   /**
    * @brief Computes the desired screen pixels for a raster overlay texture.
@@ -163,7 +165,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayUtilities {
       double maximumScreenSpaceError,
       const CesiumGeospatial::Projection& projection,
       const CesiumGeometry::Rectangle& rectangle,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Computes the texture translation and scale necessary to align a
@@ -178,7 +181,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayUtilities {
    */
   static glm::dvec4 computeTranslationAndScale(
       const CesiumGeometry::Rectangle& geometryRectangle,
-      const CesiumGeometry::Rectangle& overlayRectangle);
+      const CesiumGeometry::Rectangle& overlayRectangle
+  );
 };
 
 } // namespace CesiumRasterOverlays

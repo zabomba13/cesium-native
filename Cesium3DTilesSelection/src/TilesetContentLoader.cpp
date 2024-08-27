@@ -9,7 +9,8 @@ TileLoadInput::TileLoadInput(
     const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor_,
     const std::shared_ptr<spdlog::logger>& pLogger_,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders_,
-    const CesiumGeospatial::Ellipsoid& ellipsoid_)
+    const CesiumGeospatial::Ellipsoid& ellipsoid_
+)
     : tile{tile_},
       contentOptions{contentOptions_},
       asyncSystem{asyncSystem_},
@@ -19,7 +20,8 @@ TileLoadInput::TileLoadInput(
       ellipsoid(ellipsoid_) {}
 
 TileLoadResult TileLoadResult::createFailedResult(
-    std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest) {
+    std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest
+) {
   return TileLoadResult{
       TileUnknownContent{},
       CesiumGeometry::Axis::Y,
@@ -33,7 +35,8 @@ TileLoadResult TileLoadResult::createFailedResult(
 }
 
 TileLoadResult TileLoadResult::createRetryLaterResult(
-    std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest) {
+    std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest
+) {
   return TileLoadResult{
       TileUnknownContent{},
       CesiumGeometry::Axis::Y,

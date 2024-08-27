@@ -20,7 +20,8 @@ using namespace CesiumGltf;
 std::optional<uint32_t> parseOffsetForSemantic(
     const rapidjson::Document& document,
     const char* semantic,
-    CesiumUtility::ErrorList& errorList) {
+    CesiumUtility::ErrorList& errorList
+) {
   const auto semanticIt = document.FindMember(semantic);
   if (semanticIt == document.MemberEnd() || !semanticIt->value.IsObject()) {
     return {};
@@ -30,7 +31,8 @@ std::optional<uint32_t> parseOffsetForSemantic(
       !isValue<uint32_t>(byteOffsetIt->value)) {
     errorList.emplaceError(
         std::string("Error parsing feature table, ") + semantic +
-        "does not have valid byteOffset.");
+        "does not have valid byteOffset."
+    );
     return {};
   }
   return getValue<uint32_t>(byteOffsetIt->value);
@@ -39,7 +41,8 @@ std::optional<uint32_t> parseOffsetForSemantic(
 bool validateJsonArrayValues(
     const rapidjson::Value& arrayValue,
     uint32_t expectedLength,
-    ValuePredicate predicate) {
+    ValuePredicate predicate
+) {
   if (!arrayValue.IsArray()) {
     return false;
   }
@@ -63,7 +66,8 @@ parseArrayValueDVec3(const rapidjson::Value& arrayValue) {
     return std::make_optional(glm::dvec3(
         arrayValue[0].GetDouble(),
         arrayValue[1].GetDouble(),
-        arrayValue[2].GetDouble()));
+        arrayValue[2].GetDouble()
+    ));
   }
   return {};
 }
@@ -89,7 +93,8 @@ int32_t createBufferViewInGltf(
     Model& gltf,
     const int32_t bufferId,
     const int64_t byteLength,
-    const int64_t byteStride) {
+    const int64_t byteStride
+) {
   size_t bufferViewId = gltf.bufferViews.size();
   BufferView& bufferView = gltf.bufferViews.emplace_back();
   bufferView.buffer = bufferId;
@@ -106,7 +111,8 @@ int32_t createAccessorInGltf(
     const int32_t bufferViewId,
     const int32_t componentType,
     const int64_t count,
-    const std::string type) {
+    const std::string type
+) {
   size_t accessorId = gltf.accessors.size();
   Accessor& accessor = gltf.accessors.emplace_back();
   accessor.bufferView = bufferViewId;

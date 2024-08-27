@@ -55,7 +55,8 @@ public:
   RasterMappedTo3DTile(
       const CesiumUtility::IntrusivePointer<
           CesiumRasterOverlays::RasterOverlayTile>& pRasterTile,
-      int32_t textureCoordinateIndex);
+      int32_t textureCoordinateIndex
+  );
 
   /**
    * @brief Returns a {@link RasterOverlayTile} that is currently loading.
@@ -175,7 +176,8 @@ public:
    */
   void detachFromTile(
       IPrepareRendererResources& prepareRendererResources,
-      Tile& tile) noexcept;
+      Tile& tile
+  ) noexcept;
 
   /**
    * @brief Does a throttled load of the mapped {@link RasterOverlayTile}.
@@ -224,7 +226,8 @@ public:
       CesiumRasterOverlays::RasterOverlayTileProvider& placeholder,
       Tile& tile,
       std::vector<CesiumGeospatial::Projection>& missingProjections,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
 private:
   void computeTranslationAndScale(const Tile& tile);

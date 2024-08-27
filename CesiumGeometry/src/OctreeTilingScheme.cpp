@@ -6,30 +6,32 @@ OctreeTilingScheme::OctreeTilingScheme(
     const AxisAlignedBox& box,
     uint32_t rootTilesX,
     uint32_t rootTilesY,
-    uint32_t rootTilesZ) noexcept
+    uint32_t rootTilesZ
+) noexcept
     : _box(box),
       _rootTilesX(rootTilesX),
       _rootTilesY(rootTilesY),
       _rootTilesZ(rootTilesZ) {}
 
-uint32_t
-OctreeTilingScheme::getNumberOfXTilesAtLevel(uint32_t level) const noexcept {
+uint32_t OctreeTilingScheme::getNumberOfXTilesAtLevel(uint32_t level
+) const noexcept {
   return this->_rootTilesX << level;
 }
 
-uint32_t
-OctreeTilingScheme::getNumberOfYTilesAtLevel(uint32_t level) const noexcept {
+uint32_t OctreeTilingScheme::getNumberOfYTilesAtLevel(uint32_t level
+) const noexcept {
   return this->_rootTilesY << level;
 }
 
-uint32_t
-OctreeTilingScheme::getNumberOfZTilesAtLevel(uint32_t level) const noexcept {
+uint32_t OctreeTilingScheme::getNumberOfZTilesAtLevel(uint32_t level
+) const noexcept {
   return this->_rootTilesZ << level;
 }
 
 std::optional<OctreeTileID> OctreeTilingScheme::positionToTile(
     const glm::dvec3& position,
-    uint32_t level) const noexcept {
+    uint32_t level
+) const noexcept {
 
   if (!this->_box.contains(position)) {
     return std::nullopt;
@@ -62,8 +64,8 @@ std::optional<OctreeTileID> OctreeTilingScheme::positionToTile(
   return OctreeTileID(level, xTileCoordinate, yTileCoordinate, zTileCoordinate);
 }
 
-AxisAlignedBox
-OctreeTilingScheme::tileToBox(const OctreeTileID& tileID) const noexcept {
+AxisAlignedBox OctreeTilingScheme::tileToBox(const OctreeTileID& tileID
+) const noexcept {
   uint32_t xTiles = this->getNumberOfXTilesAtLevel(tileID.level);
   uint32_t yTiles = this->getNumberOfYTilesAtLevel(tileID.level);
   uint32_t zTiles = this->getNumberOfZTilesAtLevel(tileID.level);
@@ -82,6 +84,7 @@ OctreeTilingScheme::tileToBox(const OctreeTileID& tileID) const noexcept {
       minimumZ,
       minimumX + xTileSize,
       minimumY + yTileSize,
-      minimumZ + zTileSize);
+      minimumZ + zTileSize
+  );
 }
 } // namespace CesiumGeometry

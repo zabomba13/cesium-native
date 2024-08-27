@@ -11,9 +11,9 @@
 namespace {
 void check(const std::string& input, const std::string& expectedOutput) {
   Cesium3DTilesReader::TilesetReader reader;
-  auto readResult = reader.readFromJson(gsl::span(
-      reinterpret_cast<const std::byte*>(input.c_str()),
-      input.size()));
+  auto readResult = reader.readFromJson(
+      gsl::span(reinterpret_cast<const std::byte*>(input.c_str()), input.size())
+  );
   REQUIRE(readResult.errors.empty());
   REQUIRE(readResult.warnings.empty());
   REQUIRE(readResult.value.has_value());
@@ -30,7 +30,8 @@ void check(const std::string& input, const std::string& expectedOutput) {
 
   const std::string tilesetString(
       reinterpret_cast<const char*>(tilesetBytes.data()),
-      tilesetBytes.size());
+      tilesetBytes.size()
+  );
 
   rapidjson::Document tilesetJson;
   tilesetJson.Parse(tilesetString.c_str());
@@ -253,7 +254,8 @@ TEST_CASE("Writes tileset with prettyPrint") {
 
   std::string tilesetStringCompact(
       reinterpret_cast<const char*>(tilesetBytesCompact.data()),
-      tilesetBytesCompact.size());
+      tilesetBytesCompact.size()
+  );
 
   REQUIRE_FALSE(hasSpaces(tilesetStringCompact));
 
@@ -262,7 +264,8 @@ TEST_CASE("Writes tileset with prettyPrint") {
   const std::vector<std::byte>& tilesetBytesPretty = writeResult.tilesetBytes;
   std::string tilesetStringPretty(
       reinterpret_cast<const char*>(tilesetBytesPretty.data()),
-      tilesetBytesPretty.size());
+      tilesetBytesPretty.size()
+  );
 
   REQUIRE(hasSpaces(tilesetStringPretty));
 }

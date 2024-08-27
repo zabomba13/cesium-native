@@ -86,7 +86,8 @@ public:
    */
   GltfWriterResult writeGltf(
       const CesiumGltf::Model& model,
-      const GltfWriterOptions& options = GltfWriterOptions()) const;
+      const GltfWriterOptions& options = GltfWriterOptions()
+  ) const;
 
   /**
    * @brief Serializes the provided model into a glb byte vector.
@@ -103,7 +104,8 @@ public:
   GltfWriterResult writeGlb(
       const CesiumGltf::Model& model,
       const gsl::span<const std::byte>& bufferData,
-      const GltfWriterOptions& options = GltfWriterOptions()) const;
+      const GltfWriterOptions& options = GltfWriterOptions()
+  ) const;
 
 private:
   CesiumJsonWriter::ExtensionWriterContext _context;

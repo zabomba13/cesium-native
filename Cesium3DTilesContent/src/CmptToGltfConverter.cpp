@@ -25,7 +25,8 @@ static_assert(sizeof(InnerHeader) == 12);
 CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
     const gsl::span<const std::byte>& cmptBinary,
     const CesiumGltfReader::GltfReaderOptions& options,
-    const AssetFetcher& assetFetcher) {
+    const AssetFetcher& assetFetcher
+) {
   GltfConverterResult result;
   if (cmptBinary.size() < sizeof(CmptHeader)) {
     result.errors.emplaceWarning("Composite tile must be at least 16 bytes.");
@@ -36,14 +37,15 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
       reinterpret_cast<const CmptHeader*>(cmptBinary.data());
   if (std::string(pHeader->magic, 4) != "cmpt") {
     result.errors.emplaceWarning(
-        "Composite tile does not have the expected magic vaue 'cmpt'.");
+        "Composite tile does not have the expected magic vaue 'cmpt'."
+    );
     return assetFetcher.asyncSystem.createResolvedFuture(std::move(result));
   }
 
   if (pHeader->version != 1) {
-    result.errors.emplaceWarning(fmt::format(
-        "Unsupported composite tile version {}.",
-        pHeader->version));
+    result.errors.emplaceWarning(
+        fmt::format("Unsupported composite tile version {}.", pHeader->version)
+    );
     return assetFetcher.asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -51,7 +53,8 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
     result.errors.emplaceWarning(fmt::format(
         "Composite tile byteLength is {} but only {} bytes are available.",
         pHeader->byteLength,
-        cmptBinary.size()));
+        cmptBinary.size()
+    ));
     return assetFetcher.asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -62,25 +65,29 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
        ++i) {
     if (pos + sizeof(InnerHeader) > pHeader->byteLength) {
       result.errors.emplaceWarning(
-          "Composite tile ends before all embedded tiles could be read.");
+          "Composite tile ends before all embedded tiles could be read."
+      );
       break;
     }
     const InnerHeader* pInner =
         reinterpret_cast<const InnerHeader*>(cmptBinary.data() + pos);
     if (pos + pInner->byteLength > pHeader->byteLength) {
       result.errors.emplaceWarning(
-          "Composite tile ends before all embedded tiles could be read.");
+          "Composite tile ends before all embedded tiles could be read."
+      );
       break;
     }
 
     const gsl::span<const std::byte> innerData(
         cmptBinary.data() + pos,
-        pInner->byteLength);
+        pInner->byteLength
+    );
 
     pos += pInner->byteLength;
 
     innerTiles.emplace_back(
-        GltfConverters::convert(innerData, options, assetFetcher));
+        GltfConverters::convert(innerData, options, assetFetcher)
+    );
   }
 
   uint32_t tilesLength = pHeader->tilesLength;
@@ -88,7 +95,8 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
     if (tilesLength > 0) {
       result.errors.emplaceWarning(
           "Composite tile does not contain any loadable inner "
-          "tiles.");
+          "tiles."
+      );
     }
     return assetFetcher.asyncSystem.createResolvedFuture(std::move(result));
   }

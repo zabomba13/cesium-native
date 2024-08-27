@@ -3,8 +3,8 @@
 #include "CesiumGltf/Model.h"
 
 namespace CesiumGltf {
-/*static*/ int8_t
-Accessor::computeNumberOfComponents(const std::string& type) noexcept {
+/*static*/ int8_t Accessor::computeNumberOfComponents(const std::string& type
+) noexcept {
   if (type == CesiumGltf::Accessor::Type::SCALAR) {
     return 1;
   }
@@ -30,8 +30,8 @@ Accessor::computeNumberOfComponents(const std::string& type) noexcept {
   return 0;
 }
 
-/*static*/ int8_t
-Accessor::computeByteSizeOfComponent(int32_t componentType) noexcept {
+/*static*/ int8_t Accessor::computeByteSizeOfComponent(int32_t componentType
+) noexcept {
   switch (componentType) {
   case CesiumGltf::Accessor::ComponentType::BYTE:
   case CesiumGltf::Accessor::ComponentType::UNSIGNED_BYTE:
@@ -61,8 +61,8 @@ int64_t Accessor::computeBytesPerVertex() const noexcept {
          int64_t{this->computeNumberOfComponents()};
 }
 
-int64_t
-Accessor::computeByteStride(const CesiumGltf::Model& model) const noexcept {
+int64_t Accessor::computeByteStride(const CesiumGltf::Model& model
+) const noexcept {
   const BufferView* pBufferView =
       Model::getSafe(&model.bufferViews, this->bufferView);
   if (!pBufferView) {

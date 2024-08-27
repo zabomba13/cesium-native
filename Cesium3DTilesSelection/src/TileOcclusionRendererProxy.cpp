@@ -3,7 +3,8 @@
 namespace Cesium3DTilesSelection {
 
 TileOcclusionRendererProxyPool::TileOcclusionRendererProxyPool(
-    int32_t maximumPoolSize)
+    int32_t maximumPoolSize
+)
     : _pFreeProxiesHead(nullptr),
       _currentSize(0),
       _maxSize(maximumPoolSize < 0 ? 0 : maximumPoolSize),
@@ -29,10 +30,8 @@ void TileOcclusionRendererProxyPool::destroyPool() {
   this->_currentSize = 0;
 }
 
-const TileOcclusionRendererProxy*
-TileOcclusionRendererProxyPool::fetchOcclusionProxyForTile(
-    const Tile& tile,
-    int32_t /*currentFrame*/) {
+const TileOcclusionRendererProxy* TileOcclusionRendererProxyPool::
+    fetchOcclusionProxyForTile(const Tile& tile, int32_t /*currentFrame*/) {
   auto mappingIt = this->_tileToOcclusionProxyMappings.find(&tile);
   if (mappingIt != this->_tileToOcclusionProxyMappings.end()) {
     TileOcclusionRendererProxy* pProxy = mappingIt->second;

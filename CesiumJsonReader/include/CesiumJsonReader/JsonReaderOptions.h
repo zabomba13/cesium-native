@@ -83,7 +83,8 @@ public:
         TExtended::TypeName,
         ExtensionReaderFactory([](const JsonReaderOptions& context) {
           return std::make_unique<TExtensionHandler>(context);
-        }));
+        })
+    );
   }
 
   /**
@@ -105,7 +106,8 @@ public:
         TExtended::TypeName,
         ExtensionHandlerFactory([](const JsonReaderOptions& context) {
           return std::make_unique<TExtensionHandler>(context);
-        }));
+        })
+    );
   }
 
   /**
@@ -140,12 +142,12 @@ public:
 
   std::unique_ptr<IExtensionJsonHandler> createExtensionHandler(
       const std::string_view& extensionName,
-      const std::string& extendedObjectType) const;
+      const std::string& extendedObjectType
+  ) const;
 
 private:
-  using ExtensionHandlerFactory =
-      std::function<std::unique_ptr<IExtensionJsonHandler>(
-          const JsonReaderOptions&)>;
+  using ExtensionHandlerFactory = std::function<
+      std::unique_ptr<IExtensionJsonHandler>(const JsonReaderOptions&)>;
   using ObjectTypeToHandler = std::map<std::string, ExtensionHandlerFactory>;
   using ExtensionNameMap = std::map<std::string, ObjectTypeToHandler>;
 

@@ -32,7 +32,8 @@ public:
       const AxisAlignedBox& box,
       uint32_t rootTilesX,
       uint32_t rootTilesY,
-      uint32_t rootTilesZ) noexcept;
+      uint32_t rootTilesZ
+  ) noexcept;
 
   /**
    * @brief Return the overall box that is tiled.
@@ -96,8 +97,8 @@ public:
    * @param tileID The tile ID
    * @return The box
    */
-  AxisAlignedBox
-  tileToBox(const CesiumGeometry::OctreeTileID& tileID) const noexcept;
+  AxisAlignedBox tileToBox(const CesiumGeometry::OctreeTileID& tileID
+  ) const noexcept;
 
 private:
   AxisAlignedBox _box;

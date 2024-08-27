@@ -48,8 +48,8 @@ TEST_CASE("B3dmToGltfConverter") {
 
         CHECK(!indicesBufferView.byteStride.has_value());
         CHECK(
-            indicesBufferView.target ==
-            BufferView::Target::ELEMENT_ARRAY_BUFFER);
+            indicesBufferView.target == BufferView::Target::ELEMENT_ARRAY_BUFFER
+        );
 
         auto positionIt = primitive.attributes.find("POSITION");
         REQUIRE(positionIt != primitive.attributes.end());

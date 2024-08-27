@@ -51,7 +51,8 @@ public:
       const HttpHeaders& requestHeaders,
       uint16_t statusCode,
       const HttpHeaders& responseHeaders,
-      const gsl::span<const std::byte>& responseData) override {
+      const gsl::span<const std::byte>& responseData
+  ) override {
     this->storeRequestParam = StoreRequestParameters{
         key,
         expiryTime,
@@ -89,20 +90,23 @@ public:
 bool runResponseCacheTest(
     int statusCode,
     const std::string& methodStr,
-    const HttpHeaders& httpHeaders) {
+    const HttpHeaders& httpHeaders
+) {
   std::unique_ptr<IAssetResponse> mockResponse =
       std::make_unique<MockAssetResponse>(
           static_cast<uint16_t>(statusCode),
           "app/json",
           httpHeaders,
-          std::vector<std::byte>());
+          std::vector<std::byte>()
+      );
 
   std::shared_ptr<IAssetRequest> mockRequest =
       std::make_shared<MockAssetRequest>(
           methodStr,
           "test.com",
           HttpHeaders{},
-          std::move(mockResponse));
+          std::move(mockResponse)
+      );
 
   std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
       std::make_unique<MockStoreCacheDatabase>();
@@ -112,7 +116,8 @@ bool runResponseCacheTest(
       std::make_shared<CachingAssetAccessor>(
           spdlog::default_logger(),
           std::make_unique<MockAssetAccessor>(mockRequest),
-          std::move(ownedMockCacheDatabase));
+          std::move(ownedMockCacheDatabase)
+      );
 
   std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
       std::make_shared<MockTaskProcessor>();
@@ -222,8 +227,8 @@ TEST_CASE("Test the condition of caching the request") {
       REQUIRE(responseCached == true);
     }
 
-    SECTION(
-        "GET Request, Expires header is less than current, but has an ETag") {
+    SECTION("GET Request, Expires header is less than current, but has an ETag"
+    ) {
       int statusCode = GENERATE(200, 202, 203, 204, 205, 304);
 
       HttpHeaders headers = {
@@ -283,14 +288,16 @@ TEST_CASE("Test the condition of caching the request") {
                   {"Content-Type", "app/json"},
                   {"Cache-Control",
                    "must-revalidate, max-age=100, public, private"}},
-              std::vector<std::byte>());
+              std::vector<std::byte>()
+          );
 
       std::shared_ptr<IAssetRequest> mockRequest =
           std::make_shared<MockAssetRequest>(
               "POST",
               "test.com",
               HttpHeaders{},
-              std::move(mockResponse));
+              std::move(mockResponse)
+          );
 
       std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
           std::make_unique<MockStoreCacheDatabase>();
@@ -299,7 +306,8 @@ TEST_CASE("Test the condition of caching the request") {
           std::make_shared<CachingAssetAccessor>(
               spdlog::default_logger(),
               std::make_unique<MockAssetAccessor>(mockRequest),
-              std::move(ownedMockCacheDatabase));
+              std::move(ownedMockCacheDatabase)
+          );
       std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
           std::make_shared<MockTaskProcessor>();
 
@@ -319,14 +327,16 @@ TEST_CASE("Test the condition of caching the request") {
                   {"Content-Type", "app/json"},
                   {"Cache-Control",
                    "must-revalidate, public, private, max-age=100"}},
-              std::vector<std::byte>());
+              std::vector<std::byte>()
+          );
 
       std::shared_ptr<IAssetRequest> mockRequest =
           std::make_shared<MockAssetRequest>(
               "GET",
               "test.com",
               HttpHeaders{},
-              std::move(mockResponse));
+              std::move(mockResponse)
+          );
 
       std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
           std::make_unique<MockStoreCacheDatabase>();
@@ -335,7 +345,8 @@ TEST_CASE("Test the condition of caching the request") {
           std::make_shared<CachingAssetAccessor>(
               spdlog::default_logger(),
               std::make_unique<MockAssetAccessor>(mockRequest),
-              std::move(ownedMockCacheDatabase));
+              std::move(ownedMockCacheDatabase)
+          );
       std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
           std::make_shared<MockTaskProcessor>();
 
@@ -347,7 +358,8 @@ TEST_CASE("Test the condition of caching the request") {
     }
 
     SECTION(
-        "No store for response that has No-Store in the cache-control header") {
+        "No store for response that has No-Store in the cache-control header"
+    ) {
       std::unique_ptr<IAssetResponse> mockResponse =
           std::make_unique<MockAssetResponse>(
               static_cast<uint16_t>(200),
@@ -355,14 +367,16 @@ TEST_CASE("Test the condition of caching the request") {
               HttpHeaders{
                   {"Content-Type", "app/json"},
                   {"Cache-Control", "no-store"}},
-              std::vector<std::byte>());
+              std::vector<std::byte>()
+          );
 
       std::shared_ptr<IAssetRequest> mockRequest =
           std::make_shared<MockAssetRequest>(
               "GET",
               "test.com",
               HttpHeaders{},
-              std::move(mockResponse));
+              std::move(mockResponse)
+          );
 
       std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
           std::make_unique<MockStoreCacheDatabase>();
@@ -371,7 +385,8 @@ TEST_CASE("Test the condition of caching the request") {
           std::make_shared<CachingAssetAccessor>(
               spdlog::default_logger(),
               std::make_unique<MockAssetAccessor>(mockRequest),
-              std::move(ownedMockCacheDatabase));
+              std::move(ownedMockCacheDatabase)
+          );
       std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
           std::make_shared<MockTaskProcessor>();
 
@@ -383,7 +398,8 @@ TEST_CASE("Test the condition of caching the request") {
     }
 
     SECTION(
-        "No store for response that has No-Cache in the cache-control header") {
+        "No store for response that has No-Cache in the cache-control header"
+    ) {
       std::unique_ptr<IAssetResponse> mockResponse =
           std::make_unique<MockAssetResponse>(
               static_cast<uint16_t>(200),
@@ -391,14 +407,16 @@ TEST_CASE("Test the condition of caching the request") {
               HttpHeaders{
                   {"Content-Type", "app/json"},
                   {"Cache-Control", "must-revalidate, no-cache"}},
-              std::vector<std::byte>());
+              std::vector<std::byte>()
+          );
 
       std::shared_ptr<IAssetRequest> mockRequest =
           std::make_shared<MockAssetRequest>(
               "GET",
               "test.com",
               HttpHeaders{},
-              std::move(mockResponse));
+              std::move(mockResponse)
+          );
 
       std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
           std::make_unique<MockStoreCacheDatabase>();
@@ -407,7 +425,8 @@ TEST_CASE("Test the condition of caching the request") {
           std::make_shared<CachingAssetAccessor>(
               spdlog::default_logger(),
               std::make_unique<MockAssetAccessor>(mockRequest),
-              std::move(ownedMockCacheDatabase));
+              std::move(ownedMockCacheDatabase)
+          );
       std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
           std::make_shared<MockTaskProcessor>();
 
@@ -427,21 +446,23 @@ TEST_CASE("Test the condition of caching the request") {
       REQUIRE(mockCacheDatabase->storeResponseCall == false);
     }
 
-    SECTION(
-        "No store for response that has no Cache-Control and Expires header") {
+    SECTION("No store for response that has no Cache-Control and Expires header"
+    ) {
       std::unique_ptr<IAssetResponse> mockResponse =
           std::make_unique<MockAssetResponse>(
               static_cast<uint16_t>(200),
               "app/json",
               HttpHeaders{{"Content-Type", "app/json"}},
-              std::vector<std::byte>());
+              std::vector<std::byte>()
+          );
 
       std::shared_ptr<IAssetRequest> mockRequest =
           std::make_shared<MockAssetRequest>(
               "GET",
               "test.com",
               HttpHeaders{},
-              std::move(mockResponse));
+              std::move(mockResponse)
+          );
 
       std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
           std::make_unique<MockStoreCacheDatabase>();
@@ -450,7 +471,8 @@ TEST_CASE("Test the condition of caching the request") {
           std::make_shared<CachingAssetAccessor>(
               spdlog::default_logger(),
               std::make_unique<MockAssetAccessor>(mockRequest),
-              std::move(ownedMockCacheDatabase));
+              std::move(ownedMockCacheDatabase)
+          );
       std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
           std::make_shared<MockTaskProcessor>();
 
@@ -469,14 +491,16 @@ TEST_CASE("Test the condition of caching the request") {
               HttpHeaders{
                   {"Content-Type", "app/json"},
                   {"Expires", "Wed, 21 Oct 2010 07:28:00 GMT"}},
-              std::vector<std::byte>());
+              std::vector<std::byte>()
+          );
 
       std::shared_ptr<IAssetRequest> mockRequest =
           std::make_shared<MockAssetRequest>(
               "GET",
               "test.com",
               HttpHeaders{},
-              std::move(mockResponse));
+              std::move(mockResponse)
+          );
 
       std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
           std::make_unique<MockStoreCacheDatabase>();
@@ -485,7 +509,8 @@ TEST_CASE("Test the condition of caching the request") {
           std::make_shared<CachingAssetAccessor>(
               spdlog::default_logger(),
               std::make_unique<MockAssetAccessor>(mockRequest),
-              std::move(ownedMockCacheDatabase));
+              std::move(ownedMockCacheDatabase)
+          );
       std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
           std::make_shared<MockTaskProcessor>();
 
@@ -518,14 +543,16 @@ TEST_CASE("Test calculation of expiry time for the cached response") {
             HttpHeaders{
                 {"Content-Type", "app/json"},
                 {"Cache-Control", "must-revalidate, private, max-age=400"}},
-            std::vector<std::byte>());
+            std::vector<std::byte>()
+        );
 
     std::shared_ptr<IAssetRequest> mockRequest =
         std::make_shared<MockAssetRequest>(
             "GET",
             "test.com",
             HttpHeaders{},
-            std::move(mockResponse));
+            std::move(mockResponse)
+        );
 
     std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
         std::make_unique<MockStoreCacheDatabase>();
@@ -534,7 +561,8 @@ TEST_CASE("Test calculation of expiry time for the cached response") {
         std::make_shared<CachingAssetAccessor>(
             spdlog::default_logger(),
             std::make_unique<MockAssetAccessor>(mockRequest),
-            std::move(ownedMockCacheDatabase));
+            std::move(ownedMockCacheDatabase)
+        );
     std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
         std::make_shared<MockTaskProcessor>();
 
@@ -545,7 +573,8 @@ TEST_CASE("Test calculation of expiry time for the cached response") {
     REQUIRE(mockCacheDatabase->storeResponseCall == true);
     REQUIRE(
         mockCacheDatabase->storeRequestParam->expiryTime - std::time(nullptr) ==
-        400);
+        400
+    );
   }
 
   SECTION("Response has Expires header") {
@@ -556,14 +585,16 @@ TEST_CASE("Test calculation of expiry time for the cached response") {
             HttpHeaders{
                 {"Content-Type", "app/json"},
                 {"Expires", "Wed, 21 Oct 2037 07:28:00 GMT"}},
-            std::vector<std::byte>());
+            std::vector<std::byte>()
+        );
 
     std::shared_ptr<IAssetRequest> mockRequest =
         std::make_shared<MockAssetRequest>(
             "GET",
             "test.com",
             HttpHeaders{},
-            std::move(mockResponse));
+            std::move(mockResponse)
+        );
 
     std::unique_ptr<MockStoreCacheDatabase> ownedMockCacheDatabase =
         std::make_unique<MockStoreCacheDatabase>();
@@ -572,7 +603,8 @@ TEST_CASE("Test calculation of expiry time for the cached response") {
         std::make_shared<CachingAssetAccessor>(
             spdlog::default_logger(),
             std::make_unique<MockAssetAccessor>(mockRequest),
-            std::move(ownedMockCacheDatabase));
+            std::move(ownedMockCacheDatabase)
+        );
     std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
         std::make_shared<MockTaskProcessor>();
 
@@ -594,20 +626,23 @@ TEST_CASE("Test serving cache item") {
             HttpHeaders{
                 {"Content-Type", "app/json"},
                 {"Response-Header", "Response-Value"}},
-            std::vector<std::byte>());
+            std::vector<std::byte>()
+        );
 
     std::shared_ptr<IAssetRequest> mockRequest =
         std::make_shared<MockAssetRequest>(
             "GET",
             "test.com",
             HttpHeaders{{"Request-Header", "Request-Value"}},
-            std::move(mockResponse));
+            std::move(mockResponse)
+        );
 
     std::shared_ptr<CachingAssetAccessor> cacheAssetAccessor =
         std::make_shared<CachingAssetAccessor>(
             spdlog::default_logger(),
             std::make_unique<MockAssetAccessor>(mockRequest),
-            std::make_unique<MockStoreCacheDatabase>());
+            std::make_unique<MockStoreCacheDatabase>()
+        );
     std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
         std::make_shared<MockTaskProcessor>();
 
@@ -621,21 +656,24 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(completedRequest->url() == "test.com");
               REQUIRE(
                   completedRequest->headers() ==
-                  HttpHeaders{{"Request-Header", "Request-Value"}});
+                  HttpHeaders{{"Request-Header", "Request-Value"}}
+              );
               REQUIRE(completedRequest->method() == "GET");
 
               const IAssetResponse* response = completedRequest->response();
               REQUIRE(response != nullptr);
               REQUIRE(
-                  response->headers().at("Response-Header") ==
-                  "Response-Value");
+                  response->headers().at("Response-Header") == "Response-Value"
+              );
               REQUIRE(response->statusCode() == 200);
               REQUIRE(response->contentType() == "app/json");
               REQUIRE(response->data().empty());
               REQUIRE(!ResponseCacheControl::parseFromResponseHeaders(
-                           response->headers())
+                           response->headers()
+              )
                            .has_value());
-            })
+            }
+        )
         .wait();
   }
 
@@ -650,14 +688,16 @@ TEST_CASE("Test serving cache item") {
             HttpHeaders{
                 {"Content-Type", "app/json"},
                 {"Response-Header", "Response-Value"}},
-            std::vector<std::byte>());
+            std::vector<std::byte>()
+        );
 
     std::shared_ptr<IAssetRequest> mockRequest =
         std::make_shared<MockAssetRequest>(
             "GET",
             "test.com",
             HttpHeaders{},
-            std::move(mockResponse));
+            std::move(mockResponse)
+        );
 
     // mock fresh cache item
     std::unique_ptr<MockStoreCacheDatabase> mockCacheDatabase =
@@ -666,25 +706,29 @@ TEST_CASE("Test serving cache item") {
     CacheRequest cacheRequest(
         HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}},
         "GET",
-        "cache.com");
+        "cache.com"
+    );
     CacheResponse cacheResponse(
         static_cast<uint16_t>(200),
         HttpHeaders{
             {"Content-Type", "app/json"},
             {"Cache-Response-Header", "Cache-Response-Value"},
             {"Cache-Control", "max-age=100, private"}},
-        std::vector<std::byte>());
+        std::vector<std::byte>()
+    );
     CacheItem cacheItem(
         currentTime + 100,
         std::move(cacheRequest),
-        std::move(cacheResponse));
+        std::move(cacheResponse)
+    );
     mockCacheDatabase->cacheItem = cacheItem;
 
     std::shared_ptr<CachingAssetAccessor> cacheAssetAccessor =
         std::make_shared<CachingAssetAccessor>(
             spdlog::default_logger(),
             std::make_unique<MockAssetAccessor>(mockRequest),
-            std::move(mockCacheDatabase));
+            std::move(mockCacheDatabase)
+        );
     std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
         std::make_shared<MockTaskProcessor>();
 
@@ -698,21 +742,24 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(completedRequest->url() == "cache.com");
               REQUIRE(
                   completedRequest->headers() ==
-                  HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}});
+                  HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}}
+              );
               REQUIRE(completedRequest->method() == "GET");
 
               const IAssetResponse* response = completedRequest->response();
               REQUIRE(response != nullptr);
               REQUIRE(
                   response->headers().at("Cache-Response-Header") ==
-                  "Cache-Response-Value");
+                  "Cache-Response-Value"
+              );
               REQUIRE(response->statusCode() == 200);
               REQUIRE(response->contentType() == "app/json");
               REQUIRE(response->data().empty());
 
               std::optional<ResponseCacheControl> cacheControl =
                   ResponseCacheControl::parseFromResponseHeaders(
-                      response->headers());
+                      response->headers()
+                  );
 
               REQUIRE(cacheControl.has_value());
               REQUIRE(cacheControl->mustRevalidate() == false);
@@ -725,7 +772,8 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(cacheControl->maxAgeExists() == true);
               REQUIRE(cacheControl->maxAgeValue() == 100);
               REQUIRE(cacheControl->sharedMaxAgeExists() == false);
-            })
+            }
+        )
         .wait();
   }
 
@@ -740,14 +788,16 @@ TEST_CASE("Test serving cache item") {
                 {"Content-Type", "app/json"},
                 {"Revalidation-Response-Header", "Revalidation-Response-Value"},
                 {"Cache-Control", "max-age=300, must-revalidate, private"}},
-            std::vector<std::byte>());
+            std::vector<std::byte>()
+        );
 
     std::shared_ptr<IAssetRequest> mockRequest =
         std::make_shared<MockAssetRequest>(
             "GET",
             "test.com",
             HttpHeaders{},
-            std::move(mockResponse));
+            std::move(mockResponse)
+        );
 
     // mock cache item
     std::unique_ptr<MockStoreCacheDatabase> mockCacheDatabase =
@@ -756,25 +806,29 @@ TEST_CASE("Test serving cache item") {
     CacheRequest cacheRequest(
         HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}},
         "GET",
-        "cache.com");
+        "cache.com"
+    );
     CacheResponse cacheResponse(
         static_cast<uint16_t>(200),
         HttpHeaders{
             {"Content-Type", "app/json"},
             {"Cache-Response-Header", "Cache-Response-Value"},
             {"Cache-Control", "max-age=100, private"}},
-        std::vector<std::byte>());
+        std::vector<std::byte>()
+    );
     CacheItem cacheItem(
         currentTime - 100,
         std::move(cacheRequest),
-        std::move(cacheResponse));
+        std::move(cacheResponse)
+    );
     mockCacheDatabase->cacheItem = cacheItem;
 
     std::shared_ptr<CachingAssetAccessor> cacheAssetAccessor =
         std::make_shared<CachingAssetAccessor>(
             spdlog::default_logger(),
             std::make_unique<MockAssetAccessor>(mockRequest),
-            std::move(mockCacheDatabase));
+            std::move(mockCacheDatabase)
+        );
     std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
         std::make_shared<MockTaskProcessor>();
 
@@ -789,7 +843,8 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(completedRequest->url() == "cache.com");
               REQUIRE(
                   completedRequest->headers() ==
-                  HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}});
+                  HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}}
+              );
               REQUIRE(completedRequest->method() == "GET");
 
               // check response header is updated
@@ -797,10 +852,12 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(response != nullptr);
               REQUIRE(
                   response->headers().at("Revalidation-Response-Header") ==
-                  "Revalidation-Response-Value");
+                  "Revalidation-Response-Value"
+              );
               REQUIRE(
                   response->headers().at("Cache-Response-Header") ==
-                  "Cache-Response-Value");
+                  "Cache-Response-Value"
+              );
               REQUIRE(response->statusCode() == 200);
               REQUIRE(response->contentType() == "app/json");
               REQUIRE(response->data().empty());
@@ -808,7 +865,8 @@ TEST_CASE("Test serving cache item") {
               // check cache control is updated
               std::optional<ResponseCacheControl> cacheControl =
                   ResponseCacheControl::parseFromResponseHeaders(
-                      response->headers());
+                      response->headers()
+                  );
               REQUIRE(cacheControl.has_value());
               REQUIRE(cacheControl->mustRevalidate() == true);
               REQUIRE(cacheControl->noCache() == false);
@@ -820,7 +878,8 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(cacheControl->maxAgeExists() == true);
               REQUIRE(cacheControl->maxAgeValue() == 300);
               REQUIRE(cacheControl->sharedMaxAgeExists() == false);
-            })
+            }
+        )
         .wait();
   }
 
@@ -835,14 +894,16 @@ TEST_CASE("Test serving cache item") {
                 {"Content-Type", "app/json"},
                 {"Revalidation-Response-Header",
                  "Revalidation-Response-Value"}},
-            std::vector<std::byte>());
+            std::vector<std::byte>()
+        );
 
     std::shared_ptr<IAssetRequest> mockRequest =
         std::make_shared<MockAssetRequest>(
             "GET",
             "test.com",
             HttpHeaders{},
-            std::move(mockResponse));
+            std::move(mockResponse)
+        );
 
     // mock cache item
     std::unique_ptr<MockStoreCacheDatabase> mockCacheDatabase =
@@ -851,25 +912,29 @@ TEST_CASE("Test serving cache item") {
     CacheRequest cacheRequest(
         HttpHeaders{{"Cache-Request-Header", "Cache-Request-Value"}},
         "GET",
-        "cache.com");
+        "cache.com"
+    );
     CacheResponse cacheResponse(
         static_cast<uint16_t>(200),
         HttpHeaders{
             {"Content-Type", "app/json"},
             {"Cache-Response-Header", "Cache-Response-Value"},
             {"Cache-Control", "max-age=100, private"}},
-        std::vector<std::byte>());
+        std::vector<std::byte>()
+    );
     CacheItem cacheItem(
         currentTime - 100,
         std::move(cacheRequest),
-        std::move(cacheResponse));
+        std::move(cacheResponse)
+    );
     mockCacheDatabase->cacheItem = cacheItem;
 
     std::shared_ptr<CachingAssetAccessor> cacheAssetAccessor =
         std::make_shared<CachingAssetAccessor>(
             spdlog::default_logger(),
             std::make_unique<MockAssetAccessor>(mockRequest),
-            std::move(mockCacheDatabase));
+            std::move(mockCacheDatabase)
+        );
     std::shared_ptr<MockTaskProcessor> mockTaskProcessor =
         std::make_shared<MockTaskProcessor>();
 
@@ -889,14 +954,17 @@ TEST_CASE("Test serving cache item") {
 
               REQUIRE(
                   response->headers().at("Revalidation-Response-Header") ==
-                  "Revalidation-Response-Value");
+                  "Revalidation-Response-Value"
+              );
               REQUIRE(response->statusCode() == 200);
               REQUIRE(response->contentType() == "app/json");
               REQUIRE(response->data().empty());
               REQUIRE(!ResponseCacheControl::parseFromResponseHeaders(
-                           response->headers())
+                           response->headers()
+              )
                            .has_value());
-            })
+            }
+        )
         .wait();
   }
 }

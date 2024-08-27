@@ -18,7 +18,8 @@ public:
    */
   DebugColorizeTilesRasterOverlay(
       const std::string& name,
-      const RasterOverlayOptions& overlayOptions = RasterOverlayOptions());
+      const RasterOverlayOptions& overlayOptions = RasterOverlayOptions()
+  );
 
   /**
    * @copydoc RasterOverlay::createTileProvider
@@ -30,8 +31,8 @@ public:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner)
-      const override;
+      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+  ) const override;
 
 private:
   CesiumGeospatial::Ellipsoid _ellipsoid;

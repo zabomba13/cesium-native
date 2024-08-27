@@ -72,7 +72,8 @@ public:
    */
   SchemaWriterResult writeSchema(
       const CesiumGltf::Schema& schema,
-      const SchemaWriterOptions& options = SchemaWriterOptions()) const;
+      const SchemaWriterOptions& options = SchemaWriterOptions()
+  ) const;
 
 private:
   CesiumJsonWriter::ExtensionWriterContext _context;

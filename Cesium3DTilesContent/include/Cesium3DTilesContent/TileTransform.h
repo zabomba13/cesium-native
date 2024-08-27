@@ -26,8 +26,8 @@ public:
    * @return The transform, or `std::nullopt` if the
    * {@link Cesium3DTiles::Tile::transform} has less than 16 elements.
    */
-  static std::optional<glm::dmat4>
-  getTransform(const Cesium3DTiles::Tile& tile);
+  static std::optional<glm::dmat4> getTransform(const Cesium3DTiles::Tile& tile
+  );
 
   /**
    * @brief Sets the tile's transform using the values of a `glm::dmat4`.

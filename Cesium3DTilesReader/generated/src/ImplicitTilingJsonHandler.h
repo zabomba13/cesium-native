@@ -19,8 +19,8 @@ class ImplicitTilingJsonHandler
 public:
   using ValueType = Cesium3DTiles::ImplicitTiling;
 
-  ImplicitTilingJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  ImplicitTilingJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, Cesium3DTiles::ImplicitTiling* pObject);
 
@@ -30,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyImplicitTiling(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::ImplicitTiling& o);
+      Cesium3DTiles::ImplicitTiling& o
+  );
 
 private:
   Cesium3DTiles::ImplicitTiling* _pObject = nullptr;

@@ -17,8 +17,8 @@ class AnimationSamplerJsonHandler
 public:
   using ValueType = CesiumGltf::AnimationSampler;
 
-  AnimationSamplerJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  AnimationSamplerJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::AnimationSampler* pObject);
 
@@ -28,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyAnimationSampler(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::AnimationSampler& o);
+      CesiumGltf::AnimationSampler& o
+  );
 
 private:
   CesiumGltf::AnimationSampler* _pObject = nullptr;

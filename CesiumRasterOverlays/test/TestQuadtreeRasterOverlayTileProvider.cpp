@@ -33,7 +33,8 @@ public:
       uint32_t minimumLevel,
       uint32_t maximumLevel,
       uint32_t imageWidth,
-      uint32_t imageHeight) noexcept
+      uint32_t imageHeight
+  ) noexcept
       : QuadtreeRasterOverlayTileProvider(
             pOwner,
             asyncSystem,
@@ -47,7 +48,8 @@ public:
             minimumLevel,
             maximumLevel,
             imageWidth,
-            imageHeight) {}
+            imageHeight
+        ) {}
 
   // The tiles that will return an error from loadQuadtreeTileImage.
   std::vector<QuadtreeTileID> errorTiles;
@@ -70,7 +72,8 @@ public:
       result.image->channels = 4;
       result.image->pixelData.resize(
           this->getWidth() * this->getHeight() * 4,
-          std::byte(tileID.level));
+          std::byte(tileID.level)
+      );
     }
 
     return this->getAsyncSystem().createResolvedFuture(std::move(result));
@@ -81,7 +84,8 @@ class TestRasterOverlay : public RasterOverlay {
 public:
   TestRasterOverlay(
       const std::string& name,
-      const RasterOverlayOptions& options = RasterOverlayOptions())
+      const RasterOverlayOptions& options = RasterOverlayOptions()
+  )
       : RasterOverlay(name, options) {}
 
   virtual CesiumAsync::Future<CreateTileProviderResult> createTileProvider(
@@ -91,8 +95,8 @@ public:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner)
-      const override {
+      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+  ) const override {
     if (!pOwner) {
       pOwner = this;
     }
@@ -108,15 +112,20 @@ public:
             WebMercatorProjection(Ellipsoid::WGS84),
             QuadtreeTilingScheme(
                 WebMercatorProjection::computeMaximumProjectedRectangle(
-                    Ellipsoid::WGS84),
+                    Ellipsoid::WGS84
+                ),
                 1,
-                1),
+                1
+            ),
             WebMercatorProjection::computeMaximumProjectedRectangle(
-                Ellipsoid::WGS84),
+                Ellipsoid::WGS84
+            ),
             0,
             10,
             256,
-            256));
+            256
+        )
+    );
   }
 };
 
@@ -130,7 +139,8 @@ public:
 TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
   auto pTaskProcessor = std::make_shared<MockTaskProcessor>();
   auto pAssetAccessor = std::make_shared<SimpleAssetAccessor>(
-      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>());
+      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>()
+  );
 
   AsyncSystem asyncSystem(pTaskProcessor);
   IntrusivePointer<TestRasterOverlay> pOverlay = new TestRasterOverlay("Test");
@@ -144,12 +154,14 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
           nullptr,
           nullptr,
           spdlog::default_logger(),
-          nullptr)
+          nullptr
+      )
       .thenInMainThread(
           [&pProvider](RasterOverlay::CreateTileProviderResult&& created) {
             CHECK(created);
             pProvider = *created;
-          });
+          }
+      );
 
   asyncSystem.dispatchMainThreadTasks();
 
@@ -158,8 +170,8 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
 
   SECTION("uses root tile for a large area") {
     Rectangle rectangle =
-        GeographicProjection::computeMaximumProjectedRectangle(
-            Ellipsoid::WGS84);
+        GeographicProjection::computeMaximumProjectedRectangle(Ellipsoid::WGS84
+        );
     IntrusivePointer<RasterOverlayTile> pTile =
         pProvider->getTile(rectangle, glm::dvec2(256));
     pProvider->loadTile(*pTile);
@@ -177,7 +189,8 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
     CHECK(std::all_of(
         image.pixelData.begin(),
         image.pixelData.end(),
-        [](std::byte b) { return b == std::byte(0); }));
+        [](std::byte b) { return b == std::byte(0); }
+    ));
   }
 
   SECTION("uses a mix of levels when a tile returns an error") {
@@ -198,18 +211,21 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
         centerRectangle.minimumX - centerRectangle.computeWidth() * 0.5,
         centerRectangle.minimumY - centerRectangle.computeHeight() * 0.5,
         centerRectangle.maximumX + centerRectangle.computeWidth() * 0.5,
-        centerRectangle.maximumY + centerRectangle.computeHeight() * 0.5);
+        centerRectangle.maximumY + centerRectangle.computeHeight() * 0.5
+    );
 
     uint32_t rasterSSE = 2;
     glm::dvec2 targetScreenPixels = glm::dvec2(
         pTestProvider->getWidth() * 2 * rasterSSE,
-        pTestProvider->getHeight() * 2 * rasterSSE);
+        pTestProvider->getHeight() * 2 * rasterSSE
+    );
 
     // The tile in the southeast corner will fail to load.
     std::optional<QuadtreeTileID> southeastID =
         pTestProvider->getTilingScheme().positionToTile(
             tileRectangle.getLowerRight(),
-            expectedLevel);
+            expectedLevel
+        );
     REQUIRE(southeastID);
 
     pTestProvider->errorTiles.emplace_back(*southeastID);
@@ -233,14 +249,17 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
     CHECK(std::all_of(
         image.pixelData.begin(),
         image.pixelData.end(),
-        [](std::byte b) { return b == std::byte(7) || b == std::byte(8); }));
+        [](std::byte b) { return b == std::byte(7) || b == std::byte(8); }
+    ));
     CHECK(std::any_of(
         image.pixelData.begin(),
         image.pixelData.end(),
-        [](std::byte b) { return b == std::byte(7); }));
+        [](std::byte b) { return b == std::byte(7); }
+    ));
     CHECK(std::any_of(
         image.pixelData.begin(),
         image.pixelData.end(),
-        [](std::byte b) { return b == std::byte(8); }));
+        [](std::byte b) { return b == std::byte(8); }
+    ));
   }
 }

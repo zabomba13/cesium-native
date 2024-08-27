@@ -88,7 +88,8 @@ ElementType assembleScalarValue(const gsl::span<uint8_t> bytes) noexcept {
   if constexpr (std::is_same_v<ElementType, float>) {
     CESIUM_ASSERT(
         bytes.size() == sizeof(float) &&
-        "Not enough channel inputs to construct a float.");
+        "Not enough channel inputs to construct a float."
+    );
     uint32_t resultAsUint = 0;
     for (size_t i = 0; i < bytes.size(); i++) {
       resultAsUint |= static_cast<uint32_t>(bytes[i]) << i * 8;
@@ -119,11 +120,13 @@ ElementType assembleVecNValue(const gsl::span<uint8_t> bytes) noexcept {
   using T = typename ElementType::value_type;
 
   CESIUM_ASSERT(
-      sizeof(T) <= 2 && "Components cannot be larger than two bytes in size.");
+      sizeof(T) <= 2 && "Components cannot be larger than two bytes in size."
+  );
 
   if constexpr (std::is_same_v<T, int16_t>) {
     CESIUM_ASSERT(
-        N == 2 && "Only vec2s can contain two-byte integer components.");
+        N == 2 && "Only vec2s can contain two-byte integer components."
+    );
     uint16_t x = static_cast<uint16_t>(bytes[0]) |
                  (static_cast<uint16_t>(bytes[1]) << 8);
     uint16_t y = static_cast<uint16_t>(bytes[2]) |
@@ -135,7 +138,8 @@ ElementType assembleVecNValue(const gsl::span<uint8_t> bytes) noexcept {
 
   if constexpr (std::is_same_v<T, uint16_t>) {
     CESIUM_ASSERT(
-        N == 2 && "Only vec2s can contain two-byte integer components.");
+        N == 2 && "Only vec2s can contain two-byte integer components."
+    );
     result[0] = static_cast<uint16_t>(bytes[0]) |
                 (static_cast<uint16_t>(bytes[1]) << 8);
     result[1] = static_cast<uint16_t>(bytes[2]) |
@@ -158,8 +162,8 @@ ElementType assembleVecNValue(const gsl::span<uint8_t> bytes) noexcept {
 }
 
 template <typename T>
-PropertyArrayCopy<T>
-assembleArrayValue(const gsl::span<uint8_t> bytes) noexcept {
+PropertyArrayCopy<T> assembleArrayValue(const gsl::span<uint8_t> bytes
+) noexcept {
   std::vector<T> result(bytes.size() / sizeof(T));
 
   if constexpr (sizeof(T) == 2) {
@@ -182,7 +186,8 @@ template <typename ElementType>
 PropertyValueViewToCopy<ElementType>
 assembleValueFromChannels(const gsl::span<uint8_t> bytes) noexcept {
   CESIUM_ASSERT(
-      bytes.size() > 0 && "Channel input must have at least one value.");
+      bytes.size() > 0 && "Channel input must have at least one value."
+  );
 
   if constexpr (IsMetadataScalar<ElementType>::value) {
     return assembleScalarValue<ElementType>(bytes);
@@ -194,7 +199,8 @@ assembleValueFromChannels(const gsl::span<uint8_t> bytes) noexcept {
 
   if constexpr (IsMetadataArray<ElementType>::value) {
     return assembleArrayValue<typename MetadataArrayType<ElementType>::type>(
-        bytes);
+        bytes
+    );
   }
 }
 
@@ -250,7 +256,8 @@ public:
         _swizzle() {
     CESIUM_ASSERT(
         this->_status != PropertyTexturePropertyViewStatus::Valid &&
-        "An empty property view should not be constructed with a valid status");
+        "An empty property view should not be constructed with a valid status"
+    );
   }
 
   /**
@@ -299,14 +306,16 @@ public:
       const ClassProperty& classProperty,
       const Sampler& sampler,
       const ImageCesium& image,
-      const TextureViewOptions& options = TextureViewOptions()) noexcept
+      const TextureViewOptions& options = TextureViewOptions()
+  ) noexcept
       : PropertyView<ElementType, false>(classProperty, property),
         TextureView(
             sampler,
             image,
             property.texCoord,
             property.getExtension<ExtensionKhrTextureTransform>(),
-            options),
+            options
+        ),
         _channels(property.channels),
         _swizzle() {
     if (this->_status != PropertyTexturePropertyViewStatus::Valid) {
@@ -354,7 +363,8 @@ public:
         break;
       default:
         CESIUM_ASSERT(
-            false && "A valid channels vector must be passed to the view.");
+            false && "A valid channels vector must be passed to the view."
+        );
       }
     }
   }
@@ -393,7 +403,8 @@ public:
       return transformArray(
           propertyValueCopyToView(value),
           this->offset(),
-          this->scale());
+          this->scale()
+      );
     } else {
       return value;
     }
@@ -417,13 +428,15 @@ public:
   getRaw(double u, double v) const noexcept {
     CESIUM_ASSERT(
         this->_status == PropertyTexturePropertyViewStatus::Valid &&
-        "Check the status() first to make sure view is valid");
+        "Check the status() first to make sure view is valid"
+    );
 
     std::vector<uint8_t> sample =
         this->sampleNearestPixel(u, v, this->_channels);
 
     return assembleValueFromChannels<ElementType>(
-        gsl::span(sample.data(), this->_channels.size()));
+        gsl::span(sample.data(), this->_channels.size())
+    );
   }
 
   /**
@@ -483,7 +496,8 @@ public:
     CESIUM_ASSERT(
         this->_status != PropertyTexturePropertyViewStatus::Valid &&
         "An empty property view should not be constructed with a valid "
-        "status");
+        "status"
+    );
   }
 
   /**
@@ -532,14 +546,16 @@ public:
       const ClassProperty& classProperty,
       const Sampler& sampler,
       const ImageCesium& image,
-      const TextureViewOptions& options = TextureViewOptions()) noexcept
+      const TextureViewOptions& options = TextureViewOptions()
+  ) noexcept
       : PropertyView<ElementType, true>(classProperty, property),
         TextureView(
             sampler,
             image,
             property.texCoord,
             property.getExtension<ExtensionKhrTextureTransform>(),
-            options),
+            options
+        ),
         _channels(property.channels),
         _swizzle() {
     if (this->_status != PropertyTexturePropertyViewStatus::Valid) {
@@ -586,7 +602,8 @@ public:
         break;
       default:
         CESIUM_ASSERT(
-            false && "A valid channels vector must be passed to the view.");
+            false && "A valid channels vector must be passed to the view."
+        );
       }
     }
   }
@@ -624,7 +641,8 @@ public:
       return transformValue<NormalizedType>(
           normalize<ElementType>(value),
           this->offset(),
-          this->scale());
+          this->scale()
+      );
     } else if constexpr (IsMetadataVecN<ElementType>::value) {
       constexpr glm::length_t N = ElementType::length();
       using T = typename ElementType::value_type;
@@ -632,21 +650,24 @@ public:
       return transformValue<glm::vec<N, NormalizedT>>(
           normalize<N, T>(value),
           this->offset(),
-          this->scale());
+          this->scale()
+      );
     } else if constexpr (IsMetadataArray<ElementType>::value) {
       using ArrayElementType = typename MetadataArrayType<ElementType>::type;
       if constexpr (IsMetadataScalar<ArrayElementType>::value) {
         return transformNormalizedArray<ArrayElementType>(
             propertyValueCopyToView(value),
             this->offset(),
-            this->scale());
+            this->scale()
+        );
       } else if constexpr (IsMetadataVecN<ArrayElementType>::value) {
         constexpr glm::length_t N = ArrayElementType::length();
         using T = typename ArrayElementType::value_type;
         return transformNormalizedVecNArray<N, T>(
             propertyValueCopyToView(value),
             this->offset(),
-            this->scale());
+            this->scale()
+        );
       }
     }
   }
@@ -669,13 +690,15 @@ public:
   getRaw(double u, double v) const noexcept {
     CESIUM_ASSERT(
         this->_status == PropertyTexturePropertyViewStatus::Valid &&
-        "Check the status() first to make sure view is valid");
+        "Check the status() first to make sure view is valid"
+    );
 
     std::vector<uint8_t> sample =
         this->sampleNearestPixel(u, v, this->_channels);
 
     return assembleValueFromChannels<ElementType>(
-        gsl::span(sample.data(), this->_channels.size()));
+        gsl::span(sample.data(), this->_channels.size())
+    );
   }
 
   /**

@@ -16,7 +16,8 @@ ResponseCacheControl::ResponseCacheControl(
     bool proxyRevalidate,
     std::optional<int> maxAge,
     std::optional<int> sharedMaxAge,
-    std::optional<int> staleWhileRevalidate)
+    std::optional<int> staleWhileRevalidate
+)
     : _mustRevalidate{mustRevalidate},
       _noCache{noCache},
       _noStore{noStore},
@@ -48,7 +49,8 @@ ResponseCacheControl::parseFromResponseHeaders(const HttpHeaders& headers) {
     if (equalSize != std::string::npos) {
       parameterizedDirectives.insert(
           {trimSpace(directive.substr(0, equalSize)),
-           trimSpace(directive.substr(equalSize + 1))});
+           trimSpace(directive.substr(equalSize + 1))}
+      );
     } else {
       directives.insert(directive);
     }
@@ -61,7 +63,8 @@ ResponseCacheControl::parseFromResponseHeaders(const HttpHeaders& headers) {
   if (equalSize != std::string::npos) {
     parameterizedDirectives.insert(
         {trimSpace(directive.substr(0, equalSize)),
-         trimSpace(directive.substr(equalSize + 1))});
+         trimSpace(directive.substr(equalSize + 1))}
+    );
   } else {
     directives.insert(directive);
   }
@@ -103,7 +106,8 @@ ResponseCacheControl::parseFromResponseHeaders(const HttpHeaders& headers) {
       proxyRevalidate,
       maxAge,
       sharedMaxAge,
-      staleWhileRevalidate);
+      staleWhileRevalidate
+  );
 }
 
 std::string trimSpace(const std::string& str) {

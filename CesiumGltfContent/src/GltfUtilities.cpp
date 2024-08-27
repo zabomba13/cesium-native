@@ -55,12 +55,14 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
   if (node.matrix.size() >= 16 && !std::equal(
                                       identityMatrix.begin(),
                                       identityMatrix.end(),
-                                      matrix.begin())) {
+                                      matrix.begin()
+                                  )) {
     return glm::dmat4x4(
         glm::dvec4(matrix[0], matrix[1], matrix[2], matrix[3]),
         glm::dvec4(matrix[4], matrix[5], matrix[6], matrix[7]),
         glm::dvec4(matrix[8], matrix[9], matrix[10], matrix[11]),
-        glm::dvec4(matrix[12], matrix[13], matrix[14], matrix[15]));
+        glm::dvec4(matrix[12], matrix[13], matrix[14], matrix[15])
+    );
   }
 
   if (!node.translation.empty() || !node.rotation.empty() ||
@@ -71,7 +73,8 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
           node.translation[0],
           node.translation[1],
           node.translation[2],
-          1.0);
+          1.0
+      );
     } else if (!node.translation.empty()) {
       return std::nullopt;
     }
@@ -103,7 +106,8 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
 
 /*static*/ void GltfUtilities::setNodeTransform(
     CesiumGltf::Node& node,
-    const glm::dmat4x4& newTransform) {
+    const glm::dmat4x4& newTransform
+) {
   // Reset these fields to their default, indicating they're not to be used.
   node.translation = {0.0, 0.0, 0.0};
   node.scale = {1.0, 1.0, 1.0};
@@ -132,7 +136,8 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
 
 /*static*/ glm::dmat4x4 GltfUtilities::applyRtcCenter(
     const CesiumGltf::Model& gltf,
-    const glm::dmat4x4& rootTransform) {
+    const glm::dmat4x4& rootTransform
+) {
   const CesiumGltf::ExtensionCesiumRTC* cesiumRTC =
       gltf.getExtension<CesiumGltf::ExtensionCesiumRTC>();
   if (cesiumRTC == nullptr) {
@@ -149,13 +154,15 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
       glm::dvec4(1.0, 0.0, 0.0, 0.0),
       glm::dvec4(0.0, 1.0, 0.0, 0.0),
       glm::dvec4(0.0, 0.0, 1.0, 0.0),
-      glm::dvec4(x, y, z, 1.0));
+      glm::dvec4(x, y, z, 1.0)
+  );
   return rootTransform * rtcTransform;
 }
 
 /*static*/ glm::dmat4x4 GltfUtilities::applyGltfUpAxisTransform(
     const CesiumGltf::Model& model,
-    const glm::dmat4x4& rootTransform) {
+    const glm::dmat4x4& rootTransform
+) {
   auto gltfUpAxisIt = model.extras.find("gltfUpAxis");
   if (gltfUpAxisIt == model.extras.end()) {
     // The default up-axis of glTF is the Y-axis, and no other
@@ -179,7 +186,8 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
 GltfUtilities::computeBoundingRegion(
     const CesiumGltf::Model& gltf,
     const glm::dmat4& transform,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   glm::dmat4 rootTransform = transform;
   rootTransform = applyRtcCenter(gltf, rootTransform);
   rootTransform = applyGltfUpAxisTransform(gltf, rootTransform);
@@ -196,7 +204,8 @@ GltfUtilities::computeBoundingRegion(
           const CesiumGltf::Node& /*node*/,
           const CesiumGltf::Mesh& /*mesh*/,
           const CesiumGltf::MeshPrimitive& primitive,
-          const glm::dmat4& nodeTransform) {
+          const glm::dmat4& nodeTransform
+      ) {
         auto positionIt = primitive.attributes.find("POSITION");
         if (positionIt == primitive.attributes.end()) {
           return;
@@ -212,7 +221,8 @@ GltfUtilities::computeBoundingRegion(
 
         const CesiumGltf::AccessorView<glm::vec3> positionView(
             gltf_,
-            positionAccessorIndex);
+            positionAccessorIndex
+        );
         if (positionView.status() != CesiumGltf::AccessorViewStatus::Valid) {
           return;
         }
@@ -244,7 +254,8 @@ GltfUtilities::computeBoundingRegion(
 
           computedBounds.expandToIncludePosition(*cartographic);
         }
-      });
+      }
+  );
 
   return computedBounds.toRegion(ellipsoid);
 }
@@ -276,13 +287,15 @@ namespace {
 
 size_t moveBufferContentWithoutRenumbering(
     CesiumGltf::Buffer& destinationBuffer,
-    CesiumGltf::Buffer& sourceBuffer) {
+    CesiumGltf::Buffer& sourceBuffer
+) {
   // Assert that the byteLength and the size of the cesium data vector are in
   // sync.
   assert(sourceBuffer.byteLength == int64_t(sourceBuffer.cesium.data.size()));
   assert(
       destinationBuffer.byteLength ==
-      int64_t(destinationBuffer.cesium.data.size()));
+      int64_t(destinationBuffer.cesium.data.size())
+  );
 
   // Copy the data to the destination and keep track of where we put it.
   // Align each bufferView to an 8-byte boundary.
@@ -297,7 +310,8 @@ size_t moveBufferContentWithoutRenumbering(
   std::memcpy(
       destinationBuffer.cesium.data.data() + start,
       sourceBuffer.cesium.data.data(),
-      sourceBuffer.cesium.data.size());
+      sourceBuffer.cesium.data.size()
+  );
 
   sourceBuffer.byteLength = 0;
   sourceBuffer.cesium.data.clear();
@@ -372,14 +386,17 @@ size_t moveBufferContentWithoutRenumbering(
             int64_t index = &buffer - &gltf.buffers[0];
             assert(index >= 0 && size_t(index) < keepBuffer.size());
             return !keepBuffer[size_t(index)];
-          }),
-      gltf.buffers.end());
+          }
+      ),
+      gltf.buffers.end()
+  );
 }
 
 /*static*/ void GltfUtilities::moveBufferContent(
     CesiumGltf::Model& gltf,
     CesiumGltf::Buffer& destination,
-    CesiumGltf::Buffer& source) {
+    CesiumGltf::Buffer& source
+) {
   int64_t sourceIndex = &source - &gltf.buffers[0];
   int64_t destinationIndex = &destination - &gltf.buffers[0];
 
@@ -419,7 +436,8 @@ void findClosestRayHit(
     const CesiumGltf::MeshPrimitive& primitive,
     bool cullBackFaces,
     double& tMinOut,
-    std::vector<std::string>& warnings) {
+    std::vector<std::string>& warnings
+) {
 
   // Need at least 3 positions to form a triangle
   if (positionView.size() < 3) {
@@ -444,22 +462,26 @@ void findClosestRayHit(
       glm::dvec3 vert0(
           static_cast<double>(viewVert0.value[0]),
           static_cast<double>(viewVert0.value[1]),
-          static_cast<double>(viewVert0.value[2]));
+          static_cast<double>(viewVert0.value[2])
+      );
       glm::dvec3 vert1(
           static_cast<double>(viewVert1.value[0]),
           static_cast<double>(viewVert1.value[1]),
-          static_cast<double>(viewVert1.value[2]));
+          static_cast<double>(viewVert1.value[2])
+      );
       glm::dvec3 vert2(
           static_cast<double>(viewVert2.value[0]),
           static_cast<double>(viewVert2.value[1]),
-          static_cast<double>(viewVert2.value[2]));
+          static_cast<double>(viewVert2.value[2])
+      );
 
       tCurr = CesiumGeometry::IntersectionTests::rayTriangleParametric(
           ray,
           vert0,
           vert1,
           vert2,
-          cullBackFaces);
+          cullBackFaces
+      );
 
       // Set result to this hit if closer, or the first one
       // Only consider hits in front of the ray
@@ -487,22 +509,26 @@ void findClosestRayHit(
       glm::dvec3 vert0(
           static_cast<double>(viewVert0.value[0]),
           static_cast<double>(viewVert0.value[1]),
-          static_cast<double>(viewVert0.value[2]));
+          static_cast<double>(viewVert0.value[2])
+      );
       glm::dvec3 vert1(
           static_cast<double>(viewVert1.value[0]),
           static_cast<double>(viewVert1.value[1]),
-          static_cast<double>(viewVert1.value[2]));
+          static_cast<double>(viewVert1.value[2])
+      );
       glm::dvec3 vert2(
           static_cast<double>(viewVert2.value[0]),
           static_cast<double>(viewVert2.value[1]),
-          static_cast<double>(viewVert2.value[2]));
+          static_cast<double>(viewVert2.value[2])
+      );
 
       tCurr = CesiumGeometry::IntersectionTests::rayTriangleParametric(
           ray,
           vert0,
           vert1,
           vert2,
-          cullBackFaces);
+          cullBackFaces
+      );
 
       bool validHit = tCurr && tCurr.value() >= 0;
       if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
@@ -515,7 +541,8 @@ void findClosestRayHit(
     glm::dvec3 vert0(
         static_cast<double>(viewVert0.value[0]),
         static_cast<double>(viewVert0.value[1]),
-        static_cast<double>(viewVert0.value[2]));
+        static_cast<double>(viewVert0.value[2])
+    );
 
     for (int64_t i = 2; i < positionView.size(); ++i) {
       int64_t vert1Index = i - 1;
@@ -527,18 +554,21 @@ void findClosestRayHit(
       glm::dvec3 vert1(
           static_cast<double>(viewVert1.value[0]),
           static_cast<double>(viewVert1.value[1]),
-          static_cast<double>(viewVert1.value[2]));
+          static_cast<double>(viewVert1.value[2])
+      );
       glm::dvec3 vert2(
           static_cast<double>(viewVert2.value[0]),
           static_cast<double>(viewVert2.value[1]),
-          static_cast<double>(viewVert2.value[2]));
+          static_cast<double>(viewVert2.value[2])
+      );
 
       tCurr = CesiumGeometry::IntersectionTests::rayTriangleParametric(
           ray,
           vert0,
           vert1,
           vert2,
-          cullBackFaces);
+          cullBackFaces
+      );
 
       bool validHit = tCurr && tCurr.value() >= 0;
       if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
@@ -556,7 +586,8 @@ void findClosestIndexedRayHit(
     const CesiumGltf::MeshPrimitive& primitive,
     bool cullBackFaces,
     double& tMinOut,
-    std::vector<std::string>& warnings) {
+    std::vector<std::string>& warnings
+) {
 
   // Need at least 3 vertices to form a triangle
   if (indicesView.size() < 3) {
@@ -594,22 +625,26 @@ void findClosestIndexedRayHit(
       glm::dvec3 vert0(
           static_cast<double>(viewVert0.value[0]),
           static_cast<double>(viewVert0.value[1]),
-          static_cast<double>(viewVert0.value[2]));
+          static_cast<double>(viewVert0.value[2])
+      );
       glm::dvec3 vert1(
           static_cast<double>(viewVert1.value[0]),
           static_cast<double>(viewVert1.value[1]),
-          static_cast<double>(viewVert1.value[2]));
+          static_cast<double>(viewVert1.value[2])
+      );
       glm::dvec3 vert2(
           static_cast<double>(viewVert2.value[0]),
           static_cast<double>(viewVert2.value[1]),
-          static_cast<double>(viewVert2.value[2]));
+          static_cast<double>(viewVert2.value[2])
+      );
 
       tCurr = CesiumGeometry::IntersectionTests::rayTriangleParametric(
           ray,
           vert0,
           vert1,
           vert2,
-          cullBackFaces);
+          cullBackFaces
+      );
 
       // Set result to this hit if closer, or the first one
       // Only consider hits in front of the ray
@@ -645,22 +680,26 @@ void findClosestIndexedRayHit(
       glm::dvec3 vert0(
           static_cast<double>(viewVert0.value[0]),
           static_cast<double>(viewVert0.value[1]),
-          static_cast<double>(viewVert0.value[2]));
+          static_cast<double>(viewVert0.value[2])
+      );
       glm::dvec3 vert1(
           static_cast<double>(viewVert1.value[0]),
           static_cast<double>(viewVert1.value[1]),
-          static_cast<double>(viewVert1.value[2]));
+          static_cast<double>(viewVert1.value[2])
+      );
       glm::dvec3 vert2(
           static_cast<double>(viewVert2.value[0]),
           static_cast<double>(viewVert2.value[1]),
-          static_cast<double>(viewVert2.value[2]));
+          static_cast<double>(viewVert2.value[2])
+      );
 
       tCurr = CesiumGeometry::IntersectionTests::rayTriangleParametric(
           ray,
           vert0,
           vert1,
           vert2,
-          cullBackFaces);
+          cullBackFaces
+      );
 
       bool validHit = tCurr && tCurr.value() >= 0;
       if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
@@ -678,7 +717,8 @@ void findClosestIndexedRayHit(
       glm::dvec3 vert0(
           static_cast<double>(viewVert0.value[0]),
           static_cast<double>(viewVert0.value[1]),
-          static_cast<double>(viewVert0.value[2]));
+          static_cast<double>(viewVert0.value[2])
+      );
 
       for (int64_t i = 2; i < indicesView.size(); ++i) {
         int64_t vert1Index = static_cast<int64_t>(indicesView[i - 1].value[0]);
@@ -697,18 +737,21 @@ void findClosestIndexedRayHit(
         glm::dvec3 vert1(
             static_cast<double>(viewVert1.value[0]),
             static_cast<double>(viewVert1.value[1]),
-            static_cast<double>(viewVert1.value[2]));
+            static_cast<double>(viewVert1.value[2])
+        );
         glm::dvec3 vert2(
             static_cast<double>(viewVert2.value[0]),
             static_cast<double>(viewVert2.value[1]),
-            static_cast<double>(viewVert2.value[2]));
+            static_cast<double>(viewVert2.value[2])
+        );
 
         tCurr = CesiumGeometry::IntersectionTests::rayTriangleParametric(
             ray,
             vert0,
             vert1,
             vert2,
-            cullBackFaces);
+            cullBackFaces
+        );
 
         bool validHit = tCurr && tCurr.value() >= 0;
         if (validHit && (tCurr < tClosest || tClosest == -1.0))
@@ -718,8 +761,8 @@ void findClosestIndexedRayHit(
   }
 
   if (foundInvalidIndex)
-    warnings.push_back(
-        "Found one or more invalid index values for indexed mesh");
+    warnings.push_back("Found one or more invalid index values for indexed mesh"
+    );
 
   tMinOut = tClosest;
 }
@@ -740,7 +783,8 @@ struct VisitTextureIds {
           callback(material.pbrMetallicRoughness->baseColorTexture->index);
         if (material.pbrMetallicRoughness->metallicRoughnessTexture)
           callback(
-              material.pbrMetallicRoughness->metallicRoughnessTexture->index);
+              material.pbrMetallicRoughness->metallicRoughnessTexture->index
+          );
       }
     }
 
@@ -943,7 +987,8 @@ void removeUnusedElements(
     Model& gltf,
     const std::vector<int32_t>& extraUsedIndices,
     std::vector<T>& elements,
-    TVisitFunction&& visitFunction) {
+    TVisitFunction&& visitFunction
+) {
   std::vector<bool> usedElements(elements.size(), false);
 
   for (int32_t index : extraUsedIndices) {
@@ -976,86 +1021,103 @@ void removeUnusedElements(
             int64_t index = &element - &elements[0];
             CESIUM_ASSERT(index >= 0 && size_t(index) < usedElements.size());
             return !usedElements[size_t(index)];
-          }),
-      elements.end());
+          }
+      ),
+      elements.end()
+  );
 }
 
 } // namespace
 
 void GltfUtilities::removeUnusedTextures(
     Model& gltf,
-    const std::vector<int32_t>& extraUsedTextureIndices) {
+    const std::vector<int32_t>& extraUsedTextureIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedTextureIndices,
       gltf.textures,
-      VisitTextureIds());
+      VisitTextureIds()
+  );
 }
 
 void GltfUtilities::removeUnusedSamplers(
     Model& gltf,
-    const std::vector<int32_t>& extraUsedSamplerIndices) {
+    const std::vector<int32_t>& extraUsedSamplerIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedSamplerIndices,
       gltf.samplers,
-      VisitSamplerIds());
+      VisitSamplerIds()
+  );
 }
 
 void GltfUtilities::removeUnusedImages(
     Model& gltf,
-    const std::vector<int32_t>& extraUsedImageIndices) {
+    const std::vector<int32_t>& extraUsedImageIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedImageIndices,
       gltf.images,
-      VisitImageIds());
+      VisitImageIds()
+  );
 }
 
 void GltfUtilities::removeUnusedAccessors(
     CesiumGltf::Model& gltf,
-    const std::vector<int32_t>& extraUsedAccessorIndices) {
+    const std::vector<int32_t>& extraUsedAccessorIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedAccessorIndices,
       gltf.accessors,
-      VisitAccessorIds());
+      VisitAccessorIds()
+  );
 }
 
 void GltfUtilities::removeUnusedBufferViews(
     CesiumGltf::Model& gltf,
-    const std::vector<int32_t>& extraUsedBufferViewIndices) {
+    const std::vector<int32_t>& extraUsedBufferViewIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedBufferViewIndices,
       gltf.bufferViews,
-      VisitBufferViewIds());
+      VisitBufferViewIds()
+  );
 }
 
 void GltfUtilities::removeUnusedBuffers(
     CesiumGltf::Model& gltf,
-    const std::vector<int32_t>& extraUsedBufferIndices) {
+    const std::vector<int32_t>& extraUsedBufferIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedBufferIndices,
       gltf.buffers,
-      VisitBufferIds());
+      VisitBufferIds()
+  );
 }
 
 void GltfUtilities::removeUnusedMeshes(
     CesiumGltf::Model& gltf,
-    const std::vector<int32_t>& extraUsedMeshIndices) {
+    const std::vector<int32_t>& extraUsedMeshIndices
+) {
   removeUnusedElements(gltf, extraUsedMeshIndices, gltf.meshes, VisitMeshIds());
 }
 
 void GltfUtilities::removeUnusedMaterials(
     CesiumGltf::Model& gltf,
-    const std::vector<int32_t>& extraUsedMaterialIndices) {
+    const std::vector<int32_t>& extraUsedMaterialIndices
+) {
   removeUnusedElements(
       gltf,
       extraUsedMaterialIndices,
       gltf.materials,
-      VisitMaterialIds());
+      VisitMaterialIds()
+  );
 }
 
 void GltfUtilities::compactBuffers(CesiumGltf::Model& gltf) {
@@ -1072,7 +1134,8 @@ void deleteBufferRange(
     CesiumGltf::Model& gltf,
     int32_t bufferIndex,
     int64_t start,
-    int64_t end) {
+    int64_t end
+) {
   Buffer* pBuffer = gltf.getSafe(&gltf.buffers, bufferIndex);
   if (pBuffer == nullptr)
     return;
@@ -1100,7 +1163,8 @@ void deleteBufferRange(
       // bufferView.
       assert(
           bufferView.byteOffset >= end ||
-          (bufferView.byteOffset + bufferView.byteLength) <= start);
+          (bufferView.byteOffset + bufferView.byteLength) <= start
+      );
 
       // If this bufferView starts after the bytes we're removing, adjust the
       // start position accordingly.
@@ -1116,7 +1180,8 @@ void deleteBufferRange(
       // meshopt extension.
       assert(
           pMeshOpt->byteOffset >= end ||
-          (pMeshOpt->byteOffset + pMeshOpt->byteLength) <= start);
+          (pMeshOpt->byteOffset + pMeshOpt->byteLength) <= start
+      );
 
       // If this meshopt extension starts after the bytes we're removing, adjust
       // the start position accordingly.
@@ -1130,14 +1195,16 @@ void deleteBufferRange(
   pBuffer->byteLength -= bytesToRemove;
   pBuffer->cesium.data.erase(
       pBuffer->cesium.data.begin() + start,
-      pBuffer->cesium.data.begin() + end);
+      pBuffer->cesium.data.begin() + end
+  );
 }
 
 } // namespace
 
 void GltfUtilities::compactBuffer(
     CesiumGltf::Model& gltf,
-    int32_t bufferIndex) {
+    int32_t bufferIndex
+) {
   Buffer* pBuffer = gltf.getSafe(&gltf.buffers, bufferIndex);
   if (!pBuffer)
     return;
@@ -1160,7 +1227,8 @@ void GltfUtilities::compactBuffer(
     auto it = std::lower_bound(
         usedRanges.begin(),
         usedRanges.end(),
-        BufferRange{start, end});
+        BufferRange{start, end}
+    );
     it = usedRanges.insert(it, BufferRange{start, end});
 
     // Check if we can merge with the previous range.
@@ -1188,7 +1256,8 @@ void GltfUtilities::compactBuffer(
     if (bufferView.buffer == bufferIndex) {
       addUsedRange(
           bufferView.byteOffset,
-          bufferView.byteOffset + bufferView.byteLength);
+          bufferView.byteOffset + bufferView.byteLength
+      );
     }
 
     ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
@@ -1196,7 +1265,8 @@ void GltfUtilities::compactBuffer(
     if (pMeshOpt && pMeshOpt->buffer == bufferIndex) {
       addUsedRange(
           pMeshOpt->byteOffset,
-          pMeshOpt->byteOffset + pMeshOpt->byteLength);
+          pMeshOpt->byteOffset + pMeshOpt->byteLength
+      );
     }
   }
 
@@ -1226,29 +1296,31 @@ std::invoke_result_t<TCallback, AccessorView<AccessorTypes::VEC3<float>>>
 createPositionView(
     const Model& model,
     const Accessor& accessor,
-    TCallback&& callback) {
+    TCallback&& callback
+) {
   assert(accessor.type == Accessor::Type::VEC3);
 
   switch (accessor.componentType) {
   case Accessor::ComponentType::BYTE:
     return callback(AccessorView<AccessorTypes::VEC3<int8_t>>(model, accessor));
   case Accessor::ComponentType::UNSIGNED_BYTE:
-    return callback(
-        AccessorView<AccessorTypes::VEC3<uint8_t>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC3<uint8_t>>(model, accessor)
+    );
   case Accessor::ComponentType::SHORT:
-    return callback(
-        AccessorView<AccessorTypes::VEC3<int16_t>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC3<int16_t>>(model, accessor)
+    );
   case Accessor::ComponentType::UNSIGNED_SHORT:
-    return callback(
-        AccessorView<AccessorTypes::VEC3<uint16_t>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC3<uint16_t>>(model, accessor)
+    );
   case Accessor::ComponentType::UNSIGNED_INT:
-    return callback(
-        AccessorView<AccessorTypes::VEC3<uint32_t>>(model, accessor));
+    return callback(AccessorView<AccessorTypes::VEC3<uint32_t>>(model, accessor)
+    );
   case Accessor::ComponentType::FLOAT:
     return callback(AccessorView<AccessorTypes::VEC3<float>>(model, accessor));
   default:
     return callback(AccessorView<AccessorTypes::VEC3<float>>(
-        AccessorViewStatus::InvalidComponentType));
+        AccessorViewStatus::InvalidComponentType
+    ));
   }
 }
 
@@ -1259,7 +1331,8 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
     const Accessor& positionAccessor,
     const glm::dmat4x4& primitiveToWorld,
     bool cullBackFaces,
-    std::vector<std::string>& warnings) {
+    std::vector<std::string>& warnings
+) {
   glm::dmat4x4 worldToPrimitive = glm::inverse(primitiveToWorld);
   CesiumGeometry::Ray transformedRay = ray.transform(worldToPrimitive);
 
@@ -1276,7 +1349,9 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
               min[2],
               max[0],
               max[1],
-              max[2]));
+              max[2]
+          )
+      );
   if (!boxT)
     return std::optional<glm::dvec3>();
 
@@ -1301,7 +1376,8 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
         // Bail on invalid view
         if (positionView.status() != AccessorViewStatus::Valid) {
           warnings.push_back(
-              "Skipping mesh with an invalid position component type");
+              "Skipping mesh with an invalid position component type"
+          );
           return;
         }
 
@@ -1311,8 +1387,8 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
               Model::getSafe(&model.accessors, primitive.indices);
 
           if (!indexAccessor) {
-            warnings.push_back(
-                "Skipping mesh with an invalid index accessor id");
+            warnings.push_back("Skipping mesh with an invalid index accessor id"
+            );
             return;
           }
 
@@ -1321,7 +1397,8 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
           // "Indices MUST be non-negative integer numbers."
           if (indexAccessor->componentType == Accessor::ComponentType::FLOAT) {
             warnings.push_back(
-                "Skipping mesh with an invalid index component type");
+                "Skipping mesh with an invalid index component type"
+            );
             return;
           }
 
@@ -1337,7 +1414,8 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
                 // Bail on invalid view
                 if (indexView.status() != AccessorViewStatus::Valid) {
                   warnings.push_back(
-                      "Could not create accessor view for mesh indices");
+                      "Could not create accessor view for mesh indices"
+                  );
                   return;
                 }
 
@@ -1348,8 +1426,10 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
                     primitive,
                     cullBackFaces,
                     tClosest,
-                    warnings);
-              });
+                    warnings
+                );
+              }
+          );
         } else {
           // Non-indexed triangles
           findClosestRayHit(
@@ -1358,9 +1438,11 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
               primitive,
               cullBackFaces,
               tClosest,
-              warnings);
+              warnings
+          );
         }
-      });
+      }
+  );
   assert(tClosest >= -1.0);
 
   if (tClosest == -1.0)
@@ -1378,7 +1460,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
     const CesiumGeometry::Ray& ray,
     const CesiumGltf::Model& gltf,
     bool cullBackFaces,
-    const glm::dmat4x4& gltfTransform) {
+    const glm::dmat4x4& gltfTransform
+) {
   glm::dmat4x4 rootTransform = applyRtcCenter(gltf, gltfTransform);
   rootTransform = applyGltfUpAxisTransform(gltf, rootTransform);
 
@@ -1391,7 +1474,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
           const CesiumGltf::Node& /*node*/,
           const CesiumGltf::Mesh& mesh,
           const CesiumGltf::MeshPrimitive& primitive,
-          const glm::dmat4& nodeTransform) {
+          const glm::dmat4& nodeTransform
+      ) {
         // Ignore non-triangles. Points and lines have no area to intersect
         bool isTriangleMode =
             primitive.mode == MeshPrimitive::Mode::TRIANGLES ||
@@ -1403,8 +1487,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
         // Skip primitives that can't access positions
         auto positionAccessorIt = primitive.attributes.find("POSITION");
         if (positionAccessorIt == primitive.attributes.end()) {
-          result.warnings.push_back(
-              "Skipping mesh without a position attribute");
+          result.warnings.push_back("Skipping mesh without a position attribute"
+          );
           return;
         }
         int positionAccessorID = positionAccessorIt->second;
@@ -1412,7 +1496,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
             Model::getSafe(&model.accessors, positionAccessorID);
         if (!pPositionAccessor) {
           result.warnings.push_back(
-              "Skipping mesh with an invalid position accessor id");
+              "Skipping mesh with an invalid position accessor id"
+          );
           return;
         }
 
@@ -1420,7 +1505,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
         // But we should still protect against malformed gltfs
         if (pPositionAccessor->type != AccessorSpec::Type::VEC3) {
           result.warnings.push_back(
-              "Skipping mesh with a non-vec3 position accessor");
+              "Skipping mesh with a non-vec3 position accessor"
+          );
           return;
         }
 
@@ -1434,7 +1520,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
             *pPositionAccessor,
             primitiveToWorld,
             cullBackFaces,
-            result.warnings);
+            result.warnings
+        );
 
         if (!primitiveHitPoint.has_value())
           return;
@@ -1455,7 +1542,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
         glm::dvec3 worldPoint(
             homogeneousWorldPoint.x,
             homogeneousWorldPoint.y,
-            homogeneousWorldPoint.z);
+            homogeneousWorldPoint.z
+        );
 
         glm::dvec3 rayToWorldPoint = worldPoint - ray.getOrigin();
         double rayToWorldPointDistanceSq =
@@ -1486,7 +1574,8 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
           result.hit->meshId = meshId;
           result.hit->primitiveId = primitiveId;
         }
-      });
+      }
+  );
 
   return result;
 }

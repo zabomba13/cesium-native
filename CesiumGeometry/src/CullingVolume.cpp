@@ -11,7 +11,8 @@ CullingVolume createCullingVolume(
     const glm::dvec3& direction,
     const glm::dvec3& up,
     const double fovx,
-    const double fovy) noexcept {
+    const double fovy
+) noexcept {
   const double t = glm::tan(0.5 * fovy);
   const double b = -t;
   const double r = glm::tan(0.5 * fovx);

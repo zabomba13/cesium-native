@@ -21,11 +21,12 @@ bool Rectangle::overlaps(const Rectangle& other) const noexcept {
 bool Rectangle::fullyContains(const Rectangle& other) const noexcept {
   return (
       other.minimumX >= this->minimumX && other.maximumX <= this->maximumX &&
-      other.minimumY >= this->minimumY && other.maximumY <= this->maximumY);
+      other.minimumY >= this->minimumY && other.maximumY <= this->maximumY
+  );
 }
 
-double
-Rectangle::computeSignedDistance(const glm::dvec2& position) const noexcept {
+double Rectangle::computeSignedDistance(const glm::dvec2& position
+) const noexcept {
   const glm::dvec2 bottomLeftDistance =
       glm::dvec2(minimumX, minimumY) - position;
   const glm::dvec2 topRightDistance = position - glm::dvec2(maximumX, maximumY);
@@ -43,8 +44,8 @@ Rectangle::computeSignedDistance(const glm::dvec2& position) const noexcept {
   return glm::max(maxDistance.x, maxDistance.y);
 }
 
-std::optional<Rectangle>
-Rectangle::computeIntersection(const Rectangle& other) const noexcept {
+std::optional<Rectangle> Rectangle::computeIntersection(const Rectangle& other
+) const noexcept {
   const double left = glm::max(this->minimumX, other.minimumX);
   const double bottom = glm::max(this->minimumY, other.minimumY);
   const double right = glm::min(this->maximumX, other.maximumX);
@@ -62,7 +63,8 @@ Rectangle Rectangle::computeUnion(const Rectangle& other) const noexcept {
       glm::min(this->minimumX, other.minimumX),
       glm::min(this->minimumY, other.minimumY),
       glm::max(this->maximumX, other.maximumX),
-      glm::max(this->maximumY, other.maximumY));
+      glm::max(this->maximumY, other.maximumY)
+  );
 }
 
 } // namespace CesiumGeometry

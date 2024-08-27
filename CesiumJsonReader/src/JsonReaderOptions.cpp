@@ -13,16 +13,19 @@ public:
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override {
+      const std::string_view& extensionName
+  ) override {
     std::any& value =
         o.extensions
             .emplace(
                 extensionName,
-                CesiumUtility::JsonValue(CesiumUtility::JsonValue::Object()))
+                CesiumUtility::JsonValue(CesiumUtility::JsonValue::Object())
+            )
             .first->second;
     JsonObjectJsonHandler::reset(
         pParentHandler,
-        &std::any_cast<CesiumUtility::JsonValue&>(value));
+        &std::any_cast<CesiumUtility::JsonValue&>(value)
+    );
   }
 
   virtual IJsonHandler& getHandler() override { return *this; }
@@ -40,14 +43,16 @@ JsonReaderOptions::getExtensionState(const std::string& extensionName) const {
 
 void JsonReaderOptions::setExtensionState(
     const std::string& extensionName,
-    ExtensionState newState) {
+    ExtensionState newState
+) {
   this->_extensionStates[extensionName] = newState;
 }
 
 std::unique_ptr<IExtensionJsonHandler>
 JsonReaderOptions::createExtensionHandler(
     const std::string_view& extensionName,
-    const std::string& extendedObjectType) const {
+    const std::string& extendedObjectType
+) const {
 
   std::string extensionNameString{extensionName};
 

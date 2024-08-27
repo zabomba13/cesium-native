@@ -50,7 +50,8 @@ public:
           isDone = true;
           this->unblock();
           return task.get();
-        });
+        }
+    );
 
     while (!isDone) {
       this->dispatchInternal(true);
@@ -68,7 +69,8 @@ public:
     // guaranteed to run only after that termination condition is satisfied.
     async::task<void> unblockTask = task.then(
         async::inline_scheduler(),
-        [this](const async::shared_task<T>&) { this->unblock(); });
+        [this](const async::shared_task<T>&) { this->unblock(); }
+    );
 
     while (!task.ready()) {
       this->dispatchInternal(true);

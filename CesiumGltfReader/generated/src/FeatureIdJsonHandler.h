@@ -19,8 +19,8 @@ class FeatureIdJsonHandler
 public:
   using ValueType = CesiumGltf::FeatureId;
 
-  FeatureIdJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  FeatureIdJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::FeatureId* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -29,7 +29,8 @@ protected:
   IJsonHandler* readObjectKeyFeatureId(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::FeatureId& o);
+      CesiumGltf::FeatureId& o
+  );
 
 private:
   CesiumGltf::FeatureId* _pObject = nullptr;

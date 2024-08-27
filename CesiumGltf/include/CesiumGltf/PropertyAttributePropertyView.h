@@ -134,7 +134,8 @@ public:
       : PropertyView<ElementType, false>(status), _accessor{}, _size{0} {
     CESIUM_ASSERT(
         this->_status != PropertyAttributePropertyViewStatus::Valid &&
-        "An empty property view should not be constructed with a valid status");
+        "An empty property view should not be constructed with a valid status"
+    );
   }
 
   /**
@@ -149,7 +150,8 @@ public:
    */
   PropertyAttributePropertyView(
       const ClassProperty& classProperty,
-      int64_t size) noexcept
+      int64_t size
+  ) noexcept
       : PropertyView<ElementType, false>(classProperty), _accessor{}, _size{0} {
     if (this->_status != PropertyAttributePropertyViewStatus::Valid) {
       // Don't override the status / size if something is wrong with the class
@@ -182,7 +184,8 @@ public:
   PropertyAttributePropertyView(
       const PropertyAttributeProperty& property,
       const ClassProperty& classProperty,
-      const AccessorView<ElementType>& accessorView) noexcept
+      const AccessorView<ElementType>& accessorView
+  ) noexcept
       : PropertyView<ElementType, false>(classProperty, property),
         _accessor{accessorView},
         _size{
@@ -233,10 +236,11 @@ public:
   ElementType getRaw(int64_t index) const noexcept {
     CESIUM_ASSERT(
         this->_status == PropertyAttributePropertyViewStatus::Valid &&
-        "Check the status() first to make sure view is valid");
+        "Check the status() first to make sure view is valid"
+    );
     CESIUM_ASSERT(
-        size() > 0 &&
-        "Check the size() of the view to make sure it's not empty");
+        size() > 0 && "Check the size() of the view to make sure it's not empty"
+    );
     CESIUM_ASSERT(index >= 0 && "index must be non-negative");
     CESIUM_ASSERT(index < size() && "index must be less than size");
 
@@ -290,7 +294,8 @@ public:
       : PropertyView<ElementType, true>(status), _accessor{}, _size{0} {
     CESIUM_ASSERT(
         this->_status != PropertyAttributePropertyViewStatus::Valid &&
-        "An empty property view should not be constructed with a valid status");
+        "An empty property view should not be constructed with a valid status"
+    );
   }
 
   /**
@@ -305,7 +310,8 @@ public:
    */
   PropertyAttributePropertyView(
       const ClassProperty& classProperty,
-      int64_t size) noexcept
+      int64_t size
+  ) noexcept
       : PropertyView<ElementType, true>(classProperty), _accessor{}, _size{0} {
     if (this->_status != PropertyAttributePropertyViewStatus::Valid) {
       // Don't override the status / size if something is wrong with the class
@@ -338,7 +344,8 @@ public:
   PropertyAttributePropertyView(
       const PropertyAttributeProperty& property,
       const ClassProperty& classProperty,
-      const AccessorView<ElementType>& accessorView) noexcept
+      const AccessorView<ElementType>& accessorView
+  ) noexcept
       : PropertyView<ElementType, true>(classProperty, property),
         _accessor{accessorView},
         _size{
@@ -377,7 +384,8 @@ public:
       return transformValue<NormalizedType>(
           normalize<ElementType>(value),
           this->offset(),
-          this->scale());
+          this->scale()
+      );
     }
 
     if constexpr (IsMetadataVecN<ElementType>::value) {
@@ -387,7 +395,8 @@ public:
       return transformValue<glm::vec<N, NormalizedT>>(
           normalize<N, T>(value),
           this->offset(),
-          this->scale());
+          this->scale()
+      );
     }
 
     if constexpr (IsMetadataMatN<ElementType>::value) {
@@ -397,7 +406,8 @@ public:
       return transformValue<glm::mat<N, N, NormalizedT>>(
           normalize<N, T>(value),
           this->offset(),
-          this->scale());
+          this->scale()
+      );
     }
   }
 
@@ -414,10 +424,11 @@ public:
   ElementType getRaw(int64_t index) const noexcept {
     CESIUM_ASSERT(
         this->_status == PropertyAttributePropertyViewStatus::Valid &&
-        "Check the status() first to make sure view is valid");
+        "Check the status() first to make sure view is valid"
+    );
     CESIUM_ASSERT(
-        size() > 0 &&
-        "Check the size() of the view to make sure it's not empty");
+        size() > 0 && "Check the size() of the view to make sure it's not empty"
+    );
     CESIUM_ASSERT(index >= 0 && "index must be non-negative");
     CESIUM_ASSERT(index < size() && "index must be less than size");
 

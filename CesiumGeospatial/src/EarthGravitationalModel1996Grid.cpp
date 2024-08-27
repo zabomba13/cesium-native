@@ -28,10 +28,12 @@ constexpr size_t TOTAL_BYTES = TOTAL_VALUES * sizeof(int16_t);
 
 std::optional<EarthGravitationalModel1996Grid>
 CesiumGeospatial::EarthGravitationalModel1996Grid::fromFile(
-    const std::string& filename) {
+    const std::string& filename
+) {
   std::ifstream file(
       std::filesystem::u8path(filename),
-      std::ios::binary | std::ios::ate);
+      std::ios::binary | std::ios::ate
+  );
   if (!file.good()) {
     return std::nullopt;
   }
@@ -46,7 +48,8 @@ CesiumGeospatial::EarthGravitationalModel1996Grid::fromFile(
 
 std::optional<EarthGravitationalModel1996Grid>
 CesiumGeospatial::EarthGravitationalModel1996Grid::fromBuffer(
-    const gsl::span<const std::byte>& buffer) {
+    const gsl::span<const std::byte>& buffer
+) {
   if (buffer.size_bytes() < TOTAL_BYTES) {
     // Not enough data - is this a valid WW15MGH.DAC?
     return std::nullopt;
@@ -67,8 +70,9 @@ CesiumGeospatial::EarthGravitationalModel1996Grid::fromBuffer(
   return EarthGravitationalModel1996Grid(std::move(gridValues));
 }
 
-double EarthGravitationalModel1996Grid::sampleHeight(
-    const Cartographic& position) const {
+double
+EarthGravitationalModel1996Grid::sampleHeight(const Cartographic& position
+) const {
   const double longitude = Math::zeroToTwoPi(position.longitude);
   const double latitude =
       Math::clamp(position.latitude, -Math::PiOverTwo, Math::PiOverTwo);
@@ -101,12 +105,14 @@ double EarthGravitationalModel1996Grid::sampleHeight(
 }
 
 EarthGravitationalModel1996Grid::EarthGravitationalModel1996Grid(
-    std::vector<int16_t>&& gridValues)
+    std::vector<int16_t>&& gridValues
+)
     : _gridValues(gridValues) {}
 
 double EarthGravitationalModel1996Grid::getHeightForIndices(
     const size_t horizontal,
-    const size_t vertical) const {
+    const size_t vertical
+) const {
 
   size_t clampedVertical = vertical;
   if (vertical >= NUM_ROWS) {

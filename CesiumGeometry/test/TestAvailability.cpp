@@ -22,8 +22,9 @@ TEST_CASE("Test AvailabilityUtilities") {
     uint8_t byte = static_cast<uint8_t>(0xFF);
     for (uint8_t i = 0; i <= 8; ++i) {
       REQUIRE(
-          AvailabilityUtilities::countOnesInByte(
-              static_cast<uint8_t>(byte >> i)) == (8 - i));
+          AvailabilityUtilities::countOnesInByte(static_cast<uint8_t>(byte >> i)
+          ) == (8 - i)
+      );
     }
   }
 
@@ -36,7 +37,8 @@ TEST_CASE("Test AvailabilityUtilities") {
     // Each byte is 0xFC which has 6 ones.
     // This means there are 6 x 64 = 384 ones total in the buffer.
     uint32_t onesInBuffer = AvailabilityUtilities::countOnesInBuffer(
-        gsl::span<std::byte>(&buffer[0], 64));
+        gsl::span<std::byte>(&buffer[0], 64)
+    );
     REQUIRE(onesInBuffer == 384U);
   }
 }
@@ -55,13 +57,16 @@ TEST_CASE("Test AvailabilityAccessor") {
 
   AvailabilityAccessor tileAvailabilityAccessor(
       subtree.tileAvailability,
-      subtree);
+      subtree
+  );
   AvailabilityAccessor contentAvailabilityAccessor(
       subtree.contentAvailability,
-      subtree);
+      subtree
+  );
   AvailabilityAccessor subtreeAvailabilityAccessor(
       subtree.subtreeAvailability,
-      subtree);
+      subtree
+  );
 
   SECTION("Test constant availability") {
     REQUIRE(tileAvailabilityAccessor.isConstant());
@@ -195,8 +200,10 @@ TEST_CASE("Test OctreeAvailability") {
             }
 
             REQUIRE(
-                (bool)(availability & TileAvailabilityFlags::CONTENT_AVAILABLE) ==
-                contentShouldBeAvailable);
+                (bool
+                )(availability & TileAvailabilityFlags::CONTENT_AVAILABLE) ==
+                contentShouldBeAvailable
+            );
           }
         }
       }
@@ -224,7 +231,8 @@ TEST_CASE("Test OctreeAvailability") {
 
           REQUIRE(
               (bool)(availability & TileAvailabilityFlags::SUBTREE_AVAILABLE) ==
-              subtreeShouldBeAvailable);
+              subtreeShouldBeAvailable
+          );
 
           REQUIRE((childIndex != std::nullopt) == subtreeShouldBeAvailable);
         }
@@ -251,7 +259,8 @@ TEST_CASE("Test OctreeAvailability") {
 
         octreeAvailability.addSubtree(
             mockChildrenSubtreeId,
-            std::move(childSubtree));
+            std::move(childSubtree)
+        );
       }
     }
 
@@ -295,7 +304,8 @@ TEST_CASE("Test OctreeAvailability") {
 
           REQUIRE(
               (bool)(availability & TileAvailabilityFlags::SUBTREE_LOADED) ==
-              subtreeShouldBeLoaded);
+              subtreeShouldBeLoaded
+          );
 
           REQUIRE((pChildNode != nullptr) == subtreeShouldBeLoaded);
         }
@@ -388,7 +398,8 @@ TEST_CASE("Test QuadtreeAvailability") {
 
           REQUIRE(
               (bool)(availability & TileAvailabilityFlags::CONTENT_AVAILABLE) ==
-              contentShouldBeAvailable);
+              contentShouldBeAvailable
+          );
         }
       }
     }
@@ -414,7 +425,8 @@ TEST_CASE("Test QuadtreeAvailability") {
 
         REQUIRE(
             (bool)(availability & TileAvailabilityFlags::SUBTREE_AVAILABLE) ==
-            subtreeShouldBeAvailable);
+            subtreeShouldBeAvailable
+        );
 
         REQUIRE((childIndex != std::nullopt) == subtreeShouldBeAvailable);
       }
@@ -441,7 +453,8 @@ TEST_CASE("Test QuadtreeAvailability") {
 
         quadtreeAvailability.addSubtree(
             mockChildrenSubtreeId,
-            std::move(childSubtree));
+            std::move(childSubtree)
+        );
       }
     }
 
@@ -485,7 +498,8 @@ TEST_CASE("Test QuadtreeAvailability") {
 
         REQUIRE(
             (bool)(availability & TileAvailabilityFlags::SUBTREE_LOADED) ==
-            subtreeShouldBeLoaded);
+            subtreeShouldBeLoaded
+        );
 
         REQUIRE((pChildNode != nullptr) == subtreeShouldBeLoaded);
       }

@@ -65,7 +65,8 @@ template <typename T>
 T transformValue(
     const T& value,
     const std::optional<T>& offset,
-    const std::optional<T>& scale) {
+    const std::optional<T>& scale
+) {
   T result = value;
   if (scale) {
     result = applyScale<T>(result, *scale);
@@ -82,7 +83,8 @@ template <typename T>
 PropertyArrayCopy<T> transformArray(
     const PropertyArrayView<T>& value,
     const std::optional<PropertyArrayView<T>>& offset,
-    const std::optional<PropertyArrayView<T>>& scale) {
+    const std::optional<PropertyArrayView<T>>& scale
+) {
   std::vector<T> result(static_cast<size_t>(value.size()));
   for (int64_t i = 0; i < value.size(); i++) {
     result[i] = value[i];
@@ -105,7 +107,8 @@ template <
 PropertyArrayCopy<NormalizedType> transformNormalizedArray(
     const PropertyArrayView<T>& value,
     const std::optional<PropertyArrayView<NormalizedType>>& offset,
-    const std::optional<PropertyArrayView<NormalizedType>>& scale) {
+    const std::optional<PropertyArrayView<NormalizedType>>& scale
+) {
   std::vector<NormalizedType> result(static_cast<size_t>(value.size()));
   for (int64_t i = 0; i < value.size(); i++) {
     result[i] = normalize<T>(value[i]);
@@ -126,7 +129,8 @@ template <glm::length_t N, typename T>
 PropertyArrayCopy<glm::vec<N, double>> transformNormalizedVecNArray(
     const PropertyArrayView<glm::vec<N, T>>& value,
     const std::optional<PropertyArrayView<glm::vec<N, double>>>& offset,
-    const std::optional<PropertyArrayView<glm::vec<N, double>>>& scale) {
+    const std::optional<PropertyArrayView<glm::vec<N, double>>>& scale
+) {
   std::vector<glm::vec<N, double>> result(static_cast<size_t>(value.size()));
   for (int64_t i = 0; i < value.size(); i++) {
     result[i] = normalize<N, T>(value[i]);
@@ -147,7 +151,8 @@ template <glm::length_t N, typename T>
 PropertyArrayCopy<glm::mat<N, N, double>> transformNormalizedMatNArray(
     const PropertyArrayView<glm::mat<N, N, T>>& value,
     const std::optional<PropertyArrayView<glm::mat<N, N, double>>>& offset,
-    const std::optional<PropertyArrayView<glm::mat<N, N, double>>>& scale) {
+    const std::optional<PropertyArrayView<glm::mat<N, N, double>>>& scale
+) {
   std::vector<glm::mat<N, N, double>> result(static_cast<size_t>(value.size()));
   for (int64_t i = 0; i < value.size(); i++) {
     result[i] = normalize<N, T>(value[i]);

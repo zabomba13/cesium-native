@@ -11,8 +11,8 @@
 
 namespace Cesium3DTilesWriter {
 
-void registerWriterExtensions(
-    CesiumJsonWriter::ExtensionWriterContext& context) {
+void registerWriterExtensions(CesiumJsonWriter::ExtensionWriterContext& context
+) {
   (void)context;
   context.registerExtension<
       Cesium3DTiles::BoundingVolume,

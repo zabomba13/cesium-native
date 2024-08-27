@@ -35,12 +35,14 @@ RasterOverlayDetails& TileRenderContent::getRasterOverlayDetails() noexcept {
 }
 
 void TileRenderContent::setRasterOverlayDetails(
-    const RasterOverlayDetails& rasterOverlayDetails) {
+    const RasterOverlayDetails& rasterOverlayDetails
+) {
   this->_rasterOverlayDetails = rasterOverlayDetails;
 }
 
 void TileRenderContent::setRasterOverlayDetails(
-    RasterOverlayDetails&& rasterOverlayDetails) {
+    RasterOverlayDetails&& rasterOverlayDetails
+) {
   this->_rasterOverlayDetails = std::move(rasterOverlayDetails);
 }
 
@@ -72,8 +74,8 @@ float TileRenderContent::getLodTransitionFadePercentage() const noexcept {
   return _lodTransitionFadePercentage;
 }
 
-void TileRenderContent::setLodTransitionFadePercentage(
-    float percentage) noexcept {
+void TileRenderContent::setLodTransitionFadePercentage(float percentage
+) noexcept {
   this->_lodTransitionFadePercentage = percentage;
 }
 
@@ -92,8 +94,8 @@ void TileContent::setContentKind(TileEmptyContent content) {
   _contentKind = content;
 }
 
-void TileContent::setContentKind(
-    std::unique_ptr<TileExternalContent>&& content) {
+void TileContent::setContentKind(std::unique_ptr<TileExternalContent>&& content
+) {
   _contentKind = std::move(content);
 }
 
@@ -111,12 +113,14 @@ bool TileContent::isEmptyContent() const noexcept {
 
 bool TileContent::isExternalContent() const noexcept {
   return std::holds_alternative<std::unique_ptr<TileExternalContent>>(
-      this->_contentKind);
+      this->_contentKind
+  );
 }
 
 bool TileContent::isRenderContent() const noexcept {
   return std::holds_alternative<std::unique_ptr<TileRenderContent>>(
-      this->_contentKind);
+      this->_contentKind
+  );
 }
 
 const TileRenderContent* TileContent::getRenderContent() const noexcept {

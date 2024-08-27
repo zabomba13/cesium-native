@@ -20,17 +20,20 @@ public:
   static inline constexpr const char* ExtensionName = "EXT_meshopt_compression";
 
   ExtensionBufferExtMeshoptCompressionJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionBufferExtMeshoptCompression* pObject);
+      CesiumGltf::ExtensionBufferExtMeshoptCompression* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -38,7 +41,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionBufferExtMeshoptCompression(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionBufferExtMeshoptCompression& o);
+      CesiumGltf::ExtensionBufferExtMeshoptCompression& o
+  );
 
 private:
   CesiumGltf::ExtensionBufferExtMeshoptCompression* _pObject = nullptr;

@@ -76,11 +76,13 @@ TEST_CASE("Reads tileset JSON") {
 
   REQUIRE_THAT(
       tileset.root.boundingVolume.region,
-      Catch::Matchers::Approx(expectedRegion));
+      Catch::Matchers::Approx(expectedRegion)
+  );
 
   REQUIRE_THAT(
       tileset.root.content->boundingVolume->region,
-      Catch::Matchers::Approx(expectedContentRegion));
+      Catch::Matchers::Approx(expectedContentRegion)
+  );
 
   REQUIRE(tileset.root.children.size() == 4);
 
@@ -88,11 +90,13 @@ TEST_CASE("Reads tileset JSON") {
 
   REQUIRE_THAT(
       child.boundingVolume.region,
-      Catch::Matchers::Approx(expectedChildRegion));
+      Catch::Matchers::Approx(expectedChildRegion)
+  );
 
   REQUIRE_THAT(
       child.content->boundingVolume->region,
-      Catch::Matchers::Approx(expectedChildContentRegion));
+      Catch::Matchers::Approx(expectedChildContentRegion)
+  );
 
   CHECK(child.content->uri == "1/0/0.b3dm");
   CHECK(child.geometricError == 159.43385994848);
@@ -132,7 +136,8 @@ TEST_CASE("Reads extras") {
 
   Cesium3DTilesReader::TilesetReader reader;
   auto result = reader.readFromJson(
-      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
+      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size())
+  );
   REQUIRE(result.errors.empty());
   REQUIRE(result.warnings.empty());
   REQUIRE(result.value.has_value());
@@ -210,7 +215,8 @@ TEST_CASE("Reads 3DTILES_content_gltf") {
 
   Cesium3DTilesReader::TilesetReader reader;
   auto result = reader.readFromJson(
-      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
+      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size())
+  );
   REQUIRE(result.errors.empty());
   REQUIRE(result.warnings.empty());
   REQUIRE(result.value.has_value());
@@ -260,7 +266,8 @@ TEST_CASE("Reads custom extension") {
 
   Cesium3DTilesReader::TilesetReader reader;
   auto withCustomExt = reader.readFromJson(
-      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
+      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size())
+  );
   REQUIRE(withCustomExt.errors.empty());
   REQUIRE(withCustomExt.value.has_value());
 
@@ -276,18 +283,22 @@ TEST_CASE("Reads custom extension") {
 
   REQUIRE(pB->getValuePtrForKey("another"));
   REQUIRE(
-      pB->getValuePtrForKey("another")->getStringOrDefault("") == "Goodbye");
+      pB->getValuePtrForKey("another")->getStringOrDefault("") == "Goodbye"
+  );
 
   // Repeat test but this time the extension should be skipped.
   reader.getOptions().setExtensionState(
       "A",
-      CesiumJsonReader::ExtensionState::Disabled);
+      CesiumJsonReader::ExtensionState::Disabled
+  );
   reader.getOptions().setExtensionState(
       "B",
-      CesiumJsonReader::ExtensionState::Disabled);
+      CesiumJsonReader::ExtensionState::Disabled
+  );
 
   auto withoutCustomExt = reader.readFromJson(
-      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
+      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size())
+  );
 
   auto& zeroExtensions = withoutCustomExt.value->extensions;
   REQUIRE(zeroExtensions.empty());

@@ -22,8 +22,8 @@ public:
    *
    * @param boundingRegion The bounding region that has imprecise heights.
    */
-  BoundingRegionWithLooseFittingHeights(
-      const BoundingRegion& boundingRegion) noexcept;
+  BoundingRegionWithLooseFittingHeights(const BoundingRegion& boundingRegion
+  ) noexcept;
 
   /**
    * @brief Gets the bounding region that has imprecise heights.
@@ -53,7 +53,8 @@ public:
    */
   double computeConservativeDistanceSquaredToPosition(
       const glm::dvec3& position,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) const noexcept;
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const noexcept;
 
   /**
    * @brief Computes the conservative distance-squared from a
@@ -76,7 +77,8 @@ public:
    */
   double computeConservativeDistanceSquaredToPosition(
       const Cartographic& position,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) const noexcept;
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const noexcept;
 
   /**
    * @brief Computes the conservative distance-squared from a position to the
@@ -101,7 +103,8 @@ public:
    */
   double computeConservativeDistanceSquaredToPosition(
       const Cartographic& cartographicPosition,
-      const glm::dvec3& cartesianPosition) const noexcept;
+      const glm::dvec3& cartesianPosition
+  ) const noexcept;
 
 private:
   BoundingRegion _region;

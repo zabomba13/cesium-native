@@ -20,7 +20,8 @@ TEST_CASE("Plane::getPointDistance") {
 
   CHECK(
       plane.getPointDistance(point) ==
-      glm::dot(plane.getNormal(), point) + plane.getDistance());
+      glm::dot(plane.getNormal(), point) + plane.getDistance()
+  );
 }
 
 TEST_CASE("Plane::projectPointOntoPlane") {
@@ -46,7 +47,8 @@ TEST_CASE("Plane constructor from point and normal") {
   const CesiumGeospatial::Ellipsoid& ellipsoid =
       CesiumGeospatial::Ellipsoid::WGS84;
   glm::dvec3 point = ellipsoid.cartographicToCartesian(
-      CesiumGeospatial::Cartographic::fromDegrees(-72.0, 40.0));
+      CesiumGeospatial::Cartographic::fromDegrees(-72.0, 40.0)
+  );
   glm::dvec3 normal = ellipsoid.geodeticSurfaceNormal(point);
   Plane tangentPlane(point, normal);
   //! [constructor-point-normal]

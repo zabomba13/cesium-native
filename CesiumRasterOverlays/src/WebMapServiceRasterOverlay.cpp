@@ -44,7 +44,8 @@ public:
       uint32_t width,
       uint32_t height,
       uint32_t minimumLevel,
-      uint32_t maximumLevel)
+      uint32_t maximumLevel
+  )
       : QuadtreeRasterOverlayTileProvider(
             pOwner,
             asyncSystem,
@@ -58,7 +59,8 @@ public:
             minimumLevel,
             maximumLevel,
             width,
-            height),
+            height
+        ),
         _url(url),
         _headers(headers),
         _version(version),
@@ -68,8 +70,9 @@ public:
   virtual ~WebMapServiceTileProvider() {}
 
 protected:
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
-      const CesiumGeometry::QuadtreeTileID& tileID) const override {
+  virtual CesiumAsync::Future<LoadedRasterOverlayImage>
+  loadQuadtreeTileImage(const CesiumGeometry::QuadtreeTileID& tileID
+  ) const override {
 
     LoadTileImageFromUrlOptions options;
     options.rectangle = this->getTilingScheme().tileToRectangle(tileID);
@@ -78,7 +81,8 @@ protected:
     const CesiumGeospatial::GlobeRectangle tileRectangle =
         CesiumGeospatial::unprojectRectangleSimple(
             this->getProjection(),
-            options.rectangle);
+            options.rectangle
+        );
 
     std::string queryString = "?";
 
@@ -115,7 +119,8 @@ protected:
           auto it = map.find(placeholder);
           return it == map.end() ? "{" + placeholder + "}"
                                  : Uri::escape(it->second);
-        });
+        }
+    );
 
     return this->loadTileImageFromUrl(url, this->_headers, std::move(options));
   }
@@ -133,7 +138,8 @@ WebMapServiceRasterOverlay::WebMapServiceRasterOverlay(
     const std::string& url,
     const std::vector<IAssetAccessor::THeader>& headers,
     const WebMapServiceRasterOverlayOptions& wmsOptions,
-    const RasterOverlayOptions& overlayOptions)
+    const RasterOverlayOptions& overlayOptions
+)
     : RasterOverlay(name, overlayOptions),
       _baseUrl(url),
       _headers(headers),
@@ -144,7 +150,8 @@ WebMapServiceRasterOverlay::~WebMapServiceRasterOverlay() {}
 static bool validateCapabilities(
     tinyxml2::XMLElement* pRoot,
     const WebMapServiceRasterOverlayOptions& options,
-    std::string& error) {
+    std::string& error
+) {
   tinyxml2::XMLElement* pService = pRoot->FirstChildElement("Service");
   if (!pService) {
     error = "Web map service XML document does not have a Service "
@@ -172,7 +179,8 @@ static bool validateCapabilities(
             "Service >> "
             "MaxWidth defined in WMS document ({}).",
             optionalTileWidth,
-            maxWidth);
+            maxWidth
+        );
         return false;
       }
     } catch (std::invalid_argument&) {
@@ -194,7 +202,8 @@ static bool validateCapabilities(
             "Service >> "
             "MaxHeight defined in WMS document ({}).",
             optionalTileHeight,
-            maxHeight);
+            maxHeight
+        );
         return false;
       }
     } catch (std::invalid_argument&) {
@@ -226,7 +235,8 @@ static bool validateCapabilities(
             512,
             "the number of configured layers (%d) exceeds WMS LayerLimit %d",
             numLayers,
-            layerLimit);
+            layerLimit
+        );
         error = buffer;
         return false;
       }
@@ -247,7 +257,8 @@ WebMapServiceRasterOverlay::createTileProvider(
     const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
         pPrepareRendererResources,
     const std::shared_ptr<spdlog::logger>& pLogger,
-    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner) const {
+    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+) const {
 
   std::string xmlUrlGetcapabilities =
       CesiumUtility::Uri::substituteTemplateParameters(
@@ -266,14 +277,17 @@ WebMapServiceRasterOverlay::createTileProvider(
             }
             // Keep other placeholders
             return "{" + placeholder + "}";
-          });
+          }
+      );
 
   pOwner = pOwner ? pOwner : this;
 
   const std::optional<Credit> credit =
-      this->_options.credit ? std::make_optional(pCreditSystem->createCredit(
-                                  this->_options.credit.value()))
-                            : std::nullopt;
+      this->_options.credit
+          ? std::make_optional(
+                pCreditSystem->createCredit(this->_options.credit.value())
+            )
+          : std::nullopt;
 
   return pAssetAccessor->get(asyncSystem, xmlUrlGetcapabilities, this->_headers)
       .thenInMainThread(
@@ -286,8 +300,8 @@ WebMapServiceRasterOverlay::createTileProvider(
            options = this->_options,
            url = this->_baseUrl,
            headers =
-               this->_headers](const std::shared_ptr<IAssetRequest>& pRequest)
-              -> CreateTileProviderResult {
+               this->_headers](const std::shared_ptr<IAssetRequest>& pRequest
+          ) -> CreateTileProviderResult {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
@@ -301,7 +315,8 @@ WebMapServiceRasterOverlay::createTileProvider(
             tinyxml2::XMLDocument doc;
             const tinyxml2::XMLError error = doc.Parse(
                 reinterpret_cast<const char*>(data.data()),
-                data.size_bytes());
+                data.size_bytes()
+            );
             if (error != tinyxml2::XMLError::XML_SUCCESS) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                   RasterOverlayLoadType::TileProvider,
@@ -343,7 +358,8 @@ WebMapServiceRasterOverlay::createTileProvider(
             CesiumGeometry::QuadtreeTilingScheme tilingScheme(
                 coverageRectangle,
                 rootTilesX,
-                rootTilesY);
+                rootTilesY
+            );
 
             return new WebMapServiceTileProvider(
                 pOwner,
@@ -363,8 +379,10 @@ WebMapServiceRasterOverlay::createTileProvider(
                 options.tileWidth < 1 ? 1 : uint32_t(options.tileWidth),
                 options.tileHeight < 1 ? 1 : uint32_t(options.tileHeight),
                 options.minimumLevel < 0 ? 0 : uint32_t(options.minimumLevel),
-                options.maximumLevel < 0 ? 0 : uint32_t(options.maximumLevel));
-          });
+                options.maximumLevel < 0 ? 0 : uint32_t(options.maximumLevel)
+            );
+          }
+      );
 }
 
 } // namespace CesiumRasterOverlays

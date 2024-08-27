@@ -16,8 +16,8 @@ class AvailabilityJsonHandler
 public:
   using ValueType = Cesium3DTiles::Availability;
 
-  AvailabilityJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  AvailabilityJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, Cesium3DTiles::Availability* pObject);
 
@@ -27,7 +27,8 @@ protected:
   IJsonHandler* readObjectKeyAvailability(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::Availability& o);
+      Cesium3DTiles::Availability& o
+  );
 
 private:
   Cesium3DTiles::Availability* _pObject = nullptr;

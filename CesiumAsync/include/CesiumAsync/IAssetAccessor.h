@@ -59,7 +59,8 @@ public:
       const std::string& verb,
       const std::string& url,
       const std::vector<THeader>& headers = std::vector<THeader>(),
-      const gsl::span<const std::byte>& contentPayload = {}) = 0;
+      const gsl::span<const std::byte>& contentPayload = {}
+  ) = 0;
 
   /**
    * @brief Ticks the asset accessor system while the main thread is blocked.

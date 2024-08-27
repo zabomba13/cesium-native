@@ -20,11 +20,13 @@ public:
       CesiumGltf::ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue;
 
   ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValueJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
       CesiumGltf::ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue*
-          pObject);
+          pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -33,7 +35,8 @@ protected:
   readObjectKeyExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue& o);
+      CesiumGltf::ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue& o
+  );
 
 private:
   CesiumGltf::ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue*

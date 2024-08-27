@@ -13,7 +13,8 @@ bool CesiumUtility::isGzip(const gsl::span<const std::byte>& data) {
 
 bool CesiumUtility::gunzip(
     const gsl::span<const std::byte>& data,
-    std::vector<std::byte>& out) {
+    std::vector<std::byte>& out
+) {
   int ret;
   unsigned int index = 0;
   zng_stream strm;

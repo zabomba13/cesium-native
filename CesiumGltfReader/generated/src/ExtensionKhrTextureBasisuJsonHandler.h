@@ -20,17 +20,20 @@ public:
   static inline constexpr const char* ExtensionName = "KHR_texture_basisu";
 
   ExtensionKhrTextureBasisuJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionKhrTextureBasisu* pObject);
+      CesiumGltf::ExtensionKhrTextureBasisu* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -38,7 +41,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionKhrTextureBasisu(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionKhrTextureBasisu& o);
+      CesiumGltf::ExtensionKhrTextureBasisu& o
+  );
 
 private:
   CesiumGltf::ExtensionKhrTextureBasisu* _pObject = nullptr;

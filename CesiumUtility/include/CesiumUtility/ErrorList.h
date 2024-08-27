@@ -61,15 +61,16 @@ struct CESIUMUTILITY_API ErrorList {
    * @param prompt The message prompt for the error messages.
    */
   template <typename PromptStr>
-  void logError(
-      const std::shared_ptr<spdlog::logger>& pLogger,
-      PromptStr&& prompt) const noexcept {
+  void
+  logError(const std::shared_ptr<spdlog::logger>& pLogger, PromptStr&& prompt)
+      const noexcept {
     if (!errors.empty()) {
       SPDLOG_LOGGER_ERROR(
           pLogger,
           "{}:\n- {}",
           std::forward<PromptStr>(prompt),
-          CesiumUtility::joinToString(errors, "\n- "));
+          CesiumUtility::joinToString(errors, "\n- ")
+      );
     }
   }
 
@@ -80,15 +81,16 @@ struct CESIUMUTILITY_API ErrorList {
    * @param prompt The message prompt for the warning messages.
    */
   template <typename PromptStr>
-  void logWarning(
-      const std::shared_ptr<spdlog::logger>& pLogger,
-      PromptStr&& prompt) const noexcept {
+  void
+  logWarning(const std::shared_ptr<spdlog::logger>& pLogger, PromptStr&& prompt)
+      const noexcept {
     if (!warnings.empty()) {
       SPDLOG_LOGGER_WARN(
           pLogger,
           "{}:\n- {}",
           std::forward<PromptStr>(prompt),
-          CesiumUtility::joinToString(warnings, "\n- "));
+          CesiumUtility::joinToString(warnings, "\n- ")
+      );
     }
   }
 

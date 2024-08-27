@@ -29,13 +29,15 @@ TilesetExternals createMockTilesetExternals(const std::string& tilesetPath) {
       static_cast<uint16_t>(200),
       "doesn't matter",
       CesiumAsync::HttpHeaders{},
-      std::move(tilesetContent));
+      std::move(tilesetContent)
+  );
 
   auto pMockCompletedRequest = std::make_shared<SimpleAssetRequest>(
       "GET",
       "tileset.json",
       CesiumAsync::HttpHeaders{},
-      std::move(pMockCompletedResponse));
+      std::move(pMockCompletedResponse)
+  );
 
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>>
       mockCompletedRequests;
@@ -72,22 +74,26 @@ createLoader(const std::filesystem::path& tilesetPath) {
 TileLoadResult loadTileContent(
     const std::filesystem::path& tilePath,
     TilesetContentLoader& loader,
-    Tile& tile) {
+    Tile& tile
+) {
   auto pMockCompletedResponse = std::make_unique<SimpleAssetResponse>(
       static_cast<uint16_t>(200),
       "doesn't matter",
       CesiumAsync::HttpHeaders{},
-      readFile(tilePath));
+      readFile(tilePath)
+  );
   auto pMockCompletedRequest = std::make_shared<SimpleAssetRequest>(
       "GET",
       "doesn't matter",
       CesiumAsync::HttpHeaders{},
-      std::move(pMockCompletedResponse));
+      std::move(pMockCompletedResponse)
+  );
 
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>>
       mockCompletedRequests;
   mockCompletedRequests.insert(
-      {tilePath.filename().string(), std::move(pMockCompletedRequest)});
+      {tilePath.filename().string(), std::move(pMockCompletedRequest)}
+  );
 
   std::shared_ptr<SimpleAssetAccessor> pMockAssetAccessor =
       std::make_shared<SimpleAssetAccessor>(std::move(mockCompletedRequests));
@@ -150,7 +156,8 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(children[0].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[0].getTileID()) == "ll.b3dm");
     CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
-        children[0].getBoundingVolume()));
+        children[0].getBoundingVolume()
+    ));
 
     CHECK(children[1].getParent() == pRootTile);
     CHECK(children[1].getChildren().size() == 0);
@@ -158,7 +165,8 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(children[1].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[1].getTileID()) == "lr.b3dm");
     CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
-        children[1].getBoundingVolume()));
+        children[1].getBoundingVolume()
+    ));
 
     CHECK(children[2].getParent() == pRootTile);
     CHECK(children[2].getChildren().size() == 0);
@@ -166,7 +174,8 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(children[2].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[2].getTileID()) == "ur.b3dm");
     CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
-        children[2].getBoundingVolume()));
+        children[2].getBoundingVolume()
+    ));
 
     CHECK(children[3].getParent() == pRootTile);
     CHECK(children[3].getChildren().size() == 0);
@@ -174,7 +183,8 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(children[3].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[3].getTileID()) == "ul.b3dm");
     CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
-        children[3].getBoundingVolume()));
+        children[3].getBoundingVolume()
+    ));
 
     // check loader up axis
     CHECK(loaderResult.pLoader->getUpAxis() == CesiumGeometry::Axis::Y);
@@ -220,7 +230,8 @@ TEST_CASE("Test creating tileset json loader") {
       CHECK(child.getRefine() == TileRefine::Add);
       CHECK(std::get<std::string>(child.getTileID()) == *expectedUrlIt);
       CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
-          child.getBoundingVolume()));
+          child.getBoundingVolume()
+      ));
       ++expectedUrlIt;
     }
 
@@ -231,7 +242,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Tileset has tile with sphere bounding volume") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "SphereBoundingVolumeTileset.json");
+        "SphereBoundingVolumeTileset.json"
+    );
 
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
@@ -249,7 +261,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Tileset has tile with box bounding volume") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "BoxBoundingVolumeTileset.json");
+        "BoxBoundingVolumeTileset.json"
+    );
 
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
@@ -257,7 +270,8 @@ TEST_CASE("Test creating tileset json loader") {
     const Tile& rootTile = loaderResult.pRootTile->getChildren()[0];
     const CesiumGeometry::OrientedBoundingBox& box =
         std::get<CesiumGeometry::OrientedBoundingBox>(
-            rootTile.getBoundingVolume());
+            rootTile.getBoundingVolume()
+        );
     const glm::dmat3& halfAxis = box.getHalfAxes();
     CHECK(halfAxis[0] == glm::dvec3(100.0, 0.0, 0.0));
     CHECK(halfAxis[1] == glm::dvec3(0.0, 100.0, 0.0));
@@ -268,7 +282,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Tileset has tile with no bounding volume field") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "NoBoundingVolumeTileset.json");
+        "NoBoundingVolumeTileset.json"
+    );
 
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
@@ -283,7 +298,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Tileset has tile with no geometric error field") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "NoGeometricErrorTileset.json");
+        "NoGeometricErrorTileset.json"
+    );
 
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
@@ -302,7 +318,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Tileset has tile with no capitalized Refinement field") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "NoCapitalizedRefineTileset.json");
+        "NoCapitalizedRefineTileset.json"
+    );
 
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
@@ -323,7 +340,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Scale geometric error along with tile transform") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "ScaleGeometricErrorTileset.json");
+        "ScaleGeometricErrorTileset.json"
+    );
 
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
@@ -341,7 +359,8 @@ TEST_CASE("Test creating tileset json loader") {
 
   SECTION("Tileset with empty tile") {
     auto loaderResult = createLoader(
-        testDataPath / "MultipleKindsOfTilesets" / "EmptyTileTileset.json");
+        testDataPath / "MultipleKindsOfTilesets" / "EmptyTileTileset.json"
+    );
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
@@ -359,7 +378,8 @@ TEST_CASE("Test creating tileset json loader") {
   SECTION("Tileset with quadtree implicit tile") {
     auto loaderResult = createLoader(
         testDataPath / "MultipleKindsOfTilesets" /
-        "QuadtreeImplicitTileset.json");
+        "QuadtreeImplicitTileset.json"
+    );
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     CHECK(loaderResult.pRootTile->isExternalContent());
@@ -376,13 +396,14 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(child.getTransform() == pRootTile->getTransform());
     CHECK(
         std::get<CesiumGeometry::QuadtreeTileID>(child.getTileID()) ==
-        CesiumGeometry::QuadtreeTileID(0, 0, 0));
+        CesiumGeometry::QuadtreeTileID(0, 0, 0)
+    );
   }
 
   SECTION("Tileset with octree implicit tile") {
     auto loaderResult = createLoader(
-        testDataPath / "MultipleKindsOfTilesets" /
-        "OctreeImplicitTileset.json");
+        testDataPath / "MultipleKindsOfTilesets" / "OctreeImplicitTileset.json"
+    );
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     CHECK(loaderResult.pRootTile->isExternalContent());
@@ -399,7 +420,8 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(child.getTransform() == pRootTile->getTransform());
     CHECK(
         std::get<CesiumGeometry::OctreeTileID>(child.getTileID()) ==
-        CesiumGeometry::OctreeTileID(0, 0, 0, 0));
+        CesiumGeometry::OctreeTileID(0, 0, 0, 0)
+    );
   }
 
   SECTION("Tileset with metadata") {
@@ -439,9 +461,10 @@ TEST_CASE("Test loading individual tile of tileset json") {
     auto tileLoadResult = loadTileContent(
         testDataPath / "ReplaceTileset" / tileID,
         *loaderResult.pLoader,
-        *pRootTile);
-    CHECK(
-        std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind));
+        *pRootTile
+    );
+    CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind)
+    );
     CHECK(tileLoadResult.updatedBoundingVolume == std::nullopt);
     CHECK(tileLoadResult.updatedContentBoundingVolume == std::nullopt);
     CHECK(tileLoadResult.state == TileLoadResultState::Success);
@@ -464,18 +487,21 @@ TEST_CASE("Test loading individual tile of tileset json") {
     auto tileLoadResult = loadTileContent(
         testDataPath / "AddTileset" / tileID,
         *loaderResult.pLoader,
-        *pRootTile);
+        *pRootTile
+    );
     CHECK(tileLoadResult.updatedBoundingVolume == std::nullopt);
     CHECK(tileLoadResult.updatedContentBoundingVolume == std::nullopt);
-    CHECK(std::holds_alternative<TileExternalContent>(
-        tileLoadResult.contentKind));
+    CHECK(std::holds_alternative<TileExternalContent>(tileLoadResult.contentKind
+    ));
     CHECK(tileLoadResult.state == TileLoadResultState::Success);
     CHECK(tileLoadResult.tileInitializer);
 
     // check tile is really an external tile
     pRootTile->getContent().setContentKind(
         std::make_unique<TileExternalContent>(
-            std::get<TileExternalContent>(tileLoadResult.contentKind)));
+            std::get<TileExternalContent>(tileLoadResult.contentKind)
+        )
+    );
     tileLoadResult.tileInitializer(*pRootTile);
     const auto& children = pRootTile->getChildren();
     REQUIRE(children.size() == 1);
@@ -496,7 +522,8 @@ TEST_CASE("Test loading individual tile of tileset json") {
       CHECK(child.getGeometricError() == Approx(0.0));
       CHECK(child.getRefine() == TileRefine::Add);
       CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
-          child.getBoundingVolume()));
+          child.getBoundingVolume()
+      ));
     }
   }
 
@@ -524,12 +551,14 @@ TEST_CASE("Test loading individual tile of tileset json") {
         static_cast<uint16_t>(200),
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        readFile(subtreePath));
+        readFile(subtreePath)
+    );
     auto pMockSubtreeRequest = std::make_shared<SimpleAssetRequest>(
         "GET",
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        std::move(pMockSubtreeResponse));
+        std::move(pMockSubtreeResponse)
+    );
 
     // mock tile content response
     auto tilePath =
@@ -539,12 +568,14 @@ TEST_CASE("Test loading individual tile of tileset json") {
         static_cast<uint16_t>(200),
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        readFile(tilePath));
+        readFile(tilePath)
+    );
     auto pMockTileRequest = std::make_shared<SimpleAssetRequest>(
         "GET",
         "doesn't matter",
         CesiumAsync::HttpHeaders{},
-        std::move(pMockTileResponse));
+        std::move(pMockTileResponse)
+    );
 
     // create mock asset accessor
     std::map<std::string, std::shared_ptr<SimpleAssetRequest>>
@@ -591,7 +622,8 @@ TEST_CASE("Test loading individual tile of tileset json") {
 
       auto implicitContentResult = implicitContentResultFuture.wait();
       CHECK(std::holds_alternative<CesiumGltf::Model>(
-          implicitContentResult.contentKind));
+          implicitContentResult.contentKind
+      ));
       CHECK(!implicitContentResult.updatedBoundingVolume);
       CHECK(!implicitContentResult.updatedContentBoundingVolume);
       CHECK(implicitContentResult.state == TileLoadResultState::Success);

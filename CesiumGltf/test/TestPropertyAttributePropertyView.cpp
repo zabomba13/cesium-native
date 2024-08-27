@@ -21,7 +21,8 @@ const Accessor& addValuesToModel(Model& model, const std::vector<T>& values) {
   std::memcpy(
       buffer.cesium.data.data(),
       values.data(),
-      buffer.cesium.data.size());
+      buffer.cesium.data.size()
+  );
 
   BufferView& bufferView = model.bufferViews.emplace_back();
   bufferView.buffer = static_cast<int32_t>(model.buffers.size() - 1);
@@ -81,7 +82,8 @@ const Accessor& addValuesToModel(Model& model, const std::vector<T>& values) {
   default:
     CESIUM_ASSERT(
         false &&
-        "Input component type is not supported as an accessor component type");
+        "Input component type is not supported as an accessor component type"
+    );
     break;
   }
 
@@ -122,7 +124,8 @@ void checkAttributeValues(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   Model model;
   const Accessor& accessor = addValuesToModel<T, false>(model, values);
   AccessorView accessorView = AccessorView<T>(model, accessor);
@@ -159,7 +162,8 @@ void checkNormalizedAttributeValues(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   Model model;
   const Accessor& accessor = addValuesToModel<T, true>(model, values);
   AccessorView accessorView = AccessorView<T>(model, accessor);
@@ -183,7 +187,8 @@ void checkNormalizedAttributeValues(
   PropertyAttributePropertyView<T, true> view(
       property,
       classProperty,
-      accessorView);
+      accessorView
+  );
 
   REQUIRE(view.size() == static_cast<int64_t>(values.size()));
   REQUIRE(view.normalized());
@@ -253,7 +258,8 @@ TEST_CASE("Check scalar PropertyAttributePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -310,7 +316,8 @@ TEST_CASE("Check scalar PropertyAttributePropertyView (normalized)") {
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -394,7 +401,8 @@ TEST_CASE("Check vecN PropertyAttributePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -449,7 +457,8 @@ TEST_CASE("Check vecN PropertyAttributePropertyView (normalized)") {
         data,
         expected,
         JsonValue::Array{offset[0], offset[1]},
-        JsonValue::Array{scale[0], scale[1]});
+        JsonValue::Array{scale[0], scale[1]}
+    );
   }
 
   SECTION("glm::i8vec2 with all properties") {
@@ -477,7 +486,8 @@ TEST_CASE("Check vecN PropertyAttributePropertyView (normalized)") {
         JsonValue::Array{offset[0], offset[1]},
         JsonValue::Array{scale[0], scale[1]},
         JsonValue::Array{noData[0], noData[1]},
-        JsonValue::Array{defaultValue[0], defaultValue[1]});
+        JsonValue::Array{defaultValue[0], defaultValue[1]}
+    );
   }
 }
 
@@ -607,7 +617,8 @@ TEST_CASE("Check matN PropertyAttributePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   };
 
   SECTION("Int16 Mat3 with NoData and DefaultValue") {
@@ -644,7 +655,8 @@ TEST_CASE("Check matN PropertyAttributePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   };
 }
 
@@ -754,7 +766,8 @@ TEST_CASE("Check matN PropertyAttributePropertyView (normalized)") {
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -769,7 +782,8 @@ TEST_CASE("Check that PropertyAttributeProperty values override class property "
   std::memcpy(
       buffer.cesium.data.data(),
       data.data(),
-      buffer.cesium.data.size());
+      buffer.cesium.data.size()
+  );
 
   BufferView& bufferView = model.bufferViews.emplace_back();
   bufferView.buffer = static_cast<int32_t>(model.buffers.size() - 1);
@@ -810,7 +824,8 @@ TEST_CASE("Check that PropertyAttributeProperty values override class property "
   PropertyAttributePropertyView<float> view(
       property,
       classProperty,
-      accessorView);
+      accessorView
+  );
   REQUIRE(view.offset() == offset);
   REQUIRE(view.scale() == scale);
   REQUIRE(view.min() == min);

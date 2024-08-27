@@ -29,7 +29,9 @@ Ray Ray::transform(const glm::dmat4x4& transformation) const noexcept {
   return Ray(
       glm::dvec3(transformation * glm::dvec4(this->_origin, 1.0)),
       glm::normalize(
-          glm::dvec3(transformation * glm::dvec4(this->_direction, 0.0))));
+          glm::dvec3(transformation * glm::dvec4(this->_direction, 0.0))
+      )
+  );
 }
 
 Ray Ray::operator-() const noexcept {

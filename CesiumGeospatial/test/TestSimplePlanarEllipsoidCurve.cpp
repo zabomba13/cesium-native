@@ -18,7 +18,8 @@ const glm::dvec3 philadelphiaAntipodeEcef =
 const Cartographic philadelphiaLlh(
     -1.3119164210487293,
     0.6974930673711344,
-    373.64791900173714);
+    373.64791900173714
+);
 // Equivalent to tokyoEcef
 const Cartographic
     tokyoLlh(2.4390907007049445, 0.6222806863437318, 283.242432000711);
@@ -39,17 +40,20 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            tokyoEcef);
+            tokyoEcef
+        );
 
     CHECK(curve.has_value());
     CHECK(Math::equalsEpsilon(
         curve.value().getPosition(0.0),
         philadelphiaEcef,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
     CHECK(Math::equalsEpsilon(
         curve.value().getPosition(1.0),
         tokyoEcef,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
   }
 
   SECTION("all points should be coplanar") {
@@ -57,13 +61,15 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            tokyoEcef);
+            tokyoEcef
+        );
 
     CHECK(curve.has_value());
     // needs three points to form a plane - get midpoint to make third point
     glm::dvec3 midpoint = curve.value().getPosition(0.5);
     glm::dvec3 planeNormal = glm::normalize(
-        glm::cross(philadelphiaEcef - midpoint, tokyoEcef - midpoint));
+        glm::cross(philadelphiaEcef - midpoint, tokyoEcef - midpoint)
+    );
 
     int steps = 100;
 
@@ -81,7 +87,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            philadelphiaAntipodeEcef);
+            philadelphiaAntipodeEcef
+        );
 
     CHECK(curve.has_value());
 
@@ -103,7 +110,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            tokyoEcef);
+            tokyoEcef
+        );
 
     CHECK(forwardCurve.has_value());
     glm::dvec3 forwardResult = forwardCurve.value().getPosition(0.5);
@@ -112,7 +120,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             tokyoEcef,
-            philadelphiaEcef);
+            philadelphiaEcef
+        );
 
     CHECK(reverseCurve.has_value());
     glm::dvec3 reverseResult = reverseCurve.value().getPosition(0.5);
@@ -125,7 +134,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            philadelphiaEcef);
+            philadelphiaEcef
+        );
 
     CHECK(curve.has_value());
 
@@ -146,35 +156,42 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight(
             Ellipsoid::WGS84,
             Cartographic(25.0, 100.0, startHeight),
-            Cartographic(25.0, 100.0, endHeight));
+            Cartographic(25.0, 100.0, endHeight)
+        );
 
     CHECK(flightPath.has_value());
 
     std::optional<Cartographic> position25Percent =
         Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.25));
+            flightPath.value().getPosition(0.25)
+        );
     std::optional<Cartographic> position50Percent =
         Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.5));
+            flightPath.value().getPosition(0.5)
+        );
     std::optional<Cartographic> position75Percent =
         Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.75));
+            flightPath.value().getPosition(0.75)
+        );
 
     CHECK(position25Percent.has_value());
     CHECK(Math::equalsEpsilon(
         position25Percent.value().height,
         (endHeight - startHeight) * 0.25 + startHeight,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
     CHECK(position50Percent.has_value());
     CHECK(Math::equalsEpsilon(
         position50Percent.value().height,
         (endHeight - startHeight) * 0.5 + startHeight,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
     CHECK(position75Percent.has_value());
     CHECK(Math::equalsEpsilon(
         position75Percent.value().height,
         (endHeight - startHeight) * 0.75 + startHeight,
-        Math::Epsilon6));
+        Math::Epsilon6
+    ));
   }
 
   // Testing a bug in SimplePlanarEllipsoidCurve where a path from a point with
@@ -185,7 +202,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             timesSquareEcef,
-            newYorkCityEcef);
+            newYorkCityEcef
+        );
 
     CHECK(curve.has_value());
     const double expectedDistance =
@@ -198,18 +216,20 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
     CHECK(Math::equalsEpsilon(
         expectedDistance,
         totalActualDistance,
-        Math::Epsilon4));
+        Math::Epsilon4
+    ));
   }
 }
 
-TEST_CASE(
-    "SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates") {
+TEST_CASE("SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates"
+) {
   SECTION("should fail on coordinates (0, 0, 0)") {
     std::optional<SimplePlanarEllipsoidCurve> curve =
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            glm::dvec3(0, 0, 0));
+            glm::dvec3(0, 0, 0)
+        );
 
     CHECK(!curve.has_value());
   }
@@ -222,13 +242,15 @@ TEST_CASE("SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight") {
         SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight(
             Ellipsoid::WGS84,
             philadelphiaLlh,
-            tokyoLlh);
+            tokyoLlh
+        );
 
     std::optional<SimplePlanarEllipsoidCurve> ecefCurve =
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
             Ellipsoid::WGS84,
             philadelphiaEcef,
-            tokyoEcef);
+            tokyoEcef
+        );
 
     CHECK(llhCurve.has_value());
     CHECK(ecefCurve.has_value());
@@ -240,7 +262,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight") {
       CHECK(Math::equalsEpsilon(
           ecefCurve.value().getPosition(n),
           llhCurve.value().getPosition(n),
-          Math::Epsilon6));
+          Math::Epsilon6
+      ));
     }
   }
 }

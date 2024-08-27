@@ -83,7 +83,8 @@ public:
       const std::string& url,
       const gsl::span<const std::byte>& data,
       bool enableWaterMask,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Parses the metadata (tile availability) from the given
@@ -95,7 +96,8 @@ public:
    */
   static QuantizedMeshMetadataResult loadMetadata(
       const gsl::span<const std::byte>& data,
-      const CesiumGeometry::QuadtreeTileID& tileID);
+      const CesiumGeometry::QuadtreeTileID& tileID
+  );
 
   /**
    * @brief Extracts tile availability information from a parsed layer.json
@@ -111,7 +113,8 @@ public:
    */
   static QuantizedMeshMetadataResult loadAvailabilityRectangles(
       const rapidjson::Document& layerJson,
-      uint32_t startingLevel);
+      uint32_t startingLevel
+  );
 };
 
 } // namespace CesiumQuantizedMeshTerrain

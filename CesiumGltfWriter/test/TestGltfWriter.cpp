@@ -11,9 +11,9 @@
 namespace {
 void check(const std::string& input, const std::string& expectedOutput) {
   CesiumGltfReader::GltfReader reader;
-  CesiumGltfReader::GltfReaderResult readResult = reader.readGltf(gsl::span(
-      reinterpret_cast<const std::byte*>(input.c_str()),
-      input.size()));
+  CesiumGltfReader::GltfReaderResult readResult = reader.readGltf(
+      gsl::span(reinterpret_cast<const std::byte*>(input.c_str()), input.size())
+  );
   REQUIRE(readResult.errors.empty());
   REQUIRE(readResult.warnings.empty());
   REQUIRE(readResult.model.has_value());
@@ -29,7 +29,8 @@ void check(const std::string& input, const std::string& expectedOutput) {
 
   const std::string gltfString(
       reinterpret_cast<const char*>(gltfBytes.data()),
-      gltfBytes.size());
+      gltfBytes.size()
+  );
 
   rapidjson::Document gltfJson;
   gltfJson.Parse(gltfString.c_str());
@@ -496,7 +497,8 @@ TEST_CASE("Writes glTF with prettyPrint") {
 
   std::string gltfStringCompact(
       reinterpret_cast<const char*>(gltfBytesCompact.data()),
-      gltfBytesCompact.size());
+      gltfBytesCompact.size()
+  );
 
   REQUIRE_FALSE(hasSpaces(gltfStringCompact));
 
@@ -505,7 +507,8 @@ TEST_CASE("Writes glTF with prettyPrint") {
   const std::vector<std::byte>& gltfBytesPretty = writeResult.gltfBytes;
   std::string gltfStringPretty(
       reinterpret_cast<const char*>(gltfBytesPretty.data()),
-      gltfBytesPretty.size());
+      gltfBytesPretty.size()
+  );
 
   REQUIRE(hasSpaces(gltfStringPretty));
 }
@@ -615,7 +618,8 @@ TEST_CASE("Handles models with unregistered extension") {
     CesiumGltfWriter::GltfWriter writer;
     writer.getExtensions().setExtensionState(
         ExtensionModelTest::ExtensionName,
-        CesiumJsonWriter::ExtensionState::Disabled);
+        CesiumJsonWriter::ExtensionState::Disabled
+    );
     CesiumGltfWriter::GltfWriterResult result = writer.writeGltf(model);
     REQUIRE(result.warnings.empty());
   }

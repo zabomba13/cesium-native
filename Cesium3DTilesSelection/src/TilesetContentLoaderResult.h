@@ -24,7 +24,8 @@ template <class TilesetContentLoaderType> struct TilesetContentLoaderResult {
       std::unique_ptr<Tile>&& pRootTile_,
       std::vector<LoaderCreditResult>&& credits_,
       std::vector<CesiumAsync::IAssetAccessor::THeader>&& requestHeaders_,
-      CesiumUtility::ErrorList&& errors_)
+      CesiumUtility::ErrorList&& errors_
+  )
       : pLoader{std::move(pLoader_)},
         pRootTile{std::move(pRootTile_)},
         credits{std::move(credits_)},
@@ -49,8 +50,8 @@ template <class TilesetContentLoaderType> struct TilesetContentLoaderResult {
                   std::unique_ptr<OtherLoaderType>,
                   std::unique_ptr<TilesetContentLoaderType>>,
           int>>
-  TilesetContentLoaderResult(
-      TilesetContentLoaderResult<OtherLoaderType>&& rhs) noexcept
+  TilesetContentLoaderResult(TilesetContentLoaderResult<OtherLoaderType>&& rhs
+  ) noexcept
       : pLoader{std::move(rhs.pLoader)},
         pRootTile{std::move(rhs.pRootTile)},
         credits{std::move(rhs.credits)},

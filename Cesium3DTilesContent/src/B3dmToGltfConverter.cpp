@@ -39,7 +39,8 @@ void parseB3dmHeader(
     const gsl::span<const std::byte>& b3dmBinary,
     B3dmHeader& header,
     uint32_t& headerLength,
-    GltfConverterResult& result) {
+    GltfConverterResult& result
+) {
   if (b3dmBinary.size() < sizeof(B3dmHeader)) {
     result.errors.emplaceError("The B3DM is invalid because it is too small to "
                                "include a B3DM header.");
@@ -81,7 +82,8 @@ void parseB3dmHeader(
         "batchTableJsonByteLength][batchTableBinaryByteLength] "
         "from "
         "https://github.com/CesiumGS/3d-tiles/tree/master/specification/"
-        "TileFormats/Batched3DModel.");
+        "TileFormats/Batched3DModel."
+    );
   } else if (pHeader->batchTableBinaryByteLength >= 570425344) {
     // Second legacy check
     headerLength = sizeof(B3dmHeaderLegacy2);
@@ -101,13 +103,15 @@ void parseB3dmHeader(
         "[batchTableBinaryByteLength] "
         "from "
         "https://github.com/CesiumGS/3d-tiles/tree/master/specification/"
-        "TileFormats/Batched3DModel.");
+        "TileFormats/Batched3DModel."
+    );
   }
 
   if (static_cast<uint32_t>(b3dmBinary.size()) < pHeader->byteLength) {
     result.errors.emplaceError(
         "The B3DM is invalid because the total data available is less than the "
-        "size specified in its header.");
+        "size specified in its header."
+    );
     return;
   }
 }
@@ -117,7 +121,8 @@ CesiumAsync::Future<GltfConverterResult> convertB3dmContentToGltf(
     const B3dmHeader& header,
     uint32_t headerLength,
     const CesiumGltfReader::GltfReaderOptions& options,
-    const AssetFetcher& assetFetcher) {
+    const AssetFetcher& assetFetcher
+) {
   const uint32_t glbStart = headerLength + header.featureTableJsonByteLength +
                             header.featureTableBinaryByteLength +
                             header.batchTableJsonByteLength +
@@ -126,9 +131,9 @@ CesiumAsync::Future<GltfConverterResult> convertB3dmContentToGltf(
 
   if (glbEnd <= glbStart) {
     GltfConverterResult result;
-    result.errors.emplaceError(
-        "The B3DM is invalid because the start of the "
-        "glTF model is after the end of the entire B3DM.");
+    result.errors.emplaceError("The B3DM is invalid because the start of the "
+                               "glTF model is after the end of the entire B3DM."
+    );
     return assetFetcher.asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -140,17 +145,20 @@ CesiumAsync::Future<GltfConverterResult> convertB3dmContentToGltf(
 
 rapidjson::Document parseFeatureTableJsonData(
     const gsl::span<const std::byte>& featureTableJsonData,
-    GltfConverterResult& result) {
+    GltfConverterResult& result
+) {
   rapidjson::Document document;
   document.Parse(
       reinterpret_cast<const char*>(featureTableJsonData.data()),
-      featureTableJsonData.size());
+      featureTableJsonData.size()
+  );
   if (document.HasParseError()) {
     result.errors.emplaceError(fmt::format(
         "Error when parsing feature table JSON, error code {} at byte offset "
         "{}",
         document.GetParseError(),
-        document.GetErrorOffset()));
+        document.GetErrorOffset()
+    ));
     return document;
   }
 
@@ -163,7 +171,8 @@ rapidjson::Document parseFeatureTableJsonData(
     auto& cesiumRTC =
         result.model->addExtension<CesiumGltf::ExtensionCesiumRTC>();
     result.model->addExtensionRequired(
-        CesiumGltf::ExtensionCesiumRTC::ExtensionName);
+        CesiumGltf::ExtensionCesiumRTC::ExtensionName
+    );
     cesiumRTC.center = {
         rtcValue[0].GetDouble(),
         rtcValue[1].GetDouble(),
@@ -177,7 +186,8 @@ void convertB3dmMetadataToGltfStructuralMetadata(
     const gsl::span<const std::byte>& b3dmBinary,
     const B3dmHeader& header,
     uint32_t headerLength,
-    GltfConverterResult& result) {
+    GltfConverterResult& result
+) {
   if (result.model && header.featureTableJsonByteLength > 0) {
     CesiumGltf::Model& gltf = result.model.value();
 
@@ -195,24 +205,29 @@ void convertB3dmMetadataToGltfStructuralMetadata(
     if (batchTableLength > 0) {
       const gsl::span<const std::byte> batchTableJsonData = b3dmBinary.subspan(
           static_cast<size_t>(batchTableStart),
-          header.batchTableJsonByteLength);
+          header.batchTableJsonByteLength
+      );
       const gsl::span<const std::byte> batchTableBinaryData =
           b3dmBinary.subspan(
               static_cast<size_t>(
-                  batchTableStart + header.batchTableJsonByteLength),
-              header.batchTableBinaryByteLength);
+                  batchTableStart + header.batchTableJsonByteLength
+              ),
+              header.batchTableBinaryByteLength
+          );
 
       rapidjson::Document batchTableJson;
       batchTableJson.Parse(
           reinterpret_cast<const char*>(batchTableJsonData.data()),
-          batchTableJsonData.size());
+          batchTableJsonData.size()
+      );
       if (batchTableJson.HasParseError()) {
         result.errors.emplaceWarning(fmt::format(
             "Error when parsing batch table JSON, error code {} at byte "
             "offset "
             "{}. Skip parsing metadata",
             batchTableJson.GetParseError(),
-            batchTableJson.GetErrorOffset()));
+            batchTableJson.GetErrorOffset()
+        ));
         return;
       }
 
@@ -221,7 +236,8 @@ void convertB3dmMetadataToGltfStructuralMetadata(
           featureTableJson,
           batchTableJson,
           batchTableBinaryData,
-          gltf));
+          gltf
+      ));
     }
   }
 }
@@ -230,7 +246,8 @@ void convertB3dmMetadataToGltfStructuralMetadata(
 CesiumAsync::Future<GltfConverterResult> B3dmToGltfConverter::convert(
     const gsl::span<const std::byte>& b3dmBinary,
     const CesiumGltfReader::GltfReaderOptions& options,
-    const AssetFetcher& assetFetcher) {
+    const AssetFetcher& assetFetcher
+) {
   GltfConverterResult result;
   B3dmHeader header;
   uint32_t headerLength = 0;
@@ -244,7 +261,8 @@ CesiumAsync::Future<GltfConverterResult> B3dmToGltfConverter::convert(
              header,
              headerLength,
              options,
-             assetFetcher)
+             assetFetcher
+  )
       .thenImmediately(
           [b3dmBinary, header, headerLength](GltfConverterResult&& glbResult) {
             if (!glbResult.errors) {
@@ -252,9 +270,11 @@ CesiumAsync::Future<GltfConverterResult> B3dmToGltfConverter::convert(
                   b3dmBinary,
                   header,
                   headerLength,
-                  glbResult);
+                  glbResult
+              );
             }
             return std::move(glbResult);
-          });
+          }
+      );
 }
 } // namespace Cesium3DTilesContent

@@ -199,8 +199,8 @@ private:
 };
 
 template <typename T, typename U>
-IntrusivePointer<T>
-const_intrusive_cast(const IntrusivePointer<U>& p) noexcept {
+IntrusivePointer<T> const_intrusive_cast(const IntrusivePointer<U>& p
+) noexcept {
   return IntrusivePointer<T>(const_cast<T*>(p.get()));
 }
 

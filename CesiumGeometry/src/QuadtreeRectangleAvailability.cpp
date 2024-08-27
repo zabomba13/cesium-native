@@ -10,12 +10,14 @@ namespace CesiumGeometry {
 
 QuadtreeRectangleAvailability::QuadtreeRectangleAvailability(
     const QuadtreeTilingScheme& tilingScheme,
-    uint32_t maximumLevel) noexcept
+    uint32_t maximumLevel
+) noexcept
     : _tilingScheme(tilingScheme),
       _maximumLevel(maximumLevel),
       _rootNodes(
           this->_tilingScheme.getRootTilesX() *
-          this->_tilingScheme.getRootTilesY()) {
+          this->_tilingScheme.getRootTilesY()
+      ) {
   for (uint32_t j = 0; j < this->_tilingScheme.getRootTilesY(); ++j) {
     const uint32_t rowStart = j * this->_tilingScheme.getRootTilesX();
     for (uint32_t i = 0; i < this->_tilingScheme.getRootTilesX(); ++i) {
@@ -28,11 +30,14 @@ QuadtreeRectangleAvailability::QuadtreeRectangleAvailability(
 }
 
 void QuadtreeRectangleAvailability::addAvailableTileRange(
-    const QuadtreeTileRectangularRange& range) noexcept {
+    const QuadtreeTileRectangularRange& range
+) noexcept {
   const Rectangle ll = this->_tilingScheme.tileToRectangle(
-      QuadtreeTileID(range.level, range.minimumX, range.minimumY));
+      QuadtreeTileID(range.level, range.minimumX, range.minimumY)
+  );
   const Rectangle ur = this->_tilingScheme.tileToRectangle(
-      QuadtreeTileID(range.level, range.maximumX, range.maximumY));
+      QuadtreeTileID(range.level, range.maximumX, range.maximumY)
+  );
 
   RectangleWithLevel rectangleWithLevel{
       range.level,
@@ -44,13 +49,15 @@ void QuadtreeRectangleAvailability::addAvailableTileRange(
           this->_tilingScheme,
           this->_maximumLevel,
           *pNode,
-          rectangleWithLevel);
+          rectangleWithLevel
+      );
     }
   }
 }
 
 uint32_t QuadtreeRectangleAvailability::computeMaximumLevelAtPosition(
-    const glm::dvec2& position) const noexcept {
+    const glm::dvec2& position
+) const noexcept {
   // Find the root node that contains this position.
   for (const std::unique_ptr<QuadtreeNode>& pNode : this->_rootNodes) {
     if (pNode->extent.contains(position)) {
@@ -61,8 +68,8 @@ uint32_t QuadtreeRectangleAvailability::computeMaximumLevelAtPosition(
   return 0;
 }
 
-uint8_t QuadtreeRectangleAvailability::isTileAvailable(
-    const QuadtreeTileID& id) const noexcept {
+uint8_t QuadtreeRectangleAvailability::isTileAvailable(const QuadtreeTileID& id
+) const noexcept {
   // Get the center of the tile and find the maximum level at that position.
   // Because availability is by tile, if the level is available at that point,
   // it is sure to be available for the whole tile.  We assume that if a tile at
@@ -84,22 +91,19 @@ uint8_t QuadtreeRectangleAvailability::isTileAvailable(
     const QuadtreeTilingScheme& tilingScheme,
     uint32_t maximumLevel,
     QuadtreeRectangleAvailability::QuadtreeNode& node,
-    const QuadtreeRectangleAvailability::RectangleWithLevel&
-        rectangle) noexcept {
+    const QuadtreeRectangleAvailability::RectangleWithLevel& rectangle
+) noexcept {
   QuadtreeNode* pNode = &node;
 
   while (pNode->id.level < maximumLevel) {
     createNodeChildrenIfNecessary(*pNode, tilingScheme);
     if (pNode->ll && pNode->ll->extent.fullyContains(rectangle.rectangle)) {
       pNode = pNode->ll.get();
-    } else if (
-        pNode->lr && pNode->lr->extent.fullyContains(rectangle.rectangle)) {
+    } else if (pNode->lr && pNode->lr->extent.fullyContains(rectangle.rectangle)) {
       pNode = pNode->lr.get();
-    } else if (
-        pNode->ul && pNode->ul->extent.fullyContains(rectangle.rectangle)) {
+    } else if (pNode->ul && pNode->ul->extent.fullyContains(rectangle.rectangle)) {
       pNode = pNode->ul.get();
-    } else if (
-        pNode->ur && pNode->ur->extent.fullyContains(rectangle.rectangle)) {
+    } else if (pNode->ur && pNode->ur->extent.fullyContains(rectangle.rectangle)) {
       pNode = pNode->ur.get();
     } else {
       break;
@@ -114,20 +118,23 @@ uint8_t QuadtreeRectangleAvailability::isTileAvailable(
     std::push_heap(
         pNode->rectangles.begin(),
         pNode->rectangles.end(),
-        QuadtreeRectangleAvailability::rectangleLevelComparator);
+        QuadtreeRectangleAvailability::rectangleLevelComparator
+    );
   }
 }
 
 /*static*/ bool QuadtreeRectangleAvailability::rectangleLevelComparator(
     const QuadtreeRectangleAvailability::RectangleWithLevel& a,
-    const QuadtreeRectangleAvailability::RectangleWithLevel& b) noexcept {
+    const QuadtreeRectangleAvailability::RectangleWithLevel& b
+) noexcept {
   return a.level < b.level;
 }
 
 /*static*/ uint32_t QuadtreeRectangleAvailability::findMaxLevelFromNode(
     QuadtreeRectangleAvailability::QuadtreeNode* pStopNode,
     QuadtreeRectangleAvailability::QuadtreeNode& node,
-    const glm::dvec2& position) noexcept {
+    const glm::dvec2& position
+) noexcept {
   uint32_t maxLevel = 0;
   QuadtreeRectangleAvailability::QuadtreeNode* pNode = &node;
 
@@ -151,22 +158,26 @@ uint8_t QuadtreeRectangleAvailability::isTileAvailable(
       if (ll) {
         maxLevel = glm::max(
             maxLevel,
-            findMaxLevelFromNode(pNode, *pNode->ll, position));
+            findMaxLevelFromNode(pNode, *pNode->ll, position)
+        );
       }
       if (lr) {
         maxLevel = glm::max(
             maxLevel,
-            findMaxLevelFromNode(pNode, *pNode->lr, position));
+            findMaxLevelFromNode(pNode, *pNode->lr, position)
+        );
       }
       if (ul) {
         maxLevel = glm::max(
             maxLevel,
-            findMaxLevelFromNode(pNode, *pNode->ul, position));
+            findMaxLevelFromNode(pNode, *pNode->ul, position)
+        );
       }
       if (ur) {
         maxLevel = glm::max(
             maxLevel,
-            findMaxLevelFromNode(pNode, *pNode->ur, position));
+            findMaxLevelFromNode(pNode, *pNode->ur, position)
+        );
       }
       break;
     }
@@ -205,7 +216,8 @@ uint8_t QuadtreeRectangleAvailability::isTileAvailable(
 
 /*static*/ void QuadtreeRectangleAvailability::createNodeChildrenIfNecessary(
     QuadtreeRectangleAvailability::QuadtreeNode& node,
-    const QuadtreeTilingScheme& tilingScheme) noexcept {
+    const QuadtreeTilingScheme& tilingScheme
+) noexcept {
   if (node.ll) {
     return;
   }
@@ -214,25 +226,29 @@ uint8_t QuadtreeRectangleAvailability::isTileAvailable(
   node.ll = std::make_unique<QuadtreeNode>(
       llID,
       tilingScheme.tileToRectangle(llID),
-      &node);
+      &node
+  );
 
   QuadtreeTileID lrID(llID.level, llID.x + 1, llID.y);
   node.lr = std::make_unique<QuadtreeNode>(
       lrID,
       tilingScheme.tileToRectangle(lrID),
-      &node);
+      &node
+  );
 
   QuadtreeTileID ulID(llID.level, llID.x, llID.y + 1);
   node.ul = std::make_unique<QuadtreeNode>(
       ulID,
       tilingScheme.tileToRectangle(ulID),
-      &node);
+      &node
+  );
 
   QuadtreeTileID urID(llID.level, llID.x + 1, llID.y + 1);
   node.ur = std::make_unique<QuadtreeNode>(
       urID,
       tilingScheme.tileToRectangle(urID),
-      &node);
+      &node
+  );
 }
 
 } // namespace CesiumGeometry

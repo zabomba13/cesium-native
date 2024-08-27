@@ -46,7 +46,8 @@ struct CESIUM3DTILESSELECTION_API TileLoadInput {
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
       const std::shared_ptr<spdlog::logger>& pLogger,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief The tile that the {@link TilesetContentLoader} will request the server for the content.
@@ -143,7 +144,7 @@ public:
    */
   virtual TileChildrenResult createTileChildren(
       const Tile& tile,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) = 0;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) = 0;
 };
 } // namespace Cesium3DTilesSelection

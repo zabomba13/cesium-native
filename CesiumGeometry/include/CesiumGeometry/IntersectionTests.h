@@ -63,7 +63,8 @@ public:
       const glm::dvec2& point,
       const glm::dvec2& triangleVertA,
       const glm::dvec2& triangleVertB,
-      const glm::dvec2& triangleVertC) noexcept;
+      const glm::dvec2& triangleVertC
+  ) noexcept;
 
   /**
    * @brief Determines whether a given point is completely inside a triangle
@@ -81,7 +82,8 @@ public:
       const glm::dvec3& point,
       const glm::dvec3& triangleVertA,
       const glm::dvec3& triangleVertB,
-      const glm::dvec3& triangleVertC) noexcept;
+      const glm::dvec3& triangleVertC
+  ) noexcept;
 
   /**
    * @brief Determines whether the point is completely inside a triangle defined
@@ -101,7 +103,8 @@ public:
       const glm::dvec3& triangleVertA,
       const glm::dvec3& triangleVertB,
       const glm::dvec3& triangleVertC,
-      glm::dvec3& barycentricCoordinates) noexcept;
+      glm::dvec3& barycentricCoordinates
+  ) noexcept;
 
   /**
    * @brief Tests if a ray hits a triangle and returns the hit point.
@@ -120,7 +123,8 @@ public:
       const glm::dvec3& p0,
       const glm::dvec3& p1,
       const glm::dvec3& p2,
-      bool cullBackFaces = false);
+      bool cullBackFaces = false
+  );
 
   /**
    * @brief Tests if an infinite ray hits a triangle and returns the parametric
@@ -143,7 +147,8 @@ public:
       const glm::dvec3& p0,
       const glm::dvec3& p1,
       const glm::dvec3& p2,
-      bool cullBackFaces = false);
+      bool cullBackFaces = false
+  );
 
   /**
    * @brief Computes the intersection of a ray and an axis aligned bounding box.

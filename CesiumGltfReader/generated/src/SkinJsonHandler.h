@@ -26,7 +26,8 @@ protected:
   IJsonHandler* readObjectKeySkin(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Skin& o);
+      CesiumGltf::Skin& o
+  );
 
 private:
   CesiumGltf::Skin* _pObject = nullptr;

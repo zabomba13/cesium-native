@@ -41,8 +41,8 @@ public:
   RasterOverlayCollection(
       Tile::LoadedLinkedList& loadedTiles,
       const TilesetExternals& externals,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) noexcept;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) noexcept;
 
   /**
    * @brief Deleted Copy constructor.
@@ -63,16 +63,16 @@ public:
    *
    * @param rhs The other instance.
    */
-  RasterOverlayCollection&
-  operator=(const RasterOverlayCollection& rhs) = delete;
+  RasterOverlayCollection& operator=(const RasterOverlayCollection& rhs
+  ) = delete;
 
   /**
    * @brief Move assignment.
    *
    * @param rhs The other instance.
    */
-  RasterOverlayCollection&
-  operator=(RasterOverlayCollection&& rhs) noexcept = default;
+  RasterOverlayCollection& operator=(RasterOverlayCollection&& rhs
+  ) noexcept = default;
 
   ~RasterOverlayCollection() noexcept;
 
@@ -128,15 +128,16 @@ public:
    * @param overlay The overlay for which to obtain the tile provider.
    * @return The tile provider, if any, corresponding to the raster overlay.
    */
-  CesiumRasterOverlays::RasterOverlayTileProvider* findTileProviderForOverlay(
-      CesiumRasterOverlays::RasterOverlay& overlay) noexcept;
+  CesiumRasterOverlays::RasterOverlayTileProvider*
+  findTileProviderForOverlay(CesiumRasterOverlays::RasterOverlay& overlay
+  ) noexcept;
 
   /**
    * @copydoc findTileProviderForOverlay
    */
   const CesiumRasterOverlays::RasterOverlayTileProvider*
-  findTileProviderForOverlay(
-      const CesiumRasterOverlays::RasterOverlay& overlay) const noexcept;
+  findTileProviderForOverlay(const CesiumRasterOverlays::RasterOverlay& overlay
+  ) const noexcept;
 
   /**
    * @brief Finds the placeholder tile provider for a given overlay.
@@ -154,14 +155,16 @@ public:
    */
   CesiumRasterOverlays::RasterOverlayTileProvider*
   findPlaceholderTileProviderForOverlay(
-      CesiumRasterOverlays::RasterOverlay& overlay) noexcept;
+      CesiumRasterOverlays::RasterOverlay& overlay
+  ) noexcept;
 
   /**
    * @copydoc findPlaceholderTileProviderForOverlay
    */
   const CesiumRasterOverlays::RasterOverlayTileProvider*
   findPlaceholderTileProviderForOverlay(
-      const CesiumRasterOverlays::RasterOverlay& overlay) const noexcept;
+      const CesiumRasterOverlays::RasterOverlay& overlay
+  ) const noexcept;
 
   /**
    * @brief A constant iterator for {@link RasterOverlay} instances.

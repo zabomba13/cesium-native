@@ -18,7 +18,8 @@ namespace Cesium3DTilesContent {
 std::string ImplicitTilingUtilities::resolveUrl(
     const std::string& baseUrl,
     const std::string& urlTemplate,
-    const QuadtreeTileID& quadtreeID) {
+    const QuadtreeTileID& quadtreeID
+) {
   std::string url = CesiumUtility::Uri::substituteTemplateParameters(
       urlTemplate,
       [&quadtreeID](const std::string& placeholder) {
@@ -33,7 +34,8 @@ std::string ImplicitTilingUtilities::resolveUrl(
         }
 
         return placeholder;
-      });
+      }
+  );
 
   return CesiumUtility::Uri::resolve(baseUrl, url);
 }
@@ -41,7 +43,8 @@ std::string ImplicitTilingUtilities::resolveUrl(
 std::string ImplicitTilingUtilities::resolveUrl(
     const std::string& baseUrl,
     const std::string& urlTemplate,
-    const OctreeTileID& octreeID) {
+    const OctreeTileID& octreeID
+) {
   std::string url = CesiumUtility::Uri::substituteTemplateParameters(
       urlTemplate,
       [&octreeID](const std::string& placeholder) {
@@ -59,75 +62,88 @@ std::string ImplicitTilingUtilities::resolveUrl(
         }
 
         return placeholder;
-      });
+      }
+  );
 
   return CesiumUtility::Uri::resolve(baseUrl, url);
 }
 
 uint64_t ImplicitTilingUtilities::computeMortonIndex(
-    const CesiumGeometry::QuadtreeTileID& tileID) {
+    const CesiumGeometry::QuadtreeTileID& tileID
+) {
   return libmorton::morton2D_64_encode(tileID.x, tileID.y);
 }
 
 uint64_t ImplicitTilingUtilities::computeMortonIndex(
-    const CesiumGeometry::OctreeTileID& tileID) {
+    const CesiumGeometry::OctreeTileID& tileID
+) {
   return libmorton::morton3D_64_encode(tileID.x, tileID.y, tileID.z);
 }
 
 uint64_t ImplicitTilingUtilities::computeRelativeMortonIndex(
     const QuadtreeTileID& subtreeID,
-    const QuadtreeTileID& tileID) {
+    const QuadtreeTileID& tileID
+) {
   return computeMortonIndex(absoluteTileIDToRelative(subtreeID, tileID));
 }
 
 uint64_t ImplicitTilingUtilities::computeRelativeMortonIndex(
     const OctreeTileID& subtreeID,
-    const OctreeTileID& tileID) {
+    const OctreeTileID& tileID
+) {
   return computeMortonIndex(absoluteTileIDToRelative(subtreeID, tileID));
 }
 
 CesiumGeometry::QuadtreeTileID ImplicitTilingUtilities::getSubtreeRootID(
     uint32_t subtreeLevels,
-    const CesiumGeometry::QuadtreeTileID& tileID) noexcept {
+    const CesiumGeometry::QuadtreeTileID& tileID
+) noexcept {
   uint32_t subtreeLevel = tileID.level / subtreeLevels;
   uint32_t levelsLeft = tileID.level % subtreeLevels;
   return QuadtreeTileID(
       subtreeLevel * subtreeLevels,
       tileID.x >> levelsLeft,
-      tileID.y >> levelsLeft);
+      tileID.y >> levelsLeft
+  );
 }
 
 CesiumGeometry::OctreeTileID ImplicitTilingUtilities::getSubtreeRootID(
     uint32_t subtreeLevels,
-    const CesiumGeometry::OctreeTileID& tileID) noexcept {
+    const CesiumGeometry::OctreeTileID& tileID
+) noexcept {
   uint32_t subtreeLevel = tileID.level / subtreeLevels;
   uint32_t levelsLeft = tileID.level % subtreeLevels;
   return OctreeTileID(
       subtreeLevel * subtreeLevels,
       tileID.x >> levelsLeft,
       tileID.y >> levelsLeft,
-      tileID.z >> levelsLeft);
+      tileID.z >> levelsLeft
+  );
 }
 
 QuadtreeTileID ImplicitTilingUtilities::absoluteTileIDToRelative(
     const QuadtreeTileID& rootID,
-    const QuadtreeTileID& tileID) noexcept {
+    const QuadtreeTileID& tileID
+) noexcept {
   uint32_t relativeTileLevel = tileID.level - rootID.level;
   return QuadtreeTileID(
       relativeTileLevel,
       tileID.x - (rootID.x << relativeTileLevel),
-      tileID.y - (rootID.y << relativeTileLevel));
+      tileID.y - (rootID.y << relativeTileLevel)
+  );
 }
 
 OctreeTileID ImplicitTilingUtilities::absoluteTileIDToRelative(
     const OctreeTileID& rootID,
-    const OctreeTileID& tileID) noexcept {
+    const OctreeTileID& tileID
+) noexcept {
   uint32_t relativeTileLevel = tileID.level - rootID.level;
   return OctreeTileID(
       relativeTileLevel,
       tileID.x - (rootID.x << relativeTileLevel),
       tileID.y - (rootID.y << relativeTileLevel),
-      tileID.z - (rootID.z << relativeTileLevel));
+      tileID.z - (rootID.z << relativeTileLevel)
+  );
 }
 
 namespace {
@@ -135,7 +151,8 @@ template <typename T>
 Cesium3DTiles::BoundingVolume computeBoundingVolumeInternal(
     const Cesium3DTiles::BoundingVolume& rootBoundingVolume,
     const T& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   Cesium3DTiles::BoundingVolume result;
 
   std::optional<OrientedBoundingBox> maybeBox =
@@ -152,19 +169,22 @@ Cesium3DTiles::BoundingVolume computeBoundingVolumeInternal(
     BoundingRegion region = ImplicitTilingUtilities::computeBoundingVolume(
         *maybeRegion,
         tileID,
-        ellipsoid);
+        ellipsoid
+    );
     TileBoundingVolumes::setBoundingRegion(result, region);
   }
 
   std::optional<S2CellBoundingVolume> maybeS2 =
       TileBoundingVolumes::getS2CellBoundingVolume(
           rootBoundingVolume,
-          ellipsoid);
+          ellipsoid
+      );
   if (maybeS2) {
     S2CellBoundingVolume s2 = ImplicitTilingUtilities::computeBoundingVolume(
         *maybeS2,
         tileID,
-        ellipsoid);
+        ellipsoid
+    );
     TileBoundingVolumes::setS2CellBoundingVolume(result, s2);
   }
 
@@ -175,14 +195,16 @@ Cesium3DTiles::BoundingVolume computeBoundingVolumeInternal(
 Cesium3DTiles::BoundingVolume ImplicitTilingUtilities::computeBoundingVolume(
     const Cesium3DTiles::BoundingVolume& rootBoundingVolume,
     const CesiumGeometry::QuadtreeTileID& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   return computeBoundingVolumeInternal(rootBoundingVolume, tileID, ellipsoid);
 }
 
 Cesium3DTiles::BoundingVolume ImplicitTilingUtilities::computeBoundingVolume(
     const Cesium3DTiles::BoundingVolume& rootBoundingVolume,
     const CesiumGeometry::OctreeTileID& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   return computeBoundingVolumeInternal(rootBoundingVolume, tileID, ellipsoid);
 }
 
@@ -191,7 +213,8 @@ namespace {
 CesiumGeospatial::GlobeRectangle subdivideRectangle(
     const CesiumGeospatial::GlobeRectangle& rootRectangle,
     const CesiumGeometry::QuadtreeTileID& tileID,
-    double denominator) {
+    double denominator
+) {
   double latSize =
       (rootRectangle.getNorth() - rootRectangle.getSouth()) / denominator;
   double longSize =
@@ -207,7 +230,8 @@ CesiumGeospatial::GlobeRectangle subdivideRectangle(
       childWest,
       childSouth,
       childEast,
-      childNorth);
+      childNorth
+  );
 }
 
 } // namespace
@@ -215,13 +239,15 @@ CesiumGeospatial::GlobeRectangle subdivideRectangle(
 CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeospatial::BoundingRegion& rootBoundingVolume,
     const CesiumGeometry::QuadtreeTileID& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   double denominator = computeLevelDenominator(tileID.level);
   return CesiumGeospatial::BoundingRegion{
       subdivideRectangle(
           rootBoundingVolume.getRectangle(),
           tileID,
-          denominator),
+          denominator
+      ),
       rootBoundingVolume.getMinimumHeight(),
       rootBoundingVolume.getMaximumHeight(),
       ellipsoid};
@@ -230,7 +256,8 @@ CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
 CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeospatial::BoundingRegion& rootBoundingVolume,
     const CesiumGeometry::OctreeTileID& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   double denominator = computeLevelDenominator(tileID.level);
   double heightSize = (rootBoundingVolume.getMaximumHeight() -
                        rootBoundingVolume.getMinimumHeight()) /
@@ -245,7 +272,8 @@ CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
       subdivideRectangle(
           rootBoundingVolume.getRectangle(),
           QuadtreeTileID(tileID.level, tileID.x, tileID.y),
-          denominator),
+          denominator
+      ),
       childMinHeight,
       childMaxHeight,
       ellipsoid};
@@ -254,7 +282,8 @@ CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
 CesiumGeometry::OrientedBoundingBox
 ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeometry::OrientedBoundingBox& rootBoundingVolume,
-    const CesiumGeometry::QuadtreeTileID& tileID) noexcept {
+    const CesiumGeometry::QuadtreeTileID& tileID
+) noexcept {
   const glm::dmat3& halfAxes = rootBoundingVolume.getHalfAxes();
   const glm::dvec3& center = rootBoundingVolume.getCenter();
 
@@ -269,13 +298,15 @@ ImplicitTilingUtilities::computeBoundingVolume(
 
   return CesiumGeometry::OrientedBoundingBox(
       (childMin + childMax) / 2.0,
-      glm::dmat3{xDim / 2.0, yDim / 2.0, halfAxes[2]});
+      glm::dmat3{xDim / 2.0, yDim / 2.0, halfAxes[2]}
+  );
 }
 
 CesiumGeometry::OrientedBoundingBox
 ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeometry::OrientedBoundingBox& rootBoundingVolume,
-    const CesiumGeometry::OctreeTileID& tileID) noexcept {
+    const CesiumGeometry::OctreeTileID& tileID
+) noexcept {
   const glm::dmat3& halfAxes = rootBoundingVolume.getHalfAxes();
   const glm::dvec3& center = rootBoundingVolume.getCenter();
 
@@ -293,28 +324,33 @@ ImplicitTilingUtilities::computeBoundingVolume(
 
   return CesiumGeometry::OrientedBoundingBox(
       (childMin + childMax) / 2.0,
-      glm::dmat3{xDim / 2.0, yDim / 2.0, zDim / 2.0});
+      glm::dmat3{xDim / 2.0, yDim / 2.0, zDim / 2.0}
+  );
 }
 
 CesiumGeospatial::S2CellBoundingVolume
 ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeospatial::S2CellBoundingVolume& rootBoundingVolume,
     const CesiumGeometry::QuadtreeTileID& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   return CesiumGeospatial::S2CellBoundingVolume(
       CesiumGeospatial::S2CellID::fromQuadtreeTileID(
           rootBoundingVolume.getCellID().getFace(),
-          tileID),
+          tileID
+      ),
       rootBoundingVolume.getMinimumHeight(),
       rootBoundingVolume.getMaximumHeight(),
-      ellipsoid);
+      ellipsoid
+  );
 }
 
 CesiumGeospatial::S2CellBoundingVolume
 ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeospatial::S2CellBoundingVolume& rootBoundingVolume,
     const CesiumGeometry::OctreeTileID& tileID,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept {
   double denominator = computeLevelDenominator(tileID.level);
   double heightSize = (rootBoundingVolume.getMaximumHeight() -
                        rootBoundingVolume.getMinimumHeight()) /
@@ -328,24 +364,28 @@ ImplicitTilingUtilities::computeBoundingVolume(
   return CesiumGeospatial::S2CellBoundingVolume(
       CesiumGeospatial::S2CellID::fromQuadtreeTileID(
           rootBoundingVolume.getCellID().getFace(),
-          QuadtreeTileID(tileID.level, tileID.x, tileID.y)),
+          QuadtreeTileID(tileID.level, tileID.x, tileID.y)
+      ),
       childMinHeight,
       childMaxHeight,
-      ellipsoid);
+      ellipsoid
+  );
 }
 
-double
-ImplicitTilingUtilities::computeLevelDenominator(uint32_t level) noexcept {
+double ImplicitTilingUtilities::computeLevelDenominator(uint32_t level
+) noexcept {
   return static_cast<double>(1 << level);
 }
 
 QuadtreeChildren::iterator::iterator(
     const CesiumGeometry::QuadtreeTileID& parentTileID,
-    bool isEnd) noexcept
+    bool isEnd
+) noexcept
     : _current(
           parentTileID.level + 1,
           parentTileID.x << 1,
-          parentTileID.y << 1) {
+          parentTileID.y << 1
+      ) {
   if (isEnd) {
     this->_current.y += 2;
   }
@@ -381,24 +421,26 @@ QuadtreeChildren::iterator QuadtreeChildren::iterator::operator++(int) {
   return copy;
 }
 
-bool QuadtreeChildren::iterator::operator==(
-    const iterator& rhs) const noexcept {
+bool QuadtreeChildren::iterator::operator==(const iterator& rhs
+) const noexcept {
   return this->_current == rhs._current;
 }
 
-bool QuadtreeChildren::iterator::operator!=(
-    const iterator& rhs) const noexcept {
+bool QuadtreeChildren::iterator::operator!=(const iterator& rhs
+) const noexcept {
   return this->_current != rhs._current;
 }
 
 OctreeChildren::iterator::iterator(
     const CesiumGeometry::OctreeTileID& parentTileID,
-    bool isEnd) noexcept
+    bool isEnd
+) noexcept
     : _current(
           parentTileID.level + 1,
           parentTileID.x << 1,
           parentTileID.y << 1,
-          parentTileID.z << 1) {
+          parentTileID.z << 1
+      ) {
   if (isEnd) {
     this->_current.z += 2;
   }

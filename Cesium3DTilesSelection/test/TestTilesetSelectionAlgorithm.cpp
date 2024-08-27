@@ -29,9 +29,11 @@ using namespace CesiumNativeTests;
 static bool doesTileMeetSSE(
     const ViewState& viewState,
     const Tile& tile,
-    const Tileset& tileset) {
-  double distance = glm::sqrt(viewState.computeDistanceSquaredToBoundingVolume(
-      tile.getBoundingVolume()));
+    const Tileset& tileset
+) {
+  double distance = glm::sqrt(
+      viewState.computeDistanceSquaredToBoundingVolume(tile.getBoundingVolume())
+  );
   double sse =
       viewState.computeScreenSpaceError(tile.getGeometricError(), distance);
   return sse < tileset.getOptions().maximumScreenSpaceError;
@@ -65,7 +67,8 @@ static void initializeTileset(Tileset& tileset) {
       viewPortSize,
       horizontalFieldOfView,
       verticalFieldOfView,
-      Ellipsoid::WGS84);
+      Ellipsoid::WGS84
+  );
 
   tileset.updateView({viewState});
 }
@@ -97,7 +100,8 @@ static ViewState zoomToTile(const Tile& tile) {
       viewPortSize,
       horizontalFieldOfView,
       verticalFieldOfView,
-      Ellipsoid::WGS84);
+      Ellipsoid::WGS84
+  );
 }
 
 static ViewState zoomToTileset(const Tileset& tileset) {
@@ -138,14 +142,17 @@ TEST_CASE("Test replace refinement for render") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -186,7 +193,8 @@ TEST_CASE("Test replace refinement for render") {
         viewState.getViewportSize(),
         viewState.getHorizontalFieldOfView(),
         viewState.getVerticalFieldOfView(),
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     // Check 1st and 2nd frame. Root should meet sse and render. No transitions
     // are expected here
@@ -310,7 +318,8 @@ TEST_CASE("Test replace refinement for render") {
         viewState.getViewportSize(),
         viewState.getHorizontalFieldOfView(),
         viewState.getVerticalFieldOfView(),
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     // remove the ll.b3dm (one of the root's children) request to replicate
     // network failure
@@ -402,7 +411,8 @@ TEST_CASE("Test replace refinement for render") {
           viewState.getViewportSize(),
           viewState.getHorizontalFieldOfView(),
           viewState.getVerticalFieldOfView(),
-          Ellipsoid::WGS84);
+          Ellipsoid::WGS84
+      );
 
       ViewUpdateResult result = tileset.updateView({zoomOutViewState});
 
@@ -491,7 +501,9 @@ TEST_CASE("Test replace refinement for render") {
             std::find(
                 result.tilesToRenderThisFrame.begin(),
                 result.tilesToRenderThisFrame.end(),
-                &child) != result.tilesToRenderThisFrame.end());
+                &child
+            ) != result.tilesToRenderThisFrame.end()
+        );
       }
 
       REQUIRE(result.tilesFadingOut.size() == 1);
@@ -527,14 +539,17 @@ TEST_CASE("Test additive refinement") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -624,10 +639,12 @@ TEST_CASE("Test additive refinement") {
           // expect the children to meet sse and begin loading the content
           REQUIRE(child.getChildren().size() == 1);
           REQUIRE(
-              doesTileMeetSSE(viewState, child.getChildren().front(), tileset));
+              doesTileMeetSSE(viewState, child.getChildren().front(), tileset)
+          );
           REQUIRE(
               child.getChildren().front().getState() ==
-              TileLoadState::ContentLoading);
+              TileLoadState::ContentLoading
+          );
         }
       }
 
@@ -682,14 +699,17 @@ TEST_CASE("Render any tiles even when one of children can't be rendered for "
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -779,14 +799,17 @@ TEST_CASE("Test multiple frustums") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -824,7 +847,8 @@ TEST_CASE("Test multiple frustums") {
       viewState.getViewportSize(),
       viewState.getHorizontalFieldOfView(),
       viewState.getVerticalFieldOfView(),
-      Ellipsoid::WGS84);
+      Ellipsoid::WGS84
+  );
 
   SECTION("The frustum with the highest SSE should be used for deciding to "
           "refine") {
@@ -896,7 +920,8 @@ TEST_CASE("Test multiple frustums") {
         zoomToTileViewState.getViewportSize(),
         0.5 * zoomToTileViewState.getHorizontalFieldOfView(),
         0.5 * zoomToTileViewState.getVerticalFieldOfView(),
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     zoomInPosition = zoomToTileViewState.getPosition() +
                      glm::dvec3(15.0, 0, 0) +
@@ -908,7 +933,8 @@ TEST_CASE("Test multiple frustums") {
         zoomToTileViewState.getViewportSize(),
         0.5 * zoomToTileViewState.getHorizontalFieldOfView(),
         0.5 * zoomToTileViewState.getVerticalFieldOfView(),
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     // frame 3 & 4
     {
@@ -925,12 +951,16 @@ TEST_CASE("Test multiple frustums") {
           std::find(
               result.tilesToRenderThisFrame.begin(),
               result.tilesToRenderThisFrame.end(),
-              &grandChild) != result.tilesToRenderThisFrame.end());
+              &grandChild
+          ) != result.tilesToRenderThisFrame.end()
+      );
       REQUIRE(
           std::find(
               result.tilesToRenderThisFrame.begin(),
               result.tilesToRenderThisFrame.end(),
-              &secondChild) != result.tilesToRenderThisFrame.end());
+              &secondChild
+          ) != result.tilesToRenderThisFrame.end()
+      );
       REQUIRE(result.tilesCulled == 2);
     }
   }
@@ -1020,14 +1050,17 @@ TEST_CASE("Can load example tileset.json from 3DTILES_bounding_volume_S2 "
           static_cast<uint16_t>(200),
           "doesn't matter",
           CesiumAsync::HttpHeaders{},
-          std::vector<std::byte>(pStart, pStart + s.size()));
+          std::vector<std::byte>(pStart, pStart + s.size())
+      );
   mockCompletedRequests.insert(
       {"tileset.json",
        std::make_shared<SimpleAssetRequest>(
            "GET",
            "tileset.json",
            CesiumAsync::HttpHeaders{},
-           std::move(mockCompletedResponse))});
+           std::move(mockCompletedResponse)
+       )}
+  );
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
       std::make_shared<SimpleAssetAccessor>(std::move(mockCompletedRequests));
@@ -1111,14 +1144,17 @@ TEST_CASE("Makes metadata available once root tile is loaded") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -1167,14 +1203,17 @@ TEST_CASE("Makes metadata available on external tilesets") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -1228,14 +1267,17 @@ TEST_CASE("Allows access to material variants") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -1259,14 +1301,16 @@ TEST_CASE("Allows access to material variants") {
       Cesium3DTiles::MetadataQuery::findFirstPropertyWithSemantic(
           *pMetadata->schema,
           *pMetadata->metadata,
-          "MATERIAL_VARIANTS");
+          "MATERIAL_VARIANTS"
+      );
   REQUIRE(found1);
   CHECK(found1->classIdentifier == "MaterialVariants");
   CHECK(found1->classDefinition.properties.size() == 1);
   CHECK(found1->propertyIdentifier == "material_variants");
   CHECK(
       found1->propertyDefinition.description ==
-      "Names of material variants to be expected in the glTF assets");
+      "Names of material variants to be expected in the glTF assets"
+  );
   REQUIRE(found1->propertyValue.isArray());
 
   std::vector<std::string> variants =
@@ -1283,7 +1327,8 @@ TEST_CASE("Allows access to material variants") {
         Cesium3DTiles::MetadataQuery::findFirstPropertyWithSemantic(
             *pMetadata->schema,
             group,
-            "MATERIAL_VARIANTS");
+            "MATERIAL_VARIANTS"
+        );
     REQUIRE(found2);
     REQUIRE(found2->propertyValue.isArray());
 
@@ -1315,14 +1360,17 @@ TEST_CASE("Allows access to material variants in an external schema") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -1339,54 +1387,57 @@ TEST_CASE("Allows access to material variants in an external schema") {
   CHECK(tileset.getMetadata() == nullptr);
 
   bool wasCalled = false;
-  tileset.loadMetadata().thenInMainThread(
-      [&wasCalled](const TilesetMetadata* pMetadata) {
-        wasCalled = true;
-        REQUIRE(pMetadata);
-        REQUIRE(pMetadata->schema);
-        REQUIRE(pMetadata->metadata);
+  tileset.loadMetadata().thenInMainThread([&wasCalled](
+                                              const TilesetMetadata* pMetadata
+                                          ) {
+    wasCalled = true;
+    REQUIRE(pMetadata);
+    REQUIRE(pMetadata->schema);
+    REQUIRE(pMetadata->metadata);
 
-        std::optional<Cesium3DTiles::FoundMetadataProperty> found1 =
-            Cesium3DTiles::MetadataQuery::findFirstPropertyWithSemantic(
-                *pMetadata->schema,
-                *pMetadata->metadata,
-                "MATERIAL_VARIANTS");
-        REQUIRE(found1);
-        CHECK(found1->classIdentifier == "MaterialVariants");
-        CHECK(found1->classDefinition.properties.size() == 1);
-        CHECK(found1->propertyIdentifier == "material_variants");
-        CHECK(
-            found1->propertyDefinition.description ==
-            "Names of material variants to be expected in the glTF assets");
-        REQUIRE(found1->propertyValue.isArray());
+    std::optional<Cesium3DTiles::FoundMetadataProperty> found1 =
+        Cesium3DTiles::MetadataQuery::findFirstPropertyWithSemantic(
+            *pMetadata->schema,
+            *pMetadata->metadata,
+            "MATERIAL_VARIANTS"
+        );
+    REQUIRE(found1);
+    CHECK(found1->classIdentifier == "MaterialVariants");
+    CHECK(found1->classDefinition.properties.size() == 1);
+    CHECK(found1->propertyIdentifier == "material_variants");
+    CHECK(
+        found1->propertyDefinition.description ==
+        "Names of material variants to be expected in the glTF assets"
+    );
+    REQUIRE(found1->propertyValue.isArray());
 
-        std::vector<std::string> variants =
-            found1->propertyValue.getArrayOfStrings("");
-        REQUIRE(variants.size() == 4);
-        CHECK(variants[0] == "RGB");
-        CHECK(variants[1] == "RRR");
-        CHECK(variants[2] == "GGG");
-        CHECK(variants[3] == "BBB");
+    std::vector<std::string> variants =
+        found1->propertyValue.getArrayOfStrings("");
+    REQUIRE(variants.size() == 4);
+    CHECK(variants[0] == "RGB");
+    CHECK(variants[1] == "RRR");
+    CHECK(variants[2] == "GGG");
+    CHECK(variants[3] == "BBB");
 
-        std::vector<std::vector<std::string>> variantsByGroup;
-        for (const Cesium3DTiles::GroupMetadata& group : pMetadata->groups) {
-          std::optional<Cesium3DTiles::FoundMetadataProperty> found2 =
-              Cesium3DTiles::MetadataQuery::findFirstPropertyWithSemantic(
-                  *pMetadata->schema,
-                  group,
-                  "MATERIAL_VARIANTS");
-          REQUIRE(found2);
-          REQUIRE(found2->propertyValue.isArray());
-          variantsByGroup.emplace_back(
-              found2->propertyValue.getArrayOfStrings(""));
-        }
+    std::vector<std::vector<std::string>> variantsByGroup;
+    for (const Cesium3DTiles::GroupMetadata& group : pMetadata->groups) {
+      std::optional<Cesium3DTiles::FoundMetadataProperty> found2 =
+          Cesium3DTiles::MetadataQuery::findFirstPropertyWithSemantic(
+              *pMetadata->schema,
+              group,
+              "MATERIAL_VARIANTS"
+          );
+      REQUIRE(found2);
+      REQUIRE(found2->propertyValue.isArray());
+      variantsByGroup.emplace_back(found2->propertyValue.getArrayOfStrings(""));
+    }
 
-        std::vector<std::vector<std::string>> expected = {
-            {"RGB", "RRR"},
-            {"GGG", "BBB"}};
+    std::vector<std::vector<std::string>> expected = {
+        {"RGB", "RRR"},
+        {"GGG", "BBB"}};
 
-        CHECK(variantsByGroup == expected);
-      });
+    CHECK(variantsByGroup == expected);
+  });
 
   CHECK(!wasCalled);
   initializeTileset(tileset);
@@ -1408,14 +1459,17 @@ TEST_CASE("Future from loadSchema rejects if schemaUri can't be loaded") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   mockCompletedRequests.insert(
@@ -1428,7 +1482,10 @@ TEST_CASE("Future from loadSchema rejects if schemaUri can't be loaded") {
                static_cast<uint16_t>(404),
                "doesn't matter",
                CesiumAsync::HttpHeaders{},
-               std::vector<std::byte>()))});
+               std::vector<std::byte>()
+           )
+       )}
+  );
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
       std::make_shared<SimpleAssetAccessor>(std::move(mockCompletedRequests));
@@ -1446,8 +1503,9 @@ TEST_CASE("Future from loadSchema rejects if schemaUri can't be loaded") {
   bool wasResolved = false;
   bool wasRejected = false;
   tileset.loadMetadata()
-      .thenInMainThread(
-          [&wasResolved](const TilesetMetadata*) { wasResolved = true; })
+      .thenInMainThread([&wasResolved](const TilesetMetadata*) {
+        wasResolved = true;
+      })
       .catchInMainThread([&wasRejected](const std::exception& exception) {
         CHECK(std::string(exception.what()).find("") != std::string::npos);
         wasRejected = true;
@@ -1481,10 +1539,12 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
               center.longitude - 0.001,
               center.latitude - 0.001,
               center.longitude + 0.001,
-              center.latitude + 0.001),
+              center.latitude + 0.001
+          ),
           0.0,
           10.0,
-          Ellipsoid::WGS84));
+          Ellipsoid::WGS84
+      ));
       pRootTile->setGeometricError(100000000000.0);
 
       Tile child(this);
@@ -1519,21 +1579,20 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
         TileLoadResult result{};
         result.contentKind = TileEmptyContent();
         return input.asyncSystem.createResolvedFuture(std::move(result));
-      } else if (
-          input.tile.getParent() != nullptr &&
-          input.tile.getParent()->getParent() == this->_pRootTile) {
+      } else if (input.tile.getParent() != nullptr && input.tile.getParent()->getParent() == this->_pRootTile) {
         this->_grandchildPromise =
             input.asyncSystem.createPromise<TileLoadResult>();
         return this->_grandchildPromise->getFuture();
       }
 
       return input.asyncSystem.createResolvedFuture(
-          TileLoadResult::createFailedResult(nullptr));
+          TileLoadResult::createFailedResult(nullptr)
+      );
     }
 
-    virtual TileChildrenResult createTileChildren(
-        const Tile&,
-        const CesiumGeospatial::Ellipsoid&) override {
+    virtual TileChildrenResult
+    createTileChildren(const Tile&, const CesiumGeospatial::Ellipsoid&)
+        override {
       return TileChildrenResult{{}, TileLoadResultState::Failed};
     }
   };
@@ -1551,15 +1610,17 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
       tilesetExternals,
       std::move(pCustomLoader),
       pRawLoader->createRootTile(),
-      options);
+      options
+  );
 
   // On the first update, we should render the root tile, even though nothing is
   // loaded yet.
   initializeTileset(tileset);
   CHECK(
       tileset.getRootTile()->getLastSelectionState().getResult(
-          tileset.getRootTile()->getLastSelectionState().getFrameNumber()) ==
-      TileSelectionState::Result::Rendered);
+          tileset.getRootTile()->getLastSelectionState().getFrameNumber()
+      ) == TileSelectionState::Result::Rendered
+  );
 
   // On the third update, the grandchild load will still be pending.
   // But the child is unconditionally refined, so we should render the root
@@ -1570,16 +1631,19 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
   const Tile& grandchild = child.getChildren()[0];
   CHECK(
       tileset.getRootTile()->getLastSelectionState().getResult(
-          tileset.getRootTile()->getLastSelectionState().getFrameNumber()) ==
-      TileSelectionState::Result::Rendered);
+          tileset.getRootTile()->getLastSelectionState().getFrameNumber()
+      ) == TileSelectionState::Result::Rendered
+  );
   CHECK(
       child.getLastSelectionState().getResult(
-          child.getLastSelectionState().getFrameNumber()) !=
-      TileSelectionState::Result::Rendered);
+          child.getLastSelectionState().getFrameNumber()
+      ) != TileSelectionState::Result::Rendered
+  );
   CHECK(
       grandchild.getLastSelectionState().getResult(
-          grandchild.getLastSelectionState().getFrameNumber()) !=
-      TileSelectionState::Result::Rendered);
+          grandchild.getLastSelectionState().getFrameNumber()
+      ) != TileSelectionState::Result::Rendered
+  );
 
   REQUIRE(pRawLoader->_grandchildPromise);
 
@@ -1592,8 +1656,9 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
 
   CHECK(
       grandchild.getLastSelectionState().getResult(
-          grandchild.getLastSelectionState().getFrameNumber()) ==
-      TileSelectionState::Result::Rendered);
+          grandchild.getLastSelectionState().getFrameNumber()
+      ) == TileSelectionState::Result::Rendered
+  );
 }
 
 } // namespace
@@ -1625,14 +1690,17 @@ TEST_CASE("Additive-refined tiles are added to the tilesFadingOut array") {
             static_cast<uint16_t>(200),
             "doesn't matter",
             CesiumAsync::HttpHeaders{},
-            readFile(testDataPath / file));
+            readFile(testDataPath / file)
+        );
     mockCompletedRequests.insert(
         {file,
          std::make_shared<SimpleAssetRequest>(
              "GET",
              file,
              CesiumAsync::HttpHeaders{},
-             std::move(mockCompletedResponse))});
+             std::move(mockCompletedResponse)
+         )}
+    );
   }
 
   std::shared_ptr<SimpleAssetAccessor> mockAssetAccessor =
@@ -1670,7 +1738,8 @@ TEST_CASE("Additive-refined tiles are added to the tilesFadingOut array") {
       viewState.getViewportSize(),
       viewState.getHorizontalFieldOfView(),
       viewState.getVerticalFieldOfView(),
-      Ellipsoid::WGS84);
+      Ellipsoid::WGS84
+  );
   updateResult = tileset.updateView({zoomedOut});
 
   // Only the root tile (plus the tileset.json) is visible now, and the other

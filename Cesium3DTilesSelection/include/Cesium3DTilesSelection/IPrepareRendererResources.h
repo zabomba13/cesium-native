@@ -74,7 +74,8 @@ public:
       const CesiumAsync::AsyncSystem& asyncSystem,
       TileLoadResult&& tileLoadResult,
       const glm::dmat4& transform,
-      const std::any& rendererOptions) = 0;
+      const std::any& rendererOptions
+  ) = 0;
 
   /**
    * @brief Further prepares renderer resources.
@@ -111,7 +112,8 @@ public:
   virtual void free(
       Tile& tile,
       void* pLoadThreadResult,
-      void* pMainThreadResult) noexcept = 0;
+      void* pMainThreadResult
+  ) noexcept = 0;
 
   /**
    * @brief Attaches a raster overlay tile to a geometry tile.
@@ -139,7 +141,8 @@ public:
       const CesiumRasterOverlays::RasterOverlayTile& rasterTile,
       void* pMainThreadRendererResources,
       const glm::dvec2& translation,
-      const glm::dvec2& scale) = 0;
+      const glm::dvec2& scale
+  ) = 0;
 
   /**
    * @brief Detaches a raster overlay tile from a geometry tile.
@@ -155,7 +158,8 @@ public:
       const Tile& tile,
       int32_t overlayTextureCoordinateID,
       const CesiumRasterOverlays::RasterOverlayTile& rasterTile,
-      void* pMainThreadRendererResources) noexcept = 0;
+      void* pMainThreadRendererResources
+  ) noexcept = 0;
 };
 
 } // namespace Cesium3DTilesSelection

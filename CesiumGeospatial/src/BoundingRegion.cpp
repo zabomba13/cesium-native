@@ -17,7 +17,8 @@ BoundingRegion::BoundingRegion(
     const GlobeRectangle& rectangle,
     double minimumHeight,
     double maximumHeight,
-    const Ellipsoid& ellipsoid)
+    const Ellipsoid& ellipsoid
+)
     : _rectangle(rectangle),
       _minimumHeight(minimumHeight),
       _maximumHeight(maximumHeight),
@@ -25,11 +26,14 @@ BoundingRegion::BoundingRegion(
           rectangle,
           minimumHeight,
           maximumHeight,
-          ellipsoid)),
+          ellipsoid
+      )),
       _southwestCornerCartesian(
-          ellipsoid.cartographicToCartesian(rectangle.getSouthwest())),
+          ellipsoid.cartographicToCartesian(rectangle.getSouthwest())
+      ),
       _northeastCornerCartesian(
-          ellipsoid.cartographicToCartesian(rectangle.getNortheast())),
+          ellipsoid.cartographicToCartesian(rectangle.getNortheast())
+      ),
       _westNormal(),
       _eastNormal(),
       _southNormal(),
@@ -40,22 +44,26 @@ BoundingRegion::BoundingRegion(
       ellipsoid.cartographicToCartesian(Cartographic(
           rectangle.getWest(),
           (rectangle.getSouth() + rectangle.getNorth()) * 0.5,
-          0.0));
+          0.0
+      ));
 
   // Compute the normal of the plane on the western edge of the tile.
   this->_westNormal = glm::normalize(
-      glm::cross(westernMidpointCartesian, glm::dvec3(0.0, 0.0, 1.0)));
+      glm::cross(westernMidpointCartesian, glm::dvec3(0.0, 0.0, 1.0))
+  );
 
   // The middle latitude on the eastern edge.
   const glm::dvec3 easternMidpointCartesian =
       ellipsoid.cartographicToCartesian(Cartographic(
           rectangle.getEast(),
           (rectangle.getSouth() + rectangle.getNorth()) * 0.5,
-          0.0));
+          0.0
+      ));
 
   // Compute the normal of the plane on the eastern edge of the tile.
   this->_eastNormal = glm::normalize(
-      glm::cross(glm::dvec3(0.0, 0.0, 1.0), easternMidpointCartesian));
+      glm::cross(glm::dvec3(0.0, 0.0, 1.0), easternMidpointCartesian)
+  );
 
   // Compute the normal of the plane bounding the southern edge of the tile.
   const glm::dvec3 westVector =
@@ -76,13 +84,15 @@ BoundingRegion::BoundingRegion(
         ellipsoid.cartographicToCartesian(Cartographic(
             (rectangle.getWest() + rectangle.getEast()) * 0.5,
             south,
-            0.0));
+            0.0
+        ));
     const Plane westPlane(this->_southwestCornerCartesian, this->_westNormal);
 
     // Find a point that is on the west and the south planes
     std::optional<glm::dvec3> intersection = IntersectionTests::rayPlane(
         Ray(southCenterCartesian, eastWestNormal),
-        westPlane);
+        westPlane
+    );
 
     if (!intersection) {
       this->_planesAreInvalid = true;
@@ -107,14 +117,16 @@ BoundingRegion::BoundingRegion(
         ellipsoid.cartographicToCartesian(Cartographic(
             (rectangle.getWest() + rectangle.getEast()) * 0.5,
             north,
-            0.0));
+            0.0
+        ));
 
     const Plane eastPlane(this->_northeastCornerCartesian, this->_eastNormal);
 
     // Find a point that is on the east and the north planes
     std::optional<glm::dvec3> intersection = IntersectionTests::rayPlane(
         Ray(northCenterCartesian, -eastWestNormal),
-        eastPlane);
+        eastPlane
+    );
 
     if (!intersection) {
       this->_planesAreInvalid = true;
@@ -131,14 +143,15 @@ BoundingRegion::BoundingRegion(
       glm::normalize(glm::cross(westVector, northSurfaceNormal));
 }
 
-CullingResult
-BoundingRegion::intersectPlane(const Plane& plane) const noexcept {
+CullingResult BoundingRegion::intersectPlane(const Plane& plane
+) const noexcept {
   return this->_boundingBox.intersectPlane(plane);
 }
 
 double BoundingRegion::computeDistanceSquaredToPosition(
     const glm::dvec3& position,
-    const Ellipsoid& ellipsoid) const noexcept {
+    const Ellipsoid& ellipsoid
+) const noexcept {
   std::optional<Cartographic> cartographic =
       ellipsoid.cartesianToCartographic(position);
   if (!cartographic) {
@@ -150,15 +163,18 @@ double BoundingRegion::computeDistanceSquaredToPosition(
 
 double BoundingRegion::computeDistanceSquaredToPosition(
     const Cartographic& position,
-    const Ellipsoid& ellipsoid) const noexcept {
+    const Ellipsoid& ellipsoid
+) const noexcept {
   return this->computeDistanceSquaredToPosition(
       position,
-      ellipsoid.cartographicToCartesian(position));
+      ellipsoid.cartographicToCartesian(position)
+  );
 }
 
 double BoundingRegion::computeDistanceSquaredToPosition(
     const Cartographic& cartographicPosition,
-    const glm::dvec3& cartesianPosition) const noexcept {
+    const glm::dvec3& cartesianPosition
+) const noexcept {
   double result = 0.0;
 
   if (!this->_planesAreInvalid) {
@@ -213,19 +229,21 @@ double BoundingRegion::computeDistanceSquaredToPosition(
   }
 
   const double bboxDistanceSquared =
-      this->getBoundingBox().computeDistanceSquaredToPosition(
-          cartesianPosition);
+      this->getBoundingBox().computeDistanceSquaredToPosition(cartesianPosition
+      );
   return glm::max(bboxDistanceSquared, result);
 }
 
 BoundingRegion BoundingRegion::computeUnion(
     const BoundingRegion& other,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) const noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) const noexcept {
   return BoundingRegion(
       this->_rectangle.computeUnion(other._rectangle),
       glm::min(this->_minimumHeight, other._minimumHeight),
       glm::max(this->_maximumHeight, other._maximumHeight),
-      ellipsoid);
+      ellipsoid
+  );
 }
 
 static OrientedBoundingBox fromPlaneExtents(
@@ -238,41 +256,49 @@ static OrientedBoundingBox fromPlaneExtents(
     double minimumY,
     double maximumY,
     double minimumZ,
-    double maximumZ) noexcept {
+    double maximumZ
+) noexcept {
   glm::dmat3 halfAxes(planeXAxis, planeYAxis, planeZAxis);
 
   const glm::dvec3 centerOffset(
       (minimumX + maximumX) / 2.0,
       (minimumY + maximumY) / 2.0,
-      (minimumZ + maximumZ) / 2.0);
+      (minimumZ + maximumZ) / 2.0
+  );
 
   const glm::dvec3 scale(
       (maximumX - minimumX) / 2.0,
       (maximumY - minimumY) / 2.0,
-      (maximumZ - minimumZ) / 2.0);
+      (maximumZ - minimumZ) / 2.0
+  );
 
   const glm::dmat3 scaledHalfAxes(
       halfAxes[0] * scale.x,
       halfAxes[1] * scale.y,
-      halfAxes[2] * scale.z);
+      halfAxes[2] * scale.z
+  );
 
   return OrientedBoundingBox(
       planeOrigin + (halfAxes * centerOffset),
-      scaledHalfAxes);
+      scaledHalfAxes
+  );
 }
 
 /*static*/ OrientedBoundingBox BoundingRegion::_computeBoundingBox(
     const GlobeRectangle& rectangle,
     double minimumHeight,
     double maximumHeight,
-    const Ellipsoid& ellipsoid) {
+    const Ellipsoid& ellipsoid
+) {
   //>>includeStart('debug', pragmas.debug);
   if (!Math::equalsEpsilon(
           ellipsoid.getRadii().x,
           ellipsoid.getRadii().y,
-          Math::Epsilon15)) {
+          Math::Epsilon15
+      )) {
     throw std::runtime_error(
-        "Ellipsoid must be an ellipsoid of revolution (radii.x == radii.y)");
+        "Ellipsoid must be an ellipsoid of revolution (radii.x == radii.y)"
+    );
   }
   //>>includeEnd('debug');
 
@@ -300,23 +326,28 @@ static OrientedBoundingBox fromPlaneExtents(
     const Cartographic perimeterCartographicNC(
         lonCenter,
         rectangle.getNorth(),
-        maximumHeight);
+        maximumHeight
+    );
     Cartographic perimeterCartographicNW(
         rectangle.getWest(),
         rectangle.getNorth(),
-        maximumHeight);
+        maximumHeight
+    );
     const Cartographic perimeterCartographicCW(
         rectangle.getWest(),
         latCenter,
-        maximumHeight);
+        maximumHeight
+    );
     Cartographic perimeterCartographicSW(
         rectangle.getWest(),
         rectangle.getSouth(),
-        maximumHeight);
+        maximumHeight
+    );
     const Cartographic perimeterCartographicSC(
         lonCenter,
         rectangle.getSouth(),
-        maximumHeight);
+        maximumHeight
+    );
 
     const glm::dvec3 perimeterCartesianNC =
         ellipsoid.cartographicToCartesian(perimeterCartographicNC);
@@ -342,7 +373,8 @@ static OrientedBoundingBox fromPlaneExtents(
 
     minX = glm::min(
         glm::min(perimeterProjectedNW.x, perimeterProjectedCW.x),
-        perimeterProjectedSW.x);
+        perimeterProjectedSW.x
+    );
 
     maxX = -minX; // symmetrical
 
@@ -360,7 +392,8 @@ static OrientedBoundingBox fromPlaneExtents(
 
     minZ = glm::min(
         plane.getPointDistance(perimeterCartesianNW),
-        plane.getPointDistance(perimeterCartesianSW));
+        plane.getPointDistance(perimeterCartesianSW)
+    );
     maxZ = maximumHeight; // Since the tangent plane touches the surface at
                           // height = 0, this is okay
 
@@ -390,7 +423,8 @@ static OrientedBoundingBox fromPlaneExtents(
         minY,
         maxY,
         minZ,
-        maxZ);
+        maxZ
+    );
   }
 
   // Handle the case where rectangle width is greater than PI (wraps around more
@@ -408,7 +442,8 @@ static OrientedBoundingBox fromPlaneExtents(
   // results in a better fit than the obb approach for smaller rectangles, which
   // orients with the rectangle's center normal.
   glm::dvec3 planeOrigin = ellipsoid.cartographicToCartesian(
-      Cartographic(centerLongitude, latitudeNearestToEquator, maximumHeight));
+      Cartographic(centerLongitude, latitudeNearestToEquator, maximumHeight)
+  );
   planeOrigin.z = 0.0; // center the plane on the equator to simpify plane
                        // normal calculation
   const bool isPole = glm::abs(planeOrigin.x) < Math::Epsilon10 &&
@@ -425,7 +460,8 @@ static OrientedBoundingBox fromPlaneExtents(
       ellipsoid.cartographicToCartesian(Cartographic(
           centerLongitude + Math::PiOverTwo,
           latitudeNearestToEquator,
-          maximumHeight));
+          maximumHeight
+      ));
   maxX = glm::dot(plane.projectPointOntoPlane(horizonCartesian), planeXAxis);
   minX = -maxX; // symmetrical
 
@@ -434,18 +470,19 @@ static OrientedBoundingBox fromPlaneExtents(
              .cartographicToCartesian(Cartographic(
                  0.0,
                  rectangle.getNorth(),
-                 fullyBelowEquator ? minimumHeight : maximumHeight))
+                 fullyBelowEquator ? minimumHeight : maximumHeight
+             ))
              .z;
   minY = ellipsoid
              .cartographicToCartesian(Cartographic(
                  0.0,
                  rectangle.getSouth(),
-                 fullyAboveEquator ? minimumHeight : maximumHeight))
+                 fullyAboveEquator ? minimumHeight : maximumHeight
+             ))
              .z;
-  const glm::dvec3 farZ = ellipsoid.cartographicToCartesian(Cartographic(
-      rectangle.getEast(),
-      latitudeNearestToEquator,
-      maximumHeight));
+  const glm::dvec3 farZ = ellipsoid.cartographicToCartesian(
+      Cartographic(rectangle.getEast(), latitudeNearestToEquator, maximumHeight)
+  );
   minZ = plane.getPointDistance(farZ);
   maxZ = 0.0; // plane origin starts at maxZ already
 
@@ -460,7 +497,8 @@ static OrientedBoundingBox fromPlaneExtents(
       minY,
       maxY,
       minZ,
-      maxZ);
+      maxZ
+  );
 }
 
 } // namespace CesiumGeospatial

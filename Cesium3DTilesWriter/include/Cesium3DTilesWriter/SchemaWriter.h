@@ -72,7 +72,8 @@ public:
    */
   SchemaWriterResult writeSchema(
       const Cesium3DTiles::Schema& schema,
-      const SchemaWriterOptions& options = SchemaWriterOptions()) const;
+      const SchemaWriterOptions& options = SchemaWriterOptions()
+  ) const;
 
 private:
   CesiumJsonWriter::ExtensionWriterContext _context;

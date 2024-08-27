@@ -19,6 +19,7 @@ namespace CesiumGeospatial {
  * @param ellipsoid The ellipsoid.
  * @return The max geometric error.
  */
-double calcQuadtreeMaxGeometricError(
-    const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept;
+double
+calcQuadtreeMaxGeometricError(const CesiumGeospatial::Ellipsoid& ellipsoid
+) noexcept;
 } // namespace CesiumGeospatial

@@ -44,7 +44,8 @@ public:
       std::string _tileMatrixSetID,
       const std::optional<std::vector<std::string>> tileMatrixLabels,
       const std::optional<std::map<std::string, std::string>> dimensions,
-      const std::vector<std::string>& subdomains)
+      const std::vector<std::string>& subdomains
+  )
       : QuadtreeRasterOverlayTileProvider(
             pOwner,
             asyncSystem,
@@ -58,7 +59,8 @@ public:
             minimumLevel,
             maximumLevel,
             width,
-            height),
+            height
+        ),
         _url(url),
         _headers(headers),
         _useKVP(useKVP),
@@ -73,8 +75,9 @@ public:
   virtual ~WebMapTileServiceTileProvider() {}
 
 protected:
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
-      const CesiumGeometry::QuadtreeTileID& tileID) const override {
+  virtual CesiumAsync::Future<LoadedRasterOverlayImage>
+  loadQuadtreeTileImage(const CesiumGeometry::QuadtreeTileID& tileID
+  ) const override {
 
     LoadTileImageFromUrlOptions options;
     options.rectangle = this->getTilingScheme().tileToRectangle(tileID);
@@ -105,16 +108,19 @@ protected:
            {"TileMatrix", tileMatrix},
            {"TileRow", std::to_string(row)},
            {"TileCol", std::to_string(col)},
-           {"TileMatrixSet", _tileMatrixSetID}});
+           {"TileMatrixSet", _tileMatrixSetID}}
+      );
       if (_subdomains.size() > 0) {
         urlTemplateMap.emplace(
             "s",
-            _subdomains[(col + row + level) % _subdomains.size()]);
+            _subdomains[(col + row + level) % _subdomains.size()]
+        );
       }
       if (_staticDimensions) {
         urlTemplateMap.insert(
             _staticDimensions->begin(),
-            _staticDimensions->end());
+            _staticDimensions->end()
+        );
       }
     } else {
       urlTemplateMap.insert(
@@ -124,16 +130,19 @@ protected:
            {"tilerow", std::to_string(row)},
            {"tilecol", std::to_string(col)},
            {"tilematrixset", _tileMatrixSetID},
-           {"format", _format}}); // !! These are query parameters
+           {"format", _format}}
+      ); // !! These are query parameters
       if (_staticDimensions) {
         urlTemplateMap.insert(
             _staticDimensions->begin(),
-            _staticDimensions->end());
+            _staticDimensions->end()
+        );
       }
       if (_subdomains.size() > 0) {
         urlTemplateMap.emplace(
             "s",
-            _subdomains[(col + row + level) % _subdomains.size()]);
+            _subdomains[(col + row + level) % _subdomains.size()]
+        );
       }
 
       urlTemplate +=
@@ -150,7 +159,8 @@ protected:
           auto it = map.find(placeholder);
           return it == map.end() ? "{" + placeholder + "}"
                                  : CesiumUtility::Uri::escape(it->second);
-        });
+        }
+    );
 
     return this->loadTileImageFromUrl(url, this->_headers, std::move(options));
   }
@@ -173,7 +183,8 @@ WebMapTileServiceRasterOverlay::WebMapTileServiceRasterOverlay(
     const std::string& url,
     const std::vector<IAssetAccessor::THeader>& headers,
     const WebMapTileServiceRasterOverlayOptions& wmtsOptions,
-    const RasterOverlayOptions& overlayOptions)
+    const RasterOverlayOptions& overlayOptions
+)
     : RasterOverlay(name, overlayOptions),
       _url(url),
       _headers(headers),
@@ -189,14 +200,16 @@ WebMapTileServiceRasterOverlay::createTileProvider(
     const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
         pPrepareRendererResources,
     const std::shared_ptr<spdlog::logger>& pLogger,
-    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner) const {
+    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+) const {
 
   pOwner = pOwner ? pOwner : this;
 
   const std::optional<Credit> credit =
       this->_options.credit ? std::make_optional(pCreditSystem->createCredit(
                                   this->_options.credit.value(),
-                                  pOwner->getOptions().showCreditsOnScreen))
+                                  pOwner->getOptions().showCreditsOnScreen
+                              ))
                             : std::nullopt;
 
   bool hasError = false;
@@ -224,7 +237,8 @@ WebMapTileServiceRasterOverlay::createTileProvider(
 
   CesiumGeospatial::Projection projection =
       _options.projection.value_or(CesiumGeospatial::WebMercatorProjection(
-          _options.ellipsoid.value_or(CesiumGeospatial::Ellipsoid::WGS84)));
+          _options.ellipsoid.value_or(CesiumGeospatial::Ellipsoid::WGS84)
+      ));
   CesiumGeospatial::GlobeRectangle tilingSchemeRectangle =
       CesiumGeospatial::WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE;
   uint32_t rootTilesX = 1;
@@ -235,13 +249,13 @@ WebMapTileServiceRasterOverlay::createTileProvider(
   }
   CesiumGeometry::Rectangle coverageRectangle =
       _options.coverageRectangle.value_or(
-          projectRectangleSimple(projection, tilingSchemeRectangle));
+          projectRectangleSimple(projection, tilingSchemeRectangle)
+      );
 
   CesiumGeometry::QuadtreeTilingScheme tilingScheme =
-      _options.tilingScheme.value_or(CesiumGeometry::QuadtreeTilingScheme(
-          coverageRectangle,
-          rootTilesX,
-          1));
+      _options.tilingScheme.value_or(
+          CesiumGeometry::QuadtreeTilingScheme(coverageRectangle, rootTilesX, 1)
+      );
 
   if (hasError) {
     return asyncSystem
@@ -249,7 +263,8 @@ WebMapTileServiceRasterOverlay::createTileProvider(
             nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                 RasterOverlayLoadType::TileProvider,
                 nullptr,
-                errorMessage}));
+                errorMessage})
+        );
   }
   return asyncSystem
       .createResolvedFuture<RasterOverlay::CreateTileProviderResult>(
@@ -276,7 +291,9 @@ WebMapTileServiceRasterOverlay::createTileProvider(
               _options.tileMatrixSetID,
               _options.tileMatrixLabels,
               _options.dimensions,
-              _options.subdomains));
+              _options.subdomains
+          )
+      );
 }
 
 } // namespace CesiumRasterOverlays

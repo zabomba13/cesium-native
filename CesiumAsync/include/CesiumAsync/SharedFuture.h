@@ -53,7 +53,8 @@ public:
     return this->thenWithScheduler(
         this->_pSchedulers->workerThread.immediate,
         "waiting for worker thread",
-        std::forward<Func>(f));
+        std::forward<Func>(f)
+    );
   }
 
   /**
@@ -79,7 +80,8 @@ public:
     return this->thenWithScheduler(
         this->_pSchedulers->mainThread.immediate,
         "waiting for main thread",
-        std::forward<Func>(f));
+        std::forward<Func>(f)
+    );
   }
 
   /**
@@ -105,7 +107,10 @@ public:
             async::inline_scheduler(),
             CesiumImpl::WithTracingShared<T>::end(
                 nullptr,
-                std::forward<Func>(f))));
+                std::forward<Func>(f)
+            )
+        )
+    );
   }
 
   /**
@@ -132,7 +137,8 @@ public:
     return this->thenWithScheduler(
         threadPool._pScheduler->immediate,
         "waiting for thread pool thread",
-        std::forward<Func>(f));
+        std::forward<Func>(f)
+    );
   }
 
   /**
@@ -159,7 +165,8 @@ public:
   template <typename Func> Future<T> catchInMainThread(Func&& f) {
     return this->catchWithScheduler(
         this->_pSchedulers->mainThread.immediate,
-        std::forward<Func>(f));
+        std::forward<Func>(f)
+    );
   }
 
   /**
@@ -184,7 +191,8 @@ public:
   template <typename Func> Future<T> catchImmediately(Func&& f) {
     return this->catchWithScheduler(
         async::inline_scheduler(),
-        std::forward<Func>(f));
+        std::forward<Func>(f)
+    );
   }
 
   /**
@@ -202,11 +210,11 @@ public:
   template <typename... TPassThrough>
   Future<std::tuple<TPassThrough..., T>>
   thenPassThrough(TPassThrough&&... values) {
-    return this->thenImmediately(
-        [values = std::tuple(std::forward<TPassThrough>(values)...)](
-            const T& result) mutable {
-          return std::tuple_cat(std::move(values), std::make_tuple(result));
-        });
+    return this->thenImmediately([values = std::tuple(
+                                      std::forward<TPassThrough>(values)...
+                                  )](const T& result) mutable {
+      return std::tuple_cat(std::move(values), std::make_tuple(result));
+    });
   }
 
   /**
@@ -254,7 +262,8 @@ public:
    */
   T waitInMainThread() {
     return this->_pSchedulers->mainThread.dispatchUntilTaskCompletes(
-        std::move(this->_task));
+        std::move(this->_task)
+    );
   }
 
   /**
@@ -272,7 +281,8 @@ public:
 private:
   SharedFuture(
       const std::shared_ptr<CesiumImpl::AsyncSystemSchedulers>& pSchedulers,
-      async::shared_task<T>&& task) noexcept
+      async::shared_task<T>&& task
+  ) noexcept
       : _pSchedulers(pSchedulers), _task(std::move(task)) {}
 
   template <typename Func, typename Scheduler>
@@ -289,7 +299,9 @@ private:
         async::inline_scheduler(),
         CesiumImpl::WithTracingShared<T>::begin(
             tracingName,
-            std::forward<Func>(f)));
+            std::forward<Func>(f)
+        )
+    );
 #else
     auto& task = this->_task;
 #endif
@@ -300,7 +312,10 @@ private:
             scheduler,
             CesiumImpl::WithTracingShared<T>::end(
                 tracingName,
-                std::forward<Func>(f))));
+                std::forward<Func>(f)
+            )
+        )
+    );
   }
 
   template <typename Func, typename Scheduler>
@@ -313,7 +328,9 @@ private:
             CesiumImpl::
                 CatchFunction<Func, T, Scheduler, const async::shared_task<T>&>{
                     scheduler,
-                    std::forward<Func>(f)}));
+                    std::forward<Func>(f)}
+        )
+    );
   }
 
   std::shared_ptr<CesiumImpl::AsyncSystemSchedulers> _pSchedulers;

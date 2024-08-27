@@ -118,7 +118,8 @@ int32_t zigZagDecode(int32_t value) noexcept {
 template <class E, class D>
 void decodeIndices(
     const gsl::span<const E>& encoded,
-    const gsl::span<D>& decoded) {
+    const gsl::span<D>& decoded
+) {
   if (decoded.size() < encoded.size()) {
     throw std::runtime_error("decoded buffer is too small.");
   }
@@ -138,7 +139,8 @@ template <class T>
 static T readValue(
     const gsl::span<const std::byte>& data,
     size_t offset,
-    T defaultValue) noexcept {
+    T defaultValue
+) noexcept {
   if (offset + sizeof(T) <= data.size()) {
     return *reinterpret_cast<const T*>(data.data() + offset);
   }
@@ -150,7 +152,8 @@ processMetadata(const QuadtreeTileID& tileID, gsl::span<const char> json);
 
 static std::optional<QuantizedMeshView> parseQuantizedMesh(
     const gsl::span<const std::byte>& data,
-    bool enableWaterMask) {
+    bool enableWaterMask
+) {
   if (data.size() < headerLength) {
     return std::nullopt;
   }
@@ -167,7 +170,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
   meshView.uBuffer = gsl::span<const uint16_t>(
       reinterpret_cast<const uint16_t*>(data.data() + readIndex),
-      vertexCount);
+      vertexCount
+  );
   readIndex += meshView.uBuffer.size_bytes();
   if (readIndex > data.size()) {
     return std::nullopt;
@@ -175,7 +179,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
   meshView.vBuffer = gsl::span<const uint16_t>(
       reinterpret_cast<const uint16_t*>(data.data() + readIndex),
-      vertexCount);
+      vertexCount
+  );
   readIndex += meshView.vBuffer.size_bytes();
   if (readIndex > data.size()) {
     return std::nullopt;
@@ -183,7 +188,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
   meshView.heightBuffer = gsl::span<const uint16_t>(
       reinterpret_cast<const uint16_t*>(data.data() + readIndex),
-      vertexCount);
+      vertexCount
+  );
   readIndex += meshView.heightBuffer.size_bytes();
   if (readIndex > data.size()) {
     return std::nullopt;
@@ -209,7 +215,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
     const uint32_t indicesCount = meshView.triangleCount * 3;
     meshView.indicesBuffer = gsl::span<const std::byte>(
         data.data() + readIndex,
-        indicesCount * sizeof(uint32_t));
+        indicesCount * sizeof(uint32_t)
+    );
     readIndex += meshView.indicesBuffer.size_bytes();
     if (readIndex > data.size()) {
       return std::nullopt;
@@ -228,7 +235,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
     const uint32_t indicesCount = meshView.triangleCount * 3;
     meshView.indicesBuffer = gsl::span<const std::byte>(
         data.data() + readIndex,
-        indicesCount * sizeof(uint16_t));
+        indicesCount * sizeof(uint16_t)
+    );
     readIndex += meshView.indicesBuffer.size_bytes();
     if (readIndex > data.size()) {
       return std::nullopt;
@@ -315,7 +323,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
       if (extensionLength == 1) {
         // Either fully land or fully water
         meshView.onlyWater = static_cast<bool>(
-            *reinterpret_cast<const unsigned char*>(data.data() + readIndex));
+            *reinterpret_cast<const unsigned char*>(data.data() + readIndex)
+        );
         meshView.onlyLand = !meshView.onlyWater;
       } else if (extensionLength == 65536) {
         // We have a 256*256 mask defining where the water is within the tile
@@ -341,8 +350,10 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
       meshView.metadataJsonBuffer = gsl::span<const char>(
           reinterpret_cast<const char*>(
-              data.data() + sizeof(uint32_t) + readIndex),
-          meshView.metadataJsonLength);
+              data.data() + sizeof(uint32_t) + readIndex
+          ),
+          meshView.metadataJsonLength
+      );
     }
 
     readIndex += extensionLength;
@@ -353,7 +364,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
 static double calculateSkirtHeight(
     const CesiumGeospatial::Ellipsoid& ellipsoid,
-    const CesiumGeospatial::GlobeRectangle& rectangle) noexcept {
+    const CesiumGeospatial::GlobeRectangle& rectangle
+) noexcept {
   const double levelMaximumGeometricError =
       calcQuadtreeMaxGeometricError(ellipsoid) * rectangle.computeWidth();
   return levelMaximumGeometricError * 5.0;
@@ -377,7 +389,8 @@ static void addSkirt(
     const gsl::span<float>& normals,
     const gsl::span<I>& indices,
     glm::dvec3& positionMinimums,
-    glm::dvec3& positionMaximums) {
+    glm::dvec3& positionMaximums
+) {
   const double west = rectangle.getWest();
   const double south = rectangle.getSouth();
   const double east = rectangle.getEast();
@@ -397,7 +410,8 @@ static void addSkirt(
     const double heightMeters =
         Math::lerp(minimumHeight, maximumHeight, heightRatio) - skirtHeight;
     glm::dvec3 position = ellipsoid.cartographicToCartesian(
-        Cartographic(longitude, latitude, heightMeters));
+        Cartographic(longitude, latitude, heightMeters)
+    );
     position -= center;
 
     positions[positionIdx] = static_cast<float>(position.x);
@@ -451,7 +465,8 @@ static void addSkirts(
     const gsl::span<float>& outputNormals,
     const gsl::span<I>& outputIndices,
     glm::dvec3& positionMinimums,
-    glm::dvec3& positionMaximums) {
+    glm::dvec3& positionMaximums
+) {
   const uint32_t westVertexCount =
       static_cast<uint32_t>(westEdgeIndicesBuffer.size() / sizeof(E));
   const uint32_t southVertexCount =
@@ -471,7 +486,8 @@ static void addSkirts(
   // add skirt indices, vertices, and normals
   gsl::span<const E> westEdgeIndices(
       reinterpret_cast<const E*>(westEdgeIndicesBuffer.data()),
-      westVertexCount);
+      westVertexCount
+  );
   std::partial_sort_copy(
       westEdgeIndices.begin(),
       westEdgeIndices.end(),
@@ -479,7 +495,8 @@ static void addSkirts(
       sortEdgeIndices.begin() + westVertexCount,
       [&uvsAndHeights](auto lhs, auto rhs) noexcept {
         return uvsAndHeights[lhs].y < uvsAndHeights[rhs].y;
-      });
+      }
+  );
   westEdgeIndices = gsl::span(sortEdgeIndices.data(), westVertexCount);
   addSkirt(
       ellipsoid,
@@ -498,13 +515,15 @@ static void addSkirts(
       outputNormals,
       outputIndices,
       positionMinimums,
-      positionMaximums);
+      positionMaximums
+  );
 
   currentVertexCount += westVertexCount;
   currentIndicesCount += (westVertexCount - 1) * 6;
   gsl::span<const E> southEdgeIndices(
       reinterpret_cast<const E*>(southEdgeIndicesBuffer.data()),
-      southVertexCount);
+      southVertexCount
+  );
   std::partial_sort_copy(
       southEdgeIndices.begin(),
       southEdgeIndices.end(),
@@ -512,7 +531,8 @@ static void addSkirts(
       sortEdgeIndices.begin() + southVertexCount,
       [&uvsAndHeights](auto lhs, auto rhs) noexcept {
         return uvsAndHeights[lhs].x > uvsAndHeights[rhs].x;
-      });
+      }
+  );
   southEdgeIndices = gsl::span(sortEdgeIndices.data(), southVertexCount);
   addSkirt(
       ellipsoid,
@@ -531,13 +551,15 @@ static void addSkirts(
       outputNormals,
       outputIndices,
       positionMinimums,
-      positionMaximums);
+      positionMaximums
+  );
 
   currentVertexCount += southVertexCount;
   currentIndicesCount += (southVertexCount - 1) * 6;
   gsl::span<const E> eastEdgeIndices(
       reinterpret_cast<const E*>(eastEdgeIndicesBuffer.data()),
-      eastVertexCount);
+      eastVertexCount
+  );
   std::partial_sort_copy(
       eastEdgeIndices.begin(),
       eastEdgeIndices.end(),
@@ -545,7 +567,8 @@ static void addSkirts(
       sortEdgeIndices.begin() + eastVertexCount,
       [&uvsAndHeights](auto lhs, auto rhs) noexcept {
         return uvsAndHeights[lhs].y > uvsAndHeights[rhs].y;
-      });
+      }
+  );
   eastEdgeIndices = gsl::span(sortEdgeIndices.data(), eastVertexCount);
   addSkirt(
       ellipsoid,
@@ -564,13 +587,15 @@ static void addSkirts(
       outputNormals,
       outputIndices,
       positionMinimums,
-      positionMaximums);
+      positionMaximums
+  );
 
   currentVertexCount += eastVertexCount;
   currentIndicesCount += (eastVertexCount - 1) * 6;
   gsl::span<const E> northEdgeIndices(
       reinterpret_cast<const E*>(northEdgeIndicesBuffer.data()),
-      northVertexCount);
+      northVertexCount
+  );
   std::partial_sort_copy(
       northEdgeIndices.begin(),
       northEdgeIndices.end(),
@@ -578,7 +603,8 @@ static void addSkirts(
       sortEdgeIndices.begin() + northVertexCount,
       [&uvsAndHeights](auto lhs, auto rhs) noexcept {
         return uvsAndHeights[lhs].x < uvsAndHeights[rhs].x;
-      });
+      }
+  );
   northEdgeIndices = gsl::span(sortEdgeIndices.data(), northVertexCount);
   addSkirt(
       ellipsoid,
@@ -597,12 +623,14 @@ static void addSkirts(
       outputNormals,
       outputIndices,
       positionMinimums,
-      positionMaximums);
+      positionMaximums
+  );
 }
 
 static void decodeNormals(
     const gsl::span<const std::byte>& encoded,
-    const gsl::span<float>& decoded) {
+    const gsl::span<float>& decoded
+) {
   if (decoded.size() < encoded.size()) {
     throw std::runtime_error("decoded buffer is too small.");
   }
@@ -611,7 +639,8 @@ static void decodeNormals(
   for (size_t i = 0; i < encoded.size(); i += 2) {
     glm::dvec3 normal = AttributeCompression::octDecode(
         static_cast<uint8_t>(encoded[i]),
-        static_cast<uint8_t>(encoded[i + 1]));
+        static_cast<uint8_t>(encoded[i + 1])
+    );
     decoded[normalOutputIndex++] = static_cast<float>(normal.x);
     decoded[normalOutputIndex++] = static_cast<float>(normal.y);
     decoded[normalOutputIndex++] = static_cast<float>(normal.z);
@@ -622,11 +651,13 @@ template <class T>
 static std::vector<std::byte> generateNormals(
     const gsl::span<const float>& positions,
     const gsl::span<T>& indices,
-    size_t currentNumOfIndex) {
+    size_t currentNumOfIndex
+) {
   std::vector<std::byte> normalsBuffer(positions.size() * sizeof(float));
   const gsl::span<float> normals(
       reinterpret_cast<float*>(normalsBuffer.data()),
-      positions.size());
+      positions.size()
+  );
   for (size_t i = 0; i < currentNumOfIndex; i += 3) {
     T id0 = indices[i];
     T id1 = indices[i + 1];
@@ -675,7 +706,8 @@ static std::vector<std::byte> generateNormals(
     const std::string& url,
     const gsl::span<const std::byte>& data,
     bool enableWaterMask,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
 
   CESIUM_TRACE("Cesium3DTilesSelection::QuantizedMeshLoader::load");
 
@@ -700,20 +732,24 @@ static std::vector<std::byte> generateNormals(
   // decode position without skirt, but preallocate position buffer to include
   // skirt as well
   std::vector<std::byte> outputPositionsBuffer(
-      (vertexCount + skirtVertexCount) * 3 * sizeof(float));
+      (vertexCount + skirtVertexCount) * 3 * sizeof(float)
+  );
   gsl::span<float> outputPositions(
       reinterpret_cast<float*>(outputPositionsBuffer.data()),
-      (vertexCount + skirtVertexCount) * 3);
+      (vertexCount + skirtVertexCount) * 3
+  );
   size_t positionOutputIndex = 0;
 
   const glm::dvec3 center(
       pHeader->BoundingSphereCenterX,
       pHeader->BoundingSphereCenterY,
-      pHeader->BoundingSphereCenterZ);
+      pHeader->BoundingSphereCenterZ
+  );
   const glm::dvec3 horizonOcclusionPoint(
       pHeader->HorizonOcclusionPointX,
       pHeader->HorizonOcclusionPointY,
-      pHeader->HorizonOcclusionPointZ);
+      pHeader->HorizonOcclusionPointZ
+  );
   const double minimumHeight = pHeader->MinimumHeight;
   const double maximumHeight = pHeader->MaximumHeight;
 
@@ -747,7 +783,8 @@ static std::vector<std::byte> generateNormals(
         Math::lerp(minimumHeight, maximumHeight, heightRatio);
 
     glm::dvec3 position = ellipsoid.cartographicToCartesian(
-        Cartographic(longitude, latitude, heightMeters));
+        Cartographic(longitude, latitude, heightMeters)
+    );
     position -= center;
     outputPositions[positionOutputIndex++] = static_cast<float>(position.x);
     outputPositions[positionOutputIndex++] = static_cast<float>(position.y);
@@ -767,12 +804,14 @@ static std::vector<std::byte> generateNormals(
     outputNormalsBuffer.resize(totalNormalFloats * sizeof(float));
     outputNormals = gsl::span<float>(
         reinterpret_cast<float*>(outputNormalsBuffer.data()),
-        totalNormalFloats);
+        totalNormalFloats
+    );
     decodeNormals(meshView->octEncodedNormalBuffer, outputNormals);
 
     outputNormals = gsl::span<float>(
         reinterpret_cast<float*>(outputNormalsBuffer.data()),
-        outputNormalsBuffer.size() / sizeof(float));
+        outputNormalsBuffer.size() / sizeof(float)
+    );
   }
 
   // decode metadata
@@ -800,10 +839,12 @@ static std::vector<std::byte> generateNormals(
     outputIndicesBuffer.resize(outputIndicesCount * sizeof(uint32_t));
     const gsl::span<const uint32_t> indices(
         reinterpret_cast<const uint32_t*>(meshView->indicesBuffer.data()),
-        indicesCount);
+        indicesCount
+    );
     gsl::span<uint32_t> outputIndices(
         reinterpret_cast<uint32_t*>(outputIndicesBuffer.data()),
-        outputIndicesCount);
+        outputIndicesCount
+    );
     decodeIndices(indices, outputIndices);
 
     // generate normals if no provided
@@ -812,7 +853,8 @@ static std::vector<std::byte> generateNormals(
           generateNormals(outputPositions, outputIndices, indicesCount);
       outputNormals = gsl::span<float>(
           reinterpret_cast<float*>(outputNormalsBuffer.data()),
-          outputNormalsBuffer.size() / sizeof(float));
+          outputNormalsBuffer.size() / sizeof(float)
+      );
     }
 
     // add skirt
@@ -836,20 +878,23 @@ static std::vector<std::byte> generateNormals(
         outputNormals,
         outputIndices,
         positionMinimums,
-        positionMaximums);
+        positionMaximums
+    );
 
     indexSizeBytes = sizeof(uint32_t);
   } else {
     const size_t outputIndicesCount = indicesCount + skirtIndicesCount;
     const gsl::span<const uint16_t> indices(
         reinterpret_cast<const uint16_t*>(meshView->indicesBuffer.data()),
-        indicesCount);
+        indicesCount
+    );
     if (vertexCount + skirtVertexCount < std::numeric_limits<uint16_t>::max()) {
       // decode the tile indices without skirt.
       outputIndicesBuffer.resize(outputIndicesCount * sizeof(uint16_t));
       gsl::span<uint16_t> outputIndices(
           reinterpret_cast<uint16_t*>(outputIndicesBuffer.data()),
-          outputIndicesCount);
+          outputIndicesCount
+      );
       decodeIndices(indices, outputIndices);
 
       // generate normals if no provided
@@ -858,7 +903,8 @@ static std::vector<std::byte> generateNormals(
             generateNormals(outputPositions, outputIndices, indicesCount);
         outputNormals = gsl::span<float>(
             reinterpret_cast<float*>(outputNormalsBuffer.data()),
-            outputNormalsBuffer.size() / sizeof(float));
+            outputNormalsBuffer.size() / sizeof(float)
+        );
       }
 
       addSkirts<uint16_t, uint16_t>(
@@ -881,14 +927,16 @@ static std::vector<std::byte> generateNormals(
           outputNormals,
           outputIndices,
           positionMinimums,
-          positionMaximums);
+          positionMaximums
+      );
 
       indexSizeBytes = sizeof(uint16_t);
     } else {
       outputIndicesBuffer.resize(outputIndicesCount * sizeof(uint32_t));
       gsl::span<uint32_t> outputIndices(
           reinterpret_cast<uint32_t*>(outputIndicesBuffer.data()),
-          outputIndicesCount);
+          outputIndicesCount
+      );
       decodeIndices(indices, outputIndices);
 
       // generate normals if no provided
@@ -897,7 +945,8 @@ static std::vector<std::byte> generateNormals(
             generateNormals(outputPositions, outputIndices, indicesCount);
         outputNormals = gsl::span<float>(
             reinterpret_cast<float*>(outputNormalsBuffer.data()),
-            outputNormalsBuffer.size() / sizeof(float));
+            outputNormalsBuffer.size() / sizeof(float)
+        );
       }
 
       addSkirts<uint16_t, uint32_t>(
@@ -920,7 +969,8 @@ static std::vector<std::byte> generateNormals(
           outputNormals,
           outputIndices,
           positionMinimums,
-          positionMaximums);
+          positionMaximums
+      );
 
       indexSizeBytes = sizeof(uint32_t);
     }
@@ -1081,7 +1131,8 @@ static std::vector<std::byte> generateNormals(
     std::memcpy(
         waterMaskImage.cesium.pixelData.data(),
         meshView->waterMaskBuffer.data(),
-        65536);
+        65536
+    );
 
     // create sampler parameters
     const size_t waterMaskSamplerId = model.samplers.size();
@@ -1144,7 +1195,8 @@ static std::vector<std::byte> generateNormals(
 
 QuantizedMeshMetadataResult QuantizedMeshLoader::loadAvailabilityRectangles(
     const rapidjson::Document& metadata,
-    uint32_t startingLevel) {
+    uint32_t startingLevel
+) {
   QuantizedMeshMetadataResult ret;
   const auto availableIt = metadata.FindMember("available");
   if (availableIt == metadata.MemberEnd() || !availableIt->value.IsArray()) {
@@ -1174,7 +1226,8 @@ QuantizedMeshMetadataResult QuantizedMeshLoader::loadAvailabilityRectangles(
               JsonHelpers::getUint32OrDefault(rangeJson, "startX", 0),
               JsonHelpers::getUint32OrDefault(rangeJson, "startY", 0),
               JsonHelpers::getUint32OrDefault(rangeJson, "endX", 0),
-              JsonHelpers::getUint32OrDefault(rangeJson, "endY", 0)});
+              JsonHelpers::getUint32OrDefault(rangeJson, "endY", 0)}
+      );
     }
 
     ++startingLevel;
@@ -1191,11 +1244,13 @@ struct TileRange {
 
 static QuantizedMeshMetadataResult processMetadata(
     const QuadtreeTileID& tileID,
-    gsl::span<const char> metadataString) {
+    gsl::span<const char> metadataString
+) {
   rapidjson::Document metadata;
   metadata.Parse(
       reinterpret_cast<const char*>(metadataString.data()),
-      metadataString.size());
+      metadataString.size()
+  );
 
   QuantizedMeshMetadataResult result;
 
@@ -1203,18 +1258,21 @@ static QuantizedMeshMetadataResult processMetadata(
     result.errors.emplaceError(fmt::format(
         "Error when parsing metadata, error code {} at byte offset {}",
         metadata.GetParseError(),
-        metadata.GetErrorOffset()));
+        metadata.GetErrorOffset()
+    ));
     return result;
   }
 
   return QuantizedMeshLoader::loadAvailabilityRectangles(
       metadata,
-      tileID.level + 1);
+      tileID.level + 1
+  );
 }
 
 /*static*/ QuantizedMeshMetadataResult QuantizedMeshLoader::loadMetadata(
     const gsl::span<const std::byte>& data,
-    const QuadtreeTileID& tileID) {
+    const QuadtreeTileID& tileID
+) {
   std::optional<QuantizedMeshView> meshView = parseQuantizedMesh(data, false);
   if (!meshView) {
     return {};

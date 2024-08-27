@@ -53,7 +53,8 @@ struct ExternalContentInitializer {
 
         // save the loader of the external tileset in this loader
         tilesetJsonLoader->addChildLoader(
-            std::move(pExternalTilesetLoaders->pLoader));
+            std::move(pExternalTilesetLoaders->pLoader)
+        );
       }
     }
   }
@@ -78,7 +79,8 @@ struct ExternalContentInitializer {
  */
 CesiumGeometry::Axis obtainGltfUpAxis(
     const rapidjson::Document& tileset,
-    const std::shared_ptr<spdlog::logger>& pLogger) {
+    const std::shared_ptr<spdlog::logger>& pLogger
+) {
   const auto assetIt = tileset.FindMember("asset");
   if (assetIt == tileset.MemberEnd()) {
     return CesiumGeometry::Axis::Y;
@@ -110,14 +112,16 @@ CesiumGeometry::Axis obtainGltfUpAxis(
   SPDLOG_LOGGER_WARN(
       pLogger,
       "Unknown gltfUpAxis: {}, using default (Y)",
-      gltfUpAxisString);
+      gltfUpAxisString
+  );
   return CesiumGeometry::Axis::Y;
 }
 
 std::optional<BoundingVolume> getBoundingVolumeProperty(
     const CesiumGeospatial::Ellipsoid& ellipsoid,
     const rapidjson::Value& tileJson,
-    const std::string& key) {
+    const std::string& key
+) {
   const auto bvIt = tileJson.FindMember(key.c_str());
   if (bvIt == tileJson.MemberEnd() || !bvIt->value.IsObject()) {
     return std::nullopt;
@@ -132,20 +136,24 @@ std::optional<BoundingVolume> getBoundingVolumeProperty(
       std::string token = CesiumUtility::JsonHelpers::getStringOrDefault(
           s2It->value,
           "token",
-          "1");
+          "1"
+      );
       double minimumHeight = CesiumUtility::JsonHelpers::getDoubleOrDefault(
           s2It->value,
           "minimumHeight",
-          0.0);
+          0.0
+      );
       double maximumHeight = CesiumUtility::JsonHelpers::getDoubleOrDefault(
           s2It->value,
           "maximumHeight",
-          0.0);
+          0.0
+      );
       return CesiumGeospatial::S2CellBoundingVolume(
           CesiumGeospatial::S2CellID::fromToken(token),
           minimumHeight,
           maximumHeight,
-          ellipsoid);
+          ellipsoid
+      );
     }
   }
 
@@ -169,7 +177,9 @@ std::optional<BoundingVolume> getBoundingVolumeProperty(
             a[8].GetDouble(),
             a[9].GetDouble(),
             a[10].GetDouble(),
-            a[11].GetDouble()));
+            a[11].GetDouble()
+        )
+    );
   }
 
   const auto regionIt = bvIt->value.FindMember("region");
@@ -186,10 +196,12 @@ std::optional<BoundingVolume> getBoundingVolumeProperty(
             a[0].GetDouble(),
             a[1].GetDouble(),
             a[2].GetDouble(),
-            a[3].GetDouble()),
+            a[3].GetDouble()
+        ),
         a[4].GetDouble(),
         a[5].GetDouble(),
-        ellipsoid);
+        ellipsoid
+    );
   }
 
   const auto sphereIt = bvIt->value.FindMember("sphere");
@@ -203,7 +215,8 @@ std::optional<BoundingVolume> getBoundingVolumeProperty(
     }
     return CesiumGeometry::BoundingSphere(
         glm::dvec3(a[0].GetDouble(), a[1].GetDouble(), a[2].GetDouble()),
-        a[3].GetDouble());
+        a[3].GetDouble()
+    );
   }
 
   return std::nullopt;
@@ -215,7 +228,8 @@ void createImplicitQuadtreeLoader(
     uint32_t subtreeLevels,
     uint32_t availableLevels,
     Tile& implicitTile,
-    TilesetJsonLoader& currentLoader) {
+    TilesetJsonLoader& currentLoader
+) {
   // Quadtree does not support bounding sphere subdivision
   const BoundingVolume& boundingVolume = implicitTile.getBoundingVolume();
   if (std::holds_alternative<CesiumGeometry::BoundingSphere>(boundingVolume)) {
@@ -238,7 +252,8 @@ void createImplicitQuadtreeLoader(
         subtreeUriTemplate,
         subtreeLevels,
         availableLevels,
-        *pRegion);
+        *pRegion
+    );
     pImplicitLoader = pLoader.get();
     currentLoader.addChildLoader(std::move(pLoader));
   } else if (pBox) {
@@ -248,7 +263,8 @@ void createImplicitQuadtreeLoader(
         subtreeUriTemplate,
         subtreeLevels,
         availableLevels,
-        *pBox);
+        *pBox
+    );
     pImplicitLoader = pLoader.get();
     currentLoader.addChildLoader(std::move(pLoader));
   } else if (pS2Cell) {
@@ -258,7 +274,8 @@ void createImplicitQuadtreeLoader(
         subtreeUriTemplate,
         subtreeLevels,
         availableLevels,
-        *pS2Cell);
+        *pS2Cell
+    );
     pImplicitLoader = pLoader.get();
     currentLoader.addChildLoader(std::move(pLoader));
   }
@@ -280,14 +297,16 @@ void createImplicitOctreeLoader(
     uint32_t subtreeLevels,
     uint32_t availableLevels,
     Tile& implicitTile,
-    TilesetJsonLoader& currentLoader) {
+    TilesetJsonLoader& currentLoader
+) {
   const BoundingVolume& boundingVolume = implicitTile.getBoundingVolume();
   if (std::holds_alternative<CesiumGeometry::BoundingSphere>(boundingVolume)) {
     return;
   }
 
   if (std::holds_alternative<CesiumGeospatial::S2CellBoundingVolume>(
-          boundingVolume)) {
+          boundingVolume
+      )) {
     return;
   }
 
@@ -305,7 +324,8 @@ void createImplicitOctreeLoader(
         subtreeUriTemplate,
         subtreeLevels,
         availableLevels,
-        *pRegion);
+        *pRegion
+    );
     pImplicitLoader = pLoader.get();
     currentLoader.addChildLoader(std::move(pLoader));
   } else if (pBox) {
@@ -315,7 +335,8 @@ void createImplicitOctreeLoader(
         subtreeUriTemplate,
         subtreeLevels,
         availableLevels,
-        *pBox);
+        *pBox
+    );
     pImplicitLoader = pLoader.get();
     currentLoader.addChildLoader(std::move(pLoader));
   }
@@ -335,7 +356,8 @@ void parseImplicitTileset(
     const rapidjson::Value& implicitExtensionJson,
     const char* contentUri,
     Tile& tile,
-    TilesetJsonLoader& currentLoader) {
+    TilesetJsonLoader& currentLoader
+) {
   auto implicitTiling = implicitExtensionJson.GetObject();
   auto tilingSchemeIt = implicitTiling.FindMember("subdivisionScheme");
   auto subtreeLevelsIt = implicitTiling.FindMember("subtreeLevels");
@@ -382,7 +404,8 @@ void parseImplicitTileset(
         subtreeLevels,
         availableLevels,
         tile,
-        currentLoader);
+        currentLoader
+    );
   } else if (std::strcmp(subdivisionScheme, "OCTREE") == 0) {
     createImplicitOctreeLoader(
         contentUri,
@@ -390,7 +413,8 @@ void parseImplicitTileset(
         subtreeLevels,
         availableLevels,
         tile,
-        currentLoader);
+        currentLoader
+    );
   }
 }
 
@@ -401,7 +425,8 @@ std::optional<Tile> parseTileJsonRecursively(
     TileRefine parentRefine,
     double parentGeometricError,
     TilesetJsonLoader& currentLoader,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   if (!tileJson.IsObject()) {
     return std::nullopt;
   }
@@ -439,13 +464,15 @@ std::optional<Tile> parseTileJsonRecursively(
     SPDLOG_LOGGER_WARN(
         pLogger,
         "Tile did not contain a geometricError. "
-        "Using half of the parent tile's geometric error.");
+        "Using half of the parent tile's geometric error."
+    );
   }
 
   const glm::dvec3 scale = glm::dvec3(
       glm::length(tileTransform[0]),
       glm::length(tileTransform[1]),
-      glm::length(tileTransform[2]));
+      glm::length(tileTransform[2])
+  );
   const double maxScaleComponent =
       glm::max(scale.x, glm::max(scale.y, scale.z));
   double tileGeometricError = geometricError.value() * maxScaleComponent;
@@ -467,20 +494,23 @@ std::optional<Tile> parseTileJsonRecursively(
           refineUpper.begin(),
           [](unsigned char c) -> unsigned char {
             return static_cast<unsigned char>(std::toupper(c));
-          });
+          }
+      );
       if (refineUpper == "REPLACE" || refineUpper == "ADD") {
         SPDLOG_LOGGER_WARN(
             pLogger,
             "Tile refine value '{}' should be uppercase: '{}'",
             refine,
-            refineUpper);
+            refineUpper
+        );
         tileRefine =
             refineUpper == "REPLACE" ? TileRefine::Replace : TileRefine::Add;
       } else {
         SPDLOG_LOGGER_WARN(
             pLogger,
             "Tile contained an unknown refine value: {}",
-            refine);
+            refine
+        );
       }
     }
   } else {
@@ -544,11 +574,13 @@ std::optional<Tile> parseTileJsonRecursively(
     tileContentBoundingVolume = getBoundingVolumeProperty(
         ellipsoid,
         contentIt->value,
-        "boundingVolume");
+        "boundingVolume"
+    );
     if (tileContentBoundingVolume) {
       tileContentBoundingVolume = transformBoundingVolume(
           tileTransform,
-          tileContentBoundingVolume.value());
+          tileContentBoundingVolume.value()
+      );
     }
   }
 
@@ -567,7 +599,8 @@ std::optional<Tile> parseTileJsonRecursively(
           tileRefine,
           tileGeometricError,
           currentLoader,
-          ellipsoid);
+          ellipsoid
+      );
 
       if (maybeChild) {
         childTiles.emplace_back(std::move(*maybeChild));
@@ -608,7 +641,8 @@ TilesetContentLoaderResult<TilesetJsonLoader> parseTilesetJson(
     const rapidjson::Document& tilesetJson,
     const glm::dmat4& parentTransform,
     TileRefine parentRefine,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   std::unique_ptr<Tile> pRootTile;
   auto gltfUpAxis = obtainGltfUpAxis(tilesetJson, pLogger);
   auto pLoader =
@@ -623,7 +657,8 @@ TilesetContentLoaderResult<TilesetJsonLoader> parseTilesetJson(
         parentRefine,
         10000000.0,
         *pLoader,
-        ellipsoid);
+        ellipsoid
+    );
 
     if (maybeRootTile) {
       pRootTile = std::make_unique<Tile>(std::move(*maybeRootTile));
@@ -641,7 +676,8 @@ TilesetContentLoaderResult<TilesetJsonLoader> parseTilesetJson(
 void parseTilesetMetadata(
     const std::string& baseUrl,
     const rapidjson::Document& tilesetJson,
-    TileExternalContent& externalContent) {
+    TileExternalContent& externalContent
+) {
   auto schemaIt = tilesetJson.FindMember("schema");
   if (schemaIt != tilesetJson.MemberEnd()) {
     Cesium3DTilesReader::SchemaReader schemaReader;
@@ -683,7 +719,8 @@ TileLoadResult parseExternalTilesetInWorkerThread(
     const std::shared_ptr<spdlog::logger>& pLogger,
     std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest,
     ExternalContentInitializer&& externalContentInitializer,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   // create external tileset
   const CesiumAsync::IAssetResponse* pResponse = pCompletedRequest->response();
   const auto& responseData = pResponse->data();
@@ -692,13 +729,15 @@ TileLoadResult parseExternalTilesetInWorkerThread(
   rapidjson::Document tilesetJson;
   tilesetJson.Parse(
       reinterpret_cast<const char*>(responseData.data()),
-      responseData.size());
+      responseData.size()
+  );
   if (tilesetJson.HasParseError()) {
     SPDLOG_LOGGER_ERROR(
         pLogger,
         "Error when parsing tileset JSON, error code {} at byte offset {}",
         tilesetJson.GetParseError(),
-        tilesetJson.GetErrorOffset());
+        tilesetJson.GetErrorOffset()
+    );
     return TileLoadResult::createFailedResult(std::move(pCompletedRequest));
   }
 
@@ -712,13 +751,15 @@ TileLoadResult parseExternalTilesetInWorkerThread(
           tilesetJson,
           tileTransform,
           tileRefine,
-          ellipsoid);
+          ellipsoid
+      );
 
   // Populate the root tile with metadata
   parseTilesetMetadata(
       tileUrl,
       tilesetJson,
-      externalContentInitializer.externalContent);
+      externalContentInitializer.externalContent
+  );
 
   // check and log any errors
   const auto& errors = externalTilesetLoader.errors;
@@ -731,7 +772,8 @@ TileLoadResult parseExternalTilesetInWorkerThread(
 
   externalContentInitializer.pExternalTilesetLoaders =
       std::make_shared<TilesetContentLoaderResult<TilesetJsonLoader>>(
-          std::move(externalTilesetLoader));
+          std::move(externalTilesetLoader)
+      );
 
   // mark this tile has external content
   return TileLoadResult{
@@ -751,7 +793,8 @@ TileLoadResult parseExternalTilesetInWorkerThread(
 TilesetJsonLoader::TilesetJsonLoader(
     const std::string& baseUrl,
     CesiumGeometry::Axis upAxis,
-    const CesiumGeospatial::Ellipsoid& ellipsoid)
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+)
     : _baseUrl{baseUrl}, _ellipsoid{ellipsoid}, _upAxis{upAxis}, _children{} {}
 
 CesiumAsync::Future<TilesetContentLoaderResult<TilesetJsonLoader>>
@@ -759,7 +802,8 @@ TilesetJsonLoader::createLoader(
     const TilesetExternals& externals,
     const std::string& tilesetJsonUrl,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
 
   return externals.pAssetAccessor
       ->get(externals.asyncSystem, tilesetJsonUrl, requestHeaders)
@@ -768,7 +812,8 @@ TilesetJsonLoader::createLoader(
                            pAssetAccessor = externals.pAssetAccessor,
                            pLogger = externals.pLogger](
                               const std::shared_ptr<CesiumAsync::IAssetRequest>&
-                                  pCompletedRequest) {
+                                  pCompletedRequest
+                          ) {
         const CesiumAsync::IAssetResponse* pResponse =
             pCompletedRequest->response();
         const std::string& tileUrl = pCompletedRequest->url();
@@ -776,7 +821,8 @@ TilesetJsonLoader::createLoader(
           TilesetContentLoaderResult<TilesetJsonLoader> result;
           result.errors.emplaceError(fmt::format(
               "Did not receive a valid response for tile content {}",
-              tileUrl));
+              tileUrl
+          ));
           return asyncSystem.createResolvedFuture(std::move(result));
         }
 
@@ -786,7 +832,8 @@ TilesetJsonLoader::createLoader(
           result.errors.emplaceError(fmt::format(
               "Received status code {} for tile content {}",
               statusCode,
-              tileUrl));
+              tileUrl
+          ));
           result.statusCode = statusCode;
           return asyncSystem.createResolvedFuture(std::move(result));
         }
@@ -796,14 +843,16 @@ TilesetJsonLoader::createLoader(
         rapidjson::Document tilesetJson;
         tilesetJson.Parse(
             reinterpret_cast<const char*>(data.data()),
-            data.size());
+            data.size()
+        );
         if (tilesetJson.HasParseError()) {
           TilesetContentLoaderResult<TilesetJsonLoader> result;
           result.errors.emplaceError(fmt::format(
               "Error when parsing tileset JSON, error code {} at byte offset "
               "{}",
               tilesetJson.GetParseError(),
-              tilesetJson.GetErrorOffset()));
+              tilesetJson.GetErrorOffset()
+          ));
           return asyncSystem.createResolvedFuture(std::move(result));
         }
 
@@ -814,7 +863,8 @@ TilesetJsonLoader::createLoader(
             pCompletedRequest->url(),
             pCompletedRequest->headers(),
             tilesetJson,
-            ellipsoid);
+            ellipsoid
+        );
       });
 }
 
@@ -826,14 +876,16 @@ TilesetJsonLoader::createLoader(
     const std::string& tilesetJsonUrl,
     const CesiumAsync::HttpHeaders& /*requestHeaders*/,
     const rapidjson::Document& tilesetJson,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   TilesetContentLoaderResult<TilesetJsonLoader> result = parseTilesetJson(
       pLogger,
       tilesetJsonUrl,
       tilesetJson,
       glm::dmat4(1.0),
       TileRefine::Replace,
-      ellipsoid);
+      ellipsoid
+  );
 
   // Create a root tile to represent the tileset.json itself.
   std::vector<Tile> children;
@@ -841,7 +893,8 @@ TilesetJsonLoader::createLoader(
 
   result.pRootTile = std::make_unique<Tile>(
       children[0].getLoader(),
-      std::make_unique<TileExternalContent>());
+      std::make_unique<TileExternalContent>()
+  );
 
   result.pRootTile->setTileID("");
   result.pRootTile->setTransform(children[0].getTransform());
@@ -874,7 +927,8 @@ TilesetJsonLoader::loadTileContent(const TileLoadInput& loadInput) {
   const std::string* url = std::get_if<std::string>(&tile.getTileID());
   if (!url) {
     return loadInput.asyncSystem.createResolvedFuture<TileLoadResult>(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   const glm::dmat4& tileTransform = tile.getTransform();
@@ -891,100 +945,113 @@ TilesetJsonLoader::loadTileContent(const TileLoadInput& loadInput) {
   std::string resolvedUrl =
       CesiumUtility::Uri::resolve(this->_baseUrl, *url, true);
   return pAssetAccessor->get(asyncSystem, resolvedUrl, requestHeaders)
-      .thenInWorkerThread([pLogger,
-                           contentOptions,
-                           tileTransform,
-                           tileRefine,
-                           ellipsoid,
-                           upAxis = _upAxis,
-                           externalContentInitializer =
-                               std::move(externalContentInitializer),
-                           pAssetAccessor,
-                           &asyncSystem,
-                           requestHeaders](
-                              std::shared_ptr<CesiumAsync::IAssetRequest>&&
-                                  pCompletedRequest) mutable {
-        auto pResponse = pCompletedRequest->response();
-        const std::string& tileUrl = pCompletedRequest->url();
-        if (!pResponse) {
-          SPDLOG_LOGGER_ERROR(
-              pLogger,
-              "Did not receive a valid response for tile content {}",
-              tileUrl);
-          return asyncSystem.createResolvedFuture(
-              TileLoadResult::createFailedResult(std::move(pCompletedRequest)));
-        }
-
-        uint16_t statusCode = pResponse->statusCode();
-        if (statusCode != 0 && (statusCode < 200 || statusCode >= 300)) {
-          SPDLOG_LOGGER_ERROR(
-              pLogger,
-              "Received status code {} for tile content {}",
-              statusCode,
-              tileUrl);
-          return asyncSystem.createResolvedFuture(
-              TileLoadResult::createFailedResult(std::move(pCompletedRequest)));
-        }
-
-        // find gltf converter
-        const auto& responseData = pResponse->data();
-        auto converter = GltfConverters::getConverterByMagic(responseData);
-        if (!converter) {
-          converter = GltfConverters::getConverterByFileExtension(tileUrl);
-        }
-
-        if (converter) {
-          // Convert to gltf
-          AssetFetcher assetFetcher{
-              asyncSystem,
-              pAssetAccessor,
-              tileUrl,
-              tileTransform,
-              requestHeaders,
-              upAxis};
-          CesiumGltfReader::GltfReaderOptions gltfOptions;
-          gltfOptions.ktx2TranscodeTargets =
-              contentOptions.ktx2TranscodeTargets;
-          gltfOptions.applyTextureTransform =
-              contentOptions.applyTextureTransform;
-          return converter(responseData, gltfOptions, assetFetcher)
-              .thenImmediately(
-                  [ellipsoid, pLogger, upAxis, tileUrl, pCompletedRequest](
-                      GltfConverterResult&& result) {
-                    logTileLoadResult(pLogger, tileUrl, result.errors);
-                    if (result.errors) {
-                      return TileLoadResult::createFailedResult(
-                          std::move(pCompletedRequest));
-                    }
-                    return TileLoadResult{
-                        std::move(*result.model),
-                        upAxis,
-                        std::nullopt,
-                        std::nullopt,
-                        std::nullopt,
-                        std::move(pCompletedRequest),
-                        {},
-                        TileLoadResultState::Success,
-                        ellipsoid};
-                  });
-        } else {
-          // not a renderable content, then it must be external tileset
-          return asyncSystem.createResolvedFuture(
-              parseExternalTilesetInWorkerThread(
-                  tileTransform,
-                  upAxis,
-                  tileRefine,
+      .thenInWorkerThread(
+          [pLogger,
+           contentOptions,
+           tileTransform,
+           tileRefine,
+           ellipsoid,
+           upAxis = _upAxis,
+           externalContentInitializer = std::move(externalContentInitializer),
+           pAssetAccessor,
+           &asyncSystem,
+           requestHeaders](
+              std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest
+          ) mutable {
+            auto pResponse = pCompletedRequest->response();
+            const std::string& tileUrl = pCompletedRequest->url();
+            if (!pResponse) {
+              SPDLOG_LOGGER_ERROR(
                   pLogger,
-                  std::move(pCompletedRequest),
-                  std::move(externalContentInitializer),
-                  ellipsoid));
-        }
-      });
+                  "Did not receive a valid response for tile content {}",
+                  tileUrl
+              );
+              return asyncSystem.createResolvedFuture(
+                  TileLoadResult::createFailedResult(std::move(pCompletedRequest
+                  ))
+              );
+            }
+
+            uint16_t statusCode = pResponse->statusCode();
+            if (statusCode != 0 && (statusCode < 200 || statusCode >= 300)) {
+              SPDLOG_LOGGER_ERROR(
+                  pLogger,
+                  "Received status code {} for tile content {}",
+                  statusCode,
+                  tileUrl
+              );
+              return asyncSystem.createResolvedFuture(
+                  TileLoadResult::createFailedResult(std::move(pCompletedRequest
+                  ))
+              );
+            }
+
+            // find gltf converter
+            const auto& responseData = pResponse->data();
+            auto converter = GltfConverters::getConverterByMagic(responseData);
+            if (!converter) {
+              converter = GltfConverters::getConverterByFileExtension(tileUrl);
+            }
+
+            if (converter) {
+              // Convert to gltf
+              AssetFetcher assetFetcher{
+                  asyncSystem,
+                  pAssetAccessor,
+                  tileUrl,
+                  tileTransform,
+                  requestHeaders,
+                  upAxis};
+              CesiumGltfReader::GltfReaderOptions gltfOptions;
+              gltfOptions.ktx2TranscodeTargets =
+                  contentOptions.ktx2TranscodeTargets;
+              gltfOptions.applyTextureTransform =
+                  contentOptions.applyTextureTransform;
+              return converter(responseData, gltfOptions, assetFetcher)
+                  .thenImmediately(
+                      [ellipsoid, pLogger, upAxis, tileUrl, pCompletedRequest](
+                          GltfConverterResult&& result
+                      ) {
+                        logTileLoadResult(pLogger, tileUrl, result.errors);
+                        if (result.errors) {
+                          return TileLoadResult::createFailedResult(
+                              std::move(pCompletedRequest)
+                          );
+                        }
+                        return TileLoadResult{
+                            std::move(*result.model),
+                            upAxis,
+                            std::nullopt,
+                            std::nullopt,
+                            std::nullopt,
+                            std::move(pCompletedRequest),
+                            {},
+                            TileLoadResultState::Success,
+                            ellipsoid};
+                      }
+                  );
+            } else {
+              // not a renderable content, then it must be external tileset
+              return asyncSystem.createResolvedFuture(
+                  parseExternalTilesetInWorkerThread(
+                      tileTransform,
+                      upAxis,
+                      tileRefine,
+                      pLogger,
+                      std::move(pCompletedRequest),
+                      std::move(externalContentInitializer),
+                      ellipsoid
+                  )
+              );
+            }
+          }
+      );
 }
 
 TileChildrenResult TilesetJsonLoader::createTileChildren(
     const Tile& tile,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   auto pLoader = tile.getLoader();
   if (pLoader != this) {
     return pLoader->createTileChildren(tile, ellipsoid);
@@ -1002,7 +1069,8 @@ CesiumGeometry::Axis TilesetJsonLoader::getUpAxis() const noexcept {
 }
 
 void TilesetJsonLoader::addChildLoader(
-    std::unique_ptr<TilesetContentLoader> pLoader) {
+    std::unique_ptr<TilesetContentLoader> pLoader
+) {
   this->_children.emplace_back(std::move(pLoader));
 }
 } // namespace Cesium3DTilesSelection

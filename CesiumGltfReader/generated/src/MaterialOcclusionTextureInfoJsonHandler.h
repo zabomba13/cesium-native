@@ -17,10 +17,12 @@ public:
   using ValueType = CesiumGltf::MaterialOcclusionTextureInfo;
 
   MaterialOcclusionTextureInfoJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::MaterialOcclusionTextureInfo* pObject);
+      CesiumGltf::MaterialOcclusionTextureInfo* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -28,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyMaterialOcclusionTextureInfo(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::MaterialOcclusionTextureInfo& o);
+      CesiumGltf::MaterialOcclusionTextureInfo& o
+  );
 
 private:
   CesiumGltf::MaterialOcclusionTextureInfo* _pObject = nullptr;

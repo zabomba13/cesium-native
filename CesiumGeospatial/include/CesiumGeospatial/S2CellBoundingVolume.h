@@ -31,7 +31,8 @@ public:
       const S2CellID& cellID,
       double minimumHeight,
       double maximumHeight,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Gets this bounding volume's cell ID.
@@ -85,8 +86,8 @@ public:
    *
    * @snippet TestOrientedBoundingBox.cpp distanceSquaredTo
    */
-  double
-  computeDistanceSquaredToPosition(const glm::dvec3& position) const noexcept;
+  double computeDistanceSquaredToPosition(const glm::dvec3& position
+  ) const noexcept;
 
   /**
    * @brief Gets the six planes that bound the volume.
@@ -100,9 +101,9 @@ public:
    *
    * @return The bounding region.
    */
-  BoundingRegion
-  computeBoundingRegion(const CesiumGeospatial::Ellipsoid& ellipsoid
-                            CESIUM_DEFAULT_ELLIPSOID) const noexcept;
+  BoundingRegion computeBoundingRegion(
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const noexcept;
 
 private:
   S2CellID _cellID;

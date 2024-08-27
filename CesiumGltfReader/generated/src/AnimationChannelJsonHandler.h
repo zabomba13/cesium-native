@@ -18,8 +18,8 @@ class AnimationChannelJsonHandler
 public:
   using ValueType = CesiumGltf::AnimationChannel;
 
-  AnimationChannelJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  AnimationChannelJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::AnimationChannel* pObject);
 
@@ -29,7 +29,8 @@ protected:
   IJsonHandler* readObjectKeyAnimationChannel(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::AnimationChannel& o);
+      CesiumGltf::AnimationChannel& o
+  );
 
 private:
   CesiumGltf::AnimationChannel* _pObject = nullptr;

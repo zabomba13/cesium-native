@@ -72,7 +72,8 @@ TEST_CASE("TestJsonObjectWriter") {
     writeJsonValue(extrasObject, writer);
     REQUIRE(
         writer.toStringView() ==
-        R"({"extras":[[[1.0,-2.0,false,null,true,{"emojis":"😂👽🇵🇷"}]]]})");
+        R"({"extras":[[[1.0,-2.0,false,null,true,{"emojis":"😂👽🇵🇷"}]]]})"
+    );
   }
 
   SECTION("Empty object is serialized correctly") {

@@ -23,7 +23,8 @@ public:
         const rapidjson::Value& classIds,
         const rapidjson::Value& parentIds,
         const std::vector<uint32_t>& instanceIndices,
-        int64_t currentIndex);
+        int64_t currentIndex
+    );
 
     const_iterator& operator++();
 
@@ -57,7 +58,8 @@ public:
    */
   BatchTableHierarchyPropertyValues(
       const rapidjson::Value& batchTableHierarchy,
-      int64_t batchLength);
+      int64_t batchLength
+  );
 
   /**
    * @brief Sets the name of the property whose values are to be enumerated.

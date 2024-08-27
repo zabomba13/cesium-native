@@ -123,7 +123,8 @@ struct CESIUMGLTF_API Ktx2TranscodeTargets {
    */
   Ktx2TranscodeTargets(
       const SupportedGpuCompressedPixelFormats& supportedFormats,
-      bool preserveHighQuality);
+      bool preserveHighQuality
+  );
 };
 
 } // namespace CesiumGltf

@@ -32,12 +32,14 @@ createMockAssetRequest(const std::filesystem::path& requestContentPath) {
       static_cast<uint16_t>(200),
       "doesn't matter",
       CesiumAsync::HttpHeaders{},
-      readFile(requestContentPath));
+      readFile(requestContentPath)
+  );
   auto pMockRequest = std::make_shared<SimpleAssetRequest>(
       "GET",
       requestContentPath.filename().string(),
       CesiumAsync::HttpHeaders{},
-      std::move(pMockResponse));
+      std::move(pMockResponse)
+  );
 
   return pMockRequest;
 }
@@ -46,7 +48,8 @@ Future<TileLoadResult> loadTile(
     const QuadtreeTileID& tileID,
     LayerJsonTerrainLoader& loader,
     AsyncSystem& asyncSystem,
-    const std::shared_ptr<IAssetAccessor>& pAssetAccessor) {
+    const std::shared_ptr<IAssetAccessor>& pAssetAccessor
+) {
   Tile tile(&loader);
   tile.setTileID(tileID);
   tile.setBoundingVolume(BoundingRegionWithLooseFittingHeights{
@@ -75,7 +78,8 @@ TEST_CASE("Test create layer json terrain loader") {
   Cesium3DTilesContent::registerAllTileContentTypes();
 
   auto pMockedAssetAccessor = std::make_shared<SimpleAssetAccessor>(
-      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{});
+      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{}
+  );
 
   auto pMockedPrepareRendererResources =
       std::make_shared<SimplePrepareRendererResource>();
@@ -94,7 +98,8 @@ TEST_CASE("Test create layer json terrain loader") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "QuantizedMesh.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -126,7 +131,8 @@ TEST_CASE("Test create layer json terrain loader") {
     const Tile& rootTile = *loaderResult.pRootTile;
     const auto& rootLooseRegion =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            rootTile.getBoundingVolume());
+            rootTile.getBoundingVolume()
+        );
     const auto& rootRegion = rootLooseRegion.getBoundingRegion();
     CHECK(rootTile.isEmptyContent());
     CHECK(rootTile.getUnconditionallyRefine());
@@ -145,11 +151,13 @@ TEST_CASE("Test create layer json terrain loader") {
     const Tile& tile_0_0_0 = tileChildren[0];
     const auto& looseRegion_0_0_0 =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            tile_0_0_0.getBoundingVolume());
+            tile_0_0_0.getBoundingVolume()
+        );
     const auto& region_0_0_0 = looseRegion_0_0_0.getBoundingRegion();
     CHECK(
         std::get<QuadtreeTileID>(tile_0_0_0.getTileID()) ==
-        QuadtreeTileID(0, 0, 0));
+        QuadtreeTileID(0, 0, 0)
+    );
     CHECK(tile_0_0_0.getGeometricError() == Approx(616538.71824));
     CHECK(region_0_0_0.getRectangle().getWest() == Approx(-Math::OnePi));
     CHECK(region_0_0_0.getRectangle().getEast() == Approx(0.0));
@@ -161,11 +169,13 @@ TEST_CASE("Test create layer json terrain loader") {
     const Tile& tile_0_1_0 = tileChildren[1];
     const auto& looseRegion_0_1_0 =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            tile_0_1_0.getBoundingVolume());
+            tile_0_1_0.getBoundingVolume()
+        );
     const auto& region_0_1_0 = looseRegion_0_1_0.getBoundingRegion();
     CHECK(
         std::get<QuadtreeTileID>(tile_0_1_0.getTileID()) ==
-        QuadtreeTileID(0, 1, 0));
+        QuadtreeTileID(0, 1, 0)
+    );
     CHECK(tile_0_1_0.getGeometricError() == Approx(616538.71824));
     CHECK(region_0_1_0.getRectangle().getWest() == Approx(0.0));
     CHECK(region_0_1_0.getRectangle().getEast() == Approx(Math::OnePi));
@@ -179,7 +189,8 @@ TEST_CASE("Test create layer json terrain loader") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "EmptyTilesArray.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -192,14 +203,16 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(loaderResult.errors.errors.size() == 1);
     CHECK(
         loaderResult.errors.errors[0] ==
-        "Layer Json does not specify any tile URL templates");
+        "Layer Json does not specify any tile URL templates"
+    );
   }
 
   SECTION("Load error layer json with no tiles field") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "NoTiles.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -212,14 +225,16 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(loaderResult.errors.errors.size() == 1);
     CHECK(
         loaderResult.errors.errors[0] ==
-        "Layer Json does not specify any tile URL templates");
+        "Layer Json does not specify any tile URL templates"
+    );
   }
 
   SECTION("Load layer json with metadataAvailability field") {
     auto layerJsonPath = testDataPath / "CesiumTerrainTileJson" /
                          "MetadataAvailability.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -232,14 +247,16 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(!loaderResult.errors);
 
     CHECK(std::holds_alternative<GeographicProjection>(
-        loaderResult.pLoader->getProjection()));
+        loaderResult.pLoader->getProjection()
+    ));
 
     const auto& layers = loaderResult.pLoader->getLayers();
     CHECK(layers.size() == 1);
     CHECK(layers[0].version == "1.33.0");
     CHECK(
         layers[0].tileTemplateUrls.front() ==
-        "{z}/{x}/{y}.terrain?v={version}&extensions=octvertexnormals-metadata");
+        "{z}/{x}/{y}.terrain?v={version}&extensions=octvertexnormals-metadata"
+    );
     CHECK(layers[0].loadedSubtrees.size() == 2);
     CHECK(layers[0].availabilityLevels == 10);
   }
@@ -248,7 +265,8 @@ TEST_CASE("Test create layer json terrain loader") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "OctVertexNormals.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -261,37 +279,41 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(!loaderResult.errors);
 
     CHECK(std::holds_alternative<GeographicProjection>(
-        loaderResult.pLoader->getProjection()));
+        loaderResult.pLoader->getProjection()
+    ));
 
     const auto& layers = loaderResult.pLoader->getLayers();
     CHECK(layers.size() == 1);
     CHECK(layers[0].version == "1.0.0");
     CHECK(
         layers[0].tileTemplateUrls.front() ==
-        "{z}/{x}/{y}.terrain?v={version}&extensions=octvertexnormals");
+        "{z}/{x}/{y}.terrain?v={version}&extensions=octvertexnormals"
+    );
     CHECK(layers[0].loadedSubtrees.empty());
     CHECK(layers[0].availabilityLevels == -1);
 
-    CHECK(
-        layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(0, 0, 0)));
-    CHECK(
-        layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(0, 1, 0)));
-    CHECK(
-        layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(1, 1, 0)));
-    CHECK(
-        layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(1, 3, 1)));
+    CHECK(layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(0, 0, 0))
+    );
+    CHECK(layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(0, 1, 0))
+    );
+    CHECK(layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(1, 1, 0))
+    );
+    CHECK(layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(1, 3, 1))
+    );
   }
 
   SECTION("Load multiple layers") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "ParentUrl.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto parentJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "Parent.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"./Parent/layer.json", createMockAssetRequest(parentJsonPath)});
+        {"./Parent/layer.json", createMockAssetRequest(parentJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -310,22 +332,23 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(layers[0].version == "1.0.0");
     CHECK(layers[0].tileTemplateUrls.size() == 1);
     CHECK(
-        layers[0].tileTemplateUrls.front() ==
-        "{z}/{x}/{y}.terrain?v={version}");
+        layers[0].tileTemplateUrls.front() == "{z}/{x}/{y}.terrain?v={version}"
+    );
 
     CHECK(layers[1].baseUrl == "Parent.tile.json");
     CHECK(layers[1].version == "1.1.0");
     CHECK(layers[1].tileTemplateUrls.size() == 1);
     CHECK(
-        layers[1].tileTemplateUrls.front() ==
-        "{z}/{x}/{y}.terrain?v={version}");
+        layers[1].tileTemplateUrls.front() == "{z}/{x}/{y}.terrain?v={version}"
+    );
   }
 
   SECTION("Load layer json with partial availability") {
     auto layerJsonPath = testDataPath / "CesiumTerrainTileJson" /
                          "PartialAvailability.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -338,17 +361,18 @@ TEST_CASE("Test create layer json terrain loader") {
 
     const auto& layers = loaderResult.pLoader->getLayers();
     CHECK(layers.size() == 1);
-    CHECK(
-        layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(2, 1, 0)));
-    CHECK(!layers[0].contentAvailability.isTileAvailable(
-        QuadtreeTileID(2, 0, 0)));
+    CHECK(layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(2, 1, 0))
+    );
+    CHECK(!layers[0].contentAvailability.isTileAvailable(QuadtreeTileID(2, 0, 0)
+    ));
   }
 
   SECTION("Load layer json with attribution") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "WithAttribution.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     auto loaderFuture =
         LayerJsonTerrainLoader::createLoader(externals, {}, "layer.json", {});
@@ -361,14 +385,16 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(loaderResult.credits.size() == 1);
     CHECK(
         loaderResult.credits.front().creditText ==
-        "This amazing data is courtesy The Amazing Data Source!");
+        "This amazing data is courtesy The Amazing Data Source!"
+    );
   }
 
   SECTION("Load layer json with watermask") {
     auto layerJsonPath =
         testDataPath / "CesiumTerrainTileJson" / "WaterMask.tile.json";
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"layer.json", createMockAssetRequest(layerJsonPath)});
+        {"layer.json", createMockAssetRequest(layerJsonPath)}
+    );
 
     TilesetContentOptions options;
     options.enableWaterMask = true;
@@ -376,7 +402,8 @@ TEST_CASE("Test create layer json terrain loader") {
         externals,
         options,
         "layer.json",
-        {});
+        {}
+    );
 
     asyncSystem.dispatchMainThreadTasks();
 
@@ -390,7 +417,8 @@ TEST_CASE("Test create layer json terrain loader") {
     CHECK(
         layers[0].tileTemplateUrls[0] ==
         "{z}/{x}/"
-        "{y}.terrain?v={version}&extensions=octvertexnormals-watermask");
+        "{y}.terrain?v={version}&extensions=octvertexnormals-watermask"
+    );
   }
 }
 
@@ -398,7 +426,8 @@ TEST_CASE("Test load layer json tile content") {
   Cesium3DTilesContent::registerAllTileContentTypes();
 
   auto pMockedAssetAccessor = std::make_shared<SimpleAssetAccessor>(
-      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{});
+      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{}
+  );
 
   CesiumAsync::AsyncSystem asyncSystem{std::make_shared<SimpleTaskProcessor>()};
 
@@ -423,7 +452,8 @@ TEST_CASE("Test load layer json tile content") {
         std::vector<std::string>{"{level}.{x}.{y}/{version}.terrain"},
         std::move(contentAvailability),
         maxZoom,
-        10);
+        10
+    );
 
     LayerJsonTerrainLoader loader{tilingScheme, projection, std::move(layers)};
 
@@ -432,25 +462,28 @@ TEST_CASE("Test load layer json tile content") {
         {"0.0.0/1.0.0.terrain",
          createMockAssetRequest(
              testDataPath / "CesiumTerrainTileJson" /
-             "tile.metadataavailability.terrain")});
+             "tile.metadataavailability.terrain"
+         )}
+    );
 
     // check tile availability before loading
     const auto& loaderLayers = loader.getLayers();
     const auto& layer = loaderLayers[0];
     CHECK(layer.contentAvailability.isTileAvailable(QuadtreeTileID(0, 0, 0)));
     CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(1, 0, 1)));
-    CHECK(!layer.contentAvailability.isTileAvailable(
-        QuadtreeTileID(8, 177, 177)));
+    CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(8, 177, 177)
+    ));
 
     // check the load result
     auto tileLoadResultFuture = loadTile(
         QuadtreeTileID(0, 0, 0),
         loader,
         asyncSystem,
-        pMockedAssetAccessor);
+        pMockedAssetAccessor
+    );
     auto tileLoadResult = tileLoadResultFuture.wait();
-    CHECK(
-        std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind));
+    CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind)
+    );
     CHECK(tileLoadResult.updatedBoundingVolume);
     CHECK(!tileLoadResult.updatedContentBoundingVolume);
     CHECK(!tileLoadResult.tileInitializer);
@@ -459,8 +492,8 @@ TEST_CASE("Test load layer json tile content") {
     // check that the layer receive new rectangle availability
     CHECK(layer.contentAvailability.isTileAvailable(QuadtreeTileID(0, 0, 0)));
     CHECK(layer.contentAvailability.isTileAvailable(QuadtreeTileID(1, 0, 1)));
-    CHECK(
-        layer.contentAvailability.isTileAvailable(QuadtreeTileID(8, 177, 177)));
+    CHECK(layer.contentAvailability.isTileAvailable(QuadtreeTileID(8, 177, 177))
+    );
     CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(9, 0, 0)));
   }
 
@@ -473,7 +506,8 @@ TEST_CASE("Test load layer json tile content") {
         std::vector<std::string>{"{level}.{x}.{y}/{version}.terrain"},
         std::move(contentAvailability),
         maxZoom,
-        -1);
+        -1
+    );
 
     LayerJsonTerrainLoader loader{tilingScheme, projection, std::move(layers)};
 
@@ -482,27 +516,30 @@ TEST_CASE("Test load layer json tile content") {
         {"0.0.0/1.0.0.terrain",
          createMockAssetRequest(
              testDataPath / "CesiumTerrainTileJson" /
-             "tile.metadataavailability.terrain")});
+             "tile.metadataavailability.terrain"
+         )}
+    );
 
     // check tile availability before loading
     const auto& loaderLayers = loader.getLayers();
     const auto& layer = loaderLayers[0];
     CHECK(layer.contentAvailability.isTileAvailable(QuadtreeTileID(0, 0, 0)));
     CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(1, 0, 1)));
-    CHECK(!layer.contentAvailability.isTileAvailable(
-        QuadtreeTileID(8, 177, 177)));
+    CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(8, 177, 177)
+    ));
 
     // try to request tile
     auto tileLoadResultFuture = loadTile(
         QuadtreeTileID(0, 0, 0),
         loader,
         asyncSystem,
-        pMockedAssetAccessor);
+        pMockedAssetAccessor
+    );
 
     // check the load result
     auto tileLoadResult = tileLoadResultFuture.wait();
-    CHECK(
-        std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind));
+    CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind)
+    );
     CHECK(tileLoadResult.updatedBoundingVolume);
     CHECK(!tileLoadResult.updatedContentBoundingVolume);
     CHECK(!tileLoadResult.tileInitializer);
@@ -512,8 +549,8 @@ TEST_CASE("Test load layer json tile content") {
     // them
     CHECK(layer.contentAvailability.isTileAvailable(QuadtreeTileID(0, 0, 0)));
     CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(1, 0, 1)));
-    CHECK(!layer.contentAvailability.isTileAvailable(
-        QuadtreeTileID(8, 177, 177)));
+    CHECK(!layer.contentAvailability.isTileAvailable(QuadtreeTileID(8, 177, 177)
+    ));
   }
 
   SECTION("Load tile with multiple layers. Ensure layer is chosen correctly to "
@@ -534,7 +571,8 @@ TEST_CASE("Test load layer json tile content") {
         std::vector<std::string>{"{level}.{x}.{y}/{version}_layer0.terrain"},
         std::move(layer0ContentAvailability),
         maxZoom,
-        -1);
+        -1
+    );
 
     CesiumGeometry::QuadtreeRectangleAvailability layer1ContentAvailability{
         tilingScheme,
@@ -548,27 +586,31 @@ TEST_CASE("Test load layer json tile content") {
         std::vector<std::string>{"{level}.{x}.{y}/{version}_layer1.terrain"},
         std::move(layer1ContentAvailability),
         maxZoom,
-        -1);
+        -1
+    );
 
     LayerJsonTerrainLoader loader{tilingScheme, projection, std::move(layers)};
 
     // mock tile content request
     auto pMockRequest = createMockAssetRequest(
-        testDataPath / "CesiumTerrainTileJson" / "tile.terrain");
+        testDataPath / "CesiumTerrainTileJson" / "tile.terrain"
+    );
 
     // load tile from the first layer
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"0.0.0/1.0.0_layer0.terrain", pMockRequest});
+        {"0.0.0/1.0.0_layer0.terrain", pMockRequest}
+    );
     {
       auto tileLoadResultFuture = loadTile(
           QuadtreeTileID(0, 0, 0),
           loader,
           asyncSystem,
-          pMockedAssetAccessor);
+          pMockedAssetAccessor
+      );
 
       auto tileLoadResult = tileLoadResultFuture.wait();
-      CHECK(std::holds_alternative<CesiumGltf::Model>(
-          tileLoadResult.contentKind));
+      CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind
+      ));
       CHECK(tileLoadResult.updatedBoundingVolume);
       CHECK(!tileLoadResult.updatedContentBoundingVolume);
       CHECK(!tileLoadResult.tileInitializer);
@@ -578,17 +620,19 @@ TEST_CASE("Test load layer json tile content") {
     // load tile from the second layer
     pMockedAssetAccessor->mockCompletedRequests.clear();
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"2.3.3/1.0.0_layer1.terrain", pMockRequest});
+        {"2.3.3/1.0.0_layer1.terrain", pMockRequest}
+    );
     {
       auto tileLoadResultFuture = loadTile(
           QuadtreeTileID(2, 3, 3),
           loader,
           asyncSystem,
-          pMockedAssetAccessor);
+          pMockedAssetAccessor
+      );
 
       auto tileLoadResult = tileLoadResultFuture.wait();
-      CHECK(std::holds_alternative<CesiumGltf::Model>(
-          tileLoadResult.contentKind));
+      CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind
+      ));
       CHECK(tileLoadResult.updatedBoundingVolume);
       CHECK(!tileLoadResult.updatedContentBoundingVolume);
       CHECK(!tileLoadResult.tileInitializer);
@@ -610,7 +654,8 @@ TEST_CASE("Test load layer json tile content") {
         std::vector<std::string>{"{level}.{x}.{y}/{version}_layer0.terrain"},
         std::move(layer0ContentAvailability),
         maxZoom,
-        10);
+        10
+    );
 
     CesiumGeometry::QuadtreeRectangleAvailability layer1ContentAvailability{
         tilingScheme,
@@ -621,31 +666,36 @@ TEST_CASE("Test load layer json tile content") {
         std::vector<std::string>{"{level}.{x}.{y}/{version}_layer1.terrain"},
         std::move(layer1ContentAvailability),
         maxZoom,
-        10);
+        10
+    );
 
     LayerJsonTerrainLoader loader{tilingScheme, projection, std::move(layers)};
 
     // mock tile content request
     auto pMockRequest = createMockAssetRequest(
         testDataPath / "CesiumTerrainTileJson" /
-        "tile.metadataavailability.terrain");
+        "tile.metadataavailability.terrain"
+    );
 
     // load tile from the first layer. But the tile from the second layer
     // will be loaded as well to add the availability to the second layer
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"0.0.0/1.0.0_layer0.terrain", pMockRequest});
+        {"0.0.0/1.0.0_layer0.terrain", pMockRequest}
+    );
     pMockedAssetAccessor->mockCompletedRequests.insert(
-        {"0.0.0/1.0.0_layer1.terrain", pMockRequest});
+        {"0.0.0/1.0.0_layer1.terrain", pMockRequest}
+    );
     {
       auto tileLoadResultFuture = loadTile(
           QuadtreeTileID(0, 0, 0),
           loader,
           asyncSystem,
-          pMockedAssetAccessor);
+          pMockedAssetAccessor
+      );
 
       auto tileLoadResult = tileLoadResultFuture.wait();
-      CHECK(std::holds_alternative<CesiumGltf::Model>(
-          tileLoadResult.contentKind));
+      CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind
+      ));
       CHECK(tileLoadResult.updatedBoundingVolume);
       CHECK(!tileLoadResult.updatedContentBoundingVolume);
       CHECK(!tileLoadResult.tileInitializer);
@@ -655,27 +705,31 @@ TEST_CASE("Test load layer json tile content") {
       const auto& loaderLayers = loader.getLayers();
       CHECK(
           loaderLayers[0].loadedSubtrees[0].find(0) !=
-          loaderLayers[0].loadedSubtrees[0].end());
+          loaderLayers[0].loadedSubtrees[0].end()
+      );
 
       CHECK(
           loaderLayers[1].loadedSubtrees[0].find(0) !=
-          loaderLayers[1].loadedSubtrees[0].end());
+          loaderLayers[1].loadedSubtrees[0].end()
+      );
     }
 
     // remove the second layer request to make sure that
     // the second layer availability is not requested again
     pMockedAssetAccessor->mockCompletedRequests.erase(
-        "0.0.0/1.0.0_layer1.terrain");
+        "0.0.0/1.0.0_layer1.terrain"
+    );
     {
       auto tileLoadResultFuture = loadTile(
           QuadtreeTileID(0, 0, 0),
           loader,
           asyncSystem,
-          pMockedAssetAccessor);
+          pMockedAssetAccessor
+      );
 
       auto tileLoadResult = tileLoadResultFuture.wait();
-      CHECK(std::holds_alternative<CesiumGltf::Model>(
-          tileLoadResult.contentKind));
+      CHECK(std::holds_alternative<CesiumGltf::Model>(tileLoadResult.contentKind
+      ));
       CHECK(tileLoadResult.updatedBoundingVolume);
       CHECK(!tileLoadResult.updatedContentBoundingVolume);
       CHECK(!tileLoadResult.tileInitializer);
@@ -688,7 +742,8 @@ TEST_CASE("Test creating tile children for layer json") {
   Cesium3DTilesContent::registerAllTileContentTypes();
 
   auto pMockedAssetAccessor = std::make_shared<SimpleAssetAccessor>(
-      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{});
+      std::map<std::string, std::shared_ptr<SimpleAssetRequest>>{}
+  );
 
   CesiumAsync::AsyncSystem asyncSystem{std::make_shared<SimpleTaskProcessor>()};
 
@@ -716,7 +771,8 @@ TEST_CASE("Test creating tile children for layer json") {
       std::vector<std::string>{"{level}.{x}.{y}/{version}_layer0.terrain"},
       std::move(layer0ContentAvailability),
       maxZoom,
-      10);
+      10
+  );
   layers.back().loadedSubtrees[0].insert(0);
 
   CesiumGeometry::QuadtreeRectangleAvailability layer1ContentAvailability{
@@ -731,7 +787,8 @@ TEST_CASE("Test creating tile children for layer json") {
       std::vector<std::string>{"{level}.{x}.{y}/{version}_layer1.terrain"},
       std::move(layer1ContentAvailability),
       maxZoom,
-      10);
+      10
+  );
   layers.back().loadedSubtrees[0].insert(0);
 
   LayerJsonTerrainLoader loader{tilingScheme, projection, std::move(layers)};
@@ -743,12 +800,14 @@ TEST_CASE("Test creating tile children for layer json") {
         GlobeRectangle(-Math::OnePi, -Math::PiOverTwo, 0.0, Math::PiOverTwo),
         -1000.0,
         9000.0,
-        Ellipsoid::WGS84));
+        Ellipsoid::WGS84
+    ));
 
     {
       MockTilesetContentManagerTestFixture::setTileLoadState(
           tile,
-          TileLoadState::FailedTemporarily);
+          TileLoadState::FailedTemporarily
+      );
       auto tileChildrenResult = loader.createTileChildren(tile);
       CHECK(tileChildrenResult.state == TileLoadResultState::RetryLater);
     }
@@ -756,7 +815,8 @@ TEST_CASE("Test creating tile children for layer json") {
     {
       MockTilesetContentManagerTestFixture::setTileLoadState(
           tile,
-          TileLoadState::Unloaded);
+          TileLoadState::Unloaded
+      );
       auto tileChildrenResult = loader.createTileChildren(tile);
       CHECK(tileChildrenResult.state == TileLoadResultState::RetryLater);
     }
@@ -764,7 +824,8 @@ TEST_CASE("Test creating tile children for layer json") {
     {
       MockTilesetContentManagerTestFixture::setTileLoadState(
           tile,
-          TileLoadState::ContentLoading);
+          TileLoadState::ContentLoading
+      );
       auto tileChildrenResult = loader.createTileChildren(tile);
       CHECK(tileChildrenResult.state == TileLoadResultState::RetryLater);
     }
@@ -772,7 +833,8 @@ TEST_CASE("Test creating tile children for layer json") {
     {
       MockTilesetContentManagerTestFixture::setTileLoadState(
           tile,
-          TileLoadState::ContentLoaded);
+          TileLoadState::ContentLoaded
+      );
       auto tileChildrenResult = loader.createTileChildren(tile);
       CHECK(tileChildrenResult.state == TileLoadResultState::Success);
 
@@ -782,11 +844,13 @@ TEST_CASE("Test creating tile children for layer json") {
       const auto& tile_1_0_0 = tileChildren[0];
       const auto& looseRegion_1_0_0 =
           std::get<BoundingRegionWithLooseFittingHeights>(
-              tile_1_0_0.getBoundingVolume());
+              tile_1_0_0.getBoundingVolume()
+          );
       const auto& region_1_0_0 = looseRegion_1_0_0.getBoundingRegion();
       CHECK(
           std::get<QuadtreeTileID>(tile_1_0_0.getTileID()) ==
-          QuadtreeTileID(1, 0, 0));
+          QuadtreeTileID(1, 0, 0)
+      );
       CHECK(region_1_0_0.getRectangle().getWest() == Approx(-Math::OnePi));
       CHECK(region_1_0_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
       CHECK(region_1_0_0.getRectangle().getEast() == Approx(-Math::PiOverTwo));
@@ -795,11 +859,13 @@ TEST_CASE("Test creating tile children for layer json") {
       const auto& tile_1_1_0 = tileChildren[1];
       const auto& looseRegion_1_1_0 =
           std::get<BoundingRegionWithLooseFittingHeights>(
-              tile_1_1_0.getBoundingVolume());
+              tile_1_1_0.getBoundingVolume()
+          );
       const auto& region_1_1_0 = looseRegion_1_1_0.getBoundingRegion();
       CHECK(
           std::get<QuadtreeTileID>(tile_1_1_0.getTileID()) ==
-          QuadtreeTileID(1, 1, 0));
+          QuadtreeTileID(1, 1, 0)
+      );
       CHECK(region_1_1_0.getRectangle().getWest() == Approx(-Math::PiOverTwo));
       CHECK(region_1_1_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
       CHECK(region_1_1_0.getRectangle().getEast() == 0.0);
@@ -808,11 +874,13 @@ TEST_CASE("Test creating tile children for layer json") {
       const auto& tile_1_0_1 = tileChildren[2];
       const auto& looseRegion_1_0_1 =
           std::get<BoundingRegionWithLooseFittingHeights>(
-              tile_1_0_1.getBoundingVolume());
+              tile_1_0_1.getBoundingVolume()
+          );
       const auto& region_1_0_1 = looseRegion_1_0_1.getBoundingRegion();
       CHECK(
           std::get<QuadtreeTileID>(tile_1_0_1.getTileID()) ==
-          QuadtreeTileID(1, 0, 1));
+          QuadtreeTileID(1, 0, 1)
+      );
       CHECK(region_1_0_1.getRectangle().getWest() == Approx(-Math::OnePi));
       CHECK(region_1_0_1.getRectangle().getSouth() == 0.0);
       CHECK(region_1_0_1.getRectangle().getEast() == Approx(-Math::PiOverTwo));
@@ -821,11 +889,13 @@ TEST_CASE("Test creating tile children for layer json") {
       const auto& tile_1_1_1 = tileChildren[3];
       const auto& looseRegion_1_1_1 =
           std::get<BoundingRegionWithLooseFittingHeights>(
-              tile_1_1_1.getBoundingVolume());
+              tile_1_1_1.getBoundingVolume()
+          );
       const auto& region_1_1_1 = looseRegion_1_1_1.getBoundingRegion();
       CHECK(
           std::get<QuadtreeTileID>(tile_1_1_1.getTileID()) ==
-          QuadtreeTileID(1, 1, 1));
+          QuadtreeTileID(1, 1, 1)
+      );
       CHECK(region_1_1_1.getRectangle().getWest() == Approx(-Math::PiOverTwo));
       CHECK(region_1_1_1.getRectangle().getSouth() == 0.0);
       CHECK(region_1_1_1.getRectangle().getEast() == 0.0);
@@ -840,7 +910,8 @@ TEST_CASE("Test creating tile children for layer json") {
         GlobeRectangle(-Math::OnePi, 0, -Math::PiOverTwo, Math::PiOverTwo),
         -1000.0,
         9000.0,
-        Ellipsoid::WGS84));
+        Ellipsoid::WGS84
+    ));
     auto tileChildrenResult = loader.createTileChildren(tile);
     CHECK(tileChildrenResult.state == TileLoadResultState::Success);
 
@@ -850,29 +921,33 @@ TEST_CASE("Test creating tile children for layer json") {
     const auto& tile_2_0_2 = tileChildren[0];
     const auto& looseRegion_2_0_2 =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            tile_2_0_2.getBoundingVolume());
+            tile_2_0_2.getBoundingVolume()
+        );
     const auto& region_2_0_2 = looseRegion_2_0_2.getBoundingRegion();
     CHECK(
         std::get<QuadtreeTileID>(tile_2_0_2.getTileID()) ==
-        QuadtreeTileID(2, 0, 2));
+        QuadtreeTileID(2, 0, 2)
+    );
     CHECK(region_2_0_2.getRectangle().getWest() == Approx(-Math::OnePi));
     CHECK(region_2_0_2.getRectangle().getSouth() == 0.0);
     CHECK(
-        region_2_0_2.getRectangle().getEast() ==
-        Approx(-Math::OnePi * 3.0 / 4));
+        region_2_0_2.getRectangle().getEast() == Approx(-Math::OnePi * 3.0 / 4)
+    );
     CHECK(region_2_0_2.getRectangle().getNorth() == Approx(Math::OnePi / 4.0));
 
     const auto& tile_2_1_2 = tileChildren[1];
     const auto& looseRegion_2_1_2 =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            tile_2_1_2.getBoundingVolume());
+            tile_2_1_2.getBoundingVolume()
+        );
     const auto& region_2_1_2 = looseRegion_2_1_2.getBoundingRegion();
     CHECK(
         std::get<QuadtreeTileID>(tile_2_1_2.getTileID()) ==
-        QuadtreeTileID(2, 1, 2));
+        QuadtreeTileID(2, 1, 2)
+    );
     CHECK(
-        region_2_1_2.getRectangle().getWest() ==
-        Approx(-Math::OnePi * 3.0 / 4));
+        region_2_1_2.getRectangle().getWest() == Approx(-Math::OnePi * 3.0 / 4)
+    );
     CHECK(region_2_1_2.getRectangle().getSouth() == 0.0);
     CHECK(region_2_1_2.getRectangle().getEast() == Approx(-Math::PiOverTwo));
     CHECK(region_2_1_2.getRectangle().getNorth() == Approx(Math::OnePi / 4.0));
@@ -880,29 +955,33 @@ TEST_CASE("Test creating tile children for layer json") {
     const auto& tile_2_0_3 = tileChildren[2];
     const auto& looseRegion_2_0_3 =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            tile_2_0_3.getBoundingVolume());
+            tile_2_0_3.getBoundingVolume()
+        );
     const auto& region_2_0_3 = looseRegion_2_0_3.getBoundingRegion();
     CHECK(
         std::get<QuadtreeTileID>(tile_2_0_3.getTileID()) ==
-        QuadtreeTileID(2, 0, 3));
+        QuadtreeTileID(2, 0, 3)
+    );
     CHECK(region_2_0_3.getRectangle().getWest() == Approx(-Math::OnePi));
     CHECK(region_2_0_3.getRectangle().getSouth() == Approx(Math::OnePi / 4.0));
     CHECK(
-        region_2_0_3.getRectangle().getEast() ==
-        Approx(-Math::OnePi * 3.0 / 4));
+        region_2_0_3.getRectangle().getEast() == Approx(-Math::OnePi * 3.0 / 4)
+    );
     CHECK(region_2_0_3.getRectangle().getNorth() == Approx(Math::PiOverTwo));
 
     const auto& tile_2_1_3 = tileChildren[3];
     const auto& looseRegion_2_1_3 =
         std::get<BoundingRegionWithLooseFittingHeights>(
-            tile_2_1_3.getBoundingVolume());
+            tile_2_1_3.getBoundingVolume()
+        );
     const auto& region_2_1_3 = looseRegion_2_1_3.getBoundingRegion();
     CHECK(
         std::get<QuadtreeTileID>(tile_2_1_3.getTileID()) ==
-        QuadtreeTileID(2, 1, 3));
+        QuadtreeTileID(2, 1, 3)
+    );
     CHECK(
-        region_2_1_3.getRectangle().getWest() ==
-        Approx(-Math::OnePi * 3.0 / 4));
+        region_2_1_3.getRectangle().getWest() == Approx(-Math::OnePi * 3.0 / 4)
+    );
     CHECK(region_2_1_3.getRectangle().getSouth() == Approx(Math::OnePi / 4.0));
     CHECK(region_2_1_3.getRectangle().getEast() == Approx(-Math::PiOverTwo));
     CHECK(region_2_1_3.getRectangle().getNorth() == Approx(Math::PiOverTwo));
@@ -915,7 +994,8 @@ TEST_CASE("Test creating tile children for layer json") {
         GlobeRectangle(-Math::PiOverTwo, -Math::PiOverTwo, 0, 0),
         -1000.0,
         9000.0,
-        Ellipsoid::WGS84));
+        Ellipsoid::WGS84
+    ));
     auto tileChildrenResult = loader.createTileChildren(tile);
     CHECK(tileChildrenResult.state == TileLoadResultState::Success);
 
@@ -925,7 +1005,8 @@ TEST_CASE("Test creating tile children for layer json") {
     const auto& tile_2_2_0 = tileChildren[0];
     CHECK(
         std::get<QuadtreeTileID>(tile_2_2_0.getTileID()) ==
-        QuadtreeTileID(2, 2, 0));
+        QuadtreeTileID(2, 2, 0)
+    );
 
     const auto& tile_2_3_0 = tileChildren[1];
     const auto& upsampleID_2_3_0 =

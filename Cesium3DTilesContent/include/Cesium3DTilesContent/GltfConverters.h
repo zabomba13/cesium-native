@@ -32,7 +32,8 @@ struct CESIUM3DTILESCONTENT_API AssetFetcher {
       const std::string& baseUrl_,
       const glm::dmat4 tileTransform_,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders_,
-      CesiumGeometry::Axis upAxis_)
+      CesiumGeometry::Axis upAxis_
+  )
       : asyncSystem(asyncSystem_),
         pAssetAccessor(pAssetAccessor_),
         baseUrl(baseUrl_),
@@ -40,8 +41,8 @@ struct CESIUM3DTILESCONTENT_API AssetFetcher {
         requestHeaders(requestHeaders_),
         upAxis(upAxis_) {}
 
-  CesiumAsync::Future<AssetFetcherResult>
-  get(const std::string& relativeUrl) const;
+  CesiumAsync::Future<AssetFetcherResult> get(const std::string& relativeUrl
+  ) const;
 
   CesiumAsync::AsyncSystem asyncSystem;
   std::shared_ptr<CesiumAsync::IAssetAccessor> pAssetAccessor;
@@ -74,7 +75,8 @@ public:
   using ConverterFunction = CesiumAsync::Future<GltfConverterResult> (*)(
       const gsl::span<const std::byte>& content,
       const CesiumGltfReader::GltfReaderOptions& options,
-      const AssetFetcher& subprocessor);
+      const AssetFetcher& subprocessor
+  );
 
   /**
    * @brief Register the given function for the given magic header.
@@ -106,7 +108,8 @@ public:
    */
   static void registerFileExtension(
       const std::string& fileExtension,
-      ConverterFunction converter);
+      ConverterFunction converter
+  );
 
   /**
    * @brief Retrieve the converter function that is already registered for the
@@ -166,7 +169,8 @@ public:
       const std::string& filePath,
       const gsl::span<const std::byte>& content,
       const CesiumGltfReader::GltfReaderOptions& options,
-      const AssetFetcher& assetFetcher);
+      const AssetFetcher& assetFetcher
+  );
 
   /**
    * @brief Creates the {@link GltfConverterResult} from the given
@@ -193,7 +197,8 @@ public:
   static CesiumAsync::Future<GltfConverterResult> convert(
       const gsl::span<const std::byte>& content,
       const CesiumGltfReader::GltfReaderOptions& options,
-      const AssetFetcher& assetFetcher);
+      const AssetFetcher& assetFetcher
+  );
 
 private:
   static std::string toLowerCase(const std::string_view& str);
@@ -202,11 +207,13 @@ private:
 
   static ConverterFunction getConverterByFileExtension(
       const std::string& filePath,
-      std::string& fileExtension);
+      std::string& fileExtension
+  );
 
   static ConverterFunction getConverterByMagic(
       const gsl::span<const std::byte>& content,
-      std::string& magic);
+      std::string& magic
+  );
 
   static std::unordered_map<std::string, ConverterFunction> _loadersByMagic;
   static std::unordered_map<std::string, ConverterFunction>

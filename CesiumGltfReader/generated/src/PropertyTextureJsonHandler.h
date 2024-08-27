@@ -19,8 +19,8 @@ class PropertyTextureJsonHandler
 public:
   using ValueType = CesiumGltf::PropertyTexture;
 
-  PropertyTextureJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  PropertyTextureJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::PropertyTexture* pObject);
 
@@ -30,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyPropertyTexture(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::PropertyTexture& o);
+      CesiumGltf::PropertyTexture& o
+  );
 
 private:
   CesiumGltf::PropertyTexture* _pObject = nullptr;

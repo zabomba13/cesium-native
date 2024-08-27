@@ -39,7 +39,8 @@ public:
   fromEarthCenteredEarthFixedCoordinates(
       const Ellipsoid& ellipsoid,
       const glm::dvec3& sourceEcef,
-      const glm::dvec3& destinationEcef);
+      const glm::dvec3& destinationEcef
+  );
 
   /**
    * @brief Creates a new instance of {@link SimplePlanarEllipsoidCurve} from a
@@ -61,7 +62,8 @@ public:
   static std::optional<SimplePlanarEllipsoidCurve> fromLongitudeLatitudeHeight(
       const Ellipsoid& ellipsoid,
       const Cartographic& source,
-      const Cartographic& destination);
+      const Cartographic& destination
+  );
 
   /**
    * @brief Samples the curve at the given percentage of its length.
@@ -86,7 +88,8 @@ private:
       const glm::dvec3& scaledSourceEcef,
       const glm::dvec3& scaledDestinationEcef,
       const glm::dvec3& originalSourceEcef,
-      const glm::dvec3& originalDestinationEcef);
+      const glm::dvec3& originalDestinationEcef
+  );
 
   double _totalAngle;
   double _sourceHeight;

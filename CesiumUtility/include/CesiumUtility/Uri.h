@@ -10,11 +10,13 @@ public:
       const std::string& base,
       const std::string& relative,
       bool useBaseQuery = false,
-      bool assumeHttpsDefault = true);
+      bool assumeHttpsDefault = true
+  );
   static std::string addQuery(
       const std::string& uri,
       const std::string& key,
-      const std::string& value);
+      const std::string& value
+  );
   static std::string
   getQueryValue(const std::string& uri, const std::string& key);
 
@@ -22,7 +24,8 @@ public:
   SubstitutionCallbackSignature(const std::string& placeholder);
   static std::string substituteTemplateParameters(
       const std::string& templateUri,
-      const std::function<SubstitutionCallbackSignature>& substitutionCallback);
+      const std::function<SubstitutionCallbackSignature>& substitutionCallback
+  );
 
   /**
    * @brief Escapes a portion of a URI, percent-encoding disallowed characters.

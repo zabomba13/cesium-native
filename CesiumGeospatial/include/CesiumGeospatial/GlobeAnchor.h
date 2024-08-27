@@ -40,7 +40,8 @@ public:
    */
   static GlobeAnchor fromAnchorToLocalTransform(
       const LocalHorizontalCoordinateSystem& localCoordinateSystem,
-      const glm::dmat4& anchorToLocal);
+      const glm::dmat4& anchorToLocal
+  );
 
   /**
    * @brief Creates a new instance from a transformation to the globe-fixed
@@ -49,8 +50,8 @@ public:
    * @param anchorToFixed The matrix transforming from this object's
    * coordinate system to the globe-fixed coordinate system.
    */
-  static GlobeAnchor
-  fromAnchorToFixedTransform(const glm::dmat4& anchorToFixed);
+  static GlobeAnchor fromAnchorToFixedTransform(const glm::dmat4& anchorToFixed
+  );
 
   /**
    * @brief Constructs a new instance with a given transformation to the
@@ -88,14 +89,16 @@ public:
   void setAnchorToFixedTransform(
       const glm::dmat4& newAnchorToFixed,
       bool adjustOrientation,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Gets the transformation from the anchor's coordinate system to the
    * given local-horizontal coordinate system.
    */
   glm::dmat4 getAnchorToLocalTransform(
-      const LocalHorizontalCoordinateSystem& localCoordinateSystem) const;
+      const LocalHorizontalCoordinateSystem& localCoordinateSystem
+  ) const;
 
   /**
    * @brief Sets the globe-fixed transformation based on a new transformation
@@ -126,7 +129,8 @@ public:
       const LocalHorizontalCoordinateSystem& localCoordinateSystem,
       const glm::dmat4& newAnchorToLocal,
       bool adjustOrientation,
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
 private:
   glm::dmat4 _anchorToFixed;

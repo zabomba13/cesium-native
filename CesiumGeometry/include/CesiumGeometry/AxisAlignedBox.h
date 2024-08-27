@@ -26,7 +26,8 @@ struct CESIUMGEOMETRY_API AxisAlignedBox final {
       double minimumZ_,
       double maximumX_,
       double maximumY_,
-      double maximumZ_) noexcept
+      double maximumZ_
+  ) noexcept
       : minimumX(minimumX_),
         minimumY(minimumY_),
         minimumZ(minimumZ_),
@@ -39,7 +40,8 @@ struct CESIUMGEOMETRY_API AxisAlignedBox final {
         center(
             0.5 * (maximumX + minimumX),
             0.5 * (maximumY + minimumY),
-            0.5 * (maximumZ + minimumZ)) {}
+            0.5 * (maximumZ + minimumZ)
+        ) {}
 
   /**
    * @brief The minimum x-coordinate.

@@ -43,14 +43,17 @@ struct LoadLayersResult {
  */
 BoundingVolume createDefaultLooseEarthBoundingVolume(
     const CesiumGeospatial::GlobeRectangle& globeRectangle,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   return BoundingRegionWithLooseFittingHeights(
-      BoundingRegion(globeRectangle, -1000.0, 9000.0, ellipsoid));
+      BoundingRegion(globeRectangle, -1000.0, 9000.0, ellipsoid)
+  );
 }
 
 TileLoadResult convertToTileLoadResult(
     QuantizedMeshLoadResult&& loadResult,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   if (loadResult.errors || !loadResult.model) {
     return TileLoadResult::createFailedResult(loadResult.pRequest);
   }
@@ -70,7 +73,8 @@ TileLoadResult convertToTileLoadResult(
 TilesetContentLoaderResult<LayerJsonTerrainLoader>
 convertToTilesetContentLoaderResult(
     const Ellipsoid& ellipsoid,
-    LoadLayersResult&& loadLayersResult) {
+    LoadLayersResult&& loadLayersResult
+) {
   if (loadLayersResult.errors) {
     TilesetContentLoaderResult<LayerJsonTerrainLoader> result;
     result.errors = std::move(loadLayersResult.errors);
@@ -83,14 +87,16 @@ convertToTilesetContentLoaderResult(
     TilesetContentLoaderResult<LayerJsonTerrainLoader> result;
     result.errors.emplaceError(
         "Could not deduce tiling scheme, projection, or bounding volume "
-        "from layer.json.");
+        "from layer.json."
+    );
     return result;
   }
 
   auto pLoader = std::make_unique<LayerJsonTerrainLoader>(
       *loadLayersResult.tilingScheme,
       *loadLayersResult.projection,
-      std::move(loadLayersResult.layers));
+      std::move(loadLayersResult.layers)
+  );
 
   std::unique_ptr<Tile> pRootTile =
       std::make_unique<Tile>(pLoader.get(), TileEmptyContent());
@@ -111,12 +117,15 @@ convertToTilesetContentLoaderResult(
     const CesiumGeospatial::GlobeRectangle childGlobeRectangle =
         unprojectRectangleSimple(
             *loadLayersResult.projection,
-            loadLayersResult.tilingScheme->tileToRectangle(id));
+            loadLayersResult.tilingScheme->tileToRectangle(id)
+        );
     childTile.setBoundingVolume(
-        createDefaultLooseEarthBoundingVolume(childGlobeRectangle, ellipsoid));
+        createDefaultLooseEarthBoundingVolume(childGlobeRectangle, ellipsoid)
+    );
     childTile.setGeometricError(
         8.0 * calcQuadtreeMaxGeometricError(ellipsoid) *
-        childGlobeRectangle.computeWidth());
+        childGlobeRectangle.computeWidth()
+    );
   }
 
   pRootTile->createChildTiles(std::move(childTiles));
@@ -139,7 +148,8 @@ convertToTilesetContentLoaderResult(
 size_t maxSubtreeInLayer(uint32_t maxZooms, int32_t availabilityLevels) {
   if (availabilityLevels > 0) {
     return static_cast<size_t>(std::ceil(
-        static_cast<float>(maxZooms) / static_cast<float>(availabilityLevels)));
+        static_cast<float>(maxZooms) / static_cast<float>(availabilityLevels)
+    ));
   }
 
   return 0;
@@ -149,17 +159,20 @@ void subtreeHash(
     const CesiumGeometry::QuadtreeTileID& subtreeID,
     const LayerJsonTerrainLoader::Layer& layer,
     uint32_t& subtreeLevelIdx,
-    uint64_t& subtreeMortonIdx) {
+    uint64_t& subtreeMortonIdx
+) {
   subtreeLevelIdx = subtreeID.level / uint32_t(layer.availabilityLevels);
   subtreeMortonIdx = libmorton::morton2D_64_encode(subtreeID.x, subtreeID.y);
 }
 
 bool isSubtreeLoadedInLayer(
     const CesiumGeometry::QuadtreeTileID& subtreeID,
-    const LayerJsonTerrainLoader::Layer& layer) {
+    const LayerJsonTerrainLoader::Layer& layer
+) {
   CESIUM_ASSERT(
       layer.availabilityLevels > 0 &&
-      "Layer needs to support availabilityLevels");
+      "Layer needs to support availabilityLevels"
+  );
 
   uint32_t subtreeLevelIdx;
   uint64_t subtreeMortonIdx;
@@ -179,7 +192,8 @@ void addRectangleAvailabilityToLayer(
     LayerJsonTerrainLoader::Layer& layer,
     const QuadtreeTileID& subtreeID,
     const std::vector<CesiumGeometry::QuadtreeTileRectangularRange>&
-        rectangleAvailabilities) {
+        rectangleAvailabilities
+) {
   for (const QuadtreeTileRectangularRange& range : rectangleAvailabilities) {
     layer.contentAvailability.addAvailableTileRange(range);
   }
@@ -201,7 +215,8 @@ void generateRasterOverlayUVs(
     const BoundingVolume& tileBoundingVolume,
     const glm::dmat4& tileTransform,
     const Projection& projection,
-    TileLoadResult& result) {
+    TileLoadResult& result
+) {
   if (result.state != TileLoadResultState::Success) {
     return;
   }
@@ -222,10 +237,12 @@ void generateRasterOverlayUVs(
             *pModel,
             tileTransform,
             pParentRegion ? std::make_optional<GlobeRectangle>(
-                                pParentRegion->getRectangle())
+                                pParentRegion->getRectangle()
+                            )
                           : std::nullopt,
             {projection},
-            false);
+            false
+        );
   }
 }
 
@@ -242,7 +259,8 @@ void generateRasterOverlayUVs(
  */
 std::string createExtensionsQueryParameter(
     const std::vector<std::string>& knownExtensions,
-    const std::vector<std::string>& extensions) {
+    const std::vector<std::string>& extensions
+) {
 
   std::string extensionsToRequest;
   for (const std::string& extension : knownExtensions) {
@@ -265,7 +283,8 @@ Future<LoadLayersResult> loadLayersRecursive(
     const rapidjson::Document& layerJson,
     const QuadtreeTilingScheme& tilingScheme,
     bool useWaterMask,
-    LoadLayersResult&& loadLayersResult) {
+    LoadLayersResult&& loadLayersResult
+) {
   std::string version;
   const auto tilesetVersionIt = layerJson.FindMember("version");
   if (tilesetVersionIt != layerJson.MemberEnd() &&
@@ -276,7 +295,8 @@ Future<LoadLayersResult> loadLayersRecursive(
   std::vector<std::string> urls = JsonHelpers::getStrings(layerJson, "tiles");
   if (urls.empty()) {
     loadLayersResult.errors.emplaceError(
-        "Layer Json does not specify any tile URL templates");
+        "Layer Json does not specify any tile URL templates"
+    );
     return asyncSystem.createResolvedFuture(std::move(loadLayersResult));
   }
 
@@ -352,65 +372,71 @@ Future<LoadLayersResult> loadLayersRecursive(
     resolvedUrl += "layer.json";
 
     return pAssetAccessor->get(asyncSystem, resolvedUrl, requestHeaders)
-        .thenInWorkerThread(
-            [asyncSystem,
-             pAssetAccessor,
-             tilingScheme,
-             useWaterMask,
-             loadLayersResult = std::move(loadLayersResult)](
-                std::shared_ptr<IAssetRequest>&& pCompletedRequest) mutable {
-              const CesiumAsync::IAssetResponse* pResponse =
-                  pCompletedRequest->response();
-              const std::string& tileUrl = pCompletedRequest->url();
-              if (!pResponse) {
-                loadLayersResult.errors.emplaceWarning(fmt::format(
-                    "Did not receive a valid response for parent layer {}",
-                    pCompletedRequest->url()));
-                return asyncSystem.createResolvedFuture(
-                    std::move(loadLayersResult));
-              }
+        .thenInWorkerThread([asyncSystem,
+                             pAssetAccessor,
+                             tilingScheme,
+                             useWaterMask,
+                             loadLayersResult = std::move(loadLayersResult
+                             )](std::shared_ptr<IAssetRequest>&&
+                                    pCompletedRequest) mutable {
+          const CesiumAsync::IAssetResponse* pResponse =
+              pCompletedRequest->response();
+          const std::string& tileUrl = pCompletedRequest->url();
+          if (!pResponse) {
+            loadLayersResult.errors.emplaceWarning(fmt::format(
+                "Did not receive a valid response for parent layer {}",
+                pCompletedRequest->url()
+            ));
+            return asyncSystem.createResolvedFuture(std::move(loadLayersResult)
+            );
+          }
 
-              uint16_t statusCode = pResponse->statusCode();
-              if (statusCode != 0 && (statusCode < 200 || statusCode >= 300)) {
-                loadLayersResult.errors.emplaceWarning(fmt::format(
-                    "Received status code {} for parent layer {}",
-                    statusCode,
-                    tileUrl));
-                return asyncSystem.createResolvedFuture(
-                    std::move(loadLayersResult));
-              }
+          uint16_t statusCode = pResponse->statusCode();
+          if (statusCode != 0 && (statusCode < 200 || statusCode >= 300)) {
+            loadLayersResult.errors.emplaceWarning(fmt::format(
+                "Received status code {} for parent layer {}",
+                statusCode,
+                tileUrl
+            ));
+            return asyncSystem.createResolvedFuture(std::move(loadLayersResult)
+            );
+          }
 
-              gsl::span<const std::byte> layerJsonBinary = pResponse->data();
+          gsl::span<const std::byte> layerJsonBinary = pResponse->data();
 
-              rapidjson::Document layerJson;
-              layerJson.Parse(
-                  reinterpret_cast<const char*>(layerJsonBinary.data()),
-                  layerJsonBinary.size());
-              if (layerJson.HasParseError()) {
-                loadLayersResult.errors.emplaceWarning(fmt::format(
-                    "Error when parsing layer.json, error code {} at byte "
-                    "offset {}",
-                    layerJson.GetParseError(),
-                    layerJson.GetErrorOffset()));
-                return asyncSystem.createResolvedFuture(
-                    std::move(loadLayersResult));
-              }
+          rapidjson::Document layerJson;
+          layerJson.Parse(
+              reinterpret_cast<const char*>(layerJsonBinary.data()),
+              layerJsonBinary.size()
+          );
+          if (layerJson.HasParseError()) {
+            loadLayersResult.errors.emplaceWarning(fmt::format(
+                "Error when parsing layer.json, error code {} at byte "
+                "offset {}",
+                layerJson.GetParseError(),
+                layerJson.GetErrorOffset()
+            ));
+            return asyncSystem.createResolvedFuture(std::move(loadLayersResult)
+            );
+          }
 
-              const CesiumAsync::HttpHeaders& completedRequestHeaders =
-                  pCompletedRequest->headers();
-              std::vector<IAssetAccessor::THeader> flatHeaders(
-                  completedRequestHeaders.begin(),
-                  completedRequestHeaders.end());
-              return loadLayersRecursive(
-                  asyncSystem,
-                  pAssetAccessor,
-                  pCompletedRequest->url(),
-                  flatHeaders,
-                  layerJson,
-                  tilingScheme,
-                  useWaterMask,
-                  std::move(loadLayersResult));
-            });
+          const CesiumAsync::HttpHeaders& completedRequestHeaders =
+              pCompletedRequest->headers();
+          std::vector<IAssetAccessor::THeader> flatHeaders(
+              completedRequestHeaders.begin(),
+              completedRequestHeaders.end()
+          );
+          return loadLayersRecursive(
+              asyncSystem,
+              pAssetAccessor,
+              pCompletedRequest->url(),
+              flatHeaders,
+              layerJson,
+              tilingScheme,
+              useWaterMask,
+              std::move(loadLayersResult)
+          );
+        });
   }
 
   return asyncSystem.createResolvedFuture(std::move(loadLayersResult));
@@ -423,7 +449,8 @@ Future<LoadLayersResult> loadLayerJson(
     const std::vector<IAssetAccessor::THeader>& requestHeaders,
     const rapidjson::Document& layerJson,
     bool useWaterMask,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   // Use the projection and tiling scheme of the main layer.
   // Any underlying layers must use the same.
   std::string projectionString =
@@ -454,7 +481,8 @@ Future<LoadLayersResult> loadLayerJson(
     LoadLayersResult result;
     result.errors.emplaceError(fmt::format(
         "Tileset layer.json contained an unknown projection value: {}",
-        projectionString));
+        projectionString
+    ));
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -464,7 +492,8 @@ Future<LoadLayersResult> loadLayerJson(
   CesiumGeometry::QuadtreeTilingScheme tilingScheme(
       quadtreeRectangleProjected,
       quadtreeXTiles,
-      1);
+      1
+  );
 
   LoadLayersResult
       loadLayersResult{tilingScheme, projection, boundingVolume, {}, {}, {}};
@@ -477,7 +506,8 @@ Future<LoadLayersResult> loadLayerJson(
       layerJson,
       tilingScheme,
       useWaterMask,
-      std::move(loadLayersResult));
+      std::move(loadLayersResult)
+  );
 }
 
 Future<LoadLayersResult> loadLayerJson(
@@ -487,17 +517,20 @@ Future<LoadLayersResult> loadLayerJson(
     const std::vector<IAssetAccessor::THeader>& requestHeaders,
     const gsl::span<const std::byte>& layerJsonBinary,
     bool useWaterMask,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   rapidjson::Document layerJson;
   layerJson.Parse(
       reinterpret_cast<const char*>(layerJsonBinary.data()),
-      layerJsonBinary.size());
+      layerJsonBinary.size()
+  );
   if (layerJson.HasParseError()) {
     LoadLayersResult result;
     result.errors.emplaceError(fmt::format(
         "Error when parsing layer.json, error code {} at byte offset {}",
         layerJson.GetParseError(),
-        layerJson.GetErrorOffset()));
+        layerJson.GetErrorOffset()
+    ));
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -508,7 +541,8 @@ Future<LoadLayersResult> loadLayerJson(
       requestHeaders,
       layerJson,
       useWaterMask,
-      ellipsoid);
+      ellipsoid
+  );
 }
 } // namespace
 
@@ -519,7 +553,8 @@ LayerJsonTerrainLoader::createLoader(
     const TilesetContentOptions& contentOptions,
     const std::string& layerJsonUrl,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   bool useWaterMask = contentOptions.enableWaterMask;
 
   return externals.pAssetAccessor
@@ -530,7 +565,8 @@ LayerJsonTerrainLoader::createLoader(
            asyncSystem = externals.asyncSystem,
            pAssetAccessor = externals.pAssetAccessor,
            useWaterMask](
-              std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest) {
+              std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest
+          ) {
             const CesiumAsync::IAssetResponse* pResponse =
                 pCompletedRequest->response();
             const std::string& tileUrl = pCompletedRequest->url();
@@ -538,7 +574,8 @@ LayerJsonTerrainLoader::createLoader(
               LoadLayersResult result;
               result.errors.emplaceError(fmt::format(
                   "Did not receive a valid response for tile content {}",
-                  tileUrl));
+                  tileUrl
+              ));
               return asyncSystem.createResolvedFuture(std::move(result));
             }
 
@@ -548,7 +585,8 @@ LayerJsonTerrainLoader::createLoader(
               result.errors.emplaceError(fmt::format(
                   "Received status code {} for tile content {}",
                   statusCode,
-                  tileUrl));
+                  tileUrl
+              ));
               result.statusCode = statusCode;
               return asyncSystem.createResolvedFuture(std::move(result));
             }
@@ -557,7 +595,8 @@ LayerJsonTerrainLoader::createLoader(
                 pCompletedRequest->headers();
             std::vector<IAssetAccessor::THeader> flatHeaders(
                 completedRequestHeaders.begin(),
-                completedRequestHeaders.end());
+                completedRequestHeaders.end()
+            );
 
             return loadLayerJson(
                 asyncSystem,
@@ -566,12 +605,15 @@ LayerJsonTerrainLoader::createLoader(
                 flatHeaders,
                 pResponse->data(),
                 useWaterMask,
-                ellipsoid);
-          })
+                ellipsoid
+            );
+          }
+      )
       .thenInMainThread([ellipsoid](LoadLayersResult&& loadLayersResult) {
         return convertToTilesetContentLoaderResult(
             ellipsoid,
-            std::move(loadLayersResult));
+            std::move(loadLayersResult)
+        );
       });
 }
 
@@ -583,7 +625,8 @@ Cesium3DTilesSelection::LayerJsonTerrainLoader::createLoader(
     const std::string& layerJsonUrl,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
     const rapidjson::Document& layerJson,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   return loadLayerJson(
              asyncSystem,
              pAssetAccessor,
@@ -591,11 +634,13 @@ Cesium3DTilesSelection::LayerJsonTerrainLoader::createLoader(
              requestHeaders,
              layerJson,
              contentOptions.enableWaterMask,
-             ellipsoid)
+             ellipsoid
+  )
       .thenInMainThread([ellipsoid](LoadLayersResult&& loadLayersResult) {
         return convertToTilesetContentLoaderResult(
             ellipsoid,
-            std::move(loadLayersResult));
+            std::move(loadLayersResult)
+        );
       });
 }
 
@@ -605,7 +650,8 @@ LayerJsonTerrainLoader::Layer::Layer(
     std::vector<std::string>&& tileTemplateUrls_,
     CesiumGeometry::QuadtreeRectangleAvailability&& contentAvailability_,
     uint32_t maxZooms_,
-    int32_t availabilityLevels_)
+    int32_t availabilityLevels_
+)
     : baseUrl{baseUrl_},
       version{std::move(version_)},
       tileTemplateUrls{std::move(tileTemplateUrls_)},
@@ -616,7 +662,8 @@ LayerJsonTerrainLoader::Layer::Layer(
 LayerJsonTerrainLoader::LayerJsonTerrainLoader(
     const CesiumGeometry::QuadtreeTilingScheme& tilingScheme,
     const CesiumGeospatial::Projection& projection,
-    std::vector<Layer>&& layers)
+    std::vector<Layer>&& layers
+)
     : _tilingScheme(tilingScheme),
       _projection(projection),
       _layers(std::move(layers)) {}
@@ -625,7 +672,8 @@ namespace {
 
 std::string resolveTileUrl(
     const QuadtreeTileID& tileID,
-    const LayerJsonTerrainLoader::Layer& layer) {
+    const LayerJsonTerrainLoader::Layer& layer
+) {
   if (layer.tileTemplateUrls.empty()) {
     return std::string();
   }
@@ -649,7 +697,9 @@ std::string resolveTileUrl(
             }
 
             return placeholder;
-          }));
+          }
+      )
+  );
 }
 
 Future<QuantizedMeshLoadResult> requestTileContent(
@@ -661,7 +711,8 @@ Future<QuantizedMeshLoadResult> requestTileContent(
     const LayerJsonTerrainLoader::Layer& layer,
     const std::vector<IAssetAccessor::THeader>& requestHeaders,
     bool enableWaterMask,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   std::string url = resolveTileUrl(tileID, layer);
   return pAssetAccessor->get(asyncSystem, url, requestHeaders)
       .thenInWorkerThread([ellipsoid,
@@ -670,13 +721,15 @@ Future<QuantizedMeshLoadResult> requestTileContent(
                            tileID,
                            boundingRegion,
                            enableWaterMask](
-                              std::shared_ptr<IAssetRequest>&& pRequest) {
+                              std::shared_ptr<IAssetRequest>&& pRequest
+                          ) {
         const IAssetResponse* pResponse = pRequest->response();
         if (!pResponse) {
           QuantizedMeshLoadResult result;
           result.errors.emplaceError(fmt::format(
               "Did not receive a valid response for tile content {}",
-              pRequest->url()));
+              pRequest->url()
+          ));
           result.pRequest = std::move(pRequest);
           return result;
         }
@@ -687,7 +740,8 @@ Future<QuantizedMeshLoadResult> requestTileContent(
           result.errors.emplaceError(fmt::format(
               "Receive status code {} for tile content {}",
               pResponse->statusCode(),
-              pRequest->url()));
+              pRequest->url()
+          ));
           result.pRequest = std::move(pRequest);
           return result;
         }
@@ -698,7 +752,8 @@ Future<QuantizedMeshLoadResult> requestTileContent(
             pRequest->url(),
             pResponse->data(),
             enableWaterMask,
-            ellipsoid);
+            ellipsoid
+        );
       });
 }
 
@@ -708,7 +763,8 @@ Future<int> loadTileAvailability(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const QuadtreeTileID& tileID,
     LayerJsonTerrainLoader::Layer& layer,
-    const std::vector<IAssetAccessor::THeader>& requestHeaders) {
+    const std::vector<IAssetAccessor::THeader>& requestHeaders
+) {
   std::string url = resolveTileUrl(tileID, layer);
   return pAssetAccessor->get(asyncSystem, url, requestHeaders)
       .thenInWorkerThread([pLogger,
@@ -725,7 +781,8 @@ Future<int> loadTileAvailability(
         SPDLOG_LOGGER_ERROR(
             pLogger,
             "Failed to load availability data from {}",
-            pRequest->url());
+            pRequest->url()
+        );
         return QuantizedMeshMetadataResult();
       })
       .thenInMainThread([&layer,
@@ -758,7 +815,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
     if (!pUpsampleTileID) {
       // This loader only handles QuadtreeTileIDs and UpsampledQuadtreeNode.
       return asyncSystem.createResolvedFuture(
-          TileLoadResult::createFailedResult(nullptr));
+          TileLoadResult::createFailedResult(nullptr)
+      );
     }
 
     // now do upsampling
@@ -769,15 +827,16 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
   // available.
   auto firstAvailableIt = this->_layers.begin();
   while (firstAvailableIt != this->_layers.end() &&
-         !firstAvailableIt->contentAvailability.isTileAvailable(
-             *pQuadtreeTileID)) {
+         !firstAvailableIt->contentAvailability.isTileAvailable(*pQuadtreeTileID
+         )) {
     ++firstAvailableIt;
   }
 
   if (firstAvailableIt == this->_layers.end()) {
     // No layer has this tile available.
     return asyncSystem.createResolvedFuture(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   // Also load the same tile in any underlying layers for which this tile
@@ -800,7 +859,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
             pAssetAccessor,
             *pQuadtreeTileID,
             *it,
-            requestHeaders));
+            requestHeaders
+        ));
       }
     }
 
@@ -812,7 +872,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
   if (!pRegion) {
     // This tile does not have the required bounding volume type.
     return asyncSystem.createResolvedFuture(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   // Start the actual content request.
@@ -826,7 +887,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
       currentLayer,
       requestHeaders,
       contentOptions.enableWaterMask,
-      ellipsoid);
+      ellipsoid
+  );
 
   // determine if this tile is at the availability level of the current layer
   // and if we need to add the availability rectangles to the current layer. We
@@ -845,11 +907,11 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
         availabilityRequests.empty()
             ? std::move(futureQuantizedMesh)
             : asyncSystem.all(std::move(availabilityRequests))
-                  .thenImmediately(
-                      [futureQuantizedMesh = std::move(futureQuantizedMesh)](
-                          std::vector<int>&&) mutable {
-                        return std::move(futureQuantizedMesh);
-                      });
+                  .thenImmediately([futureQuantizedMesh =
+                                        std::move(futureQuantizedMesh
+                                        )](std::vector<int>&&) mutable {
+                    return std::move(futureQuantizedMesh);
+                  });
 
     return std::move(finalFuture)
         .thenInMainThread([this,
@@ -858,14 +920,16 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
                            &currentLayer,
                            &tile,
                            shouldCurrLayerLoadAvailability](
-                              QuantizedMeshLoadResult&& loadResult) {
+                              QuantizedMeshLoadResult&& loadResult
+                          ) {
           if (shouldCurrLayerLoadAvailability) {
             const QuadtreeTileID& tileID =
                 std::get<QuadtreeTileID>(tile.getTileID());
             addRectangleAvailabilityToLayer(
                 currentLayer,
                 tileID,
-                loadResult.availableTileRectangles);
+                loadResult.availableTileRectangles
+            );
           }
 
           // if this tile has one of the children that needs to be upsampled, we
@@ -886,9 +950,11 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
                       tileBoundingVolume,
                       tileTransform,
                       projection,
-                      finalResult);
+                      finalResult
+                  );
                   return finalResult;
-                });
+                }
+            );
           }
 
           return asyncSystem.createResolvedFuture(std::move(finalResult));
@@ -901,8 +967,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
                         projection = this->_projection,
                         tileTransform = tile.getTransform(),
                         tileBoundingVolume = tile.getBoundingVolume(),
-                        ellipsoid](
-                           QuantizedMeshLoadResult&& loadResult) mutable {
+                        ellipsoid](QuantizedMeshLoadResult&& loadResult
+                       ) mutable {
         // if this tile has one of the children needs to be upsampled, we will
         // need to generate its raster overlay UVs in the worker thread based
         // on the projection of the loader since the upsampler needs this UV
@@ -914,7 +980,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
               tileBoundingVolume,
               tileTransform,
               projection,
-              result);
+              result
+          );
         }
 
         return result;
@@ -923,7 +990,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
 
 TileChildrenResult LayerJsonTerrainLoader::createTileChildren(
     const Tile& tile,
-    [[maybe_unused]] const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    [[maybe_unused]] const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   const CesiumGeometry::QuadtreeTileID* pQuadtreeID =
       std::get_if<CesiumGeometry::QuadtreeTileID>(&tile.getTileID());
   if (pQuadtreeID) {
@@ -976,7 +1044,8 @@ bool LayerJsonTerrainLoader::tileHasUpsampledChild(const Tile& tile) const {
     const QuadtreeTileID swID(
         pQuadtreeTileID->level + 1,
         pQuadtreeTileID->x * 2,
-        pQuadtreeTileID->y * 2);
+        pQuadtreeTileID->y * 2
+    );
     const QuadtreeTileID seID(swID.level, swID.x + 1, swID.y);
     const QuadtreeTileID nwID(swID.level, swID.x, swID.y + 1);
     const QuadtreeTileID neID(swID.level, swID.x + 1, swID.y + 1);
@@ -1008,7 +1077,8 @@ LayerJsonTerrainLoader::createTileChildrenImpl(const Tile& tile) {
   const QuadtreeTileID swID(
       pQuadtreeTileID->level + 1,
       pQuadtreeTileID->x * 2,
-      pQuadtreeTileID->y * 2);
+      pQuadtreeTileID->y * 2
+  );
   const QuadtreeTileID seID(swID.level, swID.x + 1, swID.y);
   const QuadtreeTileID nwID(swID.level, swID.x, swID.y + 1);
   const QuadtreeTileID neID(swID.level, swID.x + 1, swID.y + 1);
@@ -1034,7 +1104,8 @@ LayerJsonTerrainLoader::createTileChildrenImpl(const Tile& tile) {
 }
 
 bool LayerJsonTerrainLoader::tileIsAvailableInAnyLayer(
-    const QuadtreeTileID& tileID) const {
+    const QuadtreeTileID& tileID
+) const {
   for (const Layer& layer : this->_layers) {
     auto availableState = tileIsAvailableInLayer(tileID, layer);
     if (availableState == AvailableState::Available) {
@@ -1048,7 +1119,8 @@ bool LayerJsonTerrainLoader::tileIsAvailableInAnyLayer(
 LayerJsonTerrainLoader::AvailableState
 LayerJsonTerrainLoader::tileIsAvailableInLayer(
     const CesiumGeometry::QuadtreeTileID& tileID,
-    const Layer& layer) const {
+    const Layer& layer
+) const {
   if (layer.contentAvailability.isTileAvailable(tileID)) {
     return AvailableState::Available;
   } else {
@@ -1088,7 +1160,8 @@ void LayerJsonTerrainLoader::createChildTile(
     const Tile& parent,
     std::vector<Tile>& children,
     const QuadtreeTileID& childID,
-    bool isAvailable) {
+    bool isAvailable
+) {
   Tile& child = children.emplace_back(this);
   child.setRefine(parent.getRefine());
   child.setTransform(parent.getTransform());
@@ -1119,24 +1192,28 @@ void LayerJsonTerrainLoader::createChildTile(
   const CesiumGeospatial::GlobeRectangle childGlobeRectangle =
       unprojectRectangleSimple(
           this->_projection,
-          this->_tilingScheme.tileToRectangle(childID));
+          this->_tilingScheme.tileToRectangle(childID)
+      );
   child.setBoundingVolume(BoundingRegionWithLooseFittingHeights(BoundingRegion(
       childGlobeRectangle,
       minHeight,
       maxHeight,
-      getProjectionEllipsoid(this->_projection))));
+      getProjectionEllipsoid(this->_projection)
+  )));
 }
 
 CesiumAsync::Future<TileLoadResult> LayerJsonTerrainLoader::upsampleParentTile(
     const Tile& tile,
-    const CesiumAsync::AsyncSystem& asyncSystem) {
+    const CesiumAsync::AsyncSystem& asyncSystem
+) {
   const Tile* pParent = tile.getParent();
   const TileContent& parentContent = pParent->getContent();
   const TileRenderContent* pParentRenderContent =
       parentContent.getRenderContent();
   if (!pParentRenderContent) {
     return asyncSystem.createResolvedFuture(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   const UpsampledQuadtreeNode* pUpsampledTileID =
@@ -1148,14 +1225,16 @@ CesiumAsync::Future<TileLoadResult> LayerJsonTerrainLoader::upsampleParentTile(
   auto it = std::find(
       parentProjections.begin(),
       parentProjections.end(),
-      this->_projection);
+      this->_projection
+  );
 
   // Cannot find raster overlay UVs that has this projection, so we can't
   // upsample right now
   CESIUM_ASSERT(
       it != parentProjections.end() &&
       "Cannot find raster overlay UVs that has this projection. "
-      "Should not happen");
+      "Should not happen"
+  );
 
   index = int32_t(it - parentProjections.begin());
 
@@ -1166,32 +1245,33 @@ CesiumAsync::Future<TileLoadResult> LayerJsonTerrainLoader::upsampleParentTile(
   // thread. The tileset content manager will guarantee that the parent tile
   // will not be unloaded when upsampled tile is on the fly.
   const CesiumGltf::Model& parentModel = pParentRenderContent->getModel();
-  return asyncSystem.runInWorkerThread(
-      [&parentModel,
-       ellipsoid,
-       boundingVolume = tile.getBoundingVolume(),
-       textureCoordinateIndex = index,
-       tileID = *pUpsampledTileID]() mutable {
-        auto model = RasterOverlayUtilities::upsampleGltfForRasterOverlays(
-            parentModel,
-            tileID,
-            false,
-            RasterOverlayUtilities::DEFAULT_TEXTURE_COORDINATE_BASE_NAME,
-            textureCoordinateIndex,
-            ellipsoid);
-        if (!model) {
-          return TileLoadResult::createFailedResult(nullptr);
-        }
+  return asyncSystem.runInWorkerThread([&parentModel,
+                                        ellipsoid,
+                                        boundingVolume =
+                                            tile.getBoundingVolume(),
+                                        textureCoordinateIndex = index,
+                                        tileID = *pUpsampledTileID]() mutable {
+    auto model = RasterOverlayUtilities::upsampleGltfForRasterOverlays(
+        parentModel,
+        tileID,
+        false,
+        RasterOverlayUtilities::DEFAULT_TEXTURE_COORDINATE_BASE_NAME,
+        textureCoordinateIndex,
+        ellipsoid
+    );
+    if (!model) {
+      return TileLoadResult::createFailedResult(nullptr);
+    }
 
-        return TileLoadResult{
-            std::move(*model),
-            CesiumGeometry::Axis::Y,
-            std::nullopt,
-            std::nullopt,
-            std::nullopt,
-            nullptr,
-            {},
-            TileLoadResultState::Success,
-            ellipsoid};
-      });
+    return TileLoadResult{
+        std::move(*model),
+        CesiumGeometry::Axis::Y,
+        std::nullopt,
+        std::nullopt,
+        std::nullopt,
+        nullptr,
+        {},
+        TileLoadResultState::Success,
+        ellipsoid};
+  });
 }

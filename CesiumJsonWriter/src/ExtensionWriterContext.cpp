@@ -10,15 +10,18 @@ namespace {
 void objWriter(
     const std::any& obj,
     JsonWriter& jsonWriter,
-    const ExtensionWriterContext& /* context */) {
+    const ExtensionWriterContext& /* context */
+) {
   writeJsonValue(
       std::any_cast<const CesiumUtility::JsonValue&>(obj),
-      jsonWriter);
+      jsonWriter
+  );
 }
 } // namespace
 
-ExtensionState ExtensionWriterContext::getExtensionState(
-    const std::string& extensionName) const {
+ExtensionState
+ExtensionWriterContext::getExtensionState(const std::string& extensionName
+) const {
   auto stateIt = this->_extensionStates.find(extensionName);
   if (stateIt == this->_extensionStates.end()) {
     return ExtensionState::Enabled;
@@ -29,7 +32,8 @@ ExtensionState ExtensionWriterContext::getExtensionState(
 
 void ExtensionWriterContext::setExtensionState(
     const std::string& extensionName,
-    ExtensionState newState) {
+    ExtensionState newState
+) {
   this->_extensionStates[extensionName] = newState;
 }
 
@@ -37,7 +41,8 @@ ExtensionWriterContext::ExtensionHandler<std::any>
 ExtensionWriterContext::createExtensionHandler(
     const std::string_view& extensionName,
     const std::any& obj,
-    const std::string& extendedObjectType) const {
+    const std::string& extendedObjectType
+) const {
 
   std::string extensionNameString{extensionName};
 

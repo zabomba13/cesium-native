@@ -42,7 +42,8 @@ namespace {
 FeatureIdAccessorType getFeatureIdViewFromAccessorIndex(
     const Model& model,
     int32_t featureIdAccessor,
-    bool instanceAttribute) {
+    bool instanceAttribute
+) {
   const Accessor* pAccessor =
       model.getSafe<Accessor>(&model.accessors, featureIdAccessor);
   if (!pAccessor || pAccessor->type != Accessor::Type::SCALAR ||
@@ -80,7 +81,8 @@ FeatureIdAccessorType getFeatureIdViewFromAccessorIndex(
 FeatureIdAccessorType getFeatureIdAccessorView(
     const Model& model,
     const MeshPrimitive& primitive,
-    int32_t featureIdAttributeIndex) {
+    int32_t featureIdAttributeIndex
+) {
   const std::string attributeName =
       "_FEATURE_ID_" + std::to_string(featureIdAttributeIndex);
   auto featureId = primitive.attributes.find(attributeName);
@@ -94,7 +96,8 @@ FeatureIdAccessorType getFeatureIdAccessorView(
 FeatureIdAccessorType getFeatureIdAccessorView(
     const Model& model,
     const Node& node,
-    int32_t featureIdAttributeIndex) {
+    int32_t featureIdAttributeIndex
+) {
   const auto* extInstancing =
       node.getExtension<ExtensionExtMeshGpuInstancing>();
   if (!extInstancing) {
@@ -137,7 +140,8 @@ getIndexAccessorView(const Model& model, const MeshPrimitive& primitive) {
 TexCoordAccessorType getTexCoordAccessorView(
     const Model& model,
     const MeshPrimitive& primitive,
-    int32_t textureCoordinateSetIndex) {
+    int32_t textureCoordinateSetIndex
+) {
   const std::string texCoordName =
       "TEXCOORD_" + std::to_string(textureCoordinateSetIndex);
   auto texCoord = primitive.attributes.find(texCoordName);

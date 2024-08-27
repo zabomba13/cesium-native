@@ -32,26 +32,28 @@ TEST_CASE("BoundingSphere::intersectPlane") {
       TestCase{
           BoundingSphere(glm::dvec3(1.0, 0.0, 0.0), 0.5),
           Plane(glm::dvec3(1.0, 0.0, 0.0), -1.0),
-          CullingResult::Intersecting});
+          CullingResult::Intersecting}
+  );
 
   CHECK(
-      testCase.sphere.intersectPlane(testCase.plane) ==
-      testCase.expectedResult);
+      testCase.sphere.intersectPlane(testCase.plane) == testCase.expectedResult
+  );
 }
 
-TEST_CASE(
-    "BoundingSphere::computeDistanceSquaredToPosition test outside sphere") {
+TEST_CASE("BoundingSphere::computeDistanceSquaredToPosition test outside sphere"
+) {
   BoundingSphere bs(glm::dvec3(0.0), 1.0);
   glm::dvec3 position(-2.0, 1.0, 0.0);
   double expected = 1.52786405;
   CHECK(CesiumUtility::Math::equalsEpsilon(
       bs.computeDistanceSquaredToPosition(position),
       expected,
-      CesiumUtility::Math::Epsilon6));
+      CesiumUtility::Math::Epsilon6
+  ));
 }
 
-TEST_CASE(
-    "BoundingSphere::computeDistanceSquaredToPosition test inside sphere") {
+TEST_CASE("BoundingSphere::computeDistanceSquaredToPosition test inside sphere"
+) {
   BoundingSphere bs(glm::dvec3(0.0), 1.0);
   glm::dvec3 position(-.5, 0.5, 0.0);
   CHECK(bs.computeDistanceSquaredToPosition(position) == 0);
@@ -74,7 +76,8 @@ TEST_CASE("BoundingSphere::transform") {
   SECTION("translating moves the center only") {
     glm::dmat4 transformation = glm::translate(
         glm::identity<glm::dmat4>(),
-        glm::dvec3(10.0, 20.0, 30.0));
+        glm::dvec3(10.0, 20.0, 30.0)
+    );
     BoundingSphere transformed = sphere.transform(transformation);
     CHECK(transformed.getRadius() == Approx(sphere.getRadius()));
     CHECK(transformed.getCenter().x == Approx(sphere.getCenter().x + 10.0));
@@ -94,8 +97,8 @@ TEST_CASE("BoundingSphere::transform") {
     CHECK(transformed.getCenter().z == Approx(rotatedCenter.z));
   }
 
-  SECTION(
-      "scaling moves the center, and scales the radius by the max component") {
+  SECTION("scaling moves the center, and scales the radius by the max component"
+  ) {
     glm::dmat4 transformation =
         glm::scale(glm::identity<glm::dmat4>(), glm::dvec3(2.0, 3.0, 4.0));
     BoundingSphere transformed = sphere.transform(transformation);
@@ -127,7 +130,8 @@ TEST_CASE("BoundingSphere::computeDistanceSquaredToPosition example") {
       [&cameraPosition](auto& a, auto& b) {
         return a.computeDistanceSquaredToPosition(cameraPosition) >
                b.computeDistanceSquaredToPosition(cameraPosition);
-      });
+      }
+  );
   //! [distanceSquaredTo]
 
   CHECK(spheres[0].getCenter().x == 2.0);

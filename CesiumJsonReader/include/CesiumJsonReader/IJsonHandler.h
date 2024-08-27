@@ -26,6 +26,7 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context = std::vector<std::string>()) = 0;
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) = 0;
 };
 } // namespace CesiumJsonReader

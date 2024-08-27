@@ -17,7 +17,8 @@ class SimpleAssetAccessor : public CesiumAsync::IAssetAccessor {
 public:
   SimpleAssetAccessor(
       std::map<std::string, std::shared_ptr<SimpleAssetRequest>>&&
-          mockCompletedRequests)
+          mockCompletedRequests
+  )
       : mockCompletedRequests{std::move(mockCompletedRequests)} {}
 
   virtual CesiumAsync::Future<std::shared_ptr<CesiumAsync::IAssetRequest>>
@@ -27,22 +28,21 @@ public:
     auto mockRequestIt = mockCompletedRequests.find(url);
     if (mockRequestIt != mockCompletedRequests.end()) {
       return asyncSystem.createResolvedFuture(
-          std::shared_ptr<CesiumAsync::IAssetRequest>(mockRequestIt->second));
+          std::shared_ptr<CesiumAsync::IAssetRequest>(mockRequestIt->second)
+      );
     }
 
     FAIL("Cannot find request for url " << url);
 
     return asyncSystem.createResolvedFuture(
-        std::shared_ptr<CesiumAsync::IAssetRequest>(nullptr));
+        std::shared_ptr<CesiumAsync::IAssetRequest>(nullptr)
+    );
   }
 
-  virtual CesiumAsync::Future<std::shared_ptr<CesiumAsync::IAssetRequest>>
-  request(
-      const CesiumAsync::AsyncSystem& asyncSystem,
-      const std::string& /* verb */,
-      const std::string& url,
-      const std::vector<THeader>& headers,
-      const gsl::span<const std::byte>&) override {
+  virtual CesiumAsync::
+      Future<std::shared_ptr<CesiumAsync::IAssetRequest>>
+      request(const CesiumAsync::AsyncSystem& asyncSystem, const std::string& /* verb */, const std::string& url, const std::vector<THeader>& headers, const gsl::span<const std::byte>&)
+          override {
     return this->get(asyncSystem, url, headers);
   }
 

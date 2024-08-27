@@ -17,7 +17,8 @@ public:
   using ValueType = CesiumGltf::CameraOrthographic;
 
   CameraOrthographicJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, CesiumGltf::CameraOrthographic* pObject);
 
@@ -27,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyCameraOrthographic(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::CameraOrthographic& o);
+      CesiumGltf::CameraOrthographic& o
+  );
 
 private:
   CesiumGltf::CameraOrthographic* _pObject = nullptr;

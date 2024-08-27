@@ -5,16 +5,17 @@ namespace CesiumGeometry {
 QuadtreeTilingScheme::QuadtreeTilingScheme(
     const CesiumGeometry::Rectangle& rectangle,
     uint32_t rootTilesX,
-    uint32_t rootTilesY) noexcept
+    uint32_t rootTilesY
+) noexcept
     : _rectangle(rectangle), _rootTilesX(rootTilesX), _rootTilesY(rootTilesY) {}
 
-uint32_t
-QuadtreeTilingScheme::getNumberOfXTilesAtLevel(uint32_t level) const noexcept {
+uint32_t QuadtreeTilingScheme::getNumberOfXTilesAtLevel(uint32_t level
+) const noexcept {
   return this->_rootTilesX << level;
 }
 
-uint32_t
-QuadtreeTilingScheme::getNumberOfYTilesAtLevel(uint32_t level) const noexcept {
+uint32_t QuadtreeTilingScheme::getNumberOfYTilesAtLevel(uint32_t level
+) const noexcept {
   return this->_rootTilesY << level;
 }
 
@@ -51,11 +52,13 @@ QuadtreeTilingScheme::positionToTile(const glm::dvec2& position, uint32_t level)
   return CesiumGeometry::QuadtreeTileID(
       level,
       xTileCoordinate,
-      yTileCoordinate);
+      yTileCoordinate
+  );
 }
 
 CesiumGeometry::Rectangle QuadtreeTilingScheme::tileToRectangle(
-    const CesiumGeometry::QuadtreeTileID& tileID) const noexcept {
+    const CesiumGeometry::QuadtreeTileID& tileID
+) const noexcept {
   const uint32_t xTiles = this->getNumberOfXTilesAtLevel(tileID.level);
   const uint32_t yTiles = this->getNumberOfYTilesAtLevel(tileID.level);
 

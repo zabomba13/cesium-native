@@ -138,13 +138,15 @@ public:
   getPropertyView(const std::string& propertyId) const {
     if (this->size() <= 0) {
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorInvalidPropertyTable);
+          PropertyTablePropertyViewStatus::ErrorInvalidPropertyTable
+      );
     }
 
     const ClassProperty* pClassProperty = getClassProperty(propertyId);
     if (!pClassProperty) {
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorNonexistentProperty);
+          PropertyTablePropertyViewStatus::ErrorNonexistentProperty
+      );
     }
 
     return getPropertyViewImpl<T, Normalized>(propertyId, *pClassProperty);
@@ -178,7 +180,9 @@ public:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorInvalidPropertyTable));
+              PropertyTablePropertyViewStatus::ErrorInvalidPropertyTable
+          )
+      );
       return;
     }
 
@@ -187,7 +191,9 @@ public:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorNonexistentProperty));
+              PropertyTablePropertyViewStatus::ErrorNonexistentProperty
+          )
+      );
       return;
     }
 
@@ -204,7 +210,9 @@ public:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorInvalidNormalization));
+              PropertyTablePropertyViewStatus::ErrorInvalidNormalization
+          )
+      );
       return;
     }
 
@@ -215,14 +223,16 @@ public:
             *pClassProperty,
             type,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       } else {
         getArrayPropertyViewImpl<Callback, false>(
             propertyId,
             *pClassProperty,
             type,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       }
       return;
     }
@@ -233,13 +243,15 @@ public:
             propertyId,
             *pClassProperty,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       } else {
         getScalarPropertyViewImpl<Callback, false>(
             propertyId,
             *pClassProperty,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       }
       return;
     }
@@ -251,14 +263,16 @@ public:
             *pClassProperty,
             type,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       } else {
         getVecNPropertyViewImpl<Callback, false>(
             propertyId,
             *pClassProperty,
             type,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       }
       return;
     }
@@ -270,14 +284,16 @@ public:
             *pClassProperty,
             type,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       } else {
         getMatNPropertyViewImpl<Callback, false>(
             propertyId,
             *pClassProperty,
             type,
             componentType,
-            std::forward<Callback>(callback));
+            std::forward<Callback>(callback)
+        );
       }
       return;
     }
@@ -287,21 +303,26 @@ public:
           propertyId,
           getPropertyViewImpl<std::string_view, false>(
               propertyId,
-              *pClassProperty));
+              *pClassProperty
+          )
+      );
       return;
     }
 
     if (type == PropertyType::Boolean) {
       callback(
           propertyId,
-          getPropertyViewImpl<bool, false>(propertyId, *pClassProperty));
+          getPropertyViewImpl<bool, false>(propertyId, *pClassProperty)
+      );
       return;
     }
 
     callback(
         propertyId,
         PropertyTablePropertyView<uint8_t>(
-            PropertyTablePropertyViewStatus::ErrorTypeMismatch));
+            PropertyTablePropertyViewStatus::ErrorTypeMismatch
+        )
+    );
   }
 
   /**
@@ -337,83 +358,106 @@ private:
       const std::string& propertyId,
       const ClassProperty& classProperty,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<int8_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint8:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<uint8_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int16:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<int16_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint16:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<uint16_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int32:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<int32_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint32:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<uint32_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int64:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<int64_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint64:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<uint64_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float32:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<float>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float64:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<double>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -423,83 +467,98 @@ private:
       const std::string& propertyId,
       const ClassProperty& classProperty,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, int8_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint8:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, uint8_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int16:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, int16_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint16:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, uint16_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int32:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, int32_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint32:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, uint32_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int64:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, int64_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint64:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::vec<N, uint64_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Float32:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<glm::vec<N, float>>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float64:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<glm::vec<N, double>>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -510,7 +569,8 @@ private:
       const ClassProperty& classProperty,
       PropertyType type,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     glm::length_t N = getDimensionsFromPropertyType(type);
     switch (N) {
     case 2:
@@ -518,27 +578,32 @@ private:
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 3:
       getVecNArrayPropertyViewImpl<Callback, 3, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 4:
       getVecNArrayPropertyViewImpl<Callback, 4, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -548,83 +613,98 @@ private:
       const std::string& propertyId,
       const ClassProperty& classProperty,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, int8_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint8:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, uint8_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int16:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, int16_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint16:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, uint16_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int32:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, int32_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint32:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, uint32_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int64:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, int64_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint64:
       callback(
           propertyId,
           getPropertyViewImpl<
               PropertyArrayView<glm::mat<N, N, uint64_t>>,
-              Normalized>(propertyId, classProperty));
+              Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Float32:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<glm::mat<N, N, float>>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float64:
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<glm::mat<N, N, double>>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -635,7 +715,8 @@ private:
       const ClassProperty& classProperty,
       PropertyType type,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     const glm::length_t N = getDimensionsFromPropertyType(type);
     switch (N) {
     case 2:
@@ -643,27 +724,32 @@ private:
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 3:
       getMatNArrayPropertyViewImpl<Callback, 3, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 4:
       getMatNArrayPropertyViewImpl<Callback, 4, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -674,45 +760,55 @@ private:
       const ClassProperty& classProperty,
       PropertyType type,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     if (type == PropertyType::Scalar) {
       getScalarArrayPropertyViewImpl<Callback, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
     } else if (isPropertyTypeVecN(type)) {
       getVecNArrayPropertyViewImpl<Callback, Normalized>(
           propertyId,
           classProperty,
           type,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
     } else if (isPropertyTypeMatN(type)) {
       getMatNArrayPropertyViewImpl<Callback, Normalized>(
           propertyId,
           classProperty,
           type,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
     } else if (type == PropertyType::Boolean) {
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<bool>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
 
     } else if (type == PropertyType::String) {
       callback(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<std::string_view>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
     } else {
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorTypeMismatch
+          )
+      );
     }
   }
 
@@ -721,7 +817,8 @@ private:
       const std::string& propertyId,
       const ClassProperty& classProperty,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
 
     switch (componentType) {
     case PropertyComponentType::Int8:
@@ -729,76 +826,98 @@ private:
           propertyId,
           getPropertyViewImpl<glm::vec<N, int8_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint8:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint8_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int16:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, int16_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint16:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint16_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int32:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, int32_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint32:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint32_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int64:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, int64_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint64:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint64_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float32:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, float>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float64:
       callback(
           propertyId,
           getPropertyViewImpl<glm::vec<N, double>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -809,7 +928,8 @@ private:
       const ClassProperty& classProperty,
       PropertyType type,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     const glm::length_t N = getDimensionsFromPropertyType(type);
     switch (N) {
     case 2:
@@ -817,27 +937,32 @@ private:
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 3:
       getVecNPropertyViewImpl<Callback, 3, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 4:
       getVecNPropertyViewImpl<Callback, 4, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -847,83 +972,106 @@ private:
       const std::string& propertyId,
       const ClassProperty& classProperty,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, int8_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint8:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, uint8_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int16:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, int16_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint16:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, uint16_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int32:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, int32_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint32:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, uint32_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Int64:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, int64_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Uint64:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, uint64_t>, Normalized>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float32:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, float>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     case PropertyComponentType::Float64:
       callback(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, double>, false>(
               propertyId,
-              classProperty));
+              classProperty
+          )
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -934,7 +1082,8 @@ private:
       const ClassProperty& classProperty,
       PropertyType type,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     glm::length_t N = getDimensionsFromPropertyType(type);
     switch (N) {
     case 2:
@@ -942,27 +1091,32 @@ private:
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 3:
       getMatNPropertyViewImpl<Callback, 3, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     case 4:
       getMatNPropertyViewImpl<Callback, 4, Normalized>(
           propertyId,
           classProperty,
           componentType,
-          std::forward<Callback>(callback));
+          std::forward<Callback>(callback)
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -972,63 +1126,76 @@ private:
       const std::string& propertyId,
       const ClassProperty& classProperty,
       PropertyComponentType componentType,
-      Callback&& callback) const {
+      Callback&& callback
+  ) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
       callback(
           propertyId,
-          getPropertyViewImpl<int8_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<int8_t, Normalized>(propertyId, classProperty)
+      );
       return;
     case PropertyComponentType::Uint8:
       callback(
           propertyId,
-          getPropertyViewImpl<uint8_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<uint8_t, Normalized>(propertyId, classProperty)
+      );
       return;
     case PropertyComponentType::Int16:
       callback(
           propertyId,
-          getPropertyViewImpl<int16_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<int16_t, Normalized>(propertyId, classProperty)
+      );
       return;
     case PropertyComponentType::Uint16:
       callback(
           propertyId,
-          getPropertyViewImpl<uint16_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<uint16_t, Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int32:
       callback(
           propertyId,
-          getPropertyViewImpl<int32_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<int32_t, Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint32:
       callback(
           propertyId,
-          getPropertyViewImpl<uint32_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<uint32_t, Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Int64:
       callback(
           propertyId,
-          getPropertyViewImpl<int64_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<int64_t, Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Uint64:
       callback(
           propertyId,
-          getPropertyViewImpl<uint64_t, Normalized>(propertyId, classProperty));
+          getPropertyViewImpl<uint64_t, Normalized>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Float32:
       callback(
           propertyId,
-          getPropertyViewImpl<float, false>(propertyId, classProperty));
+          getPropertyViewImpl<float, false>(propertyId, classProperty)
+      );
       break;
     case PropertyComponentType::Float64:
       callback(
           propertyId,
-          getPropertyViewImpl<double, false>(propertyId, classProperty));
+          getPropertyViewImpl<double, false>(propertyId, classProperty)
+      );
       break;
     default:
       callback(
           propertyId,
           PropertyTablePropertyView<uint8_t>(
-              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch));
+              PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+          )
+      );
       break;
     }
   }
@@ -1036,7 +1203,8 @@ private:
   template <typename T, bool Normalized>
   PropertyTablePropertyView<T, Normalized> getPropertyViewImpl(
       const std::string& propertyId,
-      const ClassProperty& classProperty) const {
+      const ClassProperty& classProperty
+  ) const {
     auto propertyTablePropertyIter =
         _pPropertyTable->properties.find(propertyId);
     if (propertyTablePropertyIter == _pPropertyTable->properties.end()) {
@@ -1046,12 +1214,14 @@ private:
         // just returns the default value.
         return PropertyTablePropertyView<T, Normalized>(
             classProperty,
-            _pPropertyTable->count);
+            _pPropertyTable->count
+        );
       }
 
       // Otherwise, the property is erroneously nonexistent.
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorNonexistentProperty);
+          PropertyTablePropertyViewStatus::ErrorNonexistentProperty
+      );
     }
 
     const PropertyTableProperty& propertyTableProperty =
@@ -1060,7 +1230,8 @@ private:
     if constexpr (IsMetadataNumeric<T>::value || IsMetadataBoolean<T>::value) {
       return getNumericOrBooleanPropertyValues<T, Normalized>(
           classProperty,
-          propertyTableProperty);
+          propertyTableProperty
+      );
     }
 
     if constexpr (IsMetadataString<T>::value) {
@@ -1070,7 +1241,8 @@ private:
     if constexpr (IsMetadataBooleanArray<T>::value) {
       return getBooleanArrayPropertyValues(
           classProperty,
-          propertyTableProperty);
+          propertyTableProperty
+      );
     }
 
     if constexpr (IsMetadataNumericArray<T>::value) {
@@ -1087,28 +1259,34 @@ private:
   template <typename T, bool Normalized>
   PropertyTablePropertyView<T, Normalized> getNumericOrBooleanPropertyValues(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& propertyTableProperty) const {
+      const PropertyTableProperty& propertyTableProperty
+  ) const {
     if (classProperty.array) {
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorArrayTypeMismatch);
+          PropertyTablePropertyViewStatus::ErrorArrayTypeMismatch
+      );
     }
 
     const PropertyType type = convertStringToPropertyType(classProperty.type);
     if (TypeToPropertyType<T>::value != type) {
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorTypeMismatch);
+          PropertyTablePropertyViewStatus::ErrorTypeMismatch
+      );
     }
     const PropertyComponentType componentType =
         convertStringToPropertyComponentType(
-            classProperty.componentType.value_or(""));
+            classProperty.componentType.value_or("")
+        );
     if (TypeToPropertyType<T>::component != componentType) {
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch);
+          PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+      );
     }
 
     if (classProperty.normalized != Normalized) {
       return PropertyTablePropertyView<T, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorNormalizationMismatch);
+          PropertyTablePropertyViewStatus::ErrorNormalizationMismatch
+      );
     }
 
     gsl::span<const std::byte> values;
@@ -1120,13 +1298,15 @@ private:
     if (values.size() % sizeof(T) != 0) {
       return PropertyTablePropertyView<T, Normalized>(
           PropertyTablePropertyViewStatus::
-              ErrorBufferViewSizeNotDivisibleByTypeSize);
+              ErrorBufferViewSizeNotDivisibleByTypeSize
+      );
     }
 
     size_t maxRequiredBytes = 0;
     if (IsMetadataBoolean<T>::value) {
       maxRequiredBytes = static_cast<size_t>(
-          glm::ceil(static_cast<double>(_pPropertyTable->count) / 8.0));
+          glm::ceil(static_cast<double>(_pPropertyTable->count) / 8.0)
+      );
     } else {
       maxRequiredBytes = _pPropertyTable->count * sizeof(T);
     }
@@ -1134,105 +1314,122 @@ private:
     if (values.size() < maxRequiredBytes) {
       return PropertyTablePropertyView<T, Normalized>(
           PropertyTablePropertyViewStatus::
-              ErrorBufferViewSizeDoesNotMatchPropertyTableCount);
+              ErrorBufferViewSizeDoesNotMatchPropertyTableCount
+      );
     }
 
     return PropertyTablePropertyView<T, Normalized>(
         propertyTableProperty,
         classProperty,
         _pPropertyTable->count,
-        values);
+        values
+    );
   }
 
   PropertyTablePropertyView<std::string_view> getStringPropertyValues(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& propertyTableProperty) const;
+      const PropertyTableProperty& propertyTableProperty
+  ) const;
 
   PropertyTablePropertyView<PropertyArrayView<bool>>
   getBooleanArrayPropertyValues(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& propertyTableProperty) const;
+      const PropertyTableProperty& propertyTableProperty
+  ) const;
 
   template <typename T, bool Normalized>
   PropertyTablePropertyView<PropertyArrayView<T>, Normalized>
   getNumericArrayPropertyValues(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& propertyTableProperty) const {
+      const PropertyTableProperty& propertyTableProperty
+  ) const {
     if (!classProperty.array) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorArrayTypeMismatch);
+          PropertyTablePropertyViewStatus::ErrorArrayTypeMismatch
+      );
     }
 
     const PropertyType type = convertStringToPropertyType(classProperty.type);
     if (TypeToPropertyType<T>::value != type) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorTypeMismatch);
+          PropertyTablePropertyViewStatus::ErrorTypeMismatch
+      );
     }
 
     const PropertyComponentType componentType =
         convertStringToPropertyComponentType(
-            classProperty.componentType.value_or(""));
+            classProperty.componentType.value_or("")
+        );
     if (TypeToPropertyType<T>::component != componentType) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch);
+          PropertyTablePropertyViewStatus::ErrorComponentTypeMismatch
+      );
     }
 
     if (classProperty.normalized != Normalized) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorNormalizationMismatch);
+          PropertyTablePropertyViewStatus::ErrorNormalizationMismatch
+      );
     }
 
     gsl::span<const std::byte> values;
     auto status = getBufferSafe(propertyTableProperty.values, values);
     if (status != PropertyTablePropertyViewStatus::Valid) {
-      return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          status);
+      return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(status
+      );
     }
 
     if (values.size() % sizeof(T) != 0) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
           PropertyTablePropertyViewStatus::
-              ErrorBufferViewSizeNotDivisibleByTypeSize);
+              ErrorBufferViewSizeNotDivisibleByTypeSize
+      );
     }
 
     const int64_t fixedLengthArrayCount = classProperty.count.value_or(0);
     if (fixedLengthArrayCount > 0 && propertyTableProperty.arrayOffsets >= 0) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          PropertyTablePropertyViewStatus::
-              ErrorArrayCountAndOffsetBufferCoexist);
+          PropertyTablePropertyViewStatus::ErrorArrayCountAndOffsetBufferCoexist
+      );
     }
 
     if (fixedLengthArrayCount <= 0 && propertyTableProperty.arrayOffsets < 0) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
           PropertyTablePropertyViewStatus::
-              ErrorArrayCountAndOffsetBufferDontExist);
+              ErrorArrayCountAndOffsetBufferDontExist
+      );
     }
 
     // Handle fixed-length arrays
     if (fixedLengthArrayCount > 0) {
       size_t maxRequiredBytes = maxRequiredBytes = static_cast<size_t>(
-          _pPropertyTable->count * fixedLengthArrayCount * sizeof(T));
+          _pPropertyTable->count * fixedLengthArrayCount * sizeof(T)
+      );
 
       if (values.size() < maxRequiredBytes) {
         return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
             PropertyTablePropertyViewStatus::
-                ErrorBufferViewSizeDoesNotMatchPropertyTableCount);
+                ErrorBufferViewSizeDoesNotMatchPropertyTableCount
+        );
       }
 
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
           propertyTableProperty,
           classProperty,
           _pPropertyTable->count,
-          values);
+          values
+      );
     }
 
     // Handle variable-length arrays
     const PropertyComponentType arrayOffsetType =
         convertArrayOffsetTypeStringToPropertyComponentType(
-            propertyTableProperty.arrayOffsetType);
+            propertyTableProperty.arrayOffsetType
+        );
     if (arrayOffsetType == PropertyComponentType::None) {
       return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          PropertyTablePropertyViewStatus::ErrorInvalidArrayOffsetType);
+          PropertyTablePropertyViewStatus::ErrorInvalidArrayOffsetType
+      );
     }
 
     constexpr bool checkBitsSize = false;
@@ -1243,10 +1440,11 @@ private:
         values.size(),
         static_cast<size_t>(_pPropertyTable->count),
         checkBitsSize,
-        arrayOffsets);
+        arrayOffsets
+    );
     if (status != PropertyTablePropertyViewStatus::Valid) {
-      return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
-          status);
+      return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(status
+      );
     }
 
     if constexpr (Normalized) {
@@ -1256,7 +1454,8 @@ private:
           _pPropertyTable->count,
           values,
           arrayOffsets,
-          arrayOffsetType);
+          arrayOffsetType
+      );
     } else {
       return PropertyTablePropertyView<PropertyArrayView<T>, false>(
           propertyTableProperty,
@@ -1266,18 +1465,21 @@ private:
           arrayOffsets,
           gsl::span<const std::byte>(),
           arrayOffsetType,
-          PropertyComponentType::None);
+          PropertyComponentType::None
+      );
     }
   }
 
   PropertyTablePropertyView<PropertyArrayView<std::string_view>>
   getStringArrayPropertyValues(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& propertyTableProperty) const;
+      const PropertyTableProperty& propertyTableProperty
+  ) const;
 
   PropertyViewStatusType getBufferSafe(
       int32_t bufferView,
-      gsl::span<const std::byte>& buffer) const noexcept;
+      gsl::span<const std::byte>& buffer
+  ) const noexcept;
 
   PropertyViewStatusType getArrayOffsetsBufferSafe(
       int32_t arrayOffsetsBufferView,
@@ -1285,14 +1487,16 @@ private:
       size_t valuesBufferSize,
       size_t propertyTableCount,
       bool checkBitsSize,
-      gsl::span<const std::byte>& arrayOffsetsBuffer) const noexcept;
+      gsl::span<const std::byte>& arrayOffsetsBuffer
+  ) const noexcept;
 
   PropertyViewStatusType getStringOffsetsBufferSafe(
       int32_t stringOffsetsBufferView,
       PropertyComponentType stringOffsetType,
       size_t valuesBufferSize,
       size_t propertyTableCount,
-      gsl::span<const std::byte>& stringOffsetsBuffer) const noexcept;
+      gsl::span<const std::byte>& stringOffsetsBuffer
+  ) const noexcept;
 
   const Model* _pModel;
   const PropertyTable* _pPropertyTable;

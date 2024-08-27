@@ -17,7 +17,8 @@ namespace {
 // Computes bounding planes of the kDOP.
 std::array<Plane, 6> computeBoundingPlanes(
     const S2CellBoundingVolume& s2Cell,
-    const Ellipsoid& ellipsoid) {
+    const Ellipsoid& ellipsoid
+) {
   std::array<Plane, 6> planes;
   glm::dvec3 centerPoint = s2Cell.getCenter();
 
@@ -91,7 +92,8 @@ computeIntersection(const Plane& p0, const Plane& p1, const Plane& p2) {
   glm::dmat3x3 matrix(
       glm::dvec3(n0.x, n1.x, n2.x),
       glm::dvec3(n0.y, n1.y, n2.y),
-      glm::dvec3(n0.z, n1.z, n2.z));
+      glm::dvec3(n0.z, n1.z, n2.z)
+  );
 
   double determinant = glm::determinant(matrix);
 
@@ -117,12 +119,14 @@ computeVertices(const std::array<Plane, 6>& boundingPlanes) {
     vertices[i] = computeIntersection(
         boundingPlanes[0],
         boundingPlanes[2 + ((i + 3) % 4)],
-        boundingPlanes[2 + (i % 4)]);
+        boundingPlanes[2 + (i % 4)]
+    );
     // Vertices on the bottom plane.
     vertices[i + 4] = computeIntersection(
         boundingPlanes[1],
         boundingPlanes[2 + ((i + 3) % 4)],
-        boundingPlanes[2 + (i % 4)]);
+        boundingPlanes[2 + (i % 4)]
+    );
   }
 
   return vertices;
@@ -134,7 +138,8 @@ S2CellBoundingVolume::S2CellBoundingVolume(
     const S2CellID& cellID,
     double minimumHeight,
     double maximumHeight,
-    const Ellipsoid& ellipsoid)
+    const Ellipsoid& ellipsoid
+)
     : _cellID(cellID),
       _minimumHeight(minimumHeight),
       _maximumHeight(maximumHeight) {
@@ -153,8 +158,9 @@ gsl::span<const glm::dvec3> S2CellBoundingVolume::getVertices() const noexcept {
   return this->_vertices;
 }
 
-CesiumGeometry::CullingResult S2CellBoundingVolume::intersectPlane(
-    const CesiumGeometry::Plane& plane) const noexcept {
+CesiumGeometry::CullingResult
+S2CellBoundingVolume::intersectPlane(const CesiumGeometry::Plane& plane
+) const noexcept {
   size_t plusCount = 0;
   size_t negCount = 0;
   for (size_t i = 0; i < this->_vertices.size(); ++i) {
@@ -199,7 +205,8 @@ getPlaneVertices(const std::array<glm::dvec3, 8>& vertices, size_t index) {
 std::array<glm::dvec3, 4> computeEdgeNormals(
     const Plane& plane,
     const std::array<glm::dvec3, 4>& vertices,
-    bool invert) {
+    bool invert
+) {
   std::array<glm::dvec3, 4> result = {
       glm::normalize(glm::cross(plane.getNormal(), vertices[1] - vertices[0])),
       glm::normalize(glm::cross(plane.getNormal(), vertices[2] - vertices[1])),
@@ -223,7 +230,8 @@ std::array<glm::dvec3, 4> computeEdgeNormals(
 glm::dvec3 closestPointLineSegment(
     const glm::dvec3& p,
     const glm::dvec3& l0,
-    const glm::dvec3& l1) {
+    const glm::dvec3& l1
+) {
   glm::dvec3 d = l1 - l0;
   double t = glm::dot(d, p - l0);
 
@@ -240,7 +248,8 @@ glm::dvec3 closestPointLineSegment(
   return glm::dvec3(
       (1 - t) * l0.x + t * l1.x,
       (1 - t) * l0.y + t * l1.y,
-      (1 - t) * l0.z + t * l1.z);
+      (1 - t) * l0.z + t * l1.z
+  );
 }
 
 /**
@@ -251,7 +260,8 @@ glm::dvec3 closestPointLineSegment(
 glm::dvec3 closestPointPolygon(
     const glm::dvec3& p,
     const std::array<glm::dvec3, 4>& vertices,
-    const std::array<glm::dvec3, 4>& edgeNormals) {
+    const std::array<glm::dvec3, 4>& edgeNormals
+) {
   double minDistance = std::numeric_limits<double>::max();
   glm::dvec3 closestPoint = p;
 
@@ -321,7 +331,8 @@ glm::dvec3 closestPointPolygon(
  * which is what we will use for the distance test.
  */
 double S2CellBoundingVolume::computeDistanceSquaredToPosition(
-    const glm::dvec3& position) const noexcept {
+    const glm::dvec3& position
+) const noexcept {
   size_t numSelectedPlanes = 0;
   std::array<size_t, 6> selectedPlaneIndices;
 
@@ -356,7 +367,8 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
     glm::dvec3 facePoint = closestPointPolygon(
         selectedPlane.projectPointOntoPlane(position),
         vertices,
-        edgeNormals);
+        edgeNormals
+    );
 
     return glm::distance2(facePoint, position);
   } else if (numSelectedPlanes == 2) {
@@ -370,7 +382,8 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
               [4 * selectedPlaneIndices[0] + (selectedPlaneIndices[1] - 2)],
           this->_vertices
               [4 * selectedPlaneIndices[0] +
-               ((selectedPlaneIndices[1] - 2 + 1) % 4)]);
+               ((selectedPlaneIndices[1] - 2 + 1) % 4)]
+      );
       return glm::distance2(facePoint, position);
     }
     double minimumDistanceSquared = std::numeric_limits<double>::max();
@@ -384,7 +397,8 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
       glm::dvec3 facePoint = closestPointPolygon(
           selectedPlane.projectPointOntoPlane(position),
           vertices,
-          edgeNormals);
+          edgeNormals
+      );
 
       double distanceSquared = glm::distance2(facePoint, position);
       if (distanceSquared < minimumDistanceSquared) {
@@ -398,7 +412,8 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
     glm::dvec3 facePoint = closestPointPolygon(
         this->_boundingPlanes[1].projectPointOntoPlane(position),
         vertices,
-        computeEdgeNormals(this->_boundingPlanes[1], vertices, false));
+        computeEdgeNormals(this->_boundingPlanes[1], vertices, false)
+    );
     return glm::distance2(facePoint, position);
   }
 
@@ -410,13 +425,15 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
   if (selectedPlaneIndices[0] == 0) {
     return glm::distance2(
         position,
-        this->_vertices[(selectedPlaneIndices[1] - 2 + skip) % 4]);
+        this->_vertices[(selectedPlaneIndices[1] - 2 + skip) % 4]
+    );
   }
 
   // Vertex is on bottom plane.
   return glm::distance2(
       position,
-      this->_vertices[4 + ((selectedPlaneIndices[1] - 2 + skip) % 4)]);
+      this->_vertices[4 + ((selectedPlaneIndices[1] - 2 + skip) % 4)]
+  );
 }
 
 gsl::span<const CesiumGeometry::Plane>
@@ -425,10 +442,12 @@ S2CellBoundingVolume::getBoundingPlanes() const noexcept {
 }
 
 BoundingRegion S2CellBoundingVolume::computeBoundingRegion(
-    const CesiumGeospatial::Ellipsoid& ellipsoid) const noexcept {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) const noexcept {
   return BoundingRegion(
       this->_cellID.computeBoundingRectangle(),
       this->_minimumHeight,
       this->_maximumHeight,
-      ellipsoid);
+      ellipsoid
+  );
 }

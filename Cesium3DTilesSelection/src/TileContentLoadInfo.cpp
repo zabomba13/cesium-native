@@ -10,7 +10,8 @@ TileContentLoadInfo::TileContentLoadInfo(
         pPrepareRendererResources_,
     const std::shared_ptr<spdlog::logger>& pLogger_,
     const TilesetContentOptions& contentOptions_,
-    const Tile& tile)
+    const Tile& tile
+)
     : asyncSystem(asyncSystem_),
       pAssetAccessor(pAssetAccessor_),
       pLogger(pLogger_),

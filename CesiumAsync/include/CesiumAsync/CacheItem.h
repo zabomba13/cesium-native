@@ -27,7 +27,8 @@ public:
   CacheResponse(
       uint16_t cacheStatusCode,
       HttpHeaders&& cacheHeaders,
-      std::vector<std::byte>&& cacheData)
+      std::vector<std::byte>&& cacheData
+  )
       : statusCode(cacheStatusCode),
         headers(std::move(cacheHeaders)),
         data(std::move(cacheData)) {}
@@ -62,7 +63,8 @@ public:
   CacheRequest(
       HttpHeaders&& cacheHeaders,
       std::string&& cacheMethod,
-      std::string&& cacheUrl)
+      std::string&& cacheUrl
+  )
       : headers(std::move(cacheHeaders)),
         method(std::move(cacheMethod)),
         url(std::move(cacheUrl)) {}
@@ -97,7 +99,8 @@ public:
   CacheItem(
       std::time_t cacheExpiryTime,
       CacheRequest&& request,
-      CacheResponse&& response)
+      CacheResponse&& response
+  )
       : expiryTime(cacheExpiryTime),
         cacheRequest(std::move(request)),
         cacheResponse(std::move(response)) {}

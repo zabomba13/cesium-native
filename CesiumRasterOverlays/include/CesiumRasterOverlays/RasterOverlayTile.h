@@ -124,7 +124,8 @@ public:
   RasterOverlayTile(
       RasterOverlayTileProvider& tileProvider,
       const glm::dvec2& targetScreenPixels,
-      const CesiumGeometry::Rectangle& imageryRectangle) noexcept;
+      const CesiumGeometry::Rectangle& imageryRectangle
+  ) noexcept;
 
   /** @brief Default destructor. */
   ~RasterOverlayTile();

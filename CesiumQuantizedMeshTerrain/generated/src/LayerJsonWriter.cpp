@@ -18,12 +18,14 @@ namespace {
 void writeJson(
     const CesiumQuantizedMeshTerrain::Layer& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
+    const CesiumJsonWriter::ExtensionWriterContext& context
+);
 
 void writeJson(
     const CesiumQuantizedMeshTerrain::AvailabilityRectangle& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
+    const CesiumJsonWriter::ExtensionWriterContext& context
+);
 
 // Forward declaration to avoid circular dependency since some properties
 // are vector of unordered_map and others are unordered_map of vector
@@ -31,47 +33,54 @@ template <typename T>
 [[maybe_unused]] void writeJson(
     const std::vector<T>& list,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
+    const CesiumJsonWriter::ExtensionWriterContext& context
+);
 
 [[maybe_unused]] void writeJson(
     const std::string& str,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   jsonWriter.String(str);
 }
 
 [[maybe_unused]] void writeJson(
     double val,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   jsonWriter.Double(val);
 }
 
 [[maybe_unused]] void writeJson(
     bool val,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   jsonWriter.Bool(val);
 }
 
 [[maybe_unused]] void writeJson(
     int64_t val,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   jsonWriter.Int64(val);
 }
 
 [[maybe_unused]] void writeJson(
     int32_t val,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   jsonWriter.Int64(val);
 }
 
 [[maybe_unused]] void writeJson(
     const CesiumUtility::JsonValue::Object& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   jsonWriter.StartObject();
   for (const auto& item : obj) {
     jsonWriter.Key(item.first);
@@ -83,7 +92,8 @@ template <typename T>
 [[maybe_unused]] void writeJson(
     const CesiumUtility::JsonValue& value,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& /* context */) {
+    const CesiumJsonWriter::ExtensionWriterContext& /* context */
+) {
   CesiumJsonWriter::writeJsonValue(value, jsonWriter);
 }
 
@@ -91,7 +101,8 @@ template <typename T>
 [[maybe_unused]] void writeJson(
     const std::unordered_map<std::string, T>& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   jsonWriter.StartObject();
   for (const auto& item : obj) {
     jsonWriter.Key(item.first);
@@ -104,7 +115,8 @@ template <typename T>
 [[maybe_unused]] void writeJson(
     const std::vector<T>& list,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   jsonWriter.StartArray();
   for (const T& item : list) {
     writeJson(item, jsonWriter, context);
@@ -116,7 +128,8 @@ template <typename T>
 [[maybe_unused]] void writeJson(
     const std::optional<T>& val,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   if (val.has_value()) {
     writeJson(*val, jsonWriter, context);
   } else {
@@ -128,7 +141,8 @@ template <typename T>
 void writeExtensibleObject(
     const T& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
 
   if (!obj.extensions.empty()) {
     jsonWriter.Key("extensions");
@@ -145,7 +159,8 @@ template <typename T>
 void writeNamedObject(
     const T& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
 
   if (!obj.name.empty()) {
     jsonWriter.Key("name");
@@ -158,7 +173,8 @@ void writeNamedObject(
 void writeJson(
     const CesiumQuantizedMeshTerrain::Layer& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   jsonWriter.StartObject();
 
   if (obj.attribution != "") {
@@ -243,7 +259,8 @@ void writeJson(
 void writeJson(
     const CesiumQuantizedMeshTerrain::AvailabilityRectangle& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   jsonWriter.StartObject();
 
   jsonWriter.Key("startX");
@@ -268,14 +285,16 @@ void writeJson(
 void LayerJsonWriter::write(
     const CesiumQuantizedMeshTerrain::Layer& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   writeJson(obj, jsonWriter, context);
 }
 
 void AvailabilityRectangleJsonWriter::write(
     const CesiumQuantizedMeshTerrain::AvailabilityRectangle& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
+    const CesiumJsonWriter::ExtensionWriterContext& context
+) {
   writeJson(obj, jsonWriter, context);
 }
 

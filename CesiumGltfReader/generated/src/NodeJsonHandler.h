@@ -27,7 +27,8 @@ protected:
   IJsonHandler* readObjectKeyNode(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Node& o);
+      CesiumGltf::Node& o
+  );
 
 private:
   CesiumGltf::Node* _pObject = nullptr;

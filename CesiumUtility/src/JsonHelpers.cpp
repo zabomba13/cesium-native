@@ -7,7 +7,8 @@ namespace CesiumUtility {
 
 std::optional<double> JsonHelpers::getScalarProperty(
     const rapidjson::Value& tileJson,
-    const std::string& key) {
+    const std::string& key
+) {
   const auto it = tileJson.FindMember(key.c_str());
   if (it == tileJson.MemberEnd() || !it->value.IsNumber()) {
     return std::nullopt;
@@ -18,7 +19,8 @@ std::optional<double> JsonHelpers::getScalarProperty(
 
 std::optional<glm::dmat4x4> JsonHelpers::getTransformProperty(
     const rapidjson::Value& tileJson,
-    const std::string& key) {
+    const std::string& key
+) {
   const auto it = tileJson.FindMember(key.c_str());
   if (it == tileJson.MemberEnd() || !it->value.IsArray() ||
       it->value.Size() < 16) {
@@ -38,28 +40,34 @@ std::optional<glm::dmat4x4> JsonHelpers::getTransformProperty(
           a[0].GetDouble(),
           a[1].GetDouble(),
           a[2].GetDouble(),
-          a[3].GetDouble()),
+          a[3].GetDouble()
+      ),
       glm::dvec4(
           a[4].GetDouble(),
           a[5].GetDouble(),
           a[6].GetDouble(),
-          a[7].GetDouble()),
+          a[7].GetDouble()
+      ),
       glm::dvec4(
           a[8].GetDouble(),
           a[9].GetDouble(),
           a[10].GetDouble(),
-          a[11].GetDouble()),
+          a[11].GetDouble()
+      ),
       glm::dvec4(
           a[12].GetDouble(),
           a[13].GetDouble(),
           a[14].GetDouble(),
-          a[15].GetDouble()));
+          a[15].GetDouble()
+      )
+  );
 }
 
 std::optional<std::vector<double>> JsonHelpers::getDoubles(
     const rapidjson::Value& json,
     int32_t expectedSize,
-    const std::string& key) {
+    const std::string& key
+) {
   const auto it = json.FindMember(key.c_str());
   if (it == json.MemberEnd()) {
     return std::nullopt;
@@ -87,7 +95,8 @@ std::optional<std::vector<double>> JsonHelpers::getDoubles(
 std::string JsonHelpers::getStringOrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    const std::string& defaultValue) {
+    const std::string& defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -96,7 +105,8 @@ std::string JsonHelpers::getStringOrDefault(
 
 std::string JsonHelpers::getStringOrDefault(
     const rapidjson::Value& json,
-    const std::string& defaultValue) {
+    const std::string& defaultValue
+) {
   if (json.IsString()) {
     return json.GetString();
   }
@@ -106,7 +116,8 @@ std::string JsonHelpers::getStringOrDefault(
 double JsonHelpers::getDoubleOrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    double defaultValue) {
+    double defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -115,7 +126,8 @@ double JsonHelpers::getDoubleOrDefault(
 
 double JsonHelpers::getDoubleOrDefault(
     const rapidjson::Value& json,
-    double defaultValue) {
+    double defaultValue
+) {
   if (json.IsNumber()) {
     return json.GetDouble();
   }
@@ -125,7 +137,8 @@ double JsonHelpers::getDoubleOrDefault(
 uint32_t JsonHelpers::getUint32OrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    uint32_t defaultValue) {
+    uint32_t defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -134,7 +147,8 @@ uint32_t JsonHelpers::getUint32OrDefault(
 
 uint32_t JsonHelpers::getUint32OrDefault(
     const rapidjson::Value& json,
-    uint32_t defaultValue) {
+    uint32_t defaultValue
+) {
   if (json.IsUint()) {
     return json.GetUint();
   }
@@ -144,7 +158,8 @@ uint32_t JsonHelpers::getUint32OrDefault(
 int32_t JsonHelpers::getInt32OrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    int32_t defaultValue) {
+    int32_t defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -153,7 +168,8 @@ int32_t JsonHelpers::getInt32OrDefault(
 
 int32_t JsonHelpers::getInt32OrDefault(
     const rapidjson::Value& json,
-    int32_t defaultValue) {
+    int32_t defaultValue
+) {
   if (json.IsInt()) {
     return json.GetInt();
   }
@@ -163,7 +179,8 @@ int32_t JsonHelpers::getInt32OrDefault(
 uint64_t JsonHelpers::getUint64OrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    uint64_t defaultValue) {
+    uint64_t defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -172,7 +189,8 @@ uint64_t JsonHelpers::getUint64OrDefault(
 
 uint64_t JsonHelpers::getUint64OrDefault(
     const rapidjson::Value& json,
-    uint64_t defaultValue) {
+    uint64_t defaultValue
+) {
   if (json.IsUint()) {
     return json.GetUint();
   }
@@ -182,7 +200,8 @@ uint64_t JsonHelpers::getUint64OrDefault(
 int64_t JsonHelpers::getInt64OrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    int64_t defaultValue) {
+    int64_t defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -191,7 +210,8 @@ int64_t JsonHelpers::getInt64OrDefault(
 
 int64_t JsonHelpers::getInt64OrDefault(
     const rapidjson::Value& json,
-    int64_t defaultValue) {
+    int64_t defaultValue
+) {
   if (json.IsInt()) {
     return json.GetInt();
   }
@@ -201,7 +221,8 @@ int64_t JsonHelpers::getInt64OrDefault(
 bool JsonHelpers::getBoolOrDefault(
     const rapidjson::Value& json,
     const std::string& key,
-    bool defaultValue) {
+    bool defaultValue
+) {
   const auto it = json.FindMember(key.c_str());
   return it == json.MemberEnd()
              ? defaultValue
@@ -210,7 +231,8 @@ bool JsonHelpers::getBoolOrDefault(
 
 bool JsonHelpers::getBoolOrDefault(
     const rapidjson::Value& json,
-    bool defaultValue) {
+    bool defaultValue
+) {
   if (json.IsBool()) {
     return json.GetBool();
   }

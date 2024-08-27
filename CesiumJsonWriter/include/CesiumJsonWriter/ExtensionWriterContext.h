@@ -60,8 +60,10 @@ public:
           return TExtensionHandler::write(
               std::any_cast<const TExtension&>(obj),
               jsonWriter,
-              context);
-        });
+              context
+          );
+        }
+    );
   }
 
   /**
@@ -75,7 +77,8 @@ public:
   template <typename TExtended, typename TExtensionHandler>
   void registerExtension() {
     registerExtension<TExtended, TExtensionHandler>(
-        TExtensionHandler::ExtensionName);
+        TExtensionHandler::ExtensionName
+    );
   }
 
   /**
@@ -105,7 +108,8 @@ public:
   ExtensionHandler<std::any> createExtensionHandler(
       const std::string_view& extensionName,
       const std::any& obj,
-      const std::string& extendedObjectType) const;
+      const std::string& extendedObjectType
+  ) const;
 
 private:
   using ObjectTypeToHandler =

@@ -17,8 +17,8 @@ class BufferJsonHandler : public CesiumGltfReader::NamedObjectJsonHandler {
 public:
   using ValueType = CesiumGltf::Buffer;
 
-  BufferJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  BufferJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::Buffer* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -27,7 +27,8 @@ protected:
   IJsonHandler* readObjectKeyBuffer(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Buffer& o);
+      CesiumGltf::Buffer& o
+  );
 
 private:
   CesiumGltf::Buffer* _pObject = nullptr;

@@ -76,7 +76,8 @@ public:
    */
   static S2CellID fromQuadtreeTileID(
       uint8_t face,
-      const CesiumGeometry::QuadtreeTileID& quadtreeTileID);
+      const CesiumGeometry::QuadtreeTileID& quadtreeTileID
+  );
 
   /**
    * @brief Constructs a new S2 cell ID.

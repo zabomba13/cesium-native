@@ -106,7 +106,8 @@ public:
   static constexpr glm::vec<L, T, Q> relativeEpsilonToAbsolute(
       const glm::vec<L, T, Q>& a,
       const glm::vec<L, T, Q>& b,
-      double relativeEpsilon) noexcept {
+      double relativeEpsilon
+  ) noexcept {
     return relativeEpsilon * glm::max(glm::abs(a), glm::abs(b));
   }
 
@@ -122,7 +123,8 @@ public:
   static constexpr double relativeEpsilonToAbsolute(
       double a,
       double b,
-      double relativeEpsilon) noexcept {
+      double relativeEpsilon
+  ) noexcept {
     return relativeEpsilon * glm::max(glm::abs(a), glm::abs(b));
   }
 
@@ -142,7 +144,8 @@ public:
   static bool constexpr equalsEpsilon(
       const glm::vec<L, T, Q>& left,
       const glm::vec<L, T, Q>& right,
-      double relativeEpsilon) noexcept {
+      double relativeEpsilon
+  ) noexcept {
     return Math::equalsEpsilon(left, right, relativeEpsilon, relativeEpsilon);
   }
 
@@ -184,7 +187,8 @@ public:
       double left,
       double right,
       double relativeEpsilon,
-      double absoluteEpsilon) noexcept {
+      double absoluteEpsilon
+  ) noexcept {
     const double diff = glm::abs(left - right);
     return diff <= absoluteEpsilon ||
            diff <= relativeEpsilonToAbsolute(left, right, relativeEpsilon);
@@ -218,14 +222,15 @@ public:
       const glm::vec<L, T, Q>& left,
       const glm::vec<L, T, Q>& right,
       double relativeEpsilon,
-      double absoluteEpsilon) noexcept {
+      double absoluteEpsilon
+  ) noexcept {
     const glm::vec<L, T, Q> diff = glm::abs(left - right);
     return glm::lessThanEqual(diff, glm::vec<L, T, Q>(absoluteEpsilon)) ==
                glm::vec<L, bool, Q>(true) ||
            glm::lessThanEqual(
                diff,
-               relativeEpsilonToAbsolute(left, right, relativeEpsilon)) ==
-               glm::vec<L, bool, Q>(true);
+               relativeEpsilonToAbsolute(left, right, relativeEpsilon)
+           ) == glm::vec<L, bool, Q>(true);
   }
 
   /**
@@ -369,7 +374,8 @@ public:
    */
   static double toSNorm(double value, double rangeMaximum = 255.0) noexcept {
     return glm::round(
-        (Math::clamp(value, -1.0, 1.0) * 0.5 + 0.5) * rangeMaximum);
+        (Math::clamp(value, -1.0, 1.0) * 0.5 + 0.5) * rangeMaximum
+    );
   };
   /**
    * @brief Converts a SNORM value in the range [0, rangeMaximum] to a scalar in

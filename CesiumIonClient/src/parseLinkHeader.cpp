@@ -58,7 +58,8 @@ std::optional<Link> parseLink(const std::string& linkText) {
 
   std::regex splitParts(
       ";\\s*(.+)\\s*=\\s*\"?([^\"]+)\"?",
-      std::regex_constants::ECMAScript);
+      std::regex_constants::ECMAScript
+  );
   std::sregex_iterator partIt(params.begin(), params.end(), splitParts);
 
   for (; partIt != std::sregex_iterator(); ++partIt) {
@@ -84,11 +85,8 @@ std::vector<Link> parseLinkHeader(const std::string& linkHeader) {
 
   std::regex splitLinks(",\\s*<", std::regex_constants::ECMAScript);
 
-  std::sregex_token_iterator it(
-      linkHeader.begin(),
-      linkHeader.end(),
-      splitLinks,
-      -1);
+  std::sregex_token_iterator
+      it(linkHeader.begin(), linkHeader.end(), splitLinks, -1);
   for (; it != std::sregex_token_iterator(); ++it) {
     std::string linkText = *it;
     std::optional<Link> link = parseLink(linkText);

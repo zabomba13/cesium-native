@@ -13,13 +13,16 @@ class ConvertTileToGltf {
 public:
   static GltfConverterResult fromB3dm(
       const std::filesystem::path& filePath,
-      const CesiumGltfReader::GltfReaderOptions& options = {});
+      const CesiumGltfReader::GltfReaderOptions& options = {}
+  );
   static GltfConverterResult fromPnts(
       const std::filesystem::path& filePath,
-      const CesiumGltfReader::GltfReaderOptions& options = {});
+      const CesiumGltfReader::GltfReaderOptions& options = {}
+  );
   static GltfConverterResult fromI3dm(
       const std::filesystem::path& filePath,
-      const CesiumGltfReader::GltfReaderOptions& options = {});
+      const CesiumGltfReader::GltfReaderOptions& options = {}
+  );
 
 private:
   static CesiumAsync::AsyncSystem asyncSystem;

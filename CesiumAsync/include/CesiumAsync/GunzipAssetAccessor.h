@@ -33,7 +33,8 @@ public:
       const std::string& verb,
       const std::string& url,
       const std::vector<THeader>& headers,
-      const gsl::span<const std::byte>& contentPayload) override;
+      const gsl::span<const std::byte>& contentPayload
+  ) override;
 
   /** @copydoc IAssetAccessor::tick */
   virtual void tick() noexcept override;

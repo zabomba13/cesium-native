@@ -18,8 +18,8 @@ class CameraJsonHandler : public CesiumGltfReader::NamedObjectJsonHandler {
 public:
   using ValueType = CesiumGltf::Camera;
 
-  CameraJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  CameraJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::Camera* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -28,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyCamera(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Camera& o);
+      CesiumGltf::Camera& o
+  );
 
 private:
   CesiumGltf::Camera* _pObject = nullptr;

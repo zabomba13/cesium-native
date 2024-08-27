@@ -60,7 +60,8 @@ unprojectPosition(const Projection& projection, const glm::dvec3& position);
  */
 CesiumGeometry::Rectangle projectRectangleSimple(
     const Projection& projection,
-    const GlobeRectangle& rectangle);
+    const GlobeRectangle& rectangle
+);
 
 /**
  * @brief Unprojects a rectangle to the globe by simply unprojecting its four
@@ -76,7 +77,8 @@ CesiumGeometry::Rectangle projectRectangleSimple(
  */
 GlobeRectangle unprojectRectangleSimple(
     const Projection& projection,
-    const CesiumGeometry::Rectangle& rectangle);
+    const CesiumGeometry::Rectangle& rectangle
+);
 
 /**
  * @brief Projects a bounding region on the globe by simply projecting its
@@ -108,7 +110,8 @@ projectRegionSimple(const Projection& projection, const BoundingRegion& region);
 BoundingRegion unprojectRegionSimple(
     const Projection& projection,
     const CesiumGeometry::AxisAlignedBox& box,
-    const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+    const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+);
 
 /**
  * @brief Computes the approximate real-world size, in meters, of a given
@@ -129,7 +132,8 @@ glm::dvec2 computeProjectedRectangleSize(
     const Projection& projection,
     const CesiumGeometry::Rectangle& rectangle,
     double maxHeight,
-    const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+    const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+);
 
 /**
  * @brief Obtains the ellipsoid used by a Projection variant.

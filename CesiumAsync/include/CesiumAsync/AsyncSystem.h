@@ -92,7 +92,8 @@ public:
   template <typename T> Promise<T> createPromise() const {
     return Promise<T>(
         this->_pSchedulers,
-        std::make_shared<async::event_task<T>>());
+        std::make_shared<async::event_task<T>>()
+    );
   }
 
   /**
@@ -111,8 +112,8 @@ public:
    * @return A future that resolves after the supplied function completes.
    */
   template <typename Func>
-  CesiumImpl::ContinuationFutureType_t<Func, void>
-  runInWorkerThread(Func&& f) const {
+  CesiumImpl::ContinuationFutureType_t<Func, void> runInWorkerThread(Func&& f
+  ) const {
     static const char* tracingName = "waiting for worker thread";
 
     CESIUM_TRACE_BEGIN_IN_TRACK(tracingName);
@@ -123,7 +124,10 @@ public:
             this->_pSchedulers->workerThread.immediate,
             CesiumImpl::WithTracing<void>::end(
                 tracingName,
-                std::forward<Func>(f))));
+                std::forward<Func>(f)
+            )
+        )
+    );
   }
 
   /**
@@ -141,8 +145,8 @@ public:
    * @return A future that resolves after the supplied function completes.
    */
   template <typename Func>
-  CesiumImpl::ContinuationFutureType_t<Func, void>
-  runInMainThread(Func&& f) const {
+  CesiumImpl::ContinuationFutureType_t<Func, void> runInMainThread(Func&& f
+  ) const {
     static const char* tracingName = "waiting for main thread";
 
     CESIUM_TRACE_BEGIN_IN_TRACK(tracingName);
@@ -153,7 +157,10 @@ public:
             this->_pSchedulers->mainThread.immediate,
             CesiumImpl::WithTracing<void>::end(
                 tracingName,
-                std::forward<Func>(f))));
+                std::forward<Func>(f)
+            )
+        )
+    );
   }
 
   /**
@@ -178,7 +185,10 @@ public:
             threadPool._pScheduler->immediate,
             CesiumImpl::WithTracing<void>::end(
                 tracingName,
-                std::forward<Func>(f))));
+                std::forward<Func>(f)
+            )
+        )
+    );
   }
 
   /**
@@ -200,8 +210,8 @@ public:
    */
   template <typename T>
   Future<std::vector<T>> all(std::vector<Future<T>>&& futures) const {
-    return this->all<T, Future<T>>(
-        std::forward<std::vector<Future<T>>>(futures));
+    return this->all<T, Future<T>>(std::forward<std::vector<Future<T>>>(futures)
+    );
   }
 
   /**
@@ -224,7 +234,8 @@ public:
   template <typename T>
   Future<std::vector<T>> all(std::vector<SharedFuture<T>>&& futures) const {
     return this->all<T, SharedFuture<T>>(
-        std::forward<std::vector<SharedFuture<T>>>(futures));
+        std::forward<std::vector<SharedFuture<T>>>(futures)
+    );
   }
 
   /**
@@ -237,7 +248,8 @@ public:
   template <typename T> Future<T> createResolvedFuture(T&& value) const {
     return Future<T>(
         this->_pSchedulers,
-        async::make_task<T>(std::forward<T>(value)));
+        async::make_task<T>(std::forward<T>(value))
+    );
   }
 
   /**
@@ -318,7 +330,8 @@ private:
                     results.emplace_back(it->get());
                   }
                   return results;
-                });
+                }
+            );
     return Future<std::vector<T>>(this->_pSchedulers, std::move(task));
   }
 

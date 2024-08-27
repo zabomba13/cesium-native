@@ -22,7 +22,8 @@ TilesetWriter::getExtensions() const {
 
 TilesetWriterResult TilesetWriter::writeTileset(
     const Cesium3DTiles::Tileset& tileset,
-    const TilesetWriterOptions& options) const {
+    const TilesetWriterOptions& options
+) const {
   CESIUM_TRACE("TilesetWriter::writeTileset");
 
   const CesiumJsonWriter::ExtensionWriterContext& context =

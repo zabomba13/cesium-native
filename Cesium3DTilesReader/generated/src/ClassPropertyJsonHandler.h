@@ -19,8 +19,8 @@ class ClassPropertyJsonHandler
 public:
   using ValueType = Cesium3DTiles::ClassProperty;
 
-  ClassPropertyJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  ClassPropertyJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, Cesium3DTiles::ClassProperty* pObject);
 
@@ -30,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyClassProperty(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::ClassProperty& o);
+      Cesium3DTiles::ClassProperty& o
+  );
 
 private:
   Cesium3DTiles::ClassProperty* _pObject = nullptr;

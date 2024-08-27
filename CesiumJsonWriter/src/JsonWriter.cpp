@@ -8,7 +8,8 @@
 namespace CesiumJsonWriter {
 JsonWriter::JsonWriter()
     : _compact(std::make_unique<rapidjson::Writer<rapidjson::StringBuffer>>(
-          _compactBuffer)) {}
+          _compactBuffer
+      )) {}
 
 bool JsonWriter::Null() { return _compact->Null(); }
 
@@ -31,7 +32,8 @@ bool JsonWriter::RawNumber(const char* str, unsigned int length, bool copy) {
 bool JsonWriter::String(std::string_view string) {
   return _compact->String(
       string.data(),
-      static_cast<unsigned int>(string.size()));
+      static_cast<unsigned int>(string.size())
+  );
 }
 
 bool JsonWriter::Key(std::string_view key) {
@@ -89,7 +91,8 @@ void JsonWriter::KeyPrimitive(std::string_view keyName, std::uint64_t value) {
 
 void JsonWriter::KeyPrimitive(
     std::string_view keyName,
-    std::string_view value) {
+    std::string_view value
+) {
   Key(keyName);
   Primitive(value);
 }
@@ -114,7 +117,8 @@ void JsonWriter::KeyPrimitive(std::string_view keyName, std::nullptr_t value) {
 // Array / Objects
 void JsonWriter::KeyArray(
     std::string_view keyName,
-    std::function<void(void)> insideArray) {
+    std::function<void(void)> insideArray
+) {
   Key(keyName);
   _compact->StartArray();
   insideArray();
@@ -123,7 +127,8 @@ void JsonWriter::KeyArray(
 
 void JsonWriter::KeyObject(
     std::string_view keyName,
-    std::function<void(void)> insideObject) {
+    std::function<void(void)> insideObject
+) {
   Key(keyName);
   _compact->StartObject();
   insideObject();

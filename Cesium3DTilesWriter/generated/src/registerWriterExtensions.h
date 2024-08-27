@@ -7,6 +7,6 @@ class ExtensionWriterContext;
 } // namespace CesiumJsonWriter
 
 namespace Cesium3DTilesWriter {
-void registerWriterExtensions(
-    CesiumJsonWriter::ExtensionWriterContext& context);
+void registerWriterExtensions(CesiumJsonWriter::ExtensionWriterContext& context
+);
 }

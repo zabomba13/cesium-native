@@ -114,7 +114,8 @@ public:
    */
   Tile(
       TilesetContentLoader* pLoader,
-      std::unique_ptr<TileExternalContent>&& externalContent) noexcept;
+      std::unique_ptr<TileExternalContent>&& externalContent
+  ) noexcept;
 
   /**
    * @brief Construct a tile with an empty content and a loader that is
@@ -244,8 +245,8 @@ public:
    *
    * @param value The viewer request volume.
    */
-  void
-  setViewerRequestVolume(const std::optional<BoundingVolume>& value) noexcept {
+  void setViewerRequestVolume(const std::optional<BoundingVolume>& value
+  ) noexcept {
     this->_viewerRequestVolume = value;
   }
 
@@ -395,8 +396,8 @@ public:
    *
    * @param value The content bounding volume
    */
-  void setContentBoundingVolume(
-      const std::optional<BoundingVolume>& value) noexcept {
+  void setContentBoundingVolume(const std::optional<BoundingVolume>& value
+  ) noexcept {
     this->_contentBoundingVolume = value;
   }
 
@@ -495,7 +496,8 @@ private:
       TileConstructorImpl tag,
       TileLoadState loadState,
       TilesetContentLoader* pLoader,
-      TileContentArgs&&... args);
+      TileContentArgs&&... args
+  );
 
   void setParent(Tile* pParent) noexcept;
 
@@ -503,8 +505,8 @@ private:
 
   bool shouldContentContinueUpdating() const noexcept;
 
-  void
-  setContentShouldContinueUpdating(bool shouldContentContinueUpdating) noexcept;
+  void setContentShouldContinueUpdating(bool shouldContentContinueUpdating
+  ) noexcept;
 
   // Position in bounding-volume hierarchy.
   Tile* _pParent;

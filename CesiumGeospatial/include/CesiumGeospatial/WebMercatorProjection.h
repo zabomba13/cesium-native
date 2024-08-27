@@ -55,7 +55,8 @@ public:
    * @return The rectangle
    */
   static constexpr CesiumGeometry::Rectangle computeMaximumProjectedRectangle(
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) noexcept {
+      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) noexcept {
     const double value =
         ellipsoid.getMaximumRadius() * CesiumUtility::Math::OnePi;
     return CesiumGeometry::Rectangle(-value, -value, value, value);
@@ -66,8 +67,8 @@ public:
    *
    * @param ellipsoid The {@link Ellipsoid}.
    */
-  WebMercatorProjection(
-      const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID) noexcept;
+  WebMercatorProjection(const Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) noexcept;
 
   /**
    * @brief Gets the {@link Ellipsoid}.

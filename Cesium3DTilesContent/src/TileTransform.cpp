@@ -15,12 +15,14 @@ TileTransform::getTransform(const Cesium3DTiles::Tile& tile) {
       glm::dvec4(a[0], a[1], a[2], a[3]),
       glm::dvec4(a[4], a[5], a[6], a[7]),
       glm::dvec4(a[8], a[9], a[10], a[11]),
-      glm::dvec4(a[12], a[13], a[14], a[15]));
+      glm::dvec4(a[12], a[13], a[14], a[15])
+  );
 }
 
 void TileTransform::setTransform(
     Cesium3DTiles::Tile& tile,
-    const glm::dmat4& newTransform) {
+    const glm::dmat4& newTransform
+) {
   tile.transform.resize(16);
   tile.transform[0] = newTransform[0].x;
   tile.transform[1] = newTransform[0].y;

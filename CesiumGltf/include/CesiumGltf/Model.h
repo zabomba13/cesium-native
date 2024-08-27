@@ -58,12 +58,14 @@ struct CESIUMGLTF_API Model : public ModelSpec {
    */
   void forEachRootNodeInScene(
       int32_t sceneID,
-      std::function<ForEachRootNodeInSceneCallback>&& callback);
+      std::function<ForEachRootNodeInSceneCallback>&& callback
+  );
 
   /** @copydoc Gltf::forEachRootNodeInScene() */
   void forEachRootNodeInScene(
       int32_t sceneID,
-      std::function<ForEachRootNodeInSceneConstCallback>&& callback) const;
+      std::function<ForEachRootNodeInSceneConstCallback>&& callback
+  ) const;
 
   /**
    * @brief A callback function for {@link forEachNodeInScene}.
@@ -71,7 +73,8 @@ struct CESIUMGLTF_API Model : public ModelSpec {
   typedef void ForEachNodeInSceneCallback(
       Model& gltf,
       Node& node,
-      const glm::dmat4& transform);
+      const glm::dmat4& transform
+  );
 
   /**
    * @brief Apply the given callback to all nodes in the scene.
@@ -95,7 +98,8 @@ struct CESIUMGLTF_API Model : public ModelSpec {
    */
   void forEachNodeInScene(
       int32_t sceneID,
-      std::function<ForEachNodeInSceneCallback>&& callback);
+      std::function<ForEachNodeInSceneCallback>&& callback
+  );
 
   /**
    * @brief A callback function for {@link forEachNodeInScene}.
@@ -103,12 +107,14 @@ struct CESIUMGLTF_API Model : public ModelSpec {
   typedef void ForEachNodeInSceneConstCallback(
       const Model& gltf,
       const Node& node,
-      const glm::dmat4& transform);
+      const glm::dmat4& transform
+  );
 
   /** @copydoc Gltf::forEachNodeInScene() */
   void forEachNodeInScene(
       int32_t sceneID,
-      std::function<ForEachNodeInSceneConstCallback>&& callback) const;
+      std::function<ForEachNodeInSceneConstCallback>&& callback
+  ) const;
 
   /**
    * @brief A callback function for {@link forEachPrimitiveInScene}.
@@ -118,7 +124,8 @@ struct CESIUMGLTF_API Model : public ModelSpec {
       Node& node,
       Mesh& mesh,
       MeshPrimitive& primitive,
-      const glm::dmat4& transform);
+      const glm::dmat4& transform
+  );
 
   /**
    * @brief Apply the given callback to all relevant primitives.
@@ -143,7 +150,8 @@ struct CESIUMGLTF_API Model : public ModelSpec {
    */
   void forEachPrimitiveInScene(
       int32_t sceneID,
-      std::function<ForEachPrimitiveInSceneCallback>&& callback);
+      std::function<ForEachPrimitiveInSceneCallback>&& callback
+  );
 
   /**
    * @brief A callback function for {@link forEachPrimitiveInScene}.
@@ -153,12 +161,14 @@ struct CESIUMGLTF_API Model : public ModelSpec {
       const Node& node,
       const Mesh& mesh,
       const MeshPrimitive& primitive,
-      const glm::dmat4& transform);
+      const glm::dmat4& transform
+  );
 
   /** @copydoc Gltf::forEachPrimitiveInScene() */
   void forEachPrimitiveInScene(
       int32_t sceneID,
-      std::function<ForEachPrimitiveInSceneConstCallback>&& callback) const;
+      std::function<ForEachPrimitiveInSceneConstCallback>&& callback
+  ) const;
 
   /**
    * @brief Fills in smooth normals for any primitives with missing normals.

@@ -35,7 +35,8 @@ public:
       const TilesetContentOptions& contentOptions,
       const std::string& layerJsonUrl,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   static CesiumAsync::Future<TilesetContentLoaderResult<LayerJsonTerrainLoader>>
   createLoader(
@@ -45,7 +46,8 @@ public:
       const std::string& layerJsonUrl,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
       const rapidjson::Document& layerJson,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   struct Layer {
     Layer(
@@ -54,7 +56,8 @@ public:
         std::vector<std::string>&& tileTemplateUrls,
         CesiumGeometry::QuadtreeRectangleAvailability&& contentAvailability,
         uint32_t maxZooms,
-        int32_t availabilityLevels);
+        int32_t availabilityLevels
+    );
 
     std::string baseUrl;
     std::string version;
@@ -67,15 +70,16 @@ public:
   LayerJsonTerrainLoader(
       const CesiumGeometry::QuadtreeTilingScheme& tilingScheme,
       const CesiumGeospatial::Projection& projection,
-      std::vector<Layer>&& layers);
+      std::vector<Layer>&& layers
+  );
 
   CesiumAsync::Future<TileLoadResult>
   loadTileContent(const TileLoadInput& loadInput) override;
 
   TileChildrenResult createTileChildren(
       const Tile& tile,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) override;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) override;
 
   const CesiumGeometry::QuadtreeTilingScheme& getTilingScheme() const noexcept;
 
@@ -88,22 +92,25 @@ private:
 
   std::vector<Tile> createTileChildrenImpl(const Tile& tile);
 
-  bool
-  tileIsAvailableInAnyLayer(const CesiumGeometry::QuadtreeTileID& tileID) const;
+  bool tileIsAvailableInAnyLayer(const CesiumGeometry::QuadtreeTileID& tileID
+  ) const;
 
   AvailableState tileIsAvailableInLayer(
       const CesiumGeometry::QuadtreeTileID& tileID,
-      const Layer& layer) const;
+      const Layer& layer
+  ) const;
 
   void createChildTile(
       const Tile& parent,
       std::vector<Tile>& children,
       const CesiumGeometry::QuadtreeTileID& childID,
-      bool isAvailable);
+      bool isAvailable
+  );
 
   CesiumAsync::Future<TileLoadResult> upsampleParentTile(
       const Tile& tile,
-      const CesiumAsync::AsyncSystem& asyncSystem);
+      const CesiumAsync::AsyncSystem& asyncSystem
+  );
 
   CesiumGeometry::QuadtreeTilingScheme _tilingScheme;
   CesiumGeospatial::Projection _projection;

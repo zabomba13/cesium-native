@@ -21,17 +21,20 @@ public:
       "CESIUM_primitive_outline";
 
   ExtensionCesiumPrimitiveOutlineJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionCesiumPrimitiveOutline* pObject);
+      CesiumGltf::ExtensionCesiumPrimitiveOutline* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -39,7 +42,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionCesiumPrimitiveOutline(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionCesiumPrimitiveOutline& o);
+      CesiumGltf::ExtensionCesiumPrimitiveOutline& o
+  );
 
 private:
   CesiumGltf::ExtensionCesiumPrimitiveOutline* _pObject = nullptr;

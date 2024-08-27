@@ -64,7 +64,8 @@
 #define CESIUM_TRACE(name)                                                     \
   CesiumUtility::CesiumImpl::ScopedTrace TRACE_NAME_AUX2(                      \
       cesiumTrace,                                                             \
-      __LINE__)(name)
+      __LINE__                                                                 \
+  )(name)
 
 /**
  * @brief Begins measuring an operation which may span scope but not threads.
@@ -173,7 +174,8 @@
 #define CESIUM_TRACE_USE_TRACK_SET(id)                                         \
   CesiumUtility::CesiumImpl::TrackReference TRACE_NAME_AUX2(                   \
       cesiumTraceEnlistTrack,                                                  \
-      __LINE__)(id);
+      __LINE__                                                                 \
+  )(id);
 
 /**
  * @brief Capture the current tracing track for a lambda, so that the lambda may
@@ -237,7 +239,8 @@ private:
       const char* category,
       const char* name,
       char type,
-      int64_t id);
+      int64_t id
+  );
 
   std::ofstream _output;
   uint32_t _numTraces;

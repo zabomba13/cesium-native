@@ -5,15 +5,15 @@
 
 namespace Cesium3DTilesSelection {
 
-/*static*/ std::string
-TileIdUtilities::createTileIdString(const TileID& tileId) {
+/*static*/ std::string TileIdUtilities::createTileIdString(const TileID& tileId
+) {
 
   struct Operation {
 
     std::string operator()(const std::string& url) { return url; }
 
-    std::string
-    operator()(const CesiumGeometry::QuadtreeTileID& quadtreeTileId) {
+    std::string operator()(const CesiumGeometry::QuadtreeTileID& quadtreeTileId
+    ) {
       // Strings of the form "L10-X23-Y144"
       return "L" + std::to_string(quadtreeTileId.level) + "-" + "X" +
              std::to_string(quadtreeTileId.x) + "-" + "Y" +
@@ -29,7 +29,8 @@ TileIdUtilities::createTileIdString(const TileID& tileId) {
     }
 
     std::string operator()(
-        const CesiumGeometry::UpsampledQuadtreeNode& upsampledQuadtreeNode) {
+        const CesiumGeometry::UpsampledQuadtreeNode& upsampledQuadtreeNode
+    ) {
       // Strings of the form "upsampled-L10-X23-Y144"
       return "upsampled-L" +
              std::to_string(upsampledQuadtreeNode.tileID.level) + "-" + "X" +

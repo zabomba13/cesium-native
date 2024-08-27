@@ -33,12 +33,14 @@ AvailabilityNode::AvailabilityNode() noexcept
 
 void AvailabilityNode::setLoadedSubtree(
     AvailabilitySubtree&& subtree_,
-    uint32_t maxChildrenSubtrees) noexcept {
+    uint32_t maxChildrenSubtrees
+) noexcept {
   this->subtree = std::make_optional<AvailabilitySubtree>(std::move(subtree_));
 
   AvailabilityAccessor subtreeAvailabilityAccessor(
       this->subtree->subtreeAvailability,
-      *this->subtree);
+      *this->subtree
+  );
 
   size_t childNodesCount = 0;
   if (subtreeAvailabilityAccessor.isConstant()) {
@@ -47,7 +49,8 @@ void AvailabilityNode::setLoadedSubtree(
     }
   } else if (subtreeAvailabilityAccessor.isBufferView()) {
     childNodesCount = AvailabilityUtilities::countOnesInBuffer(
-        subtreeAvailabilityAccessor.getBufferAccessor());
+        subtreeAvailabilityAccessor.getBufferAccessor()
+    );
   } else {
     return;
   }
@@ -57,7 +60,8 @@ void AvailabilityNode::setLoadedSubtree(
 
 AvailabilityAccessor::AvailabilityAccessor(
     const AvailabilityView& view,
-    const AvailabilitySubtree& subtree) noexcept {
+    const AvailabilitySubtree& subtree
+) noexcept {
   this->pBufferView = std::get_if<SubtreeBufferView>(&view);
   this->pConstant = std::get_if<ConstantAvailability>(&view);
 
@@ -70,7 +74,8 @@ AvailabilityAccessor::AvailabilityAccessor(
         this->bufferAccessor = gsl::span<const std::byte>(
             reinterpret_cast<const std::byte*>(buffer.data()) +
                 this->pBufferView->byteOffset,
-            this->pBufferView->byteLength);
+            this->pBufferView->byteLength
+        );
       }
     }
   }

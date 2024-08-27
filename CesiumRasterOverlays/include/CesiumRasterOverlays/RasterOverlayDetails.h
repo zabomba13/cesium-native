@@ -33,7 +33,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayDetails {
   RasterOverlayDetails(
       std::vector<CesiumGeospatial::Projection>&& rasterOverlayProjections,
       std::vector<CesiumGeometry::Rectangle>&& rasterOverlayRectangles,
-      const CesiumGeospatial::BoundingRegion& boundingRegion);
+      const CesiumGeospatial::BoundingRegion& boundingRegion
+  );
 
   /**
    * @brief Finds the rectangle corresponding to a given projection in
@@ -44,7 +45,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayDetails {
    * projection is not in {@link rasterOverlayProjections}.
    */
   const CesiumGeometry::Rectangle* findRectangleForOverlayProjection(
-      const CesiumGeospatial::Projection& projection) const;
+      const CesiumGeospatial::Projection& projection
+  ) const;
 
   /**
    * @brief Merge the other RasterOverlayDetails's projections, rectangles, and
@@ -55,7 +57,8 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayDetails {
    */
   void merge(
       const RasterOverlayDetails& other,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief The raster overlay projections for which texture coordinates have

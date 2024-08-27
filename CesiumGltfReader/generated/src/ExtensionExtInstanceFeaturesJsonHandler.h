@@ -22,17 +22,20 @@ public:
   static inline constexpr const char* ExtensionName = "EXT_instance_features";
 
   ExtensionExtInstanceFeaturesJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionExtInstanceFeatures* pObject);
+      CesiumGltf::ExtensionExtInstanceFeatures* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -40,7 +43,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionExtInstanceFeatures(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionExtInstanceFeatures& o);
+      CesiumGltf::ExtensionExtInstanceFeatures& o
+  );
 
 private:
   CesiumGltf::ExtensionExtInstanceFeatures* _pObject = nullptr;

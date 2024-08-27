@@ -75,7 +75,8 @@ bool isBinaryGltf(const gsl::span<const std::byte>& data) noexcept {
 
 GltfReaderResult readJsonGltf(
     const CesiumJsonReader::JsonReaderOptions& context,
-    const gsl::span<const std::byte>& data) {
+    const gsl::span<const std::byte>& data
+) {
 
   CESIUM_TRACE("CesiumGltfReader::GltfReader::readJsonGltf");
 
@@ -111,7 +112,8 @@ std::string toMagicString(uint32_t i) {
 
 GltfReaderResult readBinaryGltf(
     const CesiumJsonReader::JsonReaderOptions& context,
-    const gsl::span<const std::byte>& data) {
+    const gsl::span<const std::byte>& data
+) {
   CESIUM_TRACE("CesiumGltfReader::GltfReader::readBinaryGltf");
 
   if (data.size() < sizeof(GlbHeader) + sizeof(ChunkHeader)) {
@@ -206,7 +208,8 @@ GltfReaderResult readBinaryGltf(
 
     if (model.buffers.empty()) {
       result.errors.emplace_back(
-          "GLB has a binary chunk but the JSON does not define any buffers.");
+          "GLB has a binary chunk but the JSON does not define any buffers."
+      );
       return result;
     }
 
@@ -223,7 +226,8 @@ GltfReaderResult readBinaryGltf(
           "The size of the first buffer in the JSON chunk is " +
           std::to_string(buffer.byteLength) +
           ", which is larger than the size of the GLB binary chunk (" +
-          std::to_string(binaryChunkSize) + ")");
+          std::to_string(binaryChunkSize) + ")"
+      );
       return result;
     }
     // The byte length of the BIN chunk MAY be up to 3 bytes
@@ -235,12 +239,14 @@ GltfReaderResult readBinaryGltf(
           std::to_string(buffer.byteLength) +
           ", which is more than 3 bytes smaller than the size of the GLB "
           "binary chunk (" +
-          std::to_string(binaryChunkSize) + ")");
+          std::to_string(binaryChunkSize) + ")"
+      );
     }
 
     buffer.cesium.data = std::vector<std::byte>(
         binaryChunk.begin(),
-        binaryChunk.begin() + buffer.byteLength);
+        binaryChunk.begin() + buffer.byteLength
+    );
   }
 
   return result;
@@ -249,19 +255,22 @@ GltfReaderResult readBinaryGltf(
 void postprocess(
     const GltfReader& reader,
     GltfReaderResult& readGltf,
-    const GltfReaderOptions& options) {
+    const GltfReaderOptions& options
+) {
   Model& model = readGltf.model.value();
 
   auto extFeatureMetadataIter = std::find(
       model.extensionsUsed.begin(),
       model.extensionsUsed.end(),
-      "EXT_feature_metadata");
+      "EXT_feature_metadata"
+  );
 
   if (extFeatureMetadataIter != model.extensionsUsed.end()) {
     readGltf.warnings.emplace_back(
         "glTF contains EXT_feature_metadata extension, which is no longer "
         "supported. The model will still be loaded, but views cannot be "
-        "constructed on its metadata.");
+        "constructed on its metadata."
+    );
   }
 
   if (options.decodeDataUrls) {
@@ -293,30 +302,35 @@ void postprocess(
             std::to_string(bufferView.byteLength) + ", the result is " +
             std::to_string(bufferView.byteOffset + bufferView.byteLength) +
             ", which is more than the available " +
-            std::to_string(buffer.cesium.data.size()) + " bytes.");
+            std::to_string(buffer.cesium.data.size()) + " bytes."
+        );
         continue;
       }
 
       const gsl::span<const std::byte> bufferSpan(buffer.cesium.data);
       const gsl::span<const std::byte> bufferViewSpan = bufferSpan.subspan(
           static_cast<size_t>(bufferView.byteOffset),
-          static_cast<size_t>(bufferView.byteLength));
+          static_cast<size_t>(bufferView.byteLength)
+      );
       ImageReaderResult imageResult =
           GltfReader::readImage(bufferViewSpan, options.ktx2TranscodeTargets);
       readGltf.warnings.insert(
           readGltf.warnings.end(),
           imageResult.warnings.begin(),
-          imageResult.warnings.end());
+          imageResult.warnings.end()
+      );
       readGltf.errors.insert(
           readGltf.errors.end(),
           imageResult.errors.begin(),
-          imageResult.errors.end());
+          imageResult.errors.end()
+      );
       if (imageResult.image) {
         image.cesium = std::move(imageResult.image.value());
       } else {
         if (image.mimeType) {
           readGltf.errors.emplace_back(
-              "Declared image MIME Type: " + image.mimeType.value());
+              "Declared image MIME Type: " + image.mimeType.value()
+          );
         } else {
           readGltf.errors.emplace_back("Image does not declare a MIME Type");
         }
@@ -345,27 +359,27 @@ void postprocess(
     decodeDraco(readGltf);
   }
 
-  if (options.decodeMeshOptData &&
-      std::find(
-          model.extensionsUsed.begin(),
-          model.extensionsUsed.end(),
-          "EXT_meshopt_compression") != model.extensionsUsed.end()) {
+  if (options.decodeMeshOptData && std::find(
+                                       model.extensionsUsed.begin(),
+                                       model.extensionsUsed.end(),
+                                       "EXT_meshopt_compression"
+                                   ) != model.extensionsUsed.end()) {
     decodeMeshOpt(model, readGltf);
   }
 
-  if (options.dequantizeMeshData &&
-      std::find(
-          model.extensionsUsed.begin(),
-          model.extensionsUsed.end(),
-          "KHR_mesh_quantization") != model.extensionsUsed.end()) {
+  if (options.dequantizeMeshData && std::find(
+                                        model.extensionsUsed.begin(),
+                                        model.extensionsUsed.end(),
+                                        "KHR_mesh_quantization"
+                                    ) != model.extensionsUsed.end()) {
     dequantizeMeshData(model);
   }
 
-  if (options.applyTextureTransform &&
-      std::find(
-          model.extensionsUsed.begin(),
-          model.extensionsUsed.end(),
-          "KHR_texture_transform") != model.extensionsUsed.end()) {
+  if (options.applyTextureTransform && std::find(
+                                           model.extensionsUsed.begin(),
+                                           model.extensionsUsed.end(),
+                                           "KHR_texture_transform"
+                                       ) != model.extensionsUsed.end()) {
     applyKhrTextureTransform(model);
   }
 }
@@ -386,7 +400,8 @@ const CesiumJsonReader::JsonReaderOptions& GltfReader::getExtensions() const {
 
 GltfReaderResult GltfReader::readGltf(
     const gsl::span<const std::byte>& data,
-    const GltfReaderOptions& options) const {
+    const GltfReaderOptions& options
+) const {
 
   const CesiumJsonReader::JsonReaderOptions& context = this->getExtensions();
   GltfReaderResult result = isBinaryGltf(data) ? readBinaryGltf(context, data)
@@ -404,11 +419,13 @@ CesiumAsync::Future<GltfReaderResult> GltfReader::loadGltf(
     const std::string& uri,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& headers,
     const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-    const GltfReaderOptions& options) const {
+    const GltfReaderOptions& options
+) const {
   return pAssetAccessor->get(asyncSystem, uri, headers)
       .thenInWorkerThread(
           [this, options, asyncSystem, pAssetAccessor, uri](
-              std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
+              std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest
+          ) {
             const CesiumAsync::IAssetResponse* pResponse = pRequest->response();
 
             if (!pResponse) {
@@ -425,7 +442,8 @@ CesiumAsync::Future<GltfReaderResult> GltfReader::loadGltf(
                   {fmt::format(
                       "Request for {} failed with code {}",
                       uri,
-                      pResponse->statusCode())},
+                      pResponse->statusCode()
+                  )},
                   {}});
             }
 
@@ -446,8 +464,10 @@ CesiumAsync::Future<GltfReaderResult> GltfReader::loadGltf(
                 pRequest->headers(),
                 pAssetAccessor,
                 options,
-                std::move(result));
-          })
+                std::move(result)
+            );
+          }
+      )
       .thenInWorkerThread([options, this](GltfReaderResult&& result) {
         postprocess(*this, result, options);
         return std::move(result);
@@ -456,7 +476,8 @@ CesiumAsync::Future<GltfReaderResult> GltfReader::loadGltf(
 
 void CesiumGltfReader::GltfReader::postprocessGltf(
     GltfReaderResult& readGltf,
-    const GltfReaderOptions& options) {
+    const GltfReaderOptions& options
+) {
   if (readGltf.model) {
     postprocess(*this, readGltf, options);
   }
@@ -468,7 +489,8 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
     const HttpHeaders& headers,
     std::shared_ptr<IAssetAccessor> pAssetAccessor,
     const GltfReaderOptions& options,
-    GltfReaderResult&& result) {
+    GltfReaderResult&& result
+) {
 
   // TODO: Can we avoid this copy conversion?
   std::vector<IAssetAccessor::THeader> tHeaders(headers.begin(), headers.end());
@@ -515,23 +537,25 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
       resolvedBuffers.push_back(
           pAssetAccessor
               ->get(asyncSystem, Uri::resolve(baseUrl, *buffer.uri), tHeaders)
-              .thenInWorkerThread(
-                  [pBuffer =
-                       &buffer](std::shared_ptr<IAssetRequest>&& pRequest) {
-                    const IAssetResponse* pResponse = pRequest->response();
+              .thenInWorkerThread([pBuffer = &buffer](
+                                      std::shared_ptr<IAssetRequest>&& pRequest
+                                  ) {
+                const IAssetResponse* pResponse = pRequest->response();
 
-                    std::string bufferUri = *pBuffer->uri;
+                std::string bufferUri = *pBuffer->uri;
 
-                    if (pResponse) {
-                      pBuffer->uri = std::nullopt;
-                      pBuffer->cesium.data = std::vector<std::byte>(
-                          pResponse->data().begin(),
-                          pResponse->data().end());
-                      return ExternalBufferLoadResult{true, bufferUri};
-                    }
+                if (pResponse) {
+                  pBuffer->uri = std::nullopt;
+                  pBuffer->cesium.data = std::vector<std::byte>(
+                      pResponse->data().begin(),
+                      pResponse->data().end()
+                  );
+                  return ExternalBufferLoadResult{true, bufferUri};
+                }
 
-                    return ExternalBufferLoadResult{false, bufferUri};
-                  }));
+                return ExternalBufferLoadResult{false, bufferUri};
+              })
+      );
     }
   }
 
@@ -544,7 +568,8 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
                 .thenInWorkerThread(
                     [pImage = &image,
                      ktx2TranscodeTargets = options.ktx2TranscodeTargets](
-                        std::shared_ptr<IAssetRequest>&& pRequest) {
+                        std::shared_ptr<IAssetRequest>&& pRequest
+                    ) {
                       const IAssetResponse* pResponse = pRequest->response();
 
                       std::string imageUri = *pImage->uri;
@@ -561,24 +586,28 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
                       }
 
                       return ExternalBufferLoadResult{false, imageUri};
-                    }));
+                    }
+                )
+        );
       }
     }
   }
 
   return asyncSystem.all(std::move(resolvedBuffers))
       .thenInWorkerThread(
-          [pResult = std::move(pResult)](
-              std::vector<ExternalBufferLoadResult>&& loadResults) mutable {
+          [pResult = std::move(pResult
+           )](std::vector<ExternalBufferLoadResult>&& loadResults) mutable {
             for (auto& bufferResult : loadResults) {
               if (!bufferResult.success) {
                 pResult->warnings.push_back(
                     "Could not load the external gltf buffer: " +
-                    bufferResult.bufferUri);
+                    bufferResult.bufferUri
+                );
               }
             }
             return std::move(*pResult.release());
-          });
+          }
+      );
 }
 
 bool isKtx(const gsl::span<const std::byte>& data) {
@@ -605,7 +634,8 @@ bool isWebP(const gsl::span<const std::byte>& data) {
 /*static*/
 ImageReaderResult GltfReader::readImage(
     const gsl::span<const std::byte>& data,
-    const Ktx2TranscodeTargets& ktx2TranscodeTargets) {
+    const Ktx2TranscodeTargets& ktx2TranscodeTargets
+) {
   CESIUM_TRACE("CesiumGltfReader::readImage");
 
   ImageReaderResult result;
@@ -621,7 +651,8 @@ ImageReaderResult GltfReader::readImage(
         reinterpret_cast<const std::uint8_t*>(data.data()),
         data.size(),
         KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
-        &pTexture);
+        &pTexture
+    );
 
     if (errorCode == KTX_SUCCESS) {
       if (ktxTexture2_NeedsTranscoding(pTexture)) {
@@ -771,7 +802,8 @@ ImageReaderResult GltfReader::readImage(
                   level,
                   0,
                   0,
-                  &imageOffset);
+                  &imageOffset
+              );
               ktx_size_t imageSize =
                   ktxTexture_GetImageSize(ktxTexture(pTexture), level);
 
@@ -801,7 +833,8 @@ ImageReaderResult GltfReader::readImage(
     result.image.reset();
     result.errors.emplace_back(
         "KTX2 loading failed with error: " +
-        std::string(ktxErrorString(errorCode)));
+        std::string(ktxErrorString(errorCode))
+    );
 
     return result;
   } else if (isWebP(data)) {
@@ -809,7 +842,8 @@ ImageReaderResult GltfReader::readImage(
             reinterpret_cast<const uint8_t*>(data.data()),
             data.size(),
             &image.width,
-            &image.height)) {
+            &image.height
+        )) {
       image.channels = 4;
       image.bytesPerChannel = 1;
       uint8_t* pImage = NULL;
@@ -820,7 +854,8 @@ ImageReaderResult GltfReader::readImage(
           data.size(),
           reinterpret_cast<uint8_t*>(image.pixelData.data()),
           image.pixelData.size(),
-          image.width * image.channels);
+          image.width * image.channels
+      );
       if (!pImage) {
         result.image.reset();
         result.errors.emplace_back("Unable to decode WebP");
@@ -839,7 +874,8 @@ ImageReaderResult GltfReader::readImage(
             &image.width,
             &image.height,
             &inSubsamp,
-            &inColorspace)) {
+            &inColorspace
+        )) {
       CESIUM_TRACE("Decode JPG");
       image.bytesPerChannel = 1;
       image.channels = 4;
@@ -855,7 +891,8 @@ ImageReaderResult GltfReader::readImage(
               0,
               image.height,
               TJPF_RGBA,
-              0)) {
+              0
+          )) {
         result.errors.emplace_back("Unable to decode JPEG");
         result.image.reset();
       }
@@ -871,13 +908,15 @@ ImageReaderResult GltfReader::readImage(
           &image.width,
           &image.height,
           &channelsInFile,
-          image.channels);
+          image.channels
+      );
       if (pImage) {
         CESIUM_TRACE(
             "copy image " + std::to_string(image.width) + "x" +
             std::to_string(image.height) + "x" +
             std::to_string(image.channels) + "x" +
-            std::to_string(image.bytesPerChannel));
+            std::to_string(image.bytesPerChannel)
+        );
         // std::uint8_t is not implicitly convertible to std::byte, so we must
         // use reinterpret_cast to (safely) force the conversion.
         const auto lastByte =
@@ -912,7 +951,8 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
   CESIUM_TRACE(
       "generate mipmaps " + std::to_string(image.width) + "x" +
       std::to_string(image.height) + "x" + std::to_string(image.channels) +
-      "x" + std::to_string(image.bytesPerChannel));
+      "x" + std::to_string(image.bytesPerChannel)
+  );
 
   int32_t mipWidth = image.width;
   int32_t mipHeight = image.height;
@@ -935,14 +975,16 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
 
   // Byte size of the base image.
   const size_t imageByteSize = static_cast<size_t>(
-      image.width * image.height * image.channels * image.bytesPerChannel);
+      image.width * image.height * image.channels * image.bytesPerChannel
+  );
 
   image.mipPositions.resize(mipCount);
   image.mipPositions[0].byteOffset = 0;
   image.mipPositions[0].byteSize = imageByteSize;
 
   image.pixelData.resize(static_cast<size_t>(
-      totalPixelCount * image.channels * image.bytesPerChannel));
+      totalPixelCount * image.channels * image.bytesPerChannel
+  ));
 
   mipWidth = image.width;
   mipHeight = image.height;
@@ -965,14 +1007,16 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
     }
 
     byteSize = static_cast<size_t>(
-        mipWidth * mipHeight * image.channels * image.bytesPerChannel);
+        mipWidth * mipHeight * image.channels * image.bytesPerChannel
+    );
 
     image.mipPositions[mipIndex].byteOffset = byteOffset;
     image.mipPositions[mipIndex].byteSize = byteSize;
 
     if (!stbir_resize_uint8(
             reinterpret_cast<const unsigned char*>(
-                &image.pixelData[lastByteOffset]),
+                &image.pixelData[lastByteOffset]
+            ),
             lastWidth,
             lastHeight,
             0,
@@ -980,7 +1024,8 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
             mipWidth,
             mipHeight,
             0,
-            image.channels)) {
+            image.channels
+        )) {
       // Remove any added mipmaps.
       image.mipPositions.clear();
       image.pixelData.resize(imageByteSize);

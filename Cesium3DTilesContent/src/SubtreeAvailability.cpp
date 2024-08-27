@@ -28,7 +28,8 @@ namespace {
 std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
     const Cesium3DTiles::Availability& availability,
     std::vector<Cesium3DTiles::Buffer>& buffers,
-    std::vector<Cesium3DTiles::BufferView>& bufferViews) {
+    std::vector<Cesium3DTiles::BufferView>& bufferViews
+) {
   if (availability.constant) {
     return SubtreeAvailability::SubtreeConstantAvailability{
         *availability.constant ==
@@ -65,7 +66,8 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
         return SubtreeAvailability::SubtreeBufferViewAvailability{
             gsl::span<std::byte>(
                 data.data() + bufferView.byteOffset,
-                size_t(bufferView.byteLength))};
+                size_t(bufferView.byteLength)
+            )};
       }
     }
   }
@@ -78,12 +80,14 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
 /*static*/ std::optional<SubtreeAvailability> SubtreeAvailability::fromSubtree(
     ImplicitTileSubdivisionScheme subdivisionScheme,
     uint32_t levelsInSubtree,
-    Cesium3DTiles::Subtree&& subtree) noexcept {
+    Cesium3DTiles::Subtree&& subtree
+) noexcept {
   std::optional<SubtreeAvailability::AvailabilityView> maybeTileAvailability =
       parseAvailabilityView(
           subtree.tileAvailability,
           subtree.buffers,
-          subtree.bufferViews);
+          subtree.bufferViews
+      );
   if (!maybeTileAvailability)
     return std::nullopt;
 
@@ -91,7 +95,8 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
       maybeChildSubtreeAvailability = parseAvailabilityView(
           subtree.childSubtreeAvailability,
           subtree.buffers,
-          subtree.bufferViews);
+          subtree.bufferViews
+      );
   if (!maybeChildSubtreeAvailability)
     return std::nullopt;
 
@@ -106,7 +111,8 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
     auto maybeAvailability = parseAvailabilityView(
         availabilityDesc,
         subtree.buffers,
-        subtree.bufferViews);
+        subtree.bufferViews
+    );
     if (maybeAvailability) {
       contentAvailability.emplace_back(std::move(*maybeAvailability));
     }
@@ -118,12 +124,14 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
       *maybeTileAvailability,
       *maybeChildSubtreeAvailability,
       std::move(contentAvailability),
-      std::move(subtree));
+      std::move(subtree)
+  );
 }
 
 /*static*/ std::optional<SubtreeAvailability> SubtreeAvailability::createEmpty(
     ImplicitTileSubdivisionScheme subdivisionScheme,
-    uint32_t levelsInSubtree) noexcept {
+    uint32_t levelsInSubtree
+) noexcept {
   Subtree subtree;
   subtree.tileAvailability.constant =
       Cesium3DTiles::Availability::Constant::AVAILABLE;
@@ -135,7 +143,8 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
   return SubtreeAvailability::fromSubtree(
       subdivisionScheme,
       levelsInSubtree,
-      std::move(subtree));
+      std::move(subtree)
+  );
 }
 
 /*static*/ CesiumAsync::Future<std::optional<SubtreeAvailability>>
@@ -146,26 +155,29 @@ SubtreeAvailability::loadSubtree(
     const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
     const std::shared_ptr<spdlog::logger>& pLogger,
     const std::string& subtreeUrl,
-    const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders) {
+    const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders
+) {
   auto pReader = std::make_shared<SubtreeFileReader>();
   return pReader->load(asyncSystem, pAssetAccessor, subtreeUrl, requestHeaders)
       .thenInMainThread(
           [pLogger, subtreeUrl, subdivisionScheme, levelsInSubtree, pReader](
-              ReadJsonResult<Subtree>&& subtree)
-              -> std::optional<SubtreeAvailability> {
+              ReadJsonResult<Subtree>&& subtree
+          ) -> std::optional<SubtreeAvailability> {
             if (!subtree.errors.empty()) {
               SPDLOG_LOGGER_ERROR(
                   pLogger,
                   "Errors while loading subtree from {}:\n- {}",
                   subtreeUrl,
-                  CesiumUtility::joinToString(subtree.errors, "\n- "));
+                  CesiumUtility::joinToString(subtree.errors, "\n- ")
+              );
             }
             if (!subtree.warnings.empty()) {
               SPDLOG_LOGGER_WARN(
                   pLogger,
                   "Warnings while loading subtree from {}:\n- {}",
                   subtreeUrl,
-                  CesiumUtility::joinToString(subtree.warnings, "\n- "));
+                  CesiumUtility::joinToString(subtree.warnings, "\n- ")
+              );
             }
 
             if (!subtree.value) {
@@ -175,8 +187,10 @@ SubtreeAvailability::loadSubtree(
             return SubtreeAvailability::fromSubtree(
                 subdivisionScheme,
                 levelsInSubtree,
-                std::move(*subtree.value));
-          });
+                std::move(*subtree.value)
+            );
+          }
+      );
 }
 
 SubtreeAvailability::SubtreeAvailability(
@@ -185,7 +199,8 @@ SubtreeAvailability::SubtreeAvailability(
     AvailabilityView tileAvailability,
     AvailabilityView subtreeAvailability,
     std::vector<AvailabilityView>&& contentAvailability,
-    Cesium3DTiles::Subtree&& subtree)
+    Cesium3DTiles::Subtree&& subtree
+)
     : _powerOf2{subdivisionScheme == ImplicitTileSubdivisionScheme::Quadtree ? 2U : 3U},
       _levelsInSubtree{levelsInSubtree},
       _subtree{std::move(subtree)},
@@ -197,153 +212,178 @@ SubtreeAvailability::SubtreeAvailability(
       _contentAvailability{std::move(contentAvailability)} {
   CESIUM_ASSERT(
       (this->_childCount == 4 || this->_childCount == 8) &&
-      "Only support quadtree and octree");
+      "Only support quadtree and octree"
+  );
 }
 
 bool SubtreeAvailability::isTileAvailable(
     const CesiumGeometry::QuadtreeTileID& subtreeId,
-    const CesiumGeometry::QuadtreeTileID& tileId) const noexcept {
+    const CesiumGeometry::QuadtreeTileID& tileId
+) const noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   return this->isTileAvailable(
       tileId.level - subtreeId.level,
-      relativeTileMortonIdx);
+      relativeTileMortonIdx
+  );
 }
 
 bool SubtreeAvailability::isTileAvailable(
     const CesiumGeometry::OctreeTileID& subtreeId,
-    const CesiumGeometry::OctreeTileID& tileId) const noexcept {
+    const CesiumGeometry::OctreeTileID& tileId
+) const noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   return this->isTileAvailable(
       tileId.level - subtreeId.level,
-      relativeTileMortonIdx);
+      relativeTileMortonIdx
+  );
 }
 
 bool SubtreeAvailability::isTileAvailable(
     uint32_t relativeTileLevel,
-    uint64_t relativeTileMortonId) const noexcept {
+    uint64_t relativeTileMortonId
+) const noexcept {
   return isAvailable(
       relativeTileLevel,
       relativeTileMortonId,
-      this->_tileAvailability);
+      this->_tileAvailability
+  );
 }
 
 void SubtreeAvailability::setTileAvailable(
     const CesiumGeometry::QuadtreeTileID& subtreeId,
     const CesiumGeometry::QuadtreeTileID& tileId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   this->setTileAvailable(
       tileId.level - subtreeId.level,
       relativeTileMortonIdx,
-      isAvailable);
+      isAvailable
+  );
 }
 
 void SubtreeAvailability::setTileAvailable(
     const CesiumGeometry::OctreeTileID& subtreeId,
     const CesiumGeometry::OctreeTileID& tileId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   this->setTileAvailable(
       tileId.level - subtreeId.level,
       relativeTileMortonIdx,
-      isAvailable);
+      isAvailable
+  );
 }
 
 void SubtreeAvailability::setTileAvailable(
     uint32_t relativeTileLevel,
     uint64_t relativeTileMortonId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   this->setAvailable(
       relativeTileLevel,
       relativeTileMortonId,
       this->_tileAvailability,
-      isAvailable);
+      isAvailable
+  );
 }
 
 bool SubtreeAvailability::isContentAvailable(
     const CesiumGeometry::QuadtreeTileID& subtreeId,
     const CesiumGeometry::QuadtreeTileID& tileId,
-    uint64_t contentId) const noexcept {
+    uint64_t contentId
+) const noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   return this->isContentAvailable(
       tileId.level - subtreeId.level,
       relativeTileMortonIdx,
-      contentId);
+      contentId
+  );
 }
 
 bool SubtreeAvailability::isContentAvailable(
     const CesiumGeometry::OctreeTileID& subtreeId,
     const CesiumGeometry::OctreeTileID& tileId,
-    uint64_t contentId) const noexcept {
+    uint64_t contentId
+) const noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   return this->isContentAvailable(
       tileId.level - subtreeId.level,
       relativeTileMortonIdx,
-      contentId);
+      contentId
+  );
 }
 
 bool SubtreeAvailability::isContentAvailable(
     uint32_t relativeTileLevel,
     uint64_t relativeTileMortonId,
-    uint64_t contentId) const noexcept {
+    uint64_t contentId
+) const noexcept {
   if (contentId >= this->_contentAvailability.size())
     return false;
   return isAvailable(
       relativeTileLevel,
       relativeTileMortonId,
-      this->_contentAvailability[contentId]);
+      this->_contentAvailability[contentId]
+  );
 }
 
 void SubtreeAvailability::setContentAvailable(
     const CesiumGeometry::QuadtreeTileID& subtreeId,
     const CesiumGeometry::QuadtreeTileID& tileId,
     uint64_t contentId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   this->setContentAvailable(
       tileId.level - subtreeId.level,
       relativeTileMortonIdx,
       contentId,
-      isAvailable);
+      isAvailable
+  );
 }
 
 void SubtreeAvailability::setContentAvailable(
     const CesiumGeometry::OctreeTileID& subtreeId,
     const CesiumGeometry::OctreeTileID& tileId,
     uint64_t contentId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   uint64_t relativeTileMortonIdx =
       ImplicitTilingUtilities::computeRelativeMortonIndex(subtreeId, tileId);
   this->setContentAvailable(
       tileId.level - subtreeId.level,
       relativeTileMortonIdx,
       contentId,
-      isAvailable);
+      isAvailable
+  );
 }
 
 void SubtreeAvailability::setContentAvailable(
     uint32_t relativeTileLevel,
     uint64_t relativeTileMortonId,
     uint64_t contentId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   if (contentId < this->_contentAvailability.size()) {
     this->setAvailable(
         relativeTileLevel,
         relativeTileMortonId,
         this->_contentAvailability[contentId],
-        isAvailable);
+        isAvailable
+    );
   }
 }
 
-bool SubtreeAvailability::isSubtreeAvailable(
-    uint64_t relativeSubtreeMortonId) const noexcept {
+bool SubtreeAvailability::isSubtreeAvailable(uint64_t relativeSubtreeMortonId
+) const noexcept {
   const SubtreeConstantAvailability* constantAvailability =
       std::get_if<SubtreeConstantAvailability>(&this->_subtreeAvailability);
   if (constantAvailability) {
@@ -353,23 +393,28 @@ bool SubtreeAvailability::isSubtreeAvailable(
   return isAvailableUsingBufferView(
       0,
       relativeSubtreeMortonId,
-      this->_subtreeAvailability);
+      this->_subtreeAvailability
+  );
 }
 
 bool SubtreeAvailability::isSubtreeAvailable(
     const CesiumGeometry::QuadtreeTileID& thisSubtreeID,
-    const CesiumGeometry::QuadtreeTileID& checkSubtreeID) const noexcept {
+    const CesiumGeometry::QuadtreeTileID& checkSubtreeID
+) const noexcept {
   return isSubtreeAvailable(ImplicitTilingUtilities::computeRelativeMortonIndex(
       thisSubtreeID,
-      checkSubtreeID));
+      checkSubtreeID
+  ));
 }
 
 bool SubtreeAvailability::isSubtreeAvailable(
     const CesiumGeometry::OctreeTileID& thisSubtreeID,
-    const CesiumGeometry::OctreeTileID& checkSubtreeID) const noexcept {
+    const CesiumGeometry::OctreeTileID& checkSubtreeID
+) const noexcept {
   return isSubtreeAvailable(ImplicitTilingUtilities::computeRelativeMortonIndex(
       thisSubtreeID,
-      checkSubtreeID));
+      checkSubtreeID
+  ));
 }
 
 namespace {
@@ -377,11 +422,13 @@ namespace {
 void convertConstantAvailabilityToBitstream(
     Subtree& subtree,
     uint64_t numberOfTiles,
-    SubtreeAvailability::AvailabilityView& availabilityView) {
+    SubtreeAvailability::AvailabilityView& availabilityView
+) {
   const SubtreeAvailability::SubtreeConstantAvailability*
       pConstantAvailability =
           std::get_if<SubtreeAvailability::SubtreeConstantAvailability>(
-              &availabilityView);
+              &availabilityView
+          );
   if (!pConstantAvailability)
     return;
 
@@ -413,11 +460,13 @@ void convertConstantAvailabilityToBitstream(
 
   buffer.cesium.data.resize(
       size_t(buffer.byteLength),
-      oldValue ? std::byte(0xFF) : std::byte(0x00));
+      oldValue ? std::byte(0xFF) : std::byte(0x00)
+  );
 
   gsl::span<std::byte> view(
       buffer.cesium.data.data() + start,
-      buffer.cesium.data.data() + end);
+      buffer.cesium.data.data() + end
+  );
   availabilityView = SubtreeAvailability::SubtreeBufferViewAvailability{view};
 }
 
@@ -425,7 +474,8 @@ void convertConstantAvailabilityToBitstream(
 
 void SubtreeAvailability::setSubtreeAvailable(
     uint64_t relativeSubtreeMortonId,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   const SubtreeConstantAvailability* pConstantAvailability =
       std::get_if<SubtreeConstantAvailability>(&this->_subtreeAvailability);
   if (pConstantAvailability) {
@@ -439,7 +489,8 @@ void SubtreeAvailability::setSubtreeAvailable(
       convertConstantAvailabilityToBitstream(
           this->_subtree,
           numberOfTilesInNextLevel,
-          this->_subtreeAvailability);
+          this->_subtreeAvailability
+      );
     }
   }
 
@@ -447,35 +498,43 @@ void SubtreeAvailability::setSubtreeAvailable(
       0,
       relativeSubtreeMortonId,
       this->_subtreeAvailability,
-      isAvailable);
+      isAvailable
+  );
 }
 
 void SubtreeAvailability::setSubtreeAvailable(
     const CesiumGeometry::QuadtreeTileID& thisSubtreeID,
     const CesiumGeometry::QuadtreeTileID& setSubtreeID,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   this->setSubtreeAvailable(
       ImplicitTilingUtilities::computeRelativeMortonIndex(
           thisSubtreeID,
-          setSubtreeID),
-      isAvailable);
+          setSubtreeID
+      ),
+      isAvailable
+  );
 }
 
 void SubtreeAvailability::setSubtreeAvailable(
     const CesiumGeometry::OctreeTileID& thisSubtreeID,
     const CesiumGeometry::OctreeTileID& setSubtreeID,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   this->setSubtreeAvailable(
       ImplicitTilingUtilities::computeRelativeMortonIndex(
           thisSubtreeID,
-          setSubtreeID),
-      isAvailable);
+          setSubtreeID
+      ),
+      isAvailable
+  );
 }
 
 bool SubtreeAvailability::isAvailable(
     uint32_t relativeTileLevel,
     uint64_t relativeTileMortonId,
-    const AvailabilityView& availabilityView) const noexcept {
+    const AvailabilityView& availabilityView
+) const noexcept {
   uint64_t numOfTilesInLevel = uint64_t(1)
                                << (this->_powerOf2 * relativeTileLevel);
   if (relativeTileMortonId >= numOfTilesInLevel) {
@@ -494,14 +553,16 @@ bool SubtreeAvailability::isAvailable(
   return isAvailableUsingBufferView(
       numOfTilesFromRootToParentLevel,
       relativeTileMortonId,
-      availabilityView);
+      availabilityView
+  );
 }
 
 void SubtreeAvailability::setAvailable(
     uint32_t relativeTileLevel,
     uint64_t relativeTileMortonId,
     AvailabilityView& availabilityView,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   const SubtreeConstantAvailability* pConstantAvailability =
       std::get_if<SubtreeConstantAvailability>(&availabilityView);
   if (pConstantAvailability) {
@@ -517,7 +578,8 @@ void SubtreeAvailability::setAvailable(
       convertConstantAvailabilityToBitstream(
           this->_subtree,
           numberOfTilesInSubtree,
-          availabilityView);
+          availabilityView
+      );
     }
   }
 
@@ -537,13 +599,15 @@ void SubtreeAvailability::setAvailable(
       numOfTilesFromRootToParentLevel,
       relativeTileMortonId,
       availabilityView,
-      isAvailable);
+      isAvailable
+  );
 }
 
 bool SubtreeAvailability::isAvailableUsingBufferView(
     uint64_t numOfTilesFromRootToParentLevel,
     uint64_t relativeTileMortonId,
-    const AvailabilityView& availabilityView) const noexcept {
+    const AvailabilityView& availabilityView
+) const noexcept {
 
   uint64_t availabilityBitIndex =
       numOfTilesFromRootToParentLevel + relativeTileMortonId;
@@ -567,7 +631,8 @@ void SubtreeAvailability::setAvailableUsingBufferView(
     uint64_t numOfTilesFromRootToParentLevel,
     uint64_t relativeTileMortonId,
     AvailabilityView& availabilityView,
-    bool isAvailable) noexcept {
+    bool isAvailable
+) noexcept {
   uint64_t availabilityBitIndex =
       numOfTilesFromRootToParentLevel + relativeTileMortonId;
 

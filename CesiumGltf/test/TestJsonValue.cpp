@@ -17,7 +17,8 @@ TEST_CASE("JsonValue turns NaN / inf floating point values into null") {
 }
 
 TEST_CASE(
-    "JsonValue does not have precision loss when storing / retreving numbers") {
+    "JsonValue does not have precision loss when storing / retreving numbers"
+) {
   const auto int64Max = std::numeric_limits<std::int64_t>::max();
   const auto int64Min = std::numeric_limits<std::int64_t>::min();
   REQUIRE(JsonValue(int64Max).getInt64() == int64Max);

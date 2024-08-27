@@ -21,25 +21,29 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::North,
         LocalDirection::Up,
         1.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterEastEcef),
         glm::dvec3(1.0, 0.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterNorthEcef),
         glm::dvec3(0.0, 1.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterUpEcef),
         glm::dvec3(0.0, 0.0, 1.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
   }
 
   SECTION("North-east-down") {
@@ -49,25 +53,29 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::East,
         LocalDirection::Down,
         1.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterEastEcef),
         glm::dvec3(0.0, 1.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterNorthEcef),
         glm::dvec3(1.0, 0.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterUpEcef),
         glm::dvec3(0.0, 0.0, -1.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
   }
 
   SECTION("Left handed East South Up") {
@@ -77,25 +85,29 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::South,
         LocalDirection::Up,
         1.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterEastEcef),
         glm::dvec3(1.0, 0.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterNorthEcef),
         glm::dvec3(0.0, -1.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterUpEcef),
         glm::dvec3(0.0, 0.0, 1.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
   }
 
   SECTION("Left handed East Up North") {
@@ -105,25 +117,29 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::Up,
         LocalDirection::North,
         1.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterEastEcef),
         glm::dvec3(1.0, 0.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterNorthEcef),
         glm::dvec3(0.0, 0.0, 1.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterUpEcef),
         glm::dvec3(0.0, 1.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
   }
 
   SECTION("Scale") {
@@ -133,25 +149,29 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::South,
         LocalDirection::Up,
         1.0 / 100.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterEastEcef),
         glm::dvec3(100.0, 0.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterNorthEcef),
         glm::dvec3(0.0, -100.0, 0.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
 
     CHECK(Math::equalsEpsilon(
         lh.ecefPositionToLocal(nullIslandEcef + oneMeterUpEcef),
         glm::dvec3(0.0, 0.0, 100.0),
         0.0,
-        1e-10));
+        1e-10
+    ));
   }
 
   SECTION("computeTransformationToAnotherLocal") {
@@ -161,7 +181,8 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::South,
         LocalDirection::Up,
         1.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     LocalHorizontalCoordinateSystem target(
         Cartographic::fromDegrees(12.0, 23.0, 1000.0),
@@ -169,7 +190,8 @@ TEST_CASE("LocalHorizontalCoordinateSystem") {
         LocalDirection::South,
         LocalDirection::Up,
         1.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
 
     glm::dvec3 somePointInOriginal = glm::dvec3(1781.0, 373.0, 7777.2);
     glm::dvec3 samePointInEcef =

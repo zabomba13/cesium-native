@@ -33,7 +33,8 @@ public:
       int64_t ionAssetID,
       const std::string& ionAccessToken,
       const RasterOverlayOptions& overlayOptions = {},
-      const std::string& ionAssetEndpointUrl = "https://api.cesium.com/");
+      const std::string& ionAssetEndpointUrl = "https://api.cesium.com/"
+  );
   virtual ~IonRasterOverlay() override;
 
   virtual CesiumAsync::Future<CreateTileProviderResult> createTileProvider(
@@ -43,8 +44,8 @@ public:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner)
-      const override;
+      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+  ) const override;
 
 private:
   int64_t _ionAssetID;
@@ -76,7 +77,8 @@ private:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner) const;
+      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+  ) const;
 };
 
 } // namespace CesiumRasterOverlays

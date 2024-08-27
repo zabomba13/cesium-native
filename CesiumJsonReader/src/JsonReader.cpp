@@ -29,7 +29,8 @@ struct Dispatcher {
   bool RawNumber(
       const char* /* str */,
       size_t /* length */,
-      bool /* copy */) noexcept {
+      bool /* copy */
+  ) noexcept {
     // This should not be called.
     CESIUM_ASSERT(false);
     return false;
@@ -93,14 +94,16 @@ std::string getMessageFromRapidJsonError(rapidjson::ParseErrorCode code) {
 } // namespace
 
 JsonReader::FinalJsonHandler::FinalJsonHandler(
-    std::vector<std::string>& warnings)
+    std::vector<std::string>& warnings
+)
     : JsonHandler(), _warnings(warnings), _pInputStream(nullptr) {
   reset(this);
 }
 
 void JsonReader::FinalJsonHandler::reportWarning(
     const std::string& warning,
-    std::vector<std::string>&& context) {
+    std::vector<std::string>&& context
+) {
   std::string fullWarning = warning;
   fullWarning += "\n  While parsing: ";
   for (auto it = context.rbegin(); it != context.rend(); ++it) {
@@ -116,7 +119,8 @@ void JsonReader::FinalJsonHandler::reportWarning(
 }
 
 void JsonReader::FinalJsonHandler::setInputStream(
-    rapidjson::MemoryStream* pInputStream) noexcept {
+    rapidjson::MemoryStream* pInputStream
+) noexcept {
   this->_pInputStream = pInputStream;
 }
 
@@ -125,12 +129,14 @@ void JsonReader::FinalJsonHandler::setInputStream(
     IJsonHandler& handler,
     FinalJsonHandler& finalHandler,
     std::vector<std::string>& errors,
-    std::vector<std::string>& /* warnings */) {
+    std::vector<std::string>& /* warnings */
+) {
 
   rapidjson::Reader reader;
   rapidjson::MemoryStream inputStream(
       reinterpret_cast<const char*>(data.data()),
-      data.size());
+      data.size()
+  );
 
   finalHandler.setInputStream(&inputStream);
 
@@ -143,7 +149,8 @@ void JsonReader::FinalJsonHandler::setInputStream(
     success = reader.IterativeParseNext<
         rapidjson::kParseDefaultFlags | rapidjson::kParseFullPrecisionFlag>(
         inputStream,
-        dispatcher);
+        dispatcher
+    );
   }
 
   if (reader.HasParseError()) {
@@ -155,12 +162,8 @@ void JsonReader::FinalJsonHandler::setInputStream(
   }
 }
 
-void CesiumJsonReader::JsonReader::internalRead(
-    const rapidjson::Value& jsonValue,
-    IJsonHandler& handler,
-    FinalJsonHandler&,
-    std::vector<std::string>&,
-    std::vector<std::string>&) {
+void CesiumJsonReader::JsonReader::
+    internalRead(const rapidjson::Value& jsonValue, IJsonHandler& handler, FinalJsonHandler&, std::vector<std::string>&, std::vector<std::string>&) {
   Dispatcher dispatcher{&handler};
   jsonValue.Accept(dispatcher);
 }

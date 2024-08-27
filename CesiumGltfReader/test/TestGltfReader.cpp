@@ -74,7 +74,8 @@ TEST_CASE("CesiumGltfReader::GltfReader") {
 
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(
-      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
+      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size())
+  );
   CHECK(result.errors.empty());
   REQUIRE(result.model.has_value());
 
@@ -82,8 +83,8 @@ TEST_CASE("CesiumGltfReader::GltfReader") {
   REQUIRE(model.accessors.size() == 1);
   CHECK(model.accessors[0].count == 4);
   CHECK(
-      model.accessors[0].componentType ==
-      Accessor::ComponentType::UNSIGNED_BYTE);
+      model.accessors[0].componentType == Accessor::ComponentType::UNSIGNED_BYTE
+  );
   CHECK(model.accessors[0].type == Accessor::Type::VEC2);
   REQUIRE(model.accessors[0].min.size() == 2);
   CHECK(model.accessors[0].min[0] == 0.0);
@@ -139,14 +140,16 @@ VertexAttributeRange getVertexAttributeRange(const Model& model) {
           const Node&,
           const Mesh&,
           const MeshPrimitive& primitive,
-          const glm::dmat4& transform) {
+          const glm::dmat4& transform
+      ) {
         for (std::pair<const std::string, int32_t> attribute :
              primitive.attributes) {
           const std::string& attributeName = attribute.first;
           if (attributeName == "POSITION") {
             var.positionRange = glm::vec3(
                 transform *
-                glm::dvec4(getRange<glm::vec3>(model, attribute.second), 0));
+                glm::dvec4(getRange<glm::vec3>(model, attribute.second), 0)
+            );
           } else if (attributeName == "NORMAL") {
             var.normalRange =
                 glm::normalize(getRange<glm::vec3>(model, attribute.second));
@@ -154,7 +157,8 @@ VertexAttributeRange getVertexAttributeRange(const Model& model) {
             var.texCoordRange = getRange<glm::vec2>(model, attribute.second);
           }
         }
-      });
+      }
+  );
   return var;
 }
 
@@ -175,15 +179,17 @@ TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
   {
     GltfReader reader;
     GltfReaderResult result = reader.readGltf(readFile(
-        CesiumGltfReader_TEST_DATA_DIR +
-        std::string("/DucksMeshopt/Duck.glb")));
+        CesiumGltfReader_TEST_DATA_DIR + std::string("/DucksMeshopt/Duck.glb")
+    ));
     const Model& model = result.model.value();
 
     // These extensions should be removed during the load process.
     CHECK(!model.isExtensionRequired(
-        ExtensionBufferViewExtMeshoptCompression::ExtensionName));
+        ExtensionBufferViewExtMeshoptCompression::ExtensionName
+    ));
     CHECK(!model.isExtensionUsed(
-        ExtensionBufferViewExtMeshoptCompression::ExtensionName));
+        ExtensionBufferViewExtMeshoptCompression::ExtensionName
+    ));
     CHECK(!model.isExtensionRequired("KHR_mesh_quantization"));
     CHECK(!model.isExtensionUsed("KHR_mesh_quantization"));
 
@@ -207,15 +213,18 @@ TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
       REQUIRE(epsilonCompare(
           originalVar.positionRange,
           compressedVar.positionRange,
-          error));
+          error
+      ));
       REQUIRE(epsilonCompare(
           originalVar.normalRange,
           compressedVar.normalRange,
-          error));
+          error
+      ));
       REQUIRE(epsilonCompare(
           originalVar.texCoordRange,
           compressedVar.texCoordRange,
-          error));
+          error
+      ));
     }
   }
 }
@@ -271,7 +280,8 @@ TEST_CASE("Nested extras deserializes properly") {
 
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(
-      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
+      gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size())
+  );
 
   REQUIRE(result.errors.empty());
   REQUIRE(result.model.has_value());
@@ -324,7 +334,8 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   REQUIRE(result.errors.empty());
   REQUIRE(result.model.has_value());
@@ -348,11 +359,13 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
   // JsonValue.
   reader.getOptions().setExtensionState(
       "KHR_draco_mesh_compression",
-      CesiumJsonReader::ExtensionState::JsonOnly);
+      CesiumJsonReader::ExtensionState::JsonOnly
+  );
 
   GltfReaderResult result2 = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   REQUIRE(result2.errors.empty());
   REQUIRE(result2.model.has_value());
@@ -369,25 +382,30 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
   REQUIRE(pDraco2->getValuePtrForKey("bufferView"));
   CHECK(
       pDraco2->getValuePtrForKey("bufferView")
-          ->getSafeNumberOrDefault<int64_t>(0) == 1);
+          ->getSafeNumberOrDefault<int64_t>(0) == 1
+  );
 
   REQUIRE(pDraco2->getValuePtrForKey("attributes"));
   REQUIRE(pDraco2->getValuePtrForKey("attributes")->isObject());
   REQUIRE(
-      pDraco2->getValuePtrForKey("attributes")->getValuePtrForKey("POSITION"));
+      pDraco2->getValuePtrForKey("attributes")->getValuePtrForKey("POSITION")
+  );
   REQUIRE(
       pDraco2->getValuePtrForKey("attributes")
           ->getValuePtrForKey("POSITION")
-          ->getSafeNumberOrDefault<int64_t>(1) == 0);
+          ->getSafeNumberOrDefault<int64_t>(1) == 0
+  );
 
   // Repeat test but this time the extension should not be deserialized at all.
   reader.getOptions().setExtensionState(
       "KHR_draco_mesh_compression",
-      CesiumJsonReader::ExtensionState::Disabled);
+      CesiumJsonReader::ExtensionState::Disabled
+  );
 
   GltfReaderResult result3 = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   REQUIRE(result3.errors.empty());
   REQUIRE(result3.model.has_value());
@@ -424,7 +442,8 @@ TEST_CASE("Extensions deserialize to JsonVaue iff "
   GltfReader reader;
   GltfReaderResult withCustomExtModel = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   REQUIRE(withCustomExtModel.errors.empty());
   REQUIRE(withCustomExtModel.model.has_value());
@@ -438,24 +457,29 @@ TEST_CASE("Extensions deserialize to JsonVaue iff "
 
   REQUIRE(pA->getValuePtrForKey("test"));
   REQUIRE(
-      pA->getValuePtrForKey("test")->getStringOrDefault("") == "Hello World");
+      pA->getValuePtrForKey("test")->getStringOrDefault("") == "Hello World"
+  );
 
   REQUIRE(pB->getValuePtrForKey("another"));
   REQUIRE(
       pB->getValuePtrForKey("another")->getStringOrDefault("") ==
-      "Goodbye World");
+      "Goodbye World"
+  );
 
   // Repeat test but this time the extension should be skipped.
   reader.getOptions().setExtensionState(
       "A",
-      CesiumJsonReader::ExtensionState::Disabled);
+      CesiumJsonReader::ExtensionState::Disabled
+  );
   reader.getOptions().setExtensionState(
       "B",
-      CesiumJsonReader::ExtensionState::Disabled);
+      CesiumJsonReader::ExtensionState::Disabled
+  );
 
   GltfReaderResult withoutCustomExt = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   auto& zeroExtensions = withoutCustomExt.model->extensions;
   REQUIRE(zeroExtensions.empty());
@@ -479,7 +503,8 @@ TEST_CASE("Unknown MIME types are handled") {
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   // Note: The result.errors will not be empty,
   // because no images could be read.
@@ -502,14 +527,15 @@ TEST_CASE("Can parse doubles with no fractions as integers") {
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
 
   CHECK(result.warnings.empty());
   Model& model = result.model.value();
   CHECK(model.accessors[0].count == 4);
   CHECK(
-      model.accessors[0].componentType ==
-      Accessor::ComponentType::UNSIGNED_BYTE);
+      model.accessors[0].componentType == Accessor::ComponentType::UNSIGNED_BYTE
+  );
   s = R"(
     {
       "accessors": [
@@ -522,7 +548,8 @@ TEST_CASE("Can parse doubles with no fractions as integers") {
   )";
   result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
   CHECK(!result.warnings.empty());
 }
 
@@ -553,7 +580,8 @@ TEST_CASE("Can apply RTC CENTER if model uses Cesium RTC extension") {
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
   REQUIRE(result.model.has_value());
   Model& model = result.model.value();
   const ExtensionCesiumRTC* cesiumRTC =
@@ -580,7 +608,8 @@ TEST_CASE("Can correctly interpret mipmaps in KTX2 files") {
     CHECK(image.mipPositions[0].byteSize > 0);
     CHECK(
         image.mipPositions[0].byteSize ==
-        size_t(image.width * image.height * image.channels));
+        size_t(image.width * image.height * image.channels)
+    );
     CHECK(image.mipPositions[0].byteSize == image.pixelData.size());
   }
 
@@ -613,7 +642,8 @@ TEST_CASE("Can correctly interpret mipmaps in KTX2 files") {
     CHECK(image.mipPositions[0].byteSize > 0);
     CHECK(
         image.mipPositions[0].byteSize ==
-        size_t(image.width * image.height * image.channels));
+        size_t(image.width * image.height * image.channels)
+    );
     CHECK(image.mipPositions[0].byteSize < image.pixelData.size());
 
     size_t smallerThan = image.mipPositions[0].byteSize;
@@ -641,7 +671,8 @@ TEST_CASE("Can read unknown properties from a glTF") {
 
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
   REQUIRE(result.model.has_value());
 
   auto unknownIt1 = result.model->unknownProperties.find("someUnknownProperty");
@@ -671,7 +702,8 @@ TEST_CASE("Ignores unknown properties if requested") {
 
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
-      options);
+      options
+  );
   REQUIRE(result.model.has_value());
   CHECK(result.model->unknownProperties.empty());
   CHECK(result.model->asset.unknownProperties.empty());
@@ -680,7 +712,8 @@ TEST_CASE("Ignores unknown properties if requested") {
 TEST_CASE("Decodes images with data uris") {
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(readFile(
-      CesiumGltfReader_TEST_DATA_DIR + std::string("/BoxTextured.gltf")));
+      CesiumGltfReader_TEST_DATA_DIR + std::string("/BoxTextured.gltf")
+  ));
 
   REQUIRE(result.warnings.empty());
   REQUIRE(result.errors.empty());
@@ -705,22 +738,26 @@ TEST_CASE("Decodes images with data uris") {
 TEST_CASE("Decode buffer with data URI whose length does match the buffer's "
           "byteLength") {
   std::vector<std::byte> gltfBytes = readFile(
-      CesiumGltfReader_TEST_DATA_DIR + std::string("/BoxTextured.gltf"));
+      CesiumGltfReader_TEST_DATA_DIR + std::string("/BoxTextured.gltf")
+  );
   std::string gltfString(
       reinterpret_cast<const char*>(gltfBytes.data()),
-      gltfBytes.size());
+      gltfBytes.size()
+  );
 
   // Make the byteLength incorrect
   constexpr std::string_view toReplace = "\"byteLength\": 840";
   gltfString.replace(
       gltfString.find(toReplace),
       toReplace.size(),
-      "\"byteLength\": 1");
+      "\"byteLength\": 1"
+  );
 
   GltfReader reader;
   GltfReaderResult result = reader.readGltf(gsl::span<const std::byte>(
       reinterpret_cast<const std::byte*>(gltfString.data()),
-      gltfString.size()));
+      gltfString.size()
+  ));
 
   REQUIRE(result.errors.empty());
   REQUIRE(result.warnings.size() == 1);
@@ -742,20 +779,23 @@ TEST_CASE("GltfReader::loadGltf") {
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
 
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
-           dataDir / "DracoCompressed")) {
+           dataDir / "DracoCompressed"
+       )) {
     if (!entry.is_regular_file())
       continue;
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
         CesiumAsync::HttpHeaders{},
-        readFile(entry.path()));
+        readFile(entry.path())
+    );
     std::string url = "file:///" + entry.path().generic_u8string();
     auto pRequest = std::make_unique<SimpleAssetRequest>(
         "GET",
         url,
         CesiumAsync::HttpHeaders{},
-        std::move(pResponse));
+        std::move(pResponse)
+    );
     mapUrlToRequest[url] = std::move(pRequest);
   }
 
@@ -764,7 +804,8 @@ TEST_CASE("GltfReader::loadGltf") {
 
   std::string uri =
       "file:///" + std::filesystem::directory_entry(
-                       dataDir / "DracoCompressed" / "CesiumMilkTruck.gltf")
+                       dataDir / "DracoCompressed" / "CesiumMilkTruck.gltf"
+                   )
                        .path()
                        .generic_u8string();
 
@@ -792,8 +833,8 @@ TEST_CASE("GltfReader::loadGltf") {
     }
   }
 
-  SECTION(
-      "does not resolve external images when resolveExternalImages is false") {
+  SECTION("does not resolve external images when resolveExternalImages is false"
+  ) {
     GltfReaderOptions options;
     options.resolveExternalImages = false;
     GltfReader reader{};
@@ -846,7 +887,8 @@ TEST_CASE("GltfReader::postprocessGltf") {
     std::vector<std::byte>& data = readerResult.model->buffers[0].cesium.data;
     std::string s(
         reinterpret_cast<char*>(data.data()),
-        reinterpret_cast<char*>(data.data()) + data.size());
+        reinterpret_cast<char*>(data.data()) + data.size()
+    );
     CHECK(s == "test");
   }
 }

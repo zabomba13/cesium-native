@@ -48,7 +48,8 @@ public:
       const glm::dvec2& viewportSize,
       double horizontalFieldOfView,
       double verticalFieldOfView,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   /**
    * @brief Gets the position of the camera in Earth-centered, Earth-fixed
@@ -110,8 +111,8 @@ public:
    *
    * @return Whether the bounding volume is visible
    */
-  bool
-  isBoundingVolumeVisible(const BoundingVolume& boundingVolume) const noexcept;
+  bool isBoundingVolumeVisible(const BoundingVolume& boundingVolume
+  ) const noexcept;
 
   /**
    * @brief Computes the squared distance to the given {@link BoundingVolume}.
@@ -122,8 +123,9 @@ public:
    * @param boundingVolume The bounding volume
    * @returns The squared distance
    */
-  double computeDistanceSquaredToBoundingVolume(
-      const BoundingVolume& boundingVolume) const noexcept;
+  double
+  computeDistanceSquaredToBoundingVolume(const BoundingVolume& boundingVolume
+  ) const noexcept;
 
   /**
    * @brief Computes the screen space error from a given geometric error
@@ -163,7 +165,8 @@ private:
       double horizontalFieldOfView,
       double verticalFieldOfView,
       const std::optional<CesiumGeospatial::Cartographic>& positionCartographic,
-      const CesiumGeospatial::Ellipsoid& ellipsoid);
+      const CesiumGeospatial::Ellipsoid& ellipsoid
+  );
 
   const glm::dvec3 _position;
   const glm::dvec3 _direction;

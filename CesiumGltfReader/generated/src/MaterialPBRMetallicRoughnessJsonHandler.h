@@ -20,10 +20,12 @@ public:
   using ValueType = CesiumGltf::MaterialPBRMetallicRoughness;
 
   MaterialPBRMetallicRoughnessJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::MaterialPBRMetallicRoughness* pObject);
+      CesiumGltf::MaterialPBRMetallicRoughness* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -31,7 +33,8 @@ protected:
   IJsonHandler* readObjectKeyMaterialPBRMetallicRoughness(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::MaterialPBRMetallicRoughness& o);
+      CesiumGltf::MaterialPBRMetallicRoughness& o
+  );
 
 private:
   CesiumGltf::MaterialPBRMetallicRoughness* _pObject = nullptr;

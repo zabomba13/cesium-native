@@ -20,7 +20,8 @@ public:
   void write(
       const gsl::span<const std::byte>& buffer,
       std::ios::openmode flags = std::ios::out | std::ios::binary |
-                                 std::ios::trunc);
+                                 std::ios::trunc
+  );
 
 private:
   std::filesystem::path _filePath;

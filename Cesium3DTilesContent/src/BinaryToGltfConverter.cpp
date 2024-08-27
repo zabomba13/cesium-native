@@ -7,14 +7,16 @@ CesiumGltfReader::GltfReader BinaryToGltfConverter::_gltfReader;
 GltfConverterResult BinaryToGltfConverter::convertImmediate(
     const gsl::span<const std::byte>& gltfBinary,
     const CesiumGltfReader::GltfReaderOptions& options,
-    const AssetFetcher& assetFetcher) {
+    const AssetFetcher& assetFetcher
+) {
   CesiumGltfReader::GltfReaderResult loadedGltf =
       _gltfReader.readGltf(gltfBinary, options);
 
   if (loadedGltf.model) {
     loadedGltf.model->extras["gltfUpAxis"] =
         static_cast<std::underlying_type_t<CesiumGeometry::Axis>>(
-            assetFetcher.upAxis);
+            assetFetcher.upAxis
+        );
   }
   GltfConverterResult result;
   result.model = std::move(loadedGltf.model);
@@ -26,8 +28,10 @@ GltfConverterResult BinaryToGltfConverter::convertImmediate(
 CesiumAsync::Future<GltfConverterResult> BinaryToGltfConverter::convert(
     const gsl::span<const std::byte>& gltfBinary,
     const CesiumGltfReader::GltfReaderOptions& options,
-    const AssetFetcher& assetFetcher) {
+    const AssetFetcher& assetFetcher
+) {
   return assetFetcher.asyncSystem.createResolvedFuture(
-      convertImmediate(gltfBinary, options, assetFetcher));
+      convertImmediate(gltfBinary, options, assetFetcher)
+  );
 }
 } // namespace Cesium3DTilesContent

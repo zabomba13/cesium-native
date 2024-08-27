@@ -21,7 +21,8 @@ public:
   constexpr Cartographic(
       double longitudeRadians,
       double latitudeRadians,
-      double heightMeters = 0.0) noexcept
+      double heightMeters = 0.0
+  ) noexcept
       : longitude(longitudeRadians),
         latitude(latitudeRadians),
         height(heightMeters) {}
@@ -39,11 +40,13 @@ public:
   static constexpr Cartographic fromDegrees(
       double longitudeDegrees,
       double latitudeDegrees,
-      double heightMeters = 0.0) noexcept {
+      double heightMeters = 0.0
+  ) noexcept {
     return Cartographic(
         CesiumUtility::Math::degreesToRadians(longitudeDegrees),
         CesiumUtility::Math::degreesToRadians(latitudeDegrees),
-        heightMeters);
+        heightMeters
+    );
   }
 
   /**

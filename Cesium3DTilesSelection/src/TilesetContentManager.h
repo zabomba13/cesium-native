@@ -28,13 +28,15 @@ public:
       RasterOverlayCollection&& overlayCollection,
       std::vector<CesiumAsync::IAssetAccessor::THeader>&& requestHeaders,
       std::unique_ptr<TilesetContentLoader>&& pLoader,
-      std::unique_ptr<Tile>&& pRootTile);
+      std::unique_ptr<Tile>&& pRootTile
+  );
 
   TilesetContentManager(
       const TilesetExternals& externals,
       const TilesetOptions& tilesetOptions,
       RasterOverlayCollection&& overlayCollection,
-      const std::string& url);
+      const std::string& url
+  );
 
   TilesetContentManager(
       const TilesetExternals& externals,
@@ -42,7 +44,8 @@ public:
       RasterOverlayCollection&& overlayCollection,
       int64_t ionAssetID,
       const std::string& ionAccessToken,
-      const std::string& ionAssetEndpointUrl = "https://api.cesium.com/");
+      const std::string& ionAssetEndpointUrl = "https://api.cesium.com/"
+  );
 
   /**
    * @brief A future that resolves after all async operations initiated by this
@@ -110,7 +113,8 @@ private:
   static void setTileContent(
       Tile& tile,
       TileLoadResult&& result,
-      void* pWorkerRenderResources);
+      void* pWorkerRenderResources
+  );
 
   void
   updateContentLoadedState(Tile& tile, const TilesetOptions& tilesetOptions);
@@ -132,7 +136,8 @@ private:
       TilesetLoadType type,
       const std::function<void(const TilesetLoadFailureDetails&)>&
           loadErrorCallback,
-      TilesetContentLoaderResult<TilesetContentLoaderType>&& result);
+      TilesetContentLoaderResult<TilesetContentLoaderType>&& result
+  );
 
   TilesetExternals _externals;
   std::vector<CesiumAsync::IAssetAccessor::THeader> _requestHeaders;

@@ -49,7 +49,8 @@ void updateIndex(int32_t& index, size_t offset) noexcept {
 void mergeSchemas(
     Schema& lhs,
     Schema& rhs,
-    std::map<std::string, std::string>& classNameMap);
+    std::map<std::string, std::string>& classNameMap
+);
 
 } // namespace
 
@@ -64,15 +65,18 @@ ErrorList Model::merge(Model&& rhs) {
   std::sort(this->extensionsUsed.begin(), this->extensionsUsed.end());
   this->extensionsUsed.erase(
       std::unique(this->extensionsUsed.begin(), this->extensionsUsed.end()),
-      this->extensionsUsed.end());
+      this->extensionsUsed.end()
+  );
 
   copyElements(this->extensionsRequired, rhs.extensionsRequired);
   std::sort(this->extensionsRequired.begin(), this->extensionsRequired.end());
   this->extensionsRequired.erase(
       std::unique(
           this->extensionsRequired.begin(),
-          this->extensionsRequired.end()),
-      this->extensionsRequired.end());
+          this->extensionsRequired.end()
+      ),
+      this->extensionsRequired.end()
+  );
 
   const size_t firstAccessor = copyElements(this->accessors, rhs.accessors);
   const size_t firstAnimation = copyElements(this->animations, rhs.animations);
@@ -123,7 +127,8 @@ ErrorList Model::merge(Model&& rhs) {
         copyElements(metadata.propertyTextures, pRhsMetadata->propertyTextures);
     firstPropertyAttribute = copyElements(
         metadata.propertyAttributes,
-        pRhsMetadata->propertyAttributes);
+        pRhsMetadata->propertyAttributes
+    );
 
     for (size_t i = firstPropertyTable; i < metadata.propertyTables.size();
          ++i) {
@@ -371,7 +376,8 @@ ErrorList Model::merge(Model&& rhs) {
     std::copy(
         pRhsDefaultScene->nodes.begin(),
         pRhsDefaultScene->nodes.end(),
-        newScene.nodes.begin() + int64_t(originalNodeCount));
+        newScene.nodes.begin() + int64_t(originalNodeCount)
+    );
 
     // No need to update indices because they've already been updated when
     // we copied them from rhs to this.
@@ -389,7 +395,8 @@ void forEachPrimitiveInMeshObject(
     const Model& model,
     const Node& node,
     const Mesh& mesh,
-    TCallback& callback) {
+    TCallback& callback
+) {
   for (const MeshPrimitive& primitive : mesh.primitives) {
     callback(model, node, mesh, primitive, transform);
   }
@@ -414,12 +421,14 @@ std::optional<glm::dmat4x4> getNodeTransform(const CesiumGltf::Node& node) {
   if (node.matrix.size() >= 16 && !std::equal(
                                       identityMatrix.begin(),
                                       identityMatrix.end(),
-                                      matrix.begin())) {
+                                      matrix.begin()
+                                  )) {
     return glm::dmat4x4(
         glm::dvec4(matrix[0], matrix[1], matrix[2], matrix[3]),
         glm::dvec4(matrix[4], matrix[5], matrix[6], matrix[7]),
         glm::dvec4(matrix[8], matrix[9], matrix[10], matrix[11]),
-        glm::dvec4(matrix[12], matrix[13], matrix[14], matrix[15]));
+        glm::dvec4(matrix[12], matrix[13], matrix[14], matrix[15])
+    );
   }
 
   if (!node.translation.empty() || !node.rotation.empty() ||
@@ -430,7 +439,8 @@ std::optional<glm::dmat4x4> getNodeTransform(const CesiumGltf::Node& node) {
           node.translation[0],
           node.translation[1],
           node.translation[2],
-          1.0);
+          1.0
+      );
     } else if (!node.translation.empty()) {
       return std::nullopt;
     }
@@ -465,7 +475,8 @@ void forEachPrimitiveInNodeObject(
     const glm::dmat4x4& transform,
     const Model& model,
     const Node& node,
-    TCallback& callback) {
+    TCallback& callback
+) {
 
   // This should just call GltfUtilities::getNodeTransform, but it can't because
   // it's in CesiumGltfContent. We should merge these two libraries, but until
@@ -485,7 +496,8 @@ void forEachPrimitiveInNodeObject(
           nodeTransform,
           model,
           model.nodes[size_t(childNodeId)],
-          callback);
+          callback
+      );
     }
   }
 }
@@ -495,7 +507,8 @@ void forEachNode(
     const glm::dmat4x4& transform,
     const Model& model,
     const Node& node,
-    TCallback& callback) {
+    TCallback& callback
+) {
 
   glm::dmat4x4 nodeTransform =
       transform * getNodeTransform(node).value_or(glm::dmat4x4(1.0));
@@ -508,7 +521,8 @@ void forEachNode(
           nodeTransform,
           model,
           model.nodes[size_t(childNodeId)],
-          callback);
+          callback
+      );
     }
   }
 }
@@ -517,7 +531,8 @@ template <typename TCallback>
 void forEachNodeInSceneObject(
     const Model& model,
     const Scene& scene,
-    TCallback& callback) {
+    TCallback& callback
+) {
   for (int32_t node : scene.nodes) {
     const Node* pNode = model.getSafe(&model.nodes, node);
     if (!pNode)
@@ -531,17 +546,20 @@ void forEachNodeInSceneObject(
 
 void Model::forEachRootNodeInScene(
     int32_t sceneID,
-    std::function<ForEachRootNodeInSceneCallback>&& callback) {
+    std::function<ForEachRootNodeInSceneCallback>&& callback
+) {
   return const_cast<const Model*>(this)->forEachRootNodeInScene(
       sceneID,
       [&callback](const Model& gltf, const Node& node) {
         callback(const_cast<Model&>(gltf), const_cast<Node&>(node));
-      });
+      }
+  );
 }
 
 void Model::forEachRootNodeInScene(
     int32_t sceneID,
-    std::function<ForEachRootNodeInSceneConstCallback>&& callback) const {
+    std::function<ForEachRootNodeInSceneConstCallback>&& callback
+) const {
   if (sceneID >= 0) {
     // Use the user-specified scene if it exists.
     if (size_t(sceneID) < this->scenes.size()) {
@@ -552,7 +570,8 @@ void Model::forEachRootNodeInScene(
     forEachNodeInSceneObject(
         *this,
         this->scenes[size_t(this->scene)],
-        callback);
+        callback
+    );
   } else if (!this->scenes.empty()) {
     // There's no default, so use the first scene
     const Scene& defaultScene = this->scenes[0];
@@ -565,30 +584,36 @@ void Model::forEachRootNodeInScene(
 
 void Model::forEachNodeInScene(
     int32_t sceneID,
-    std::function<ForEachNodeInSceneCallback>&& callback) {
+    std::function<ForEachNodeInSceneCallback>&& callback
+) {
   return const_cast<const Model*>(this)->forEachNodeInScene(
       sceneID,
       [&callback](
           const Model& gltf,
           const Node& node,
-          const glm::dmat4& transform) {
+          const glm::dmat4& transform
+      ) {
         callback(const_cast<Model&>(gltf), const_cast<Node&>(node), transform);
-      });
+      }
+  );
 }
 
 void Model::forEachNodeInScene(
     int32_t sceneID,
-    std::function<ForEachNodeInSceneConstCallback>&& callback) const {
+    std::function<ForEachNodeInSceneConstCallback>&& callback
+) const {
   this->forEachRootNodeInScene(
       sceneID,
       [callback = std::move(callback)](const Model& model, const Node& node) {
         forEachNode(glm::dmat4x4(1.0), model, node, callback);
-      });
+      }
+  );
 }
 
 void Model::forEachPrimitiveInScene(
     int32_t sceneID,
-    std::function<ForEachPrimitiveInSceneCallback>&& callback) {
+    std::function<ForEachPrimitiveInSceneCallback>&& callback
+) {
   return const_cast<const Model*>(this)->forEachPrimitiveInScene(
       sceneID,
       [&callback](
@@ -596,19 +621,23 @@ void Model::forEachPrimitiveInScene(
           const Node& node,
           const Mesh& mesh,
           const MeshPrimitive& primitive,
-          const glm::dmat4& transform) {
+          const glm::dmat4& transform
+      ) {
         callback(
             const_cast<Model&>(gltf),
             const_cast<Node&>(node),
             const_cast<Mesh&>(mesh),
             const_cast<MeshPrimitive&>(primitive),
-            transform);
-      });
+            transform
+        );
+      }
+  );
 }
 
 void Model::forEachPrimitiveInScene(
     int32_t sceneID,
-    std::function<ForEachPrimitiveInSceneConstCallback>&& callback) const {
+    std::function<ForEachPrimitiveInSceneConstCallback>&& callback
+) const {
   bool anythingVisited = false;
   this->forEachRootNodeInScene(
       sceneID,
@@ -616,7 +645,8 @@ void Model::forEachPrimitiveInScene(
        callback = std::move(callback)](const Model& model, const Node& node) {
         anythingVisited = true;
         forEachPrimitiveInNodeObject(glm::dmat4x4(1.0), model, node, callback);
-      });
+      }
+  );
 
   if (!anythingVisited) {
     // No root nodes at all in this model, so enumerate all the meshes.
@@ -626,7 +656,8 @@ void Model::forEachPrimitiveInScene(
           *this,
           Node(),
           mesh,
-          callback);
+          callback
+      );
     }
   }
 }
@@ -638,7 +669,8 @@ void addTriangleNormalToVertexNormals(
     const AccessorView<glm::vec3>& positionView,
     TIndex tIndex0,
     TIndex tIndex1,
-    TIndex tIndex2) {
+    TIndex tIndex2
+) {
 
   // Add the triangle's normal to each vertex's accumulated normal.
 
@@ -666,7 +698,8 @@ bool accumulateNormals(
     const gsl::span<glm::vec3>& normals,
     const AccessorView<glm::vec3>& positionView,
     int64_t numIndices,
-    GetIndex getIndex) {
+    GetIndex getIndex
+) {
 
   switch (meshPrimitiveMode) {
   case MeshPrimitive::Mode::TRIANGLES:
@@ -680,7 +713,8 @@ bool accumulateNormals(
           positionView,
           index0,
           index1,
-          index2);
+          index2
+      );
     }
     break;
 
@@ -705,7 +739,8 @@ bool accumulateNormals(
           positionView,
           index0,
           index1,
-          index2);
+          index2
+      );
     }
     break;
 
@@ -725,7 +760,8 @@ bool accumulateNormals(
             positionView,
             index0,
             index1,
-            index2);
+            index2
+        );
       }
     }
     break;
@@ -742,7 +778,8 @@ void generateSmoothNormals(
     Model& gltf,
     MeshPrimitive& primitive,
     const AccessorView<glm::vec3>& positionView,
-    const std::optional<Accessor>& indexAccessor) {
+    const std::optional<Accessor>& indexAccessor
+) {
 
   const size_t count = static_cast<size_t>(positionView.size());
   const size_t normalBufferStride = sizeof(glm::vec3);
@@ -751,7 +788,8 @@ void generateSmoothNormals(
   std::vector<std::byte> normalByteBuffer(normalBufferSize);
   gsl::span<glm::vec3> normals(
       reinterpret_cast<glm::vec3*>(normalByteBuffer.data()),
-      count);
+      count
+  );
 
   // In the indexed case, the positions are accessed with the
   // indices from the indexView. Otherwise, the elements are
@@ -768,7 +806,8 @@ void generateSmoothNormals(
         normals,
         positionView,
         indexView.size(),
-        [&indexView](int64_t index) { return indexView[index]; });
+        [&indexView](int64_t index) { return indexView[index]; }
+    );
 
   } else {
     accumulationResult = accumulateNormals<TIndex>(
@@ -776,7 +815,8 @@ void generateSmoothNormals(
         normals,
         positionView,
         int64_t(count),
-        [](int64_t index) { return static_cast<TIndex>(index); });
+        [](int64_t index) { return static_cast<TIndex>(index); }
+    );
   }
 
   if (!accumulationResult) {
@@ -821,7 +861,8 @@ void generateSmoothNormals(
     Model& gltf,
     MeshPrimitive& primitive,
     const AccessorView<glm::vec3>& positionView,
-    const std::optional<Accessor>& indexAccessor) {
+    const std::optional<Accessor>& indexAccessor
+) {
   if (indexAccessor) {
     switch (indexAccessor->componentType) {
     case Accessor::ComponentType::UNSIGNED_BYTE:
@@ -829,21 +870,24 @@ void generateSmoothNormals(
           gltf,
           primitive,
           positionView,
-          indexAccessor);
+          indexAccessor
+      );
       break;
     case Accessor::ComponentType::UNSIGNED_SHORT:
       generateSmoothNormals<uint16_t>(
           gltf,
           primitive,
           positionView,
-          indexAccessor);
+          indexAccessor
+      );
       break;
     case Accessor::ComponentType::UNSIGNED_INT:
       generateSmoothNormals<uint32_t>(
           gltf,
           primitive,
           positionView,
-          indexAccessor);
+          indexAccessor
+      );
       break;
     default:
       return;
@@ -853,7 +897,8 @@ void generateSmoothNormals(
         gltf,
         primitive,
         positionView,
-        std::nullopt);
+        std::nullopt
+    );
   }
 }
 } // namespace
@@ -891,7 +936,8 @@ void Model::generateMissingNormalsSmooth() {
           Accessor& indexAccessor = gltf.accessors[size_t(primitive.indices)];
           generateSmoothNormals(gltf, primitive, positionView, indexAccessor);
         }
-      });
+      }
+  );
 }
 
 void Model::addExtensionUsed(const std::string& extensionName) {
@@ -913,8 +959,10 @@ void Model::removeExtensionUsed(const std::string& extensionName) {
       std::remove(
           this->extensionsUsed.begin(),
           this->extensionsUsed.end(),
-          extensionName),
-      this->extensionsUsed.end());
+          extensionName
+      ),
+      this->extensionsUsed.end()
+  );
 }
 
 void Model::removeExtensionRequired(const std::string& extensionName) {
@@ -924,23 +972,27 @@ void Model::removeExtensionRequired(const std::string& extensionName) {
       std::remove(
           this->extensionsRequired.begin(),
           this->extensionsRequired.end(),
-          extensionName),
-      this->extensionsRequired.end());
+          extensionName
+      ),
+      this->extensionsRequired.end()
+  );
 }
 
 bool Model::isExtensionUsed(const std::string& extensionName) const noexcept {
   return std::find(
              this->extensionsUsed.begin(),
              this->extensionsUsed.end(),
-             extensionName) != this->extensionsUsed.end();
+             extensionName
+         ) != this->extensionsUsed.end();
 }
 
-bool Model::isExtensionRequired(
-    const std::string& extensionName) const noexcept {
+bool Model::isExtensionRequired(const std::string& extensionName
+) const noexcept {
   return std::find(
              this->extensionsRequired.begin(),
              this->extensionsRequired.end(),
-             extensionName) != this->extensionsRequired.end();
+             extensionName
+         ) != this->extensionsRequired.end();
 }
 
 namespace {
@@ -948,7 +1000,8 @@ namespace {
 template <typename T>
 std::string findAvailableName(
     const std::unordered_map<std::string, T>& map,
-    const std::string& name) {
+    const std::string& name
+) {
   auto it = map.find(name);
   if (it == map.end())
     return name;
@@ -975,7 +1028,8 @@ std::string findAvailableName(
 void mergeSchemas(
     Schema& lhs,
     Schema& rhs,
-    std::map<std::string, std::string>& classNameMap) {
+    std::map<std::string, std::string>& classNameMap
+) {
   if (!lhs.name)
     lhs.name = rhs.name;
   else if (rhs.name && *lhs.name != *rhs.name)

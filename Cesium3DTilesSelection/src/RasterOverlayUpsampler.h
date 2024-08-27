@@ -10,7 +10,7 @@ public:
 
   TileChildrenResult createTileChildren(
       const Tile& tile,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) override;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) override;
 };
 } // namespace Cesium3DTilesSelection

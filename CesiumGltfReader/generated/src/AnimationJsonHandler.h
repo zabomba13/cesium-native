@@ -18,8 +18,8 @@ class AnimationJsonHandler : public CesiumGltfReader::NamedObjectJsonHandler {
 public:
   using ValueType = CesiumGltf::Animation;
 
-  AnimationJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  AnimationJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::Animation* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -28,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyAnimation(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Animation& o);
+      CesiumGltf::Animation& o
+  );
 
 private:
   CesiumGltf::Animation* _pObject = nullptr;

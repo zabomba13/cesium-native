@@ -1,14 +1,17 @@
 #include "CesiumUtility/ExtensibleObject.h"
 
 namespace CesiumUtility {
-JsonValue* ExtensibleObject::getGenericExtension(
-    const std::string& extensionName) noexcept {
+JsonValue*
+ExtensibleObject::getGenericExtension(const std::string& extensionName
+) noexcept {
   return const_cast<JsonValue*>(
-      std::as_const(*this).getGenericExtension(extensionName));
+      std::as_const(*this).getGenericExtension(extensionName)
+  );
 }
 
-const JsonValue* ExtensibleObject::getGenericExtension(
-    const std::string& extensionName) const noexcept {
+const JsonValue*
+ExtensibleObject::getGenericExtension(const std::string& extensionName
+) const noexcept {
   auto it = this->extensions.find(extensionName);
   if (it == this->extensions.end()) {
     return nullptr;

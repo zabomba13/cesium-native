@@ -23,7 +23,8 @@ Response<T>::Response(
     T&& value_,
     uint16_t httpStatusCode_,
     const std::string& errorCode_,
-    const std::string& errorMessage_)
+    const std::string& errorMessage_
+)
     : value(value_),
       httpStatusCode(httpStatusCode_),
       errorCode(errorCode_),
@@ -35,7 +36,8 @@ template <typename T>
 Response<T>::Response(
     uint16_t httpStatusCode_,
     const std::string& errorCode_,
-    const std::string& errorMessage_)
+    const std::string& errorMessage_
+)
     : value(),
       httpStatusCode(httpStatusCode_),
       errorCode(errorCode_),
@@ -46,7 +48,8 @@ Response<T>::Response(
 template <typename T>
 Response<T>::Response(
     const std::shared_ptr<CesiumAsync::IAssetRequest>& pRequest,
-    T&& value_)
+    T&& value_
+)
     : value(value_),
       httpStatusCode(pRequest->response()->statusCode()),
       errorCode(),

@@ -23,7 +23,8 @@ public:
   LayerJsonHandler(const CesiumJsonReader::JsonReaderOptions& options) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumQuantizedMeshTerrain::Layer* pObject);
+      CesiumQuantizedMeshTerrain::Layer* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -31,7 +32,8 @@ protected:
   IJsonHandler* readObjectKeyLayer(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumQuantizedMeshTerrain::Layer& o);
+      CesiumQuantizedMeshTerrain::Layer& o
+  );
 
 private:
   CesiumQuantizedMeshTerrain::Layer* _pObject = nullptr;

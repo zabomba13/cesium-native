@@ -45,7 +45,8 @@ public:
    */
   bool addSubtree(
       const OctreeTileID& tileID,
-      AvailabilitySubtree&& newSubtree) noexcept;
+      AvailabilitySubtree&& newSubtree
+  ) noexcept;
 
   /**
    * @brief Determines the currently known availability status of the given
@@ -63,7 +64,8 @@ public:
    */
   uint8_t computeAvailability(
       const OctreeTileID& tileID,
-      const AvailabilityNode* pNode) const noexcept;
+      const AvailabilityNode* pNode
+  ) const noexcept;
 
   /**
    * @brief Attempts to add a child subtree node onto the given parent node.
@@ -95,7 +97,8 @@ public:
    */
   bool addLoadedSubtree(
       AvailabilityNode* pNode,
-      AvailabilitySubtree&& newSubtree) noexcept;
+      AvailabilitySubtree&& newSubtree
+  ) noexcept;
   /**
    * @brief Find the child node index corresponding to this tile ID and parent
    * node.
@@ -114,7 +117,8 @@ public:
    */
   std::optional<uint32_t> findChildNodeIndex(
       const OctreeTileID& tileID,
-      const AvailabilityNode* pParentNode) const;
+      const AvailabilityNode* pParentNode
+  ) const;
 
   /**
    * @brief Find the child node corresponding to this tile ID and parent node.
@@ -133,7 +137,8 @@ public:
    */
   AvailabilityNode* findChildNode(
       const OctreeTileID& tileID,
-      AvailabilityNode* pParentNode) const;
+      AvailabilityNode* pParentNode
+  ) const;
 
   /**
    * @brief Gets the number of levels in each subtree.

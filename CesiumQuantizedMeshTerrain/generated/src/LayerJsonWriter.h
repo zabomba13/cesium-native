@@ -22,7 +22,8 @@ struct LayerJsonWriter {
   static void write(
       const CesiumQuantizedMeshTerrain::Layer& obj,
       CesiumJsonWriter::JsonWriter& jsonWriter,
-      const CesiumJsonWriter::ExtensionWriterContext& context);
+      const CesiumJsonWriter::ExtensionWriterContext& context
+  );
 };
 
 struct AvailabilityRectangleJsonWriter {
@@ -31,7 +32,8 @@ struct AvailabilityRectangleJsonWriter {
   static void write(
       const CesiumQuantizedMeshTerrain::AvailabilityRectangle& obj,
       CesiumJsonWriter::JsonWriter& jsonWriter,
-      const CesiumJsonWriter::ExtensionWriterContext& context);
+      const CesiumJsonWriter::ExtensionWriterContext& context
+  );
 };
 
 } // namespace CesiumQuantizedMeshTerrain

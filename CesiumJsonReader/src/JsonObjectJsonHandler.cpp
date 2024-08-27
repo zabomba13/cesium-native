@@ -20,7 +20,8 @@ JsonObjectJsonHandler::JsonObjectJsonHandler() noexcept : JsonHandler() {}
 
 void JsonObjectJsonHandler::reset(
     IJsonHandler* pParent,
-    CesiumUtility::JsonValue* pValue) {
+    CesiumUtility::JsonValue* pValue
+) {
   JsonHandler::reset(pParent);
   this->_stack.clear();
   this->_stack.push_back(pValue);
@@ -89,8 +90,8 @@ IJsonHandler* JsonObjectJsonHandler::readObjectStart() {
   return this;
 }
 
-IJsonHandler*
-JsonObjectJsonHandler::readObjectKey(const std::string_view& str) {
+IJsonHandler* JsonObjectJsonHandler::readObjectKey(const std::string_view& str
+) {
   CesiumUtility::JsonValue& json = *this->_stack.back();
   CesiumUtility::JsonValue::Object* pObject =
       std::get_if<CesiumUtility::JsonValue::Object>(&json.value);

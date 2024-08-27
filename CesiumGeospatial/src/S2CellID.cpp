@@ -33,32 +33,38 @@ using GoogleS2CellID = S2CellId;
 /*static*/ S2CellID S2CellID::fromToken(const std::string_view& token) {
   return S2CellID(
       GoogleS2CellID::FromToken(absl::string_view(token.data(), token.size()))
-          .id());
+          .id()
+  );
 }
 
 /*static*/ S2CellID S2CellID::fromFaceLevelPosition(
     uint8_t face,
     uint32_t level,
-    uint64_t position) {
+    uint64_t position
+) {
   // Convert the position-within-level to an absolute, level 30 position as
   // expected by the Google implementation.
   position <<= (GoogleS2CellID::kMaxLevel - level) * 2 + 1;
   return S2CellID(
-      GoogleS2CellID::FromFacePosLevel(int(face), position, int(level)).id());
+      GoogleS2CellID::FromFacePosLevel(int(face), position, int(level)).id()
+  );
 }
 
 /*static*/ S2CellID S2CellID::fromQuadtreeTileID(
     uint8_t face,
-    const QuadtreeTileID& quadtreeTileID) {
+    const QuadtreeTileID& quadtreeTileID
+) {
 
   uint64_t position = (face & 1) == 0 ? HilbertOrder::encode2D(
                                             quadtreeTileID.level,
                                             quadtreeTileID.x,
-                                            quadtreeTileID.y)
+                                            quadtreeTileID.y
+                                        )
                                       : HilbertOrder::encode2D(
                                             quadtreeTileID.level,
                                             quadtreeTileID.y,
-                                            quadtreeTileID.x);
+                                            quadtreeTileID.x
+                                        );
 
   return S2CellID::fromFaceLevelPosition(face, quadtreeTileID.level, position);
 }
@@ -132,7 +138,8 @@ R1Interval FullLat() { return R1Interval(-M_PI_2, M_PI_2); }
 GlobeRectangle Expanded(
     const R1Interval& lat_,
     const S1Interval& lng_,
-    const S2LatLng& margin) {
+    const S2LatLng& margin
+) {
   R1Interval lat = lat_.Expanded(margin.lat().radians());
   S1Interval lng = lng_.Expanded(margin.lng().radians());
   if (lat.is_empty() || lng.is_empty())
@@ -180,10 +187,12 @@ GlobeRectangle S2CellID::computeBoundingRectangle() const {
     int j = S2::GetVAxis(face_)[2] == 0 ? (v < 0) : (v > 0);
     R1Interval lat = R1Interval::FromPointPair(
         GetLatitude(uv_, face_, i, j),
-        GetLatitude(uv_, face_, 1 - i, 1 - j));
+        GetLatitude(uv_, face_, 1 - i, 1 - j)
+    );
     S1Interval lng = S1Interval::FromPointPair(
         GetLongitude(uv_, face_, i, 1 - j),
-        GetLongitude(uv_, face_, 1 - i, j));
+        GetLongitude(uv_, face_, 1 - i, j)
+    );
 
     // We grow the bounds slightly to make sure that the bounding rectangle
     // contains S2LatLng(P) for any point P inside the loop L defined by the
@@ -204,7 +213,8 @@ GlobeRectangle S2CellID::computeBoundingRectangle() const {
     return Expanded(
         lat,
         lng,
-        S2LatLng::FromRadians(2 * DBL_EPSILON, 2 * DBL_EPSILON));
+        S2LatLng::FromRadians(2 * DBL_EPSILON, 2 * DBL_EPSILON)
+    );
   }
 
   // The 4 cells around the equator extend to +/-45 degrees latitude at the

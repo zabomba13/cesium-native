@@ -162,7 +162,8 @@ public:
    */
   GltfReaderResult readGltf(
       const gsl::span<const std::byte>& data,
-      const GltfReaderOptions& options = GltfReaderOptions()) const;
+      const GltfReaderOptions& options = GltfReaderOptions()
+  ) const;
 
   /**
    * @brief Reads a glTF or binary glTF file from a URL and resolves external
@@ -180,7 +181,8 @@ public:
       const std::string& url,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& headers,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const GltfReaderOptions& options = GltfReaderOptions()) const;
+      const GltfReaderOptions& options = GltfReaderOptions()
+  ) const;
 
   /**
    * @brief Performs post-load processing on a glTF. The specific operations
@@ -210,7 +212,8 @@ public:
       const CesiumAsync::HttpHeaders& headers,
       std::shared_ptr<CesiumAsync::IAssetAccessor> pAssetAccessor,
       const GltfReaderOptions& options,
-      GltfReaderResult&& result);
+      GltfReaderResult&& result
+  );
 
   /**
    * @brief Reads an image from a buffer.
@@ -226,7 +229,8 @@ public:
    */
   static ImageReaderResult readImage(
       const gsl::span<const std::byte>& data,
-      const CesiumGltf::Ktx2TranscodeTargets& ktx2TranscodeTargets);
+      const CesiumGltf::Ktx2TranscodeTargets& ktx2TranscodeTargets
+  );
 
   /**
    * @brief Generate mipmaps for this image.

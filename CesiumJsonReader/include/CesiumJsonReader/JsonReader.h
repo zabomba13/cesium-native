@@ -70,7 +70,8 @@ public:
         handler,
         finalHandler,
         result.errors,
-        result.warnings);
+        result.warnings
+    );
 
     if (!result.errors.empty()) {
       result.value.reset();
@@ -107,7 +108,8 @@ public:
         handler,
         finalHandler,
         result.errors,
-        result.warnings);
+        result.warnings
+    );
 
     if (!result.errors.empty()) {
       result.value.reset();
@@ -122,7 +124,8 @@ private:
     FinalJsonHandler(std::vector<std::string>& warnings);
     virtual void reportWarning(
         const std::string& warning,
-        std::vector<std::string>&& context) override;
+        std::vector<std::string>&& context
+    ) override;
     void setInputStream(rapidjson::MemoryStream* pInputStream) noexcept;
 
   private:
@@ -135,14 +138,16 @@ private:
       IJsonHandler& handler,
       FinalJsonHandler& finalHandler,
       std::vector<std::string>& errors,
-      std::vector<std::string>& warnings);
+      std::vector<std::string>& warnings
+  );
 
   static void internalRead(
       const rapidjson::Value& jsonValue,
       IJsonHandler& handler,
       FinalJsonHandler& finalHandler,
       std::vector<std::string>& errors,
-      std::vector<std::string>& warnings);
+      std::vector<std::string>& warnings
+  );
 };
 
 } // namespace CesiumJsonReader

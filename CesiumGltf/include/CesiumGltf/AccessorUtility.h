@@ -82,7 +82,8 @@ typedef std::variant<
 FeatureIdAccessorType getFeatureIdAccessorView(
     const Model& model,
     const MeshPrimitive& primitive,
-    int32_t featureIdAttributeIndex);
+    int32_t featureIdAttributeIndex
+);
 
 /**
  * Retrieves an accessor view for the specified feature ID attribute from the
@@ -93,7 +94,8 @@ FeatureIdAccessorType getFeatureIdAccessorView(
 FeatureIdAccessorType getFeatureIdAccessorView(
     const Model& model,
     const Node& node,
-    int32_t featureIdAttributeIndex);
+    int32_t featureIdAttributeIndex
+);
 
 /**
  * Visitor that retrieves the feature ID from the given accessor type as an
@@ -280,7 +282,8 @@ typedef std::variant<
 TexCoordAccessorType getTexCoordAccessorView(
     const Model& model,
     const MeshPrimitive& primitive,
-    int32_t textureCoordinateSetIndex);
+    int32_t textureCoordinateSetIndex
+);
 
 /**
  * Visitor that retrieves the texture coordinates from the given accessor type

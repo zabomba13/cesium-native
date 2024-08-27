@@ -26,7 +26,8 @@ TEST_CASE("Test disk cache with Sqlite") {
             static_cast<uint16_t>(200),
             "text/html",
             responseHeaders,
-            responseData);
+            responseData
+        );
 
     HttpHeaders requestHeaders{{"Request-Header", "Request-Value"}};
     std::unique_ptr<MockAssetRequest> request =
@@ -34,7 +35,8 @@ TEST_CASE("Test disk cache with Sqlite") {
             "GET",
             "test.com",
             requestHeaders,
-            std::move(response));
+            std::move(response)
+        );
 
     std::time_t currentTime = std::time(nullptr);
     REQUIRE(diskCache.storeEntry(
@@ -45,15 +47,16 @@ TEST_CASE("Test disk cache with Sqlite") {
         request->headers(),
         request->response()->statusCode(),
         request->response()->headers(),
-        request->response()->data()));
+        request->response()->data()
+    ));
 
     std::optional<CacheItem> cacheItem = diskCache.getEntry("TestKey");
     REQUIRE(cacheItem->expiryTime == currentTime);
 
     const CacheRequest& cacheRequest = cacheItem->cacheRequest;
     REQUIRE(
-        cacheRequest.headers ==
-        HttpHeaders{{"Request-Header", "Request-Value"}});
+        cacheRequest.headers == HttpHeaders{{"Request-Header", "Request-Value"}}
+    );
     REQUIRE(cacheRequest.method == "GET");
     REQUIRE(cacheRequest.url == "test.com");
 
@@ -62,12 +65,14 @@ TEST_CASE("Test disk cache with Sqlite") {
     REQUIRE(cacheResponse.statusCode == 200);
     REQUIRE(cacheResponse.headers.at("Response-Header") == "Response-Value");
     REQUIRE(
-        cacheResponse.data == std::vector<std::byte>{
-                                  std::byte(0),
-                                  std::byte(1),
-                                  std::byte(2),
-                                  std::byte(3),
-                                  std::byte(4)});
+        cacheResponse.data ==
+        std::vector<std::byte>{
+            std::byte(0),
+            std::byte(1),
+            std::byte(2),
+            std::byte(3),
+            std::byte(4)}
+    );
 
     std::optional<ResponseCacheControl> cacheControl =
         ResponseCacheControl::parseFromResponseHeaders(cacheResponse.headers);
@@ -96,7 +101,8 @@ TEST_CASE("Test disk cache with Sqlite") {
               static_cast<uint16_t>(200),
               "text/html",
               responseHeaders,
-              responseData);
+              responseData
+          );
 
       HttpHeaders requestHeaders{
           {"Request-Header-" + std::to_string(i),
@@ -106,7 +112,8 @@ TEST_CASE("Test disk cache with Sqlite") {
               "GET",
               "test.com",
               requestHeaders,
-              std::move(response));
+              std::move(response)
+          );
 
       REQUIRE(diskCache.storeEntry(
           "TestKey" + std::to_string(i),
@@ -116,7 +123,8 @@ TEST_CASE("Test disk cache with Sqlite") {
           request->headers(),
           request->response()->statusCode(),
           request->response()->headers(),
-          request->response()->data()));
+          request->response()->data()
+      ));
     }
 
     REQUIRE(diskCache.prune());
@@ -136,9 +144,11 @@ TEST_CASE("Test disk cache with Sqlite") {
 
       const CacheRequest& cacheRequest = cacheItem->cacheRequest;
       REQUIRE(
-          cacheRequest.headers == HttpHeaders{
-                                      {"Request-Header-" + std::to_string(i),
-                                       "Request-Value-" + std::to_string(i)}});
+          cacheRequest.headers ==
+          HttpHeaders{
+              {"Request-Header-" + std::to_string(i),
+               "Request-Value-" + std::to_string(i)}}
+      );
       REQUIRE(cacheRequest.method == "GET");
       REQUIRE(cacheRequest.url == "test.com");
 
@@ -147,14 +157,17 @@ TEST_CASE("Test disk cache with Sqlite") {
       REQUIRE(cacheResponse.statusCode == 200);
       REQUIRE(
           cacheResponse.headers.at("Response-Header-" + std::to_string(i)) ==
-          "Response-Value-" + std::to_string(i));
+          "Response-Value-" + std::to_string(i)
+      );
       REQUIRE(
-          cacheResponse.data == std::vector<std::byte>{
-                                    std::byte(0),
-                                    std::byte(1),
-                                    std::byte(2),
-                                    std::byte(3),
-                                    std::byte(4)});
+          cacheResponse.data ==
+          std::vector<std::byte>{
+              std::byte(0),
+              std::byte(1),
+              std::byte(2),
+              std::byte(3),
+              std::byte(4)}
+      );
 
       std::optional<ResponseCacheControl> cacheControl =
           ResponseCacheControl::parseFromResponseHeaders(cacheResponse.headers);
@@ -183,7 +196,8 @@ TEST_CASE("Test disk cache with Sqlite") {
             static_cast<uint16_t>(200),
             "text/html",
             responseHeaders,
-            responseData);
+            responseData
+        );
 
     HttpHeaders requestHeaders{{"Request-Header", "Request-Value"}};
     std::unique_ptr<MockAssetRequest> request =
@@ -191,7 +205,8 @@ TEST_CASE("Test disk cache with Sqlite") {
             "GET",
             "test.com",
             requestHeaders,
-            std::move(response));
+            std::move(response)
+        );
 
     for (size_t i = 0; i < 10; ++i) {
       REQUIRE(diskCache.storeEntry(
@@ -202,7 +217,8 @@ TEST_CASE("Test disk cache with Sqlite") {
           request->headers(),
           request->response()->statusCode(),
           request->response()->headers(),
-          request->response()->data()));
+          request->response()->data()
+      ));
     }
 
     // clear all

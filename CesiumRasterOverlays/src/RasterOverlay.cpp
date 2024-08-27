@@ -16,12 +16,14 @@ public:
       const IntrusivePointer<const RasterOverlay>& pOwner,
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
-      const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept
+      const CesiumGeospatial::Ellipsoid& ellipsoid
+  ) noexcept
       : RasterOverlayTileProvider(
             pOwner,
             asyncSystem,
             pAssetAccessor,
-            ellipsoid) {}
+            ellipsoid
+        ) {}
 
   virtual CesiumAsync::Future<LoadedRasterOverlayImage>
   loadTileImage(RasterOverlayTile& /* overlayTile */) override {
@@ -33,7 +35,8 @@ public:
 
 RasterOverlay::RasterOverlay(
     const std::string& name,
-    const RasterOverlayOptions& options)
+    const RasterOverlayOptions& options
+)
     : _name(name), _options(options), _destructionCompleteDetails{} {}
 
 RasterOverlay::~RasterOverlay() noexcept {
@@ -44,7 +47,8 @@ RasterOverlay::~RasterOverlay() noexcept {
 
 CesiumAsync::SharedFuture<void>&
 RasterOverlay::getAsyncDestructionCompleteEvent(
-    const CesiumAsync::AsyncSystem& asyncSystem) {
+    const CesiumAsync::AsyncSystem& asyncSystem
+) {
   if (!this->_destructionCompleteDetails.has_value()) {
     auto promise = asyncSystem.createPromise<void>();
     auto sharedFuture = promise.getFuture().share();
@@ -56,7 +60,8 @@ RasterOverlay::getAsyncDestructionCompleteEvent(
     // All invocations of getAsyncDestructionCompleteEvent on a particular
     // RasterOverlay must pass equivalent AsyncSystems.
     CESIUM_ASSERT(
-        this->_destructionCompleteDetails->asyncSystem == asyncSystem);
+        this->_destructionCompleteDetails->asyncSystem == asyncSystem
+    );
   }
 
   return this->_destructionCompleteDetails->future;
@@ -66,10 +71,12 @@ CesiumUtility::IntrusivePointer<RasterOverlayTileProvider>
 RasterOverlay::createPlaceholder(
     const CesiumAsync::AsyncSystem& asyncSystem,
     const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) const {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) const {
   return new PlaceholderTileProvider(
       this,
       asyncSystem,
       pAssetAccessor,
-      ellipsoid);
+      ellipsoid
+  );
 }

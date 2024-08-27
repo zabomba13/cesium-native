@@ -65,18 +65,23 @@ SkirtMeshMetadata::parseFromGltfExtras(const JsonValue::Object& extras) {
   skirtMeshMetadata.meshCenter = glm::dvec3(
       (*pMeshCenter)[0].getSafeNumberOrDefault<double>(0.0),
       (*pMeshCenter)[1].getSafeNumberOrDefault<double>(0.0),
-      (*pMeshCenter)[2].getSafeNumberOrDefault<double>(0.0));
+      (*pMeshCenter)[2].getSafeNumberOrDefault<double>(0.0)
+  );
 
   double westHeight, southHeight, eastHeight, northHeight;
   try {
     westHeight = gltfSkirtMeshMetadata.getSafeNumericalValueForKey<double>(
-        "skirtWestHeight");
+        "skirtWestHeight"
+    );
     southHeight = gltfSkirtMeshMetadata.getSafeNumericalValueForKey<double>(
-        "skirtSouthHeight");
+        "skirtSouthHeight"
+    );
     eastHeight = gltfSkirtMeshMetadata.getSafeNumericalValueForKey<double>(
-        "skirtEastHeight");
+        "skirtEastHeight"
+    );
     northHeight = gltfSkirtMeshMetadata.getSafeNumericalValueForKey<double>(
-        "skirtNorthHeight");
+        "skirtNorthHeight"
+    );
   } catch (const JsonValueMissingKey&) {
     return std::nullopt;
   } catch (const JsonValueNotRealValue&) {
@@ -91,8 +96,9 @@ SkirtMeshMetadata::parseFromGltfExtras(const JsonValue::Object& extras) {
   return skirtMeshMetadata;
 }
 
-JsonValue::Object SkirtMeshMetadata::createGltfExtras(
-    const SkirtMeshMetadata& skirtMeshMetadata) {
+JsonValue::Object
+SkirtMeshMetadata::createGltfExtras(const SkirtMeshMetadata& skirtMeshMetadata
+) {
   return {
       {"skirtMeshMetadata",
        JsonValue::Object{

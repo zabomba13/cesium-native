@@ -21,7 +21,8 @@ public:
   ArrayJsonHandler(Ts&&... args) noexcept
       : JsonHandler(),
         _handlerFactory(
-            std::bind(handlerFactory<Ts...>, std::forward<Ts>(args)...)),
+            std::bind(handlerFactory<Ts...>, std::forward<Ts>(args)...)
+        ),
         _objectHandler() {}
 
   void reset(IJsonHandler* pParent, std::vector<T>* pArray) {
@@ -95,10 +96,11 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context =
-          std::vector<std::string>()) override {
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) override {
     context.push_back(
-        std::string("[") + std::to_string(this->_pArray->size()) + "]");
+        std::string("[") + std::to_string(this->_pArray->size()) + "]"
+    );
     this->parent()->reportWarning(warning, std::move(context));
   }
 
@@ -107,7 +109,8 @@ private:
     if (this->_arrayIsOpen) {
       this->reportWarning(
           type + " value is not allowed in the object array and has been "
-                 "replaced with a default value.");
+                 "replaced with a default value."
+      );
       this->_pArray->emplace_back();
       return this->ignoreAndContinue();
     } else {
@@ -221,10 +224,11 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context =
-          std::vector<std::string>()) override {
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) override {
     context.push_back(
-        std::string("[") + std::to_string(this->_pArray->size()) + "]");
+        std::string("[") + std::to_string(this->_pArray->size()) + "]"
+    );
     this->parent()->reportWarning(warning, std::move(context));
   }
 
@@ -233,7 +237,8 @@ private:
     if (this->_arrayIsOpen) {
       this->reportWarning(
           type + " value is not allowed in the double array and has been "
-                 "replaced with a default value.");
+                 "replaced with a default value."
+      );
       this->_pArray->emplace_back();
       return this->ignoreAndContinue();
     } else {
@@ -334,10 +339,11 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context =
-          std::vector<std::string>()) override {
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) override {
     context.push_back(
-        std::string("[") + std::to_string(this->_pArray->size()) + "]");
+        std::string("[") + std::to_string(this->_pArray->size()) + "]"
+    );
     this->parent()->reportWarning(warning, std::move(context));
   }
 
@@ -346,7 +352,8 @@ private:
     if (this->_arrayIsOpen) {
       this->reportWarning(
           type + " value is not allowed in the integer array and has been "
-                 "replaced with a default value.");
+                 "replaced with a default value."
+      );
       this->_pArray->emplace_back();
       return this->ignoreAndContinue();
     } else {
@@ -429,10 +436,11 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context =
-          std::vector<std::string>()) override {
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) override {
     context.push_back(
-        std::string("[") + std::to_string(this->_pArray->size()) + "]");
+        std::string("[") + std::to_string(this->_pArray->size()) + "]"
+    );
     this->parent()->reportWarning(warning, std::move(context));
   }
 
@@ -441,7 +449,8 @@ private:
     if (this->_arrayIsOpen) {
       this->reportWarning(
           type + " value is not allowed in the string array and has been "
-                 "replaced with a default value.");
+                 "replaced with a default value."
+      );
       this->_pArray->emplace_back();
       return this->ignoreAndContinue();
     } else {
@@ -465,7 +474,8 @@ public:
   ArrayJsonHandler(Ts&&... args) noexcept
       : JsonHandler(),
         _handlerFactory(
-            std::bind(handlerFactory<Ts...>, std::forward<Ts>(args)...)),
+            std::bind(handlerFactory<Ts...>, std::forward<Ts>(args)...)
+        ),
         _elementHandler() {}
 
   void reset(IJsonHandler* pParent, std::vector<std::vector<T>>* pArray) {
@@ -528,10 +538,11 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context =
-          std::vector<std::string>()) override {
+      std::vector<std::string>&& context = std::vector<std::string>()
+  ) override {
     context.push_back(
-        std::string("[") + std::to_string(this->_pArray->size()) + "]");
+        std::string("[") + std::to_string(this->_pArray->size()) + "]"
+    );
     this->parent()->reportWarning(warning, std::move(context));
   }
 
@@ -540,7 +551,8 @@ private:
     if (this->_arrayIsOpen) {
       this->reportWarning(
           type + " value is not allowed in the array of arrays and has been "
-                 "replaced with a default value.");
+                 "replaced with a default value."
+      );
       this->_pArray->emplace_back();
       return this->ignoreAndContinue();
     } else {

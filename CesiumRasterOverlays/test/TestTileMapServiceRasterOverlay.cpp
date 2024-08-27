@@ -23,20 +23,23 @@ TEST_CASE("TileMapServiceRasterOverlay") {
 
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
-           dataDir / "Cesium_Logo_Color")) {
+           dataDir / "Cesium_Logo_Color"
+       )) {
     if (!entry.is_regular_file())
       continue;
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
         CesiumAsync::HttpHeaders{},
-        readFile(entry.path()));
+        readFile(entry.path())
+    );
     std::string url = "file:///" + entry.path().generic_u8string();
     auto pRequest = std::make_unique<SimpleAssetRequest>(
         "GET",
         url,
         CesiumAsync::HttpHeaders{},
-        std::move(pResponse));
+        std::move(pResponse)
+    );
     mapUrlToRequest[url] = std::move(pRequest);
   }
 
@@ -45,7 +48,8 @@ TEST_CASE("TileMapServiceRasterOverlay") {
 
   std::string tmr =
       "file:///" + std::filesystem::directory_entry(
-                       dataDir / "Cesium_Logo_Color" / "tilemapresource.xml")
+                       dataDir / "Cesium_Logo_Color" / "tilemapresource.xml"
+                   )
                        .path()
                        .generic_u8string();
   IntrusivePointer<TileMapServiceRasterOverlay> pRasterOverlay =
@@ -60,7 +64,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             nullptr,
             nullptr,
             spdlog::default_logger(),
-            nullptr));
+            nullptr
+        )
+    );
 
     REQUIRE(result);
 
@@ -68,7 +74,8 @@ TEST_CASE("TileMapServiceRasterOverlay") {
         *result;
     IntrusivePointer<RasterOverlayTile> pTile = pTileProvider->getTile(
         pTileProvider->getCoverageRectangle(),
-        glm::dvec2(256.0, 256.0));
+        glm::dvec2(256.0, 256.0)
+    );
     REQUIRE(pTile);
     waitForFuture(asyncSystem, pTileProvider->loadTile(*pTile));
 
@@ -79,10 +86,11 @@ TEST_CASE("TileMapServiceRasterOverlay") {
 
   SECTION("appends tilemapresource.xml to URL if not already present and "
           "direct request fails") {
-    std::string url = "file:///" + std::filesystem::directory_entry(
-                                       dataDir / "Cesium_Logo_Color")
-                                       .path()
-                                       .generic_u8string();
+    std::string url =
+        "file:///" +
+        std::filesystem::directory_entry(dataDir / "Cesium_Logo_Color")
+            .path()
+            .generic_u8string();
     pMockAssetAccessor->mockCompletedRequests[url] =
         std::make_shared<SimpleAssetRequest>(
             "GET",
@@ -92,7 +100,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
                 404,
                 "",
                 CesiumAsync::HttpHeaders(),
-                std::vector<std::byte>()));
+                std::vector<std::byte>()
+            )
+        );
     pRasterOverlay = new TileMapServiceRasterOverlay("test", url);
 
     RasterOverlay::CreateTileProviderResult result = waitForFuture(
@@ -103,7 +113,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             nullptr,
             nullptr,
             spdlog::default_logger(),
-            nullptr));
+            nullptr
+        )
+    );
 
     REQUIRE(result);
   }
@@ -125,7 +137,10 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             CesiumAsync::HttpHeaders{},
             std::make_unique<SimpleAssetResponse>(
                 *static_cast<const SimpleAssetResponse*>(
-                    pExistingRequest->response())));
+                    pExistingRequest->response()
+                )
+            )
+        );
 
     pRasterOverlay =
         new TileMapServiceRasterOverlay("test", xmlUrlWithParameter);
@@ -138,7 +153,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             nullptr,
             nullptr,
             spdlog::default_logger(),
-            nullptr));
+            nullptr
+        )
+    );
 
     REQUIRE(result);
   }
@@ -162,7 +179,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
                 404,
                 "",
                 CesiumAsync::HttpHeaders(),
-                std::vector<std::byte>()));
+                std::vector<std::byte>()
+            )
+        );
 
     // Add a request handler for `.../tilemapresource.xml?some=parameter` but
     // _not_ `.../tilemapresource.xml?some=parameter/`or
@@ -180,7 +199,10 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             CesiumAsync::HttpHeaders{},
             std::make_unique<SimpleAssetResponse>(
                 *static_cast<const SimpleAssetResponse*>(
-                    pExistingRequest->response())));
+                    pExistingRequest->response()
+                )
+            )
+        );
 
     pRasterOverlay = new TileMapServiceRasterOverlay("test", url);
 
@@ -192,7 +214,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             nullptr,
             nullptr,
             spdlog::default_logger(),
-            nullptr));
+            nullptr
+        )
+    );
 
     REQUIRE(result);
   }

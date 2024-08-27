@@ -21,18 +21,21 @@ template <typename T> struct Response final {
 
   Response(
       const std::shared_ptr<CesiumAsync::IAssetRequest>& pRequest,
-      T&& value);
+      T&& value
+  );
 
   Response(
       T&& value,
       uint16_t httpStatusCode,
       const std::string& errorCode,
-      const std::string& errorMessage);
+      const std::string& errorMessage
+  );
 
   Response(
       uint16_t httpStatusCode,
       const std::string& errorCode,
-      const std::string& errorMessage);
+      const std::string& errorMessage
+  );
 
   /**
    * @brief The response value, or `std::nullopt` if the response was

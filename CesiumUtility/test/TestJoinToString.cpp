@@ -8,18 +8,22 @@ TEST_CASE("joinToString") {
   SECTION("joins vector with non-empty elements") {
     CHECK(
         joinToString(std::vector<std::string>{"test", "this"}, "--") ==
-        "test--this");
+        "test--this"
+    );
     CHECK(
         joinToString(std::vector<std::string>{"test", "this", "thing"}, " ") ==
-        "test this thing");
+        "test this thing"
+    );
     CHECK(
         joinToString(std::vector<std::string>{"test", "this", "thing"}, "") ==
-        "testthisthing");
+        "testthisthing"
+    );
   }
 
   SECTION("joins vector with empty elements") {
     CHECK(
-        joinToString(std::vector<std::string>{"", "aa", ""}, "--") == "--aa--");
+        joinToString(std::vector<std::string>{"", "aa", ""}, "--") == "--aa--"
+    );
     CHECK(joinToString(std::vector<std::string>{"", ""}, "--") == "--");
   }
 

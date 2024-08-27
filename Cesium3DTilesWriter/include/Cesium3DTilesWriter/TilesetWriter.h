@@ -72,7 +72,8 @@ public:
    */
   TilesetWriterResult writeTileset(
       const Cesium3DTiles::Tileset& tileset,
-      const TilesetWriterOptions& options = TilesetWriterOptions()) const;
+      const TilesetWriterOptions& options = TilesetWriterOptions()
+  ) const;
 
 private:
   CesiumJsonWriter::ExtensionWriterContext _context;

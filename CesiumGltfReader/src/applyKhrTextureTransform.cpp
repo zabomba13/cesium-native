@@ -12,7 +12,8 @@ namespace {
 bool transformBufferView(
     const AccessorView<glm::vec2>& accessorView,
     std::vector<std::byte>& data,
-    const ExtensionKhrTextureTransform& textureTransformExtension) {
+    const ExtensionKhrTextureTransform& textureTransformExtension
+) {
   KhrTextureTransform textureTransform(textureTransformExtension);
   if (textureTransform.status() != KhrTextureTransformStatus::Valid) {
     return false;
@@ -35,7 +36,8 @@ template <typename T>
 void processTextureInfo(
     Model& model,
     MeshPrimitive& primitive,
-    std::optional<T>& maybeTextureInfo) {
+    std::optional<T>& maybeTextureInfo
+) {
   static_assert(std::is_base_of<TextureInfo, T>::value);
   if (!maybeTextureInfo) {
     return;
@@ -95,8 +97,8 @@ void processTextureInfo(
   find->second = static_cast<int32_t>(model.accessors.size() - 1);
 
   // Erase the extension so it is not re-applied by client implementations.
-  maybeTextureInfo->extensions.erase(
-      ExtensionKhrTextureTransform::ExtensionName);
+  maybeTextureInfo->extensions.erase(ExtensionKhrTextureTransform::ExtensionName
+  );
 }
 
 void applyKhrTextureTransform(Model& model) {
@@ -107,11 +109,13 @@ void applyKhrTextureTransform(Model& model) {
         processTextureInfo(
             model,
             primitive,
-            material->pbrMetallicRoughness->baseColorTexture);
+            material->pbrMetallicRoughness->baseColorTexture
+        );
         processTextureInfo(
             model,
             primitive,
-            material->pbrMetallicRoughness->metallicRoughnessTexture);
+            material->pbrMetallicRoughness->metallicRoughnessTexture
+        );
         processTextureInfo(model, primitive, material->normalTexture);
         processTextureInfo(model, primitive, material->occlusionTexture);
         processTextureInfo(model, primitive, material->emissiveTexture);

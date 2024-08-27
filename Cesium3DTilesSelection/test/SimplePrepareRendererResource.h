@@ -32,7 +32,8 @@ public:
       const CesiumAsync::AsyncSystem& asyncSystem,
       TileLoadResult&& tileLoadResult,
       const glm::dmat4& /*transform*/,
-      const std::any& /*rendererOptions*/) override {
+      const std::any& /*rendererOptions*/
+  ) override {
     return asyncSystem.createResolvedFuture(TileLoadResultAndRenderResources{
         std::move(tileLoadResult),
         new AllocationResult{totalAllocation}});
@@ -40,7 +41,8 @@ public:
 
   virtual void* prepareInMainThread(
       Cesium3DTilesSelection::Tile& /*tile*/,
-      void* pLoadThreadResult) override {
+      void* pLoadThreadResult
+  ) override {
     if (pLoadThreadResult) {
       AllocationResult* loadThreadResult =
           reinterpret_cast<AllocationResult*>(pLoadThreadResult);
@@ -53,7 +55,8 @@ public:
   virtual void free(
       Cesium3DTilesSelection::Tile& /*tile*/,
       void* pLoadThreadResult,
-      void* pMainThreadResult) noexcept override {
+      void* pMainThreadResult
+  ) noexcept override {
     if (pMainThreadResult) {
       AllocationResult* mainThreadResult =
           reinterpret_cast<AllocationResult*>(pMainThreadResult);
@@ -69,13 +72,15 @@ public:
 
   virtual void* prepareRasterInLoadThread(
       CesiumGltf::ImageCesium& /*image*/,
-      const std::any& /*rendererOptions*/) override {
+      const std::any& /*rendererOptions*/
+  ) override {
     return new AllocationResult{totalAllocation};
   }
 
   virtual void* prepareRasterInMainThread(
       CesiumRasterOverlays::RasterOverlayTile& /*rasterTile*/,
-      void* pLoadThreadResult) override {
+      void* pLoadThreadResult
+  ) override {
     if (pLoadThreadResult) {
       AllocationResult* loadThreadResult =
           reinterpret_cast<AllocationResult*>(pLoadThreadResult);
@@ -88,7 +93,8 @@ public:
   virtual void freeRaster(
       const CesiumRasterOverlays::RasterOverlayTile& /*rasterTile*/,
       void* pLoadThreadResult,
-      void* pMainThreadResult) noexcept override {
+      void* pMainThreadResult
+  ) noexcept override {
     if (pMainThreadResult) {
       AllocationResult* mainThreadResult =
           reinterpret_cast<AllocationResult*>(pMainThreadResult);
@@ -108,12 +114,14 @@ public:
       const CesiumRasterOverlays::RasterOverlayTile& /*rasterTile*/,
       void* /*pMainThreadRendererResources*/,
       const glm::dvec2& /*translation*/,
-      const glm::dvec2& /*scale*/) override {}
+      const glm::dvec2& /*scale*/
+  ) override {}
 
   virtual void detachRasterInMainThread(
       const Cesium3DTilesSelection::Tile& /*tile*/,
       int32_t /*overlayTextureCoordinateID*/,
       const CesiumRasterOverlays::RasterOverlayTile& /*rasterTile*/,
-      void* /*pMainThreadRendererResources*/) noexcept override {}
+      void* /*pMainThreadRendererResources*/
+  ) noexcept override {}
 };
 } // namespace Cesium3DTilesSelection

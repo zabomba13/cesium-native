@@ -14,7 +14,8 @@ glm::dmat4 createYupToZup() {
       glm::dvec4(1.0, 0.0, 0.0, 0.0),
       glm::dvec4(0.0, 0.0, 1.0, 0.0),
       glm::dvec4(0.0, -1.0, 0.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 }
 
 glm::dmat4 createZupToYup() {
@@ -22,7 +23,8 @@ glm::dmat4 createZupToYup() {
       glm::dvec4(1.0, 0.0, 0.0, 0.0),
       glm::dvec4(0.0, 0.0, -1.0, 0.0),
       glm::dvec4(0.0, 1.0, 0.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 }
 
 glm::dmat4 createXupToZup() {
@@ -30,7 +32,8 @@ glm::dmat4 createXupToZup() {
       glm::dvec4(0.0, 0.0, 1.0, 0.0),
       glm::dvec4(0.0, 1.0, 0.0, 0.0),
       glm::dvec4(-1.0, 0.0, 0.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 }
 
 glm::dmat4 createZupToXup() {
@@ -38,7 +41,8 @@ glm::dmat4 createZupToXup() {
       glm::dvec4(0.0, 0.0, -1.0, 0.0),
       glm::dvec4(0.0, 1.0, 0.0, 0.0),
       glm::dvec4(1.0, 0.0, 0.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 }
 
 glm::dmat4 createXupToYup() {
@@ -46,7 +50,8 @@ glm::dmat4 createXupToYup() {
       glm::dvec4(0.0, 1.0, 0.0, 0.0),
       glm::dvec4(-1.0, 0.0, 0.0, 0.0),
       glm::dvec4(0.0, 0.0, 1.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 }
 
 glm::dmat4 createYupToXup() {
@@ -54,7 +59,8 @@ glm::dmat4 createYupToXup() {
       glm::dvec4(0.0, -1.0, 0.0, 0.0),
       glm::dvec4(1.0, 0.0, 0.0, 0.0),
       glm::dvec4(0.0, 0.0, 1.0, 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 }
 } // namespace
 
@@ -68,24 +74,28 @@ const glm::dmat4 Transforms::Y_UP_TO_X_UP = createYupToXup();
 glm::dmat4 Transforms::createTranslationRotationScaleMatrix(
     const glm::dvec3& translation,
     const glm::dquat& rotation,
-    const glm::dvec3& scale) {
+    const glm::dvec3& scale
+) {
   glm::dmat3 rotationScale =
       glm::mat3_cast(rotation) * glm::dmat3(
                                      glm::dvec3(scale.x, 0.0, 0.0),
                                      glm::dvec3(0.0, scale.y, 0.0),
-                                     glm::dvec3(0.0, 0.0, scale.z));
+                                     glm::dvec3(0.0, 0.0, scale.z)
+                                 );
   return glm::dmat4(
       glm::dvec4(rotationScale[0], 0.0),
       glm::dvec4(rotationScale[1], 0.0),
       glm::dvec4(rotationScale[2], 0.0),
-      glm::dvec4(translation, 1.0));
+      glm::dvec4(translation, 1.0)
+  );
 }
 
 void Transforms::computeTranslationRotationScaleFromMatrix(
     const glm::dmat4& matrix,
     glm::dvec3* pTranslation,
     glm::dquat* pRotation,
-    glm::dvec3* pScale) {
+    glm::dvec3* pScale
+) {
   if (pRotation || pScale) {
     glm::dmat3 rotationAndScale = glm::dmat3(matrix);
     double lengthColumn0 = glm::length(rotationAndScale[0]);
@@ -95,7 +105,8 @@ void Transforms::computeTranslationRotationScaleFromMatrix(
     glm::dmat3 rotationMatrix(
         rotationAndScale[0] / lengthColumn0,
         rotationAndScale[1] / lengthColumn1,
-        rotationAndScale[2] / lengthColumn2);
+        rotationAndScale[2] / lengthColumn2
+    );
 
     glm::dvec3 scale(lengthColumn0, lengthColumn1, lengthColumn2);
 

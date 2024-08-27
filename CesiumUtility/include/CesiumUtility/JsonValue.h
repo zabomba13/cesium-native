@@ -212,8 +212,8 @@ public:
   JsonValue(std::initializer_list<std::pair<const std::string, JsonValue>> v)
       : value(std::map<std::string, JsonValue>(v)) {}
 
-  [[nodiscard]] const JsonValue*
-  getValuePtrForKey(const std::string& key) const;
+  [[nodiscard]] const JsonValue* getValuePtrForKey(const std::string& key
+  ) const;
   [[nodiscard]] JsonValue* getValuePtrForKey(const std::string& key);
 
   /**
@@ -314,9 +314,9 @@ public:
       typename std::enable_if<
           std::is_integral<To>::value ||
           std::is_floating_point<To>::value>::type* = nullptr>
-  [[nodiscard]] To getSafeNumericalValueOrDefaultForKey(
-      const std::string& key,
-      To defaultValue) const {
+  [[nodiscard]] To
+  getSafeNumericalValueOrDefaultForKey(const std::string& key, To defaultValue)
+      const {
     const Object& pObject = std::get<Object>(this->value);
     const auto it = pObject.find(key);
     if (it == pObject.end()) {
@@ -517,8 +517,8 @@ public:
    * @brief Gets the double from the value or returns defaultValue
    * @return The double or defaultValue if this->value is not a double.
    */
-  [[nodiscard]] inline double
-  getDoubleOrDefault(double defaultValue) const noexcept {
+  [[nodiscard]] inline double getDoubleOrDefault(double defaultValue
+  ) const noexcept {
     const auto* v = std::get_if<double>(&this->value);
     if (v) {
       return *v;
@@ -545,8 +545,8 @@ public:
    * @brief Gets the int64_t from the value or returns defaultValue
    * @return The int64_t or defaultValue if this->value is not a int64_t.
    */
-  [[nodiscard]] inline std::int64_t
-  getInt64OrDefault(std::int64_t defaultValue) const noexcept {
+  [[nodiscard]] inline std::int64_t getInt64OrDefault(std::int64_t defaultValue
+  ) const noexcept {
     const auto* v = std::get_if<std::int64_t>(&this->value);
     if (v) {
       return *v;

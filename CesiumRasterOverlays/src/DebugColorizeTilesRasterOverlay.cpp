@@ -20,7 +20,8 @@ public:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      const Ellipsoid& ellipsoid)
+      const Ellipsoid& ellipsoid
+  )
       : RasterOverlayTileProvider(
             pOwner,
             asyncSystem,
@@ -29,8 +30,8 @@ public:
             pPrepareRendererResources,
             pLogger,
             GeographicProjection(ellipsoid),
-            GeographicProjection::computeMaximumProjectedRectangle(ellipsoid)) {
-  }
+            GeographicProjection::computeMaximumProjectedRectangle(ellipsoid)
+        ) {}
 
   virtual CesiumAsync::Future<LoadedRasterOverlayImage>
   loadTileImage(RasterOverlayTile& overlayTile) override {
@@ -67,7 +68,8 @@ public:
 
 DebugColorizeTilesRasterOverlay::DebugColorizeTilesRasterOverlay(
     const std::string& name,
-    const RasterOverlayOptions& overlayOptions)
+    const RasterOverlayOptions& overlayOptions
+)
     : RasterOverlay(name, overlayOptions),
       _ellipsoid(overlayOptions.ellipsoid.value_or(Ellipsoid::WGS84)) {}
 
@@ -79,7 +81,8 @@ DebugColorizeTilesRasterOverlay::createTileProvider(
     const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
         pPrepareRendererResources,
     const std::shared_ptr<spdlog::logger>& pLogger,
-    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner) const {
+    CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+) const {
   pOwner = pOwner ? pOwner : this;
 
   return asyncSystem.createResolvedFuture<CreateTileProviderResult>(
@@ -89,5 +92,7 @@ DebugColorizeTilesRasterOverlay::createTileProvider(
           pAssetAccessor,
           pPrepareRendererResources,
           pLogger,
-          this->_ellipsoid)));
+          this->_ellipsoid
+      ))
+  );
 }

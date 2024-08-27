@@ -63,8 +63,10 @@ TEST_CASE("AsyncSystem") {
   SECTION("main thread continuations are run when instructed") {
     bool executed = false;
 
-    auto future = asyncSystem.createResolvedFuture().thenInMainThread(
-        [&executed]() { executed = true; });
+    auto future =
+        asyncSystem.createResolvedFuture().thenInMainThread([&executed]() {
+          executed = true;
+        });
 
     CHECK(!executed);
     bool taskDispatched = asyncSystem.dispatchOneMainThreadTask();
@@ -99,8 +101,8 @@ TEST_CASE("AsyncSystem") {
     bool executed2 = false;
 
     auto future =
-        asyncSystem.runInMainThread([&executed1]() { executed1 = true; })
-            .thenInMainThread([&executed2]() { executed2 = true; });
+        asyncSystem.runInMainThread([&executed1]() { executed1 = true; }
+        ).thenInMainThread([&executed2]() { executed2 = true; });
 
     CHECK(!executed1);
     CHECK(!executed2);
@@ -137,7 +139,8 @@ TEST_CASE("AsyncSystem") {
     asyncSystem
         .runInWorkerThread([asyncSystem, &executed]() {
           auto future = asyncSystem.createResolvedFuture().thenInWorkerThread(
-              [&executed]() { executed = true; });
+              [&executed]() { executed = true; }
+          );
 
           // The above continuation should be complete by the time the
           // `thenInWorkerThread` returns.
@@ -155,26 +158,30 @@ TEST_CASE("AsyncSystem") {
     auto future =
         asyncSystem
             .runInWorkerThread([]() { return std::make_unique<int>(42); })
-            .thenInWorkerThread(
-                [](std::unique_ptr<int>&& pResult) { return *pResult; });
+            .thenInWorkerThread([](std::unique_ptr<int>&& pResult) {
+              return *pResult;
+            });
     CHECK(future.wait() == 42);
   }
 
   SECTION("an exception thrown in a continuation rejects the future") {
-    auto future = asyncSystem.runInWorkerThread(
-        []() { throw std::runtime_error("test"); });
+    auto future = asyncSystem.runInWorkerThread([]() {
+      throw std::runtime_error("test");
+    });
     CHECK_THROWS_WITH(future.wait(), "test");
   }
 
   SECTION("an exception thrown in createFuture rejects the future") {
-    auto future = asyncSystem.createFuture<int>(
-        [](const auto& /*promise*/) { throw std::runtime_error("test"); });
+    auto future = asyncSystem.createFuture<int>([](const auto& /*promise*/) {
+      throw std::runtime_error("test");
+    });
     CHECK_THROWS_WITH(future.wait(), "test");
   }
 
   SECTION("createFuture promise may resolve immediately") {
-    auto future = asyncSystem.createFuture<int>(
-        [](const auto& promise) { promise.resolve(42); });
+    auto future = asyncSystem.createFuture<int>([](const auto& promise) {
+      promise.resolve(42);
+    });
     CHECK(future.wait() == 42);
   }
 
@@ -217,7 +224,8 @@ TEST_CASE("AsyncSystem") {
                           [asyncSystem](std::exception&& e) -> Future<int> {
                             CHECK(std::string(e.what()) == "test");
                             return asyncSystem.createResolvedFuture(2);
-                          });
+                          }
+                      );
 
     asyncSystem.dispatchOneMainThreadTask();
     CHECK(future.wait() == 2);
@@ -588,8 +596,10 @@ TEST_CASE("AsyncSystem") {
 
     SECTION("Future returning void") {
       bool called = false;
-      Future<void> future = asyncSystem.createResolvedFuture().thenInMainThread(
-          [&called]() { called = true; });
+      Future<void> future =
+          asyncSystem.createResolvedFuture().thenInMainThread([&called]() {
+            called = true;
+          });
       std::move(future).waitInMainThread();
       CHECK(called);
     }
@@ -667,11 +677,11 @@ TEST_CASE("AsyncSystem") {
     SECTION("Future rejecting with throw") {
       bool called = false;
       auto future =
-          asyncSystem.runInWorkerThread([]() { throw std::runtime_error(""); })
-              .thenInMainThread([&called]() {
-                called = true;
-                return 4;
-              });
+          asyncSystem.runInWorkerThread([]() { throw std::runtime_error(""); }
+          ).thenInMainThread([&called]() {
+            called = true;
+            return 4;
+          });
       CHECK_THROWS(std::move(future).waitInMainThread());
       CHECK(!called);
     }

@@ -40,7 +40,8 @@ IntersectionTests::rayPlane(const Ray& ray, const Plane& plane) noexcept {
 
 std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
     const Ray& ray,
-    const glm::dvec3& radii) noexcept {
+    const glm::dvec3& radii
+) noexcept {
   if (radii.x == 0.0 || radii.y == 0.0 || radii.z == 0.0) {
     return std::nullopt;
   }
@@ -115,7 +116,8 @@ std::optional<glm::dvec3> IntersectionTests::rayTriangle(
     const glm::dvec3& v0,
     const glm::dvec3& v1,
     const glm::dvec3& v2,
-    bool cullBackFaces) {
+    bool cullBackFaces
+) {
   std::optional<double> t =
       rayTriangleParametric(ray, v0, v1, v2, cullBackFaces);
   if (t && t.value() >= 0)
@@ -129,7 +131,8 @@ std::optional<double> IntersectionTests::rayTriangleParametric(
     const glm::dvec3& p0,
     const glm::dvec3& p1,
     const glm::dvec3& p2,
-    bool cullBackFaces) {
+    bool cullBackFaces
+) {
 
   const glm::dvec3& origin = ray.getOrigin();
   const glm::dvec3& direction = ray.getDirection();
@@ -188,7 +191,8 @@ IntersectionTests::rayAABB(const Ray& ray, const AxisAlignedBox& aabb) {
 
 std::optional<double> IntersectionTests::rayAABBParametric(
     const Ray& ray,
-    const AxisAlignedBox& aabb) {
+    const AxisAlignedBox& aabb
+) {
   const glm::dvec3& dir = ray.getDirection();
   const glm::dvec3& origin = ray.getOrigin();
   const glm::dvec3* min = reinterpret_cast<const glm::dvec3*>(&aabb.minimumX);
@@ -228,14 +232,16 @@ IntersectionTests::rayOBB(const Ray& ray, const OrientedBoundingBox& obb) {
 
 std::optional<double> IntersectionTests::rayOBBParametric(
     const Ray& ray,
-    const OrientedBoundingBox& obb) {
+    const OrientedBoundingBox& obb
+) {
 
   const glm::dmat3x3& inverseHalfAxis = obb.getInverseHalfAxes();
   glm::dmat4x4 transformation(
       glm::dvec4(glm::normalize(inverseHalfAxis[0]), 0.0),
       glm::dvec4(glm::normalize(inverseHalfAxis[1]), 0.0),
       glm::dvec4(glm::normalize(inverseHalfAxis[2]), 0.0),
-      glm::dvec4(0.0, 0.0, 0.0, 1.0));
+      glm::dvec4(0.0, 0.0, 0.0, 1.0)
+  );
 
   glm::dvec3 center =
       glm::dvec3(transformation * glm::dvec4(obb.getCenter(), 1.0));
@@ -245,7 +251,8 @@ std::optional<double> IntersectionTests::rayOBBParametric(
 
   return rayAABBParametric(
       ray.transform(transformation),
-      AxisAlignedBox(ll.x, ll.y, ll.z, ur.x, ur.y, ur.z));
+      AxisAlignedBox(ll.x, ll.y, ll.z, ur.x, ur.y, ur.z)
+  );
 }
 
 std::optional<glm::dvec3>
@@ -263,7 +270,8 @@ bool solveQuadratic(
     double b,
     double c,
     double& root0,
-    double& root1) {
+    double& root1
+) {
   double det = b * b - 4.0 * a * c;
   if (det < 0.0) {
     return false;
@@ -291,7 +299,8 @@ bool solveQuadratic(
 
 std::optional<double> IntersectionTests::raySphereParametric(
     const Ray& ray,
-    const BoundingSphere& sphere) {
+    const BoundingSphere& sphere
+) {
   const glm::dvec3& origin = ray.getOrigin();
   const glm::dvec3& direction = ray.getDirection();
 
@@ -314,7 +323,8 @@ bool IntersectionTests::pointInTriangle(
     const glm::dvec2& point,
     const glm::dvec2& triangleVertA,
     const glm::dvec2& triangleVertB,
-    const glm::dvec2& triangleVertC) noexcept {
+    const glm::dvec2& triangleVertC
+) noexcept {
   // Define the triangle edges.
   const glm::dvec2 ab = triangleVertB - triangleVertA;
   const glm::dvec2 bc = triangleVertC - triangleVertB;
@@ -346,7 +356,8 @@ bool IntersectionTests::pointInTriangle(
     const glm::dvec3& point,
     const glm::dvec3& triangleVertA,
     const glm::dvec3& triangleVertB,
-    const glm::dvec3& triangleVertC) noexcept {
+    const glm::dvec3& triangleVertC
+) noexcept {
   // PERFORMANCE_IDEA: Investigate if there is a faster algorithm that can do
   // this test, but without needing to compute barycentric coordinates
   glm::dvec3 unused;
@@ -355,7 +366,8 @@ bool IntersectionTests::pointInTriangle(
       triangleVertA,
       triangleVertB,
       triangleVertC,
-      unused);
+      unused
+  );
 }
 
 bool IntersectionTests::pointInTriangle(
@@ -363,7 +375,8 @@ bool IntersectionTests::pointInTriangle(
     const glm::dvec3& triangleVertA,
     const glm::dvec3& triangleVertB,
     const glm::dvec3& triangleVertC,
-    glm::dvec3& barycentricCoordinates) noexcept {
+    glm::dvec3& barycentricCoordinates
+) noexcept {
   // PERFORMANCE_IDEA: If optimization is necessary in the future, there are
   // algorithms that avoid length computations (which involve square root
   // operations).

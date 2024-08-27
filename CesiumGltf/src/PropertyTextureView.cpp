@@ -3,7 +3,8 @@
 namespace CesiumGltf {
 PropertyTextureView::PropertyTextureView(
     const Model& model,
-    const PropertyTexture& propertyTexture) noexcept
+    const PropertyTexture& propertyTexture
+) noexcept
     : _pModel(&model),
       _pPropertyTexture(&propertyTexture),
       _pClass(nullptr),
@@ -48,7 +49,8 @@ PropertyTextureView::getClassProperty(const std::string& propertyId) const {
 PropertyViewStatusType PropertyTextureView::getTextureSafe(
     const int32_t textureIndex,
     int32_t& samplerIndex,
-    int32_t& imageIndex) const noexcept {
+    int32_t& imageIndex
+) const noexcept {
   if (textureIndex < 0 ||
       static_cast<size_t>(textureIndex) >= _pModel->textures.size()) {
     return PropertyTexturePropertyViewStatus::ErrorInvalidTexture;
@@ -73,8 +75,8 @@ PropertyTextureView::checkSampler(const int32_t samplerIndex) const noexcept {
   return PropertyTexturePropertyViewStatus::Valid;
 }
 
-PropertyViewStatusType
-PropertyTextureView::checkImage(const int32_t imageIndex) const noexcept {
+PropertyViewStatusType PropertyTextureView::checkImage(const int32_t imageIndex
+) const noexcept {
   if (imageIndex < 0 ||
       static_cast<size_t>(imageIndex) >= _pModel->images.size()) {
     return PropertyTexturePropertyViewStatus::ErrorInvalidImage;
@@ -96,7 +98,8 @@ PropertyTextureView::checkImage(const int32_t imageIndex) const noexcept {
 
 PropertyViewStatusType PropertyTextureView::checkChannels(
     const std::vector<int64_t>& channels,
-    const ImageCesium& image) const noexcept {
+    const ImageCesium& image
+) const noexcept {
   if (channels.size() <= 0 || channels.size() > 4) {
     return PropertyTexturePropertyViewStatus::ErrorInvalidChannels;
   }

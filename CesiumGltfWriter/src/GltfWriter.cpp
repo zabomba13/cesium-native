@@ -24,9 +24,11 @@ void writeGlbBuffer(
     GltfWriterResult& result,
     const gsl::span<const std::byte>& jsonData,
     const gsl::span<const std::byte>& bufferData,
-    size_t binaryChunkByteAlignment) {
+    size_t binaryChunkByteAlignment
+) {
   CESIUM_ASSERT(
-      binaryChunkByteAlignment > 0 && binaryChunkByteAlignment % 4 == 0);
+      binaryChunkByteAlignment > 0 && binaryChunkByteAlignment % 4 == 0
+  );
 
   size_t headerSize = 12;
   size_t chunkHeaderSize = 8;
@@ -59,7 +61,8 @@ void writeGlbBuffer(
   if (glbSize > size_t(std::numeric_limits<uint32_t>::max())) {
     result.errors.emplace_back(
         "glTF is too large to represent as a binary glTF (GLB). The total size "
-        "of the GLB must be less than 4GB.");
+        "of the GLB must be less than 4GB."
+    );
     return;
   }
 
@@ -127,7 +130,8 @@ GltfWriter::getExtensions() const {
 
 GltfWriterResult GltfWriter::writeGltf(
     const CesiumGltf::Model& model,
-    const GltfWriterOptions& options) const {
+    const GltfWriterOptions& options
+) const {
   CESIUM_TRACE("GltfWriter::writeGltf");
 
   const CesiumJsonWriter::ExtensionWriterContext& context =
@@ -153,7 +157,8 @@ GltfWriterResult GltfWriter::writeGltf(
 GltfWriterResult GltfWriter::writeGlb(
     const CesiumGltf::Model& model,
     const gsl::span<const std::byte>& bufferData,
-    const GltfWriterOptions& options) const {
+    const GltfWriterOptions& options
+) const {
   CESIUM_TRACE("GltfWriter::writeGlb");
 
   const CesiumJsonWriter::ExtensionWriterContext& context =
@@ -175,17 +180,20 @@ GltfWriterResult GltfWriter::writeGlb(
       result,
       gsl::span(jsonData),
       bufferData,
-      options.binaryChunkByteAlignment);
+      options.binaryChunkByteAlignment
+  );
 
   result.errors.insert(
       result.errors.end(),
       writer->getErrors().begin(),
-      writer->getErrors().end());
+      writer->getErrors().end()
+  );
 
   result.warnings.insert(
       result.warnings.end(),
       writer->getWarnings().begin(),
-      writer->getWarnings().end());
+      writer->getWarnings().end()
+  );
 
   return result;
 }

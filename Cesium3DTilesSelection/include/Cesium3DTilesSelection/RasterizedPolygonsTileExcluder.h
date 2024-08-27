@@ -27,8 +27,8 @@ public:
    */
   RasterizedPolygonsTileExcluder(
       const CesiumUtility::IntrusivePointer<
-          const CesiumRasterOverlays::RasterizedPolygonsOverlay>&
-          pOverlay) noexcept;
+          const CesiumRasterOverlays::RasterizedPolygonsOverlay>& pOverlay
+  ) noexcept;
 
   /**
    * @brief Determines whether a given tile is entirely inside a polygon and

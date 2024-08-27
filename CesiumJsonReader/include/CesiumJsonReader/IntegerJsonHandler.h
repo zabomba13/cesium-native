@@ -52,7 +52,8 @@ public:
 
   virtual void reportWarning(
       const std::string& warning,
-      std::vector<std::string>&& context) override {
+      std::vector<std::string>&& context
+  ) override {
     context.push_back("(expecting an integer)");
     this->parent()->reportWarning(warning, std::move(context));
   }

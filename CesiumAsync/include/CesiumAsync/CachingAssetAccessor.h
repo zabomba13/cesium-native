@@ -40,7 +40,8 @@ public:
       const std::shared_ptr<spdlog::logger>& pLogger,
       const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
       const std::shared_ptr<ICacheDatabase>& pCacheDatabase,
-      int32_t requestsPerCachePrune = 10000);
+      int32_t requestsPerCachePrune = 10000
+  );
 
   virtual ~CachingAssetAccessor() noexcept override;
 
@@ -55,7 +56,8 @@ public:
       const std::string& verb,
       const std::string& url,
       const std::vector<THeader>& headers,
-      const gsl::span<const std::byte>& contentPayload) override;
+      const gsl::span<const std::byte>& contentPayload
+  ) override;
 
   /** @copydoc IAssetAccessor::tick */
   virtual void tick() noexcept override;

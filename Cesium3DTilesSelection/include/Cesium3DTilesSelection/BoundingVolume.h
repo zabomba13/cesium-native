@@ -47,7 +47,8 @@ typedef std::variant<
  */
 CESIUM3DTILESSELECTION_API BoundingVolume transformBoundingVolume(
     const glm::dmat4x4& transform,
-    const BoundingVolume& boundingVolume);
+    const BoundingVolume& boundingVolume
+);
 
 /**
  * @brief Returns the center of the given {@link BoundingVolume}.
@@ -69,7 +70,8 @@ getBoundingVolumeCenter(const BoundingVolume& boundingVolume);
 CESIUM3DTILESSELECTION_API std::optional<CesiumGeospatial::GlobeRectangle>
 estimateGlobeRectangle(
     const BoundingVolume& boundingVolume,
-    const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+    const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+);
 
 /**
  * @brief Returns the bounding region if the bounding volume is a
@@ -91,6 +93,7 @@ getBoundingRegionFromBoundingVolume(const BoundingVolume& boundingVolume);
 CESIUM3DTILESSELECTION_API CesiumGeometry::OrientedBoundingBox
 getOrientedBoundingBoxFromBoundingVolume(
     const BoundingVolume& boundingVolume,
-    const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+    const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+);
 
 } // namespace Cesium3DTilesSelection

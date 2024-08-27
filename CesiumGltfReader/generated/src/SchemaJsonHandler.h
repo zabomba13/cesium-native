@@ -19,8 +19,8 @@ class SchemaJsonHandler : public CesiumJsonReader::ExtensibleObjectJsonHandler {
 public:
   using ValueType = CesiumGltf::Schema;
 
-  SchemaJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  SchemaJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, CesiumGltf::Schema* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -29,7 +29,8 @@ protected:
   IJsonHandler* readObjectKeySchema(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::Schema& o);
+      CesiumGltf::Schema& o
+  );
 
 private:
   CesiumGltf::Schema* _pObject = nullptr;

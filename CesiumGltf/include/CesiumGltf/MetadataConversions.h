@@ -119,7 +119,8 @@ public:
    */
   static std::optional<bool> convert(const std::string& from) {
     return MetadataConversions<bool, std::string_view>::convert(
-        std::string_view(from.data(), from.size()));
+        std::string_view(from.data(), from.size())
+    );
   }
 };
 
@@ -458,7 +459,8 @@ template <> struct MetadataConversions<float, std::string_view> {
     // * except std::from_chars, but compiler/library support for the
     //   floating-point version of that method is spotty at best.
     return MetadataConversions<float, std::string>::convert(
-        std::string(from.data(), from.size()));
+        std::string(from.data(), from.size())
+    );
   }
 };
 #pragma endregion
@@ -836,8 +838,8 @@ struct MetadataConversions<
     for (glm::length_t c = 0; c < validLength; c++) {
       for (glm::length_t r = 0; r < validLength; r++) {
         auto maybeValue =
-            MetadataConversions<ToValueType, FromValueType>::convert(
-                from[c][r]);
+            MetadataConversions<ToValueType, FromValueType>::convert(from[c][r]
+            );
         if (!maybeValue) {
           return std::nullopt;
         }

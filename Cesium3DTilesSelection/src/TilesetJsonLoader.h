@@ -19,15 +19,16 @@ public:
   TilesetJsonLoader(
       const std::string& baseUrl,
       CesiumGeometry::Axis upAxis,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   CesiumAsync::Future<TileLoadResult>
   loadTileContent(const TileLoadInput& loadInput) override;
 
   TileChildrenResult createTileChildren(
       const Tile& tile,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) override;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) override;
 
   const std::string& getBaseUrl() const noexcept;
 
@@ -40,7 +41,8 @@ public:
       const TilesetExternals& externals,
       const std::string& tilesetJsonUrl,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   static CesiumAsync::Future<TilesetContentLoaderResult<TilesetJsonLoader>>
   createLoader(
@@ -50,7 +52,8 @@ public:
       const std::string& tilesetJsonUrl,
       const CesiumAsync::HttpHeaders& requestHeaders,
       const rapidjson::Document& tilesetJson,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
 private:
   std::string _baseUrl;

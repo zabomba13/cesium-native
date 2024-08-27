@@ -22,14 +22,16 @@ public:
       std::string&& ionAssetEndpointUrl,
       std::unique_ptr<TilesetContentLoader>&& pAggregatedLoader,
       AuthorizationHeaderChangeListener&& headerChangeListener,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   CesiumAsync::Future<TileLoadResult>
   loadTileContent(const TileLoadInput& loadInput) override;
 
   TileChildrenResult createTileChildren(
       const Tile& tile,
-      const CesiumGeospatial::Ellipsoid& ellipsoid) override;
+      const CesiumGeospatial::Ellipsoid& ellipsoid
+  ) override;
 
   static CesiumAsync::Future<TilesetContentLoaderResult<CesiumIonTilesetLoader>>
   createLoader(
@@ -40,7 +42,8 @@ public:
       const std::string& ionAssetEndpointUrl,
       const AuthorizationHeaderChangeListener& headerChangeListener,
       bool showCreditsOnScreen,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
   static CesiumAsync::Future<TilesetContentLoaderResult<CesiumIonTilesetLoader>>
   refreshTokenIfNeeded(
@@ -52,13 +55,15 @@ public:
       const AuthorizationHeaderChangeListener& headerChangeListener,
       bool showCreditsOnScreen,
       TilesetContentLoaderResult<CesiumIonTilesetLoader>&& result,
-      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  );
 
 private:
   void refreshTokenInMainThread(
       const std::shared_ptr<spdlog::logger>& pLogger,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const CesiumAsync::AsyncSystem& asyncSystem);
+      const CesiumAsync::AsyncSystem& asyncSystem
+  );
 
   CesiumGeospatial::Ellipsoid _ellipsoid;
   TokenRefreshState _refreshTokenState;

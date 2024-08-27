@@ -18,7 +18,8 @@ public:
 
   void reset(
       IJsonHandler* pParent,
-      std::unordered_map<std::string, T>* pDictionary) {
+      std::unordered_map<std::string, T>* pDictionary
+  ) {
     ObjectJsonHandler::reset(pParent);
     this->_pDictionary1 = pDictionary;
   }

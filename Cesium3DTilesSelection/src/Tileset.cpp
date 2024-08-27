@@ -38,7 +38,8 @@ Tileset::Tileset(
     const TilesetExternals& externals,
     std::unique_ptr<TilesetContentLoader>&& pCustomLoader,
     std::unique_ptr<Tile>&& pRootTile,
-    const TilesetOptions& options)
+    const TilesetOptions& options
+)
     : _externals(externals),
       _asyncSystem(externals.asyncSystem),
       _options(options),
@@ -51,12 +52,14 @@ Tileset::Tileset(
           RasterOverlayCollection{_loadedTiles, externals, options.ellipsoid},
           std::vector<CesiumAsync::IAssetAccessor::THeader>{},
           std::move(pCustomLoader),
-          std::move(pRootTile))} {}
+          std::move(pRootTile)
+      )} {}
 
 Tileset::Tileset(
     const TilesetExternals& externals,
     const std::string& url,
-    const TilesetOptions& options)
+    const TilesetOptions& options
+)
     : _externals(externals),
       _asyncSystem(externals.asyncSystem),
       _options(options),
@@ -67,14 +70,16 @@ Tileset::Tileset(
           _externals,
           _options,
           RasterOverlayCollection{_loadedTiles, externals, options.ellipsoid},
-          url)} {}
+          url
+      )} {}
 
 Tileset::Tileset(
     const TilesetExternals& externals,
     int64_t ionAssetID,
     const std::string& ionAccessToken,
     const TilesetOptions& options,
-    const std::string& ionAssetEndpointUrl)
+    const std::string& ionAssetEndpointUrl
+)
     : _externals(externals),
       _asyncSystem(externals.asyncSystem),
       _options(options),
@@ -87,7 +92,8 @@ Tileset::Tileset(
           RasterOverlayCollection{_loadedTiles, externals, options.ellipsoid},
           ionAssetID,
           ionAccessToken,
-          ionAssetEndpointUrl)} {}
+          ionAssetEndpointUrl
+      )} {}
 
 Tileset::~Tileset() noexcept {
   this->_pTilesetContentManager->unloadAll();
@@ -141,7 +147,8 @@ operator<(const FogDensityAtHeight& fogDensity, double height) noexcept {
 
 static double computeFogDensity(
     const std::vector<FogDensityAtHeight>& fogDensityTable,
-    const ViewState& viewState) {
+    const ViewState& viewState
+) {
   const double height = viewState.getPositionCartographic()
                             .value_or(Cartographic(0.0, 0.0, 0.0))
                             .height;
@@ -186,7 +193,8 @@ static double computeFogDensity(
 void Tileset::_updateLodTransitions(
     const FrameState& frameState,
     float deltaTime,
-    ViewUpdateResult& result) const noexcept {
+    ViewUpdateResult& result
+) const noexcept {
   if (_options.enableLodTransitionPeriod) {
     // We always fade tiles from 0.0 --> 1.0. Whether the tile is fading in or
     // out is determined by whether the tile is in the tilesToRenderThisFrame
@@ -210,7 +218,8 @@ void Tileset::_updateLodTransitions(
       // Remove tile from fade-out list if it is back on the render list.
       TileSelectionState::Result selectionResult =
           (*tileIt)->getLastSelectionState().getResult(
-              frameState.currentFrameNumber);
+              frameState.currentFrameNumber
+          );
       if (selectionResult == TileSelectionState::Result::Rendered) {
         // This tile will already be on the render list.
         pRenderContent->setLodTransitionFadePercentage(0.0f);
@@ -279,7 +288,8 @@ Tileset::updateViewOffline(const std::vector<ViewState>& frustums) {
 
   std::unordered_set<Tile*> uniqueTilesToRenderThisFrame(
       this->_updateResult.tilesToRenderThisFrame.begin(),
-      this->_updateResult.tilesToRenderThisFrame.end());
+      this->_updateResult.tilesToRenderThisFrame.end()
+  );
   for (Tile* tile : tilesSelectedPrevFrame) {
     if (uniqueTilesToRenderThisFrame.find(tile) ==
         uniqueTilesToRenderThisFrame.end()) {
@@ -344,7 +354,8 @@ Tileset::updateView(const std::vector<ViewState>& frustums, float deltaTime) {
       [&fogDensityTable =
            this->_options.fogDensityTable](const ViewState& frustum) -> double {
         return computeFogDensity(fogDensityTable, frustum);
-      });
+      }
+  );
 
   FrameState frameState{
       frustums,
@@ -436,7 +447,8 @@ int32_t Tileset::getNumberOfTilesLoaded() const {
 float Tileset::computeLoadProgress() noexcept {
   int32_t queueSizeSum = static_cast<int32_t>(
       this->_updateResult.workerThreadTileLoadQueueLength +
-      this->_updateResult.mainThreadTileLoadQueueLength);
+      this->_updateResult.mainThreadTileLoadQueueLength
+  );
   int32_t numOfTilesLoading =
       this->_pTilesetContentManager->getNumberOfTilesLoading();
   int32_t numOfTilesLoaded =
@@ -456,8 +468,8 @@ float Tileset::computeLoadProgress() noexcept {
   return (percentage * 100.f);
 }
 
-void Tileset::forEachLoadedTile(
-    const std::function<void(Tile& tile)>& callback) {
+void Tileset::forEachLoadedTile(const std::function<void(Tile& tile)>& callback
+) {
   Tile* pCurrent = this->_loadedTiles.head();
   while (pCurrent) {
     Tile* pNext = this->_loadedTiles.next(pCurrent);
@@ -499,14 +511,16 @@ CesiumAsync::Future<const TilesetMetadata*> Tileset::loadMetadata() {
             pRoot->getContent().getExternalContent();
         if (!pExternal) {
           return asyncSystem.createResolvedFuture<const TilesetMetadata*>(
-              nullptr);
+              nullptr
+          );
         }
 
         TilesetMetadata& metadata = pExternal->metadata;
         if (!metadata.schemaUri) {
           // No schema URI, so the metadata is ready to go.
           return asyncSystem.createResolvedFuture<const TilesetMetadata*>(
-              &metadata);
+              &metadata
+          );
         }
 
         return metadata.loadSchemaUri(asyncSystem, pAssetAccessor)
@@ -521,14 +535,17 @@ CesiumAsync::Future<const TilesetMetadata*> Tileset::loadMetadata() {
                     return nullptr;
                   }
                   return &pExternal->metadata;
-                });
-      });
+                }
+            );
+      }
+  );
 }
 
 static void markTileNonRendered(
     TileSelectionState::Result lastResult,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   if (lastResult == TileSelectionState::Result::Rendered ||
       (lastResult == TileSelectionState::Result::Refined &&
        tile.getRefine() == TileRefine::Add)) {
@@ -543,7 +560,8 @@ static void markTileNonRendered(
 static void markTileNonRendered(
     int32_t lastFrameNumber,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   const TileSelectionState::Result lastResult =
       tile.getLastSelectionState().getResult(lastFrameNumber);
   markTileNonRendered(lastResult, tile, result);
@@ -553,7 +571,8 @@ static void markChildrenNonRendered(
     int32_t lastFrameNumber,
     TileSelectionState::Result lastResult,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   if (lastResult == TileSelectionState::Result::Refined) {
     for (Tile& child : tile.getChildren()) {
       const TileSelectionState::Result childLastResult =
@@ -567,7 +586,8 @@ static void markChildrenNonRendered(
 static void markChildrenNonRendered(
     int32_t lastFrameNumber,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   const TileSelectionState::Result lastResult =
       tile.getLastSelectionState().getResult(lastFrameNumber);
   markChildrenNonRendered(lastFrameNumber, lastResult, tile, result);
@@ -576,7 +596,8 @@ static void markChildrenNonRendered(
 static void markTileAndChildrenNonRendered(
     int32_t lastFrameNumber,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   const TileSelectionState::Result lastResult =
       tile.getLastSelectionState().getResult(lastFrameNumber);
   markTileNonRendered(lastResult, tile, result);
@@ -599,7 +620,8 @@ static bool isVisibleFromCamera(
     const ViewState& viewState,
     const BoundingVolume& boundingVolume,
     const Ellipsoid& ellipsoid,
-    bool forceRenderTilesUnderCamera) {
+    bool forceRenderTilesUnderCamera
+) {
   if (viewState.isBoundingVolumeVisible(boundingVolume)) {
     return true;
   }
@@ -641,7 +663,8 @@ void Tileset::_frustumCull(
     const Tile& tile,
     const FrameState& frameState,
     bool cullWithChildrenBounds,
-    CullResult& cullResult) {
+    CullResult& cullResult
+) {
 
   if (!cullResult.shouldVisit || cullResult.culled) {
     return;
@@ -657,20 +680,23 @@ void Tileset::_frustumCull(
             frustums.end(),
             [&ellipsoid,
              children = tile.getChildren(),
-             renderTilesUnderCamera = this->_options.renderTilesUnderCamera](
-                const ViewState& frustum) {
+             renderTilesUnderCamera =
+                 this->_options.renderTilesUnderCamera](const ViewState& frustum
+            ) {
               for (const Tile& child : children) {
                 if (isVisibleFromCamera(
                         frustum,
                         child.getBoundingVolume(),
                         ellipsoid,
-                        renderTilesUnderCamera)) {
+                        renderTilesUnderCamera
+                    )) {
                   return true;
                 }
               }
 
               return false;
-            })) {
+            }
+        )) {
       // At least one child is visible in at least one frustum, so don't cull.
       return;
     }
@@ -682,13 +708,16 @@ void Tileset::_frustumCull(
                   &boundingVolume = tile.getBoundingVolume(),
                   renderTilesUnderCamera =
                       this->_options.renderTilesUnderCamera](
-                     const ViewState& frustum) {
+                     const ViewState& frustum
+                 ) {
                    return isVisibleFromCamera(
                        frustum,
                        boundingVolume,
                        ellipsoid,
-                       renderTilesUnderCamera);
-                 })) {
+                       renderTilesUnderCamera
+                   );
+                 }
+             )) {
     // The tile is visible in at least one frustum, so don't cull.
     return;
   }
@@ -705,7 +734,8 @@ void Tileset::_frustumCull(
 void Tileset::_fogCull(
     const FrameState& frameState,
     const std::vector<double>& distances,
-    CullResult& cullResult) {
+    CullResult& cullResult
+) {
 
   if (!cullResult.shouldVisit || cullResult.culled) {
     return;
@@ -739,7 +769,8 @@ void Tileset::_fogCull(
 static double computeTilePriority(
     const Tile& tile,
     const std::vector<ViewState>& frustums,
-    const std::vector<double>& distances) {
+    const std::vector<double>& distances
+) {
   double highestLoadPriority = std::numeric_limits<double>::max();
   const glm::dvec3 boundingVolumeCenter =
       getBoundingVolumeCenter(tile.getBoundingVolume());
@@ -767,7 +798,8 @@ static double computeTilePriority(
 void computeDistances(
     const Tile& tile,
     const std::vector<ViewState>& frustums,
-    std::vector<double>& distances) {
+    std::vector<double>& distances
+) {
   const BoundingVolume& boundingVolume = tile.getBoundingVolume();
 
   distances.clear();
@@ -780,15 +812,18 @@ void computeDistances(
       [boundingVolume](const ViewState& frustum) -> double {
         return glm::sqrt(glm::max(
             frustum.computeDistanceSquaredToBoundingVolume(boundingVolume),
-            0.0));
-      });
+            0.0
+        ));
+      }
+  );
 }
 
 bool Tileset::_meetsSse(
     const std::vector<ViewState>& frustums,
     const Tile& tile,
     const std::vector<double>& distances,
-    bool culled) const noexcept {
+    bool culled
+) const noexcept {
 
   double largestSse = 0.0;
 
@@ -820,7 +855,8 @@ Tileset::TraversalDetails Tileset::_visitTileIfNeeded(
     uint32_t depth,
     bool ancestorMeetsSse,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
 
   std::vector<double>& distances = this->_distances;
   computeDistances(tile, frameState.frustums, distances);
@@ -862,8 +898,8 @@ Tileset::TraversalDetails Tileset::_visitTileIfNeeded(
     // mode, because we need to load this tile's descendants before we can
     // render any of its siblings. An unconditionally refined root tile must be
     // visited as well, otherwise we won't load anything at all.
-    if ((this->_options.forbidHoles &&
-         tile.getRefine() == TileRefine::Replace) ||
+    if ((this->_options.forbidHoles && tile.getRefine() == TileRefine::Replace
+        ) ||
         tile.getParent() == nullptr) {
       cullResult.shouldVisit = true;
     }
@@ -876,7 +912,8 @@ Tileset::TraversalDetails Tileset::_visitTileIfNeeded(
     markTileAndChildrenNonRendered(frameState.lastFrameNumber, tile, result);
     tile.setLastSelectionState(TileSelectionState(
         frameState.currentFrameNumber,
-        TileSelectionState::Result::Culled));
+        TileSelectionState::Result::Culled
+    ));
 
     ++result.tilesCulled;
 
@@ -891,7 +928,8 @@ Tileset::TraversalDetails Tileset::_visitTileIfNeeded(
       traversalDetails = Tileset::createTraversalDetailsForSingleTile(
           frameState,
           tile,
-          lastFrameSelectionState);
+          lastFrameSelectionState
+      );
     } else if (this->_options.preloadSiblings) {
       // Preload this culled sibling as requested.
       addTileToLoadQueue(tile, TileLoadPriorityGroup::Preload, tilePriority);
@@ -914,7 +952,8 @@ Tileset::TraversalDetails Tileset::_visitTileIfNeeded(
       ancestorMeetsSse,
       tile,
       tilePriority,
-      result);
+      result
+  );
 }
 
 static bool isLeaf(const Tile& tile) noexcept {
@@ -925,14 +964,16 @@ Tileset::TraversalDetails Tileset::_renderLeaf(
     const FrameState& frameState,
     Tile& tile,
     double tilePriority,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
 
   const TileSelectionState lastFrameSelectionState =
       tile.getLastSelectionState();
 
   tile.setLastSelectionState(TileSelectionState(
       frameState.currentFrameNumber,
-      TileSelectionState::Result::Rendered));
+      TileSelectionState::Result::Rendered
+  ));
   result.tilesToRenderThisFrame.push_back(&tile);
 
   addTileToLoadQueue(tile, TileLoadPriorityGroup::Normal, tilePriority);
@@ -940,7 +981,8 @@ Tileset::TraversalDetails Tileset::_renderLeaf(
   return Tileset::createTraversalDetailsForSingleTile(
       frameState,
       tile,
-      lastFrameSelectionState);
+      lastFrameSelectionState
+  );
 }
 
 /**
@@ -955,7 +997,8 @@ Tileset::TraversalDetails Tileset::_renderLeaf(
 static bool shouldRenderThisTile(
     const Tile& tile,
     const TileSelectionState& lastFrameSelectionState,
-    int32_t lastFrameNumber) noexcept {
+    int32_t lastFrameNumber
+) noexcept {
   const TileSelectionState::Result originalResult =
       lastFrameSelectionState.getOriginalResult(lastFrameNumber);
   if (originalResult == TileSelectionState::Result::Rendered) {
@@ -977,7 +1020,8 @@ static bool shouldRenderThisTile(
 Tileset::TraversalDetails Tileset::_renderInnerTile(
     const FrameState& frameState,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
 
   const TileSelectionState lastFrameSelectionState =
       tile.getLastSelectionState();
@@ -985,20 +1029,23 @@ Tileset::TraversalDetails Tileset::_renderInnerTile(
   markChildrenNonRendered(frameState.lastFrameNumber, tile, result);
   tile.setLastSelectionState(TileSelectionState(
       frameState.currentFrameNumber,
-      TileSelectionState::Result::Rendered));
+      TileSelectionState::Result::Rendered
+  ));
   result.tilesToRenderThisFrame.push_back(&tile);
 
   return Tileset::createTraversalDetailsForSingleTile(
       frameState,
       tile,
-      lastFrameSelectionState);
+      lastFrameSelectionState
+  );
 }
 
 bool Tileset::_loadAndRenderAdditiveRefinedTile(
     Tile& tile,
     ViewUpdateResult& result,
     double tilePriority,
-    bool queuedForLoad) {
+    bool queuedForLoad
+) {
   // If this tile uses additive refinement, we need to render this tile in
   // addition to its children.
   if (tile.getRefine() == TileRefine::Add) {
@@ -1022,7 +1069,8 @@ bool Tileset::_kickDescendantsAndRenderTile(
     size_t workerThreadLoadQueueIndex,
     size_t mainThreadLoadQueueIndex,
     bool queuedForLoad,
-    double tilePriority) {
+    double tilePriority
+) {
   const TileSelectionState lastFrameSelectionState =
       tile.getLastSelectionState();
 
@@ -1034,7 +1082,8 @@ bool Tileset::_kickDescendantsAndRenderTile(
     Tile* pWorkTile = renderList[i];
     while (pWorkTile != nullptr &&
            !pWorkTile->getLastSelectionState().wasKicked(
-               frameState.currentFrameNumber) &&
+               frameState.currentFrameNumber
+           ) &&
            pWorkTile != &tile) {
       pWorkTile->getLastSelectionState().kick();
       pWorkTile = pWorkTile->getParent();
@@ -1045,8 +1094,10 @@ bool Tileset::_kickDescendantsAndRenderTile(
   renderList.erase(
       renderList.begin() +
           static_cast<std::vector<Tile*>::iterator::difference_type>(
-              firstRenderedDescendantIndex),
-      renderList.end());
+              firstRenderedDescendantIndex
+          ),
+      renderList.end()
+  );
 
   if (tile.getRefine() != Cesium3DTilesSelection::TileRefine::Add) {
     renderList.push_back(&tile);
@@ -1054,7 +1105,8 @@ bool Tileset::_kickDescendantsAndRenderTile(
 
   tile.setLastSelectionState(TileSelectionState(
       frameState.currentFrameNumber,
-      TileSelectionState::Result::Rendered));
+      TileSelectionState::Result::Rendered
+  ));
 
   // If we're waiting on heaps of descendants, the above will take too long. So
   // in that case, load this tile INSTEAD of loading any of the descendants, and
@@ -1079,13 +1131,17 @@ bool Tileset::_kickDescendantsAndRenderTile(
     this->_workerThreadLoadQueue.erase(
         this->_workerThreadLoadQueue.begin() +
             static_cast<std::vector<TileLoadTask>::iterator::difference_type>(
-                workerThreadLoadQueueIndex),
-        this->_workerThreadLoadQueue.end());
+                workerThreadLoadQueueIndex
+            ),
+        this->_workerThreadLoadQueue.end()
+    );
     this->_mainThreadLoadQueue.erase(
         this->_mainThreadLoadQueue.begin() +
             static_cast<std::vector<TileLoadTask>::iterator::difference_type>(
-                mainThreadLoadQueueIndex),
-        this->_mainThreadLoadQueue.end());
+                mainThreadLoadQueueIndex
+            ),
+        this->_mainThreadLoadQueue.end()
+    );
     size_t allQueueEndSize =
         _workerThreadLoadQueue.size() + _mainThreadLoadQueue.size();
     result.tilesKicked +=
@@ -1117,15 +1173,16 @@ Tileset::_checkOcclusion(const Tile& tile, const FrameState& frameState) {
     const TileOcclusionRendererProxy* pOcclusion =
         pOcclusionPool->fetchOcclusionProxyForTile(
             tile,
-            frameState.currentFrameNumber);
+            frameState.currentFrameNumber
+        );
     if (!pOcclusion) {
       // This indicates we ran out of occlusion proxies. We don't want to wait
       // on occlusion info here since it might not ever arrive, so treat this
       // tile as if it is _known_ to be unoccluded.
       return TileOcclusionState::NotOccluded;
     } else
-      switch (
-          static_cast<TileOcclusionState>(pOcclusion->getOcclusionState())) {
+      switch (static_cast<TileOcclusionState>(pOcclusion->getOcclusionState())
+      ) {
       case TileOcclusionState::OcclusionUnavailable:
         // We have an occlusion proxy, but it does not have valid occlusion
         // info yet, wait for it.
@@ -1159,7 +1216,8 @@ Tileset::_checkOcclusion(const Tile& tile, const FrameState& frameState) {
       const TileOcclusionRendererProxy* pChildProxy =
           pOcclusionPool->fetchOcclusionProxyForTile(
               child,
-              frameState.currentFrameNumber);
+              frameState.currentFrameNumber
+          );
 
       if (!pChildProxy) {
         // We ran out of occlusion proxies, treat this as if it is _known_ to
@@ -1213,7 +1271,8 @@ Tileset::TraversalDetails Tileset::_visitTile(
                            // children!
     Tile& tile,
     double tilePriority,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   ++result.tilesVisited;
   result.maxDepthVisited = glm::max(result.maxDepthVisited, depth);
 
@@ -1292,7 +1351,8 @@ Tileset::TraversalDetails Tileset::_visitTile(
     const bool renderThisTile = shouldRenderThisTile(
         tile,
         lastFrameSelectionState,
-        frameState.lastFrameNumber);
+        frameState.lastFrameNumber
+    );
     if (renderThisTile) {
       // Only load this tile if it (not just an ancestor) meets the SSE.
       if (meetsSse && !ancestorMeetsSse) {
@@ -1326,7 +1386,8 @@ Tileset::TraversalDetails Tileset::_visitTile(
                       tile,
                       result,
                       tilePriority,
-                      queuedForLoad) ||
+                      queuedForLoad
+                  ) ||
                   queuedForLoad;
 
   const size_t firstRenderedDescendantIndex =
@@ -1339,7 +1400,8 @@ Tileset::TraversalDetails Tileset::_visitTile(
       depth,
       ancestorMeetsSse,
       tile,
-      result);
+      result
+  );
 
   // Zero or more descendant tiles were added to the render list.
   // The traversalDetails tell us what happened while visiting the children.
@@ -1371,14 +1433,16 @@ Tileset::TraversalDetails Tileset::_visitTile(
         workerThreadLoadQueueIndex,
         mainThreadLoadQueueIndex,
         queuedForLoad,
-        tilePriority);
+        tilePriority
+    );
   } else {
     if (tile.getRefine() != TileRefine::Add) {
       markTileNonRendered(frameState.lastFrameNumber, tile, result);
     }
     tile.setLastSelectionState(TileSelectionState(
         frameState.currentFrameNumber,
-        TileSelectionState::Result::Refined));
+        TileSelectionState::Result::Refined
+    ));
   }
 
   if (this->_options.preloadAncestors && !queuedForLoad) {
@@ -1393,7 +1457,8 @@ Tileset::TraversalDetails Tileset::_visitVisibleChildrenNearToFar(
     uint32_t depth,
     bool ancestorMeetsSse,
     Tile& tile,
-    ViewUpdateResult& result) {
+    ViewUpdateResult& result
+) {
   TraversalDetails traversalDetails;
 
   // TODO: actually visit near-to-far, rather than in order of occurrence.
@@ -1404,7 +1469,8 @@ Tileset::TraversalDetails Tileset::_visitVisibleChildrenNearToFar(
         depth + 1,
         ancestorMeetsSse,
         child,
-        result);
+        result
+    );
 
     traversalDetails.allAreRenderable &= childTraversal.allAreRenderable;
     traversalDetails.anyWereRenderedLastFrame |=
@@ -1444,7 +1510,8 @@ void Tileset::_processMainThreadLoadQueue() {
 
   std::sort(
       this->_mainThreadLoadQueue.begin(),
-      this->_mainThreadLoadQueue.end());
+      this->_mainThreadLoadQueue.end()
+  );
 
   double timeBudget = this->_options.mainThreadLoadingTimeLimit;
 
@@ -1478,10 +1545,11 @@ void Tileset::_unloadCachedTiles(double timeBudget) noexcept {
   // A time budget of 0.0 indicates we shouldn't throttle cache unloads. So set
   // the end time to the max time_point in that case.
   auto start = std::chrono::system_clock::now();
-  auto end = (timeBudget <= 0.0)
-                 ? std::chrono::time_point<std::chrono::system_clock>::max()
-                 : (start + std::chrono::milliseconds(
-                                static_cast<long long>(timeBudget)));
+  auto end =
+      (timeBudget <= 0.0)
+          ? std::chrono::time_point<std::chrono::system_clock>::max()
+          : (start +
+             std::chrono::milliseconds(static_cast<long long>(timeBudget)));
 
   while (this->getTotalDataBytes() > maxBytes) {
     if (pTile == nullptr || pTile == pRootTile) {
@@ -1522,20 +1590,23 @@ void Tileset::_markTileVisited(Tile& tile) noexcept {
 void Tileset::addTileToLoadQueue(
     Tile& tile,
     TileLoadPriorityGroup priorityGroup,
-    double priority) {
+    double priority
+) {
   // Assert that this tile hasn't been added to a queue already.
   CESIUM_ASSERT(
       std::find_if(
           this->_workerThreadLoadQueue.begin(),
           this->_workerThreadLoadQueue.end(),
-          [&](const TileLoadTask& task) { return task.pTile == &tile; }) ==
-      this->_workerThreadLoadQueue.end());
+          [&](const TileLoadTask& task) { return task.pTile == &tile; }
+      ) == this->_workerThreadLoadQueue.end()
+  );
   CESIUM_ASSERT(
       std::find_if(
           this->_mainThreadLoadQueue.begin(),
           this->_mainThreadLoadQueue.end(),
-          [&](const TileLoadTask& task) { return task.pTile == &tile; }) ==
-      this->_mainThreadLoadQueue.end());
+          [&](const TileLoadTask& task) { return task.pTile == &tile; }
+      ) == this->_mainThreadLoadQueue.end()
+  );
 
   if (this->_pTilesetContentManager->tileNeedsWorkerThreadLoading(tile)) {
     this->_workerThreadLoadQueue.push_back({&tile, priorityGroup, priority});
@@ -1547,7 +1618,8 @@ void Tileset::addTileToLoadQueue(
 Tileset::TraversalDetails Tileset::createTraversalDetailsForSingleTile(
     const FrameState& frameState,
     const Tile& tile,
-    const TileSelectionState& lastFrameSelectionState) {
+    const TileSelectionState& lastFrameSelectionState
+) {
   TileSelectionState::Result lastFrameResult =
       lastFrameSelectionState.getResult(frameState.lastFrameNumber);
   bool isRenderable = tile.isRenderable();

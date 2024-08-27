@@ -9,21 +9,19 @@ using namespace CesiumGeospatial;
 using namespace CesiumUtility;
 
 TEST_CASE("S2CellBoundingVolume") {
-  S2CellBoundingVolume tileS2Cell(
-      S2CellID::fromToken("1"),
-      0.0,
-      100000.0,
-      Ellipsoid::WGS84);
+  S2CellBoundingVolume
+      tileS2Cell(S2CellID::fromToken("1"), 0.0, 100000.0, Ellipsoid::WGS84);
 
   SECTION("distance-squared to position is 0 when camera is inside bounding "
           "volume") {
     CHECK(
         tileS2Cell.computeDistanceSquaredToPosition(tileS2Cell.getCenter()) ==
-        0.0);
+        0.0
+    );
   }
 
-  SECTION(
-      "Case I - distanceToCamera works when camera is facing only one plane") {
+  SECTION("Case I - distanceToCamera works when camera is facing only one plane"
+  ) {
     const double testDistance = 100.0;
 
     gsl::span<const Plane> bvPlanes = tileS2Cell.getBoundingPlanes();
@@ -31,19 +29,22 @@ TEST_CASE("S2CellBoundingVolume") {
     // Test against the top plane.
     Plane topPlane(
         bvPlanes[0].getNormal(),
-        bvPlanes[0].getDistance() - testDistance);
+        bvPlanes[0].getDistance() - testDistance
+    );
     glm::dvec3 position =
         topPlane.projectPointOntoPlane(tileS2Cell.getCenter());
     CHECK(Math::equalsEpsilon(
         glm::sqrt(tileS2Cell.computeDistanceSquaredToPosition(position)),
         testDistance,
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
 
     // Test against the first side plane.
     Plane sidePlane0(
         bvPlanes[2].getNormal(),
-        bvPlanes[2].getDistance() - testDistance);
+        bvPlanes[2].getDistance() - testDistance
+    );
 
     gsl::span<const glm::dvec3> vertices = tileS2Cell.getVertices();
     glm::dvec3 faceCenter = ((vertices[0] + vertices[1]) * 0.5 +
@@ -54,7 +55,8 @@ TEST_CASE("S2CellBoundingVolume") {
         glm::sqrt(tileS2Cell.computeDistanceSquaredToPosition(position)),
         testDistance,
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
   }
 
   SECTION("Case II - distanceToCamera works when camera is facing two planes") {
@@ -68,7 +70,8 @@ TEST_CASE("S2CellBoundingVolume") {
         glm::sqrt(tileS2Cell.computeDistanceSquaredToPosition(position)),
         testDistance,
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
 
     // Test with first and second side planes.
     position =
@@ -79,7 +82,8 @@ TEST_CASE("S2CellBoundingVolume") {
         tileS2Cell.computeDistanceSquaredToPosition(position),
         2.0,
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
 
     // Test with bottom plane and second side plane. Handles the obtuse dihedral
     // angle case.
@@ -91,17 +95,19 @@ TEST_CASE("S2CellBoundingVolume") {
         glm::sqrt(tileS2Cell.computeDistanceSquaredToPosition(position)),
         10000.0,
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
   }
 
-  SECTION(
-      "Case III - distanceToCamera works when camera is facing three planes") {
+  SECTION("Case III - distanceToCamera works when camera is facing three planes"
+  ) {
     glm::dvec3 position = tileS2Cell.getVertices()[2] + glm::dvec3(1.0);
     CHECK(Math::equalsEpsilon(
         tileS2Cell.computeDistanceSquaredToPosition(position),
         3.0,
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
   }
 
   SECTION("Case IV - distanceToCamera works when camera is facing more than "
@@ -112,31 +118,32 @@ TEST_CASE("S2CellBoundingVolume") {
         Ellipsoid::WGS84.getMaximumRadius() +
             tileS2Cell.getBoundingPlanes()[1].getDistance(),
         0.0,
-        Math::Epsilon7));
+        Math::Epsilon7
+    ));
   }
 
   SECTION("intersect plane") {
     CHECK(
         tileS2Cell.intersectPlane(Plane::ORIGIN_ZX_PLANE) ==
-        CullingResult::Intersecting);
+        CullingResult::Intersecting
+    );
 
     Plane outsidePlane(
         Plane::ORIGIN_YZ_PLANE.getNormal(),
         Plane::ORIGIN_YZ_PLANE.getDistance() -
-            2 * Ellipsoid::WGS84.getMaximumRadius());
+            2 * Ellipsoid::WGS84.getMaximumRadius()
+    );
     CHECK(tileS2Cell.intersectPlane(outsidePlane) == CullingResult::Outside);
 
     CHECK(
         tileS2Cell.intersectPlane(Plane::ORIGIN_YZ_PLANE) ==
-        CullingResult::Inside);
+        CullingResult::Inside
+    );
   }
 
   SECTION("can construct face 2 (North pole)") {
-    S2CellBoundingVolume face2Root(
-        S2CellID::fromToken("5"),
-        1000.0,
-        2000.0,
-        Ellipsoid::WGS84);
+    S2CellBoundingVolume
+        face2Root(S2CellID::fromToken("5"), 1000.0, 2000.0, Ellipsoid::WGS84);
     CHECK(face2Root.getCellID().isValid());
     CHECK(face2Root.getCellID().getID() == 5764607523034234880U);
   }

@@ -31,12 +31,13 @@ public:
   SqliteCache(
       const std::shared_ptr<spdlog::logger>& pLogger,
       const std::string& databaseName,
-      uint64_t maxItems = 4096);
+      uint64_t maxItems = 4096
+  );
   ~SqliteCache();
 
   /** @copydoc ICacheDatabase::getEntry*/
-  virtual std::optional<CacheItem>
-  getEntry(const std::string& key) const override;
+  virtual std::optional<CacheItem> getEntry(const std::string& key
+  ) const override;
 
   /** @copydoc ICacheDatabase::storeEntry*/
   virtual bool storeEntry(
@@ -47,7 +48,8 @@ public:
       const HttpHeaders& requestHeaders,
       uint16_t statusCode,
       const HttpHeaders& responseHeaders,
-      const gsl::span<const std::byte>& responseData) override;
+      const gsl::span<const std::byte>& responseData
+  ) override;
 
   /** @copydoc ICacheDatabase::prune*/
   virtual bool prune() override;

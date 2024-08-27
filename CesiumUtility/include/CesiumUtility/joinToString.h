@@ -28,7 +28,8 @@ joinToString(TIterator begin, TIterator end, const std::string& separator) {
       std::move(first),
       [&separator](const std::string& acc, const std::string& element) {
         return acc + separator + element;
-      });
+      }
+  );
 }
 
 /**

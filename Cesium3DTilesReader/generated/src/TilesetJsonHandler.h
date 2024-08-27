@@ -27,8 +27,8 @@ class TilesetJsonHandler
 public:
   using ValueType = Cesium3DTiles::Tileset;
 
-  TilesetJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  TilesetJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, Cesium3DTiles::Tileset* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -37,7 +37,8 @@ protected:
   IJsonHandler* readObjectKeyTileset(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::Tileset& o);
+      Cesium3DTiles::Tileset& o
+  );
 
 private:
   Cesium3DTiles::Tileset* _pObject = nullptr;

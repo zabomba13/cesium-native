@@ -15,7 +15,8 @@ using namespace CesiumNativeTests;
 TEST_CASE("CesiumIonClient::Connection") {
   std::shared_ptr<SimpleAssetAccessor> pAssetAccessor =
       std::make_shared<SimpleAssetAccessor>(
-          std::map<std::string, std::shared_ptr<SimpleAssetRequest>>());
+          std::map<std::string, std::shared_ptr<SimpleAssetRequest>>()
+      );
 
   std::unique_ptr<SimpleAssetResponse> pResponse =
       std::make_unique<SimpleAssetResponse>(
@@ -24,17 +25,21 @@ TEST_CASE("CesiumIonClient::Connection") {
           CesiumAsync::HttpHeaders{},
           readFile(
               std::filesystem::path(CesiumIonClient_TEST_DATA_DIR) /
-              "defaults.json"));
+              "defaults.json"
+          )
+      );
 
   std::shared_ptr<SimpleAssetRequest> pRequest =
       std::make_shared<SimpleAssetRequest>(
           "GET",
           "doesn't matter",
           CesiumAsync::HttpHeaders{},
-          std::move(pResponse));
+          std::move(pResponse)
+      );
 
   pAssetAccessor->mockCompletedRequests.insert(
-      {"https://example.com/v1/defaults", std::move(pRequest)});
+      {"https://example.com/v1/defaults", std::move(pRequest)}
+  );
 
   AsyncSystem asyncSystem(std::make_shared<SimpleTaskProcessor>());
   Connection connection(
@@ -42,7 +47,8 @@ TEST_CASE("CesiumIonClient::Connection") {
       pAssetAccessor,
       "my access token",
       CesiumIonClient::ApplicationData(),
-      "https://example.com/");
+      "https://example.com/"
+  );
 
   Future<Response<Defaults>> futureDefaults = connection.defaults();
   Response<Defaults> defaults =
@@ -63,7 +69,8 @@ TEST_CASE("CesiumIonClient::Connection") {
       "High-resolution global terrain tileset curated from several data "
       "sources.  See the official [Cesium World "
       "Terrain](https://cesium.com/content/cesium-world-terrain/) page for "
-      "details. textured with Aerial imagery.");
+      "details. textured with Aerial imagery."
+  );
   CHECK(cwtAndBing.assetId == 1);
   CHECK(cwtAndBing.type == "TERRAIN");
   CHECK(cwtAndBing.subscribed == true);
@@ -79,7 +86,8 @@ TEST_CASE("CesiumIonClient::Connection on single-user mode") {
 
   std::shared_ptr<SimpleAssetAccessor> pAssetAccessor =
       std::make_shared<SimpleAssetAccessor>(
-          std::map<std::string, std::shared_ptr<SimpleAssetRequest>>());
+          std::map<std::string, std::shared_ptr<SimpleAssetRequest>>()
+      );
 
   ApplicationData data;
   data.authenticationMode = AuthenticationMode::SingleUser;
@@ -90,7 +98,8 @@ TEST_CASE("CesiumIonClient::Connection on single-user mode") {
       pAssetAccessor,
       "my access token",
       data,
-      "https://example.com/");
+      "https://example.com/"
+  );
 
   Future<Response<Profile>> futureMe = connection.me();
   Response<Profile> me = waitForFuture(asyncSystem, std::move(futureMe));

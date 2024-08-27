@@ -72,7 +72,8 @@ public:
    */
   SubtreeWriterResult writeSubtree(
       const Cesium3DTiles::Subtree& subtree,
-      const SubtreeWriterOptions& options = SubtreeWriterOptions()) const;
+      const SubtreeWriterOptions& options = SubtreeWriterOptions()
+  ) const;
 
 private:
   CesiumJsonWriter::ExtensionWriterContext _context;

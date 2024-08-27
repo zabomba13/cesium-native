@@ -7,22 +7,23 @@
 
 namespace CesiumJsonReader {
 ExtensibleObjectJsonHandler::ExtensibleObjectJsonHandler(
-    const JsonReaderOptions& context) noexcept
+    const JsonReaderOptions& context
+) noexcept
     : ObjectJsonHandler(),
       _extras(),
       _extensions(context),
       _captureUnknownProperties(context.getCaptureUnknownProperties()) {}
 
-void ExtensibleObjectJsonHandler::reset(
-    IJsonHandler* pParent,
-    CesiumUtility::ExtensibleObject* /*pObject*/) {
+void ExtensibleObjectJsonHandler::
+    reset(IJsonHandler* pParent, CesiumUtility::ExtensibleObject* /*pObject*/) {
   ObjectJsonHandler::reset(pParent);
 }
 
 IJsonHandler* ExtensibleObjectJsonHandler::readObjectKeyExtensibleObject(
     const std::string& objectType,
     const std::string_view& str,
-    CesiumUtility::ExtensibleObject& o) {
+    CesiumUtility::ExtensibleObject& o
+) {
   using namespace std::string_literals;
 
   if ("extras"s == str)

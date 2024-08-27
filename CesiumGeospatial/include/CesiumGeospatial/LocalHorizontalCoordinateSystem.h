@@ -48,7 +48,8 @@ public:
       double scaleToMeters = 1.0,
       // Can't use CESIUM_DEFAULT_ELLIPSOID here because of the other default
       // parameters
-      const Ellipsoid& ellipsoid = CesiumGeospatial::Ellipsoid::WGS84);
+      const Ellipsoid& ellipsoid = CesiumGeospatial::Ellipsoid::WGS84
+  );
 
   /**
    * @brief Create a new coordinate system centered at a Earth-Centered,
@@ -72,7 +73,8 @@ public:
       LocalDirection yAxisDirection = LocalDirection::North,
       LocalDirection zAxisDirection = LocalDirection::Up,
       double scaleToMeters = 1.0,
-      const Ellipsoid& ellipsoid = CesiumGeospatial::Ellipsoid::WGS84);
+      const Ellipsoid& ellipsoid = CesiumGeospatial::Ellipsoid::WGS84
+  );
 
   /**
    * @brief Create a new coordinate system with a specified transformation to
@@ -108,7 +110,8 @@ public:
    */
   LocalHorizontalCoordinateSystem(
       const glm::dmat4& localToEcef,
-      const glm::dmat4& ecefToLocal);
+      const glm::dmat4& ecefToLocal
+  );
 
   /**
    * @brief Gets the transformation matrix from the local horizontal coordinate
@@ -139,8 +142,8 @@ public:
    * @param localPosition The position in the local coordinate system.
    * @return The equivalent position in the ECEF coordinate system.
    */
-  glm::dvec3
-  localPositionToEcef(const glm::dvec3& localPosition) const noexcept;
+  glm::dvec3 localPositionToEcef(const glm::dvec3& localPosition
+  ) const noexcept;
 
   /**
    * @brief Converts a position in the Earth-Centered, Earth-Fixed (ECEF)
@@ -162,8 +165,8 @@ public:
    * @param localDirection The direction in the local coordinate system.
    * @return The equivalent direction in the ECEF coordinate system.
    */
-  glm::dvec3
-  localDirectionToEcef(const glm::dvec3& localDirection) const noexcept;
+  glm::dvec3 localDirectionToEcef(const glm::dvec3& localDirection
+  ) const noexcept;
 
   /**
    * @brief Converts a direction in the Earth-Centered, Earth-Fixed (ECEF)
@@ -176,8 +179,8 @@ public:
    * @param ecefDirection The direction in the ECEF coordinate system.
    * @return The equivalent direction in the local coordinate system.
    */
-  glm::dvec3
-  ecefDirectionToLocal(const glm::dvec3& ecefDirection) const noexcept;
+  glm::dvec3 ecefDirectionToLocal(const glm::dvec3& ecefDirection
+  ) const noexcept;
 
   /**
    * @brief Computes the transformation matrix from this local horizontal
@@ -190,7 +193,8 @@ public:
    * @return The transformation.
    */
   glm::dmat4 computeTransformationToAnotherLocal(
-      const LocalHorizontalCoordinateSystem& target) const noexcept;
+      const LocalHorizontalCoordinateSystem& target
+  ) const noexcept;
 
 private:
   glm::dmat4 _ecefToLocal;

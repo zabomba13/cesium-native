@@ -41,10 +41,12 @@ const std::filesystem::path& OwnedTempFile::getPath() const {
 
 void OwnedTempFile::write(
     const gsl::span<const std::byte>& buffer,
-    std::ios::openmode flags) {
+    std::ios::openmode flags
+) {
   std::fstream stream(_filePath.string(), flags);
   REQUIRE(stream.good());
   stream.write(
       reinterpret_cast<const char*>(buffer.data()),
-      static_cast<std::streamsize>(buffer.size()));
+      static_cast<std::streamsize>(buffer.size())
+  );
 }

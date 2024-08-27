@@ -15,8 +15,8 @@ class GroupMetadataJsonHandler : public MetadataEntityJsonHandler {
 public:
   using ValueType = Cesium3DTiles::GroupMetadata;
 
-  GroupMetadataJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  GroupMetadataJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, Cesium3DTiles::GroupMetadata* pObject);
 
@@ -26,7 +26,8 @@ protected:
   IJsonHandler* readObjectKeyGroupMetadata(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::GroupMetadata& o);
+      Cesium3DTiles::GroupMetadata& o
+  );
 
 private:
   Cesium3DTiles::GroupMetadata* _pObject = nullptr;

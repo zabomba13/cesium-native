@@ -28,7 +28,8 @@ public:
       const std::string& subtreeUrlTemplate,
       uint32_t subtreeLevels,
       uint32_t availableLevels,
-      ImplicitBoundingVolumeType&& volume)
+      ImplicitBoundingVolumeType&& volume
+  )
       : _baseUrl{baseUrl},
         _contentUrlTemplate{contentUrlTemplate},
         _subtreeUrlTemplate{subtreeUrlTemplate},
@@ -37,15 +38,16 @@ public:
         _boundingVolume{std::forward<ImplicitBoundingVolumeType>(volume)},
         _loadedSubtrees(static_cast<size_t>(std::ceil(
             static_cast<float>(availableLevels) /
-            static_cast<float>(subtreeLevels)))) {}
+            static_cast<float>(subtreeLevels)
+        ))) {}
 
   CesiumAsync::Future<TileLoadResult>
   loadTileContent(const TileLoadInput& loadInput) override;
 
   TileChildrenResult createTileChildren(
       const Tile& tile,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) override;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) override;
 
   uint32_t getSubtreeLevels() const noexcept;
 
@@ -55,7 +57,8 @@ public:
 
   void addSubtreeAvailability(
       const CesiumGeometry::QuadtreeTileID& subtreeID,
-      Cesium3DTilesContent::SubtreeAvailability&& subtreeAvailability);
+      Cesium3DTilesContent::SubtreeAvailability&& subtreeAvailability
+  );
 
 private:
   std::string _baseUrl;

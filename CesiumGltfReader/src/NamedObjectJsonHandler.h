@@ -13,13 +13,14 @@ namespace CesiumGltfReader {
 class NamedObjectJsonHandler
     : public CesiumJsonReader::ExtensibleObjectJsonHandler {
 protected:
-  NamedObjectJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& context) noexcept;
+  NamedObjectJsonHandler(const CesiumJsonReader::JsonReaderOptions& context
+  ) noexcept;
   void reset(IJsonHandler* pParentReader, CesiumGltf::NamedObject* pObject);
   IJsonHandler* readObjectKeyNamedObject(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::NamedObject& o);
+      CesiumGltf::NamedObject& o
+  );
 
 private:
   CesiumJsonReader::StringJsonHandler _name;

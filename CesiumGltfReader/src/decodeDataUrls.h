@@ -9,5 +9,6 @@ class GltfReader;
 void decodeDataUrls(
     const GltfReader& reader,
     GltfReaderResult& readGltf,
-    const GltfReaderOptions& clearDecodedDataUrls);
+    const GltfReaderOptions& clearDecodedDataUrls
+);
 } // namespace CesiumGltfReader

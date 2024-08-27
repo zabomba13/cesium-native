@@ -23,10 +23,12 @@ Future<ReadJsonResult<Cesium3DTiles::Subtree>> SubtreeFileReader::load(
     const AsyncSystem& asyncSystem,
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::string& url,
-    const std::vector<IAssetAccessor::THeader>& headers) const noexcept {
+    const std::vector<IAssetAccessor::THeader>& headers
+) const noexcept {
   return pAssetAccessor->get(asyncSystem, url, headers)
-      .thenInWorkerThread([asyncSystem, pAssetAccessor, this](
-                              std::shared_ptr<IAssetRequest>&& pRequest) {
+      .thenInWorkerThread([asyncSystem,
+                           pAssetAccessor,
+                           this](std::shared_ptr<IAssetRequest>&& pRequest) {
         return this->load(asyncSystem, pAssetAccessor, pRequest);
       });
 }
@@ -34,7 +36,8 @@ Future<ReadJsonResult<Cesium3DTiles::Subtree>> SubtreeFileReader::load(
 Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
     const AsyncSystem& asyncSystem,
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
-    const std::shared_ptr<IAssetRequest>& pRequest) const noexcept {
+    const std::shared_ptr<IAssetRequest>& pRequest
+) const noexcept {
   const IAssetResponse* pResponse = pRequest->response();
   if (pResponse == nullptr) {
     ReadJsonResult<Cesium3DTiles::Subtree> result;
@@ -46,19 +49,22 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
   if (statusCode != 0 && (statusCode < 200 || statusCode >= 300)) {
     CesiumJsonReader::ReadJsonResult<Cesium3DTiles::Subtree> result;
     result.errors.emplace_back(
-        fmt::format("Request failed with status code {}", statusCode));
+        fmt::format("Request failed with status code {}", statusCode)
+    );
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
   std::vector<CesiumAsync::IAssetAccessor::THeader> requestHeaders(
       pRequest->headers().begin(),
-      pRequest->headers().end());
+      pRequest->headers().end()
+  );
   return this->load(
       asyncSystem,
       pAssetAccessor,
       pRequest->url(),
       requestHeaders,
-      pResponse->data());
+      pResponse->data()
+  );
 }
 
 namespace {
@@ -70,13 +76,15 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::string& url,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    const gsl::span<const std::byte>& data) const noexcept {
+    const gsl::span<const std::byte>& data
+) const noexcept {
   if (data.size() < 4) {
     CesiumJsonReader::ReadJsonResult<Subtree> result;
     result.errors.emplace_back(fmt::format(
         "Subtree file has only {} bytes, which is too few to be a valid "
         "subtree.",
-        data.size()));
+        data.size()
+    ));
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -113,13 +121,15 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::string& url,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    const gsl::span<const std::byte>& data) const noexcept {
+    const gsl::span<const std::byte>& data
+) const noexcept {
   if (data.size() < sizeof(SubtreeHeader)) {
     CesiumJsonReader::ReadJsonResult<Subtree> result;
     result.errors.emplace_back(fmt::format(
         "The binary Subtree file is invalid because it is too small to include "
         "a Subtree header.",
-        data.size()));
+        data.size()
+    ));
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -130,7 +140,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
     result.errors.emplace_back(fmt::format(
         "The binary Subtree file is invalid because it is too small to include "
         "the jsonByteLength specified in its header.",
-        data.size()));
+        data.size()
+    ));
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
@@ -140,17 +151,20 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
     result.errors.emplace_back(fmt::format(
         "The binary Subtree file is invalid because it is too small to include "
         "the binaryByteLength specified in its header.",
-        data.size()));
+        data.size()
+    ));
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
   ReadJsonResult<Subtree> result = this->_reader.readFromJson(
-      data.subspan(sizeof(SubtreeHeader), header->jsonByteLength));
+      data.subspan(sizeof(SubtreeHeader), header->jsonByteLength)
+  );
 
   if (result.value) {
     gsl::span<const std::byte> binaryChunk = data.subspan(
         sizeof(SubtreeHeader) + header->jsonByteLength,
-        header->binaryByteLength);
+        header->binaryByteLength
+    );
 
     if (result.value->buffers.empty()) {
       result.errors.emplace_back("Subtree has a binary chunk but the JSON does "
@@ -162,7 +176,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
     if (buffer.uri) {
       result.errors.emplace_back(
           "Subtree has a binary chunk but the first buffer "
-          "in the JSON chunk also has a 'uri'.");
+          "in the JSON chunk also has a 'uri'."
+      );
       return asyncSystem.createResolvedFuture(std::move(result));
     }
 
@@ -184,7 +199,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
 
     buffer.cesium.data = std::vector<std::byte>(
         binaryChunk.begin(),
-        binaryChunk.begin() + buffer.byteLength);
+        binaryChunk.begin() + buffer.byteLength
+    );
   }
 
   return postprocess(
@@ -192,7 +208,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
       pAssetAccessor,
       url,
       requestHeaders,
-      std::move(result));
+      std::move(result)
+  );
 }
 
 CesiumAsync::Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadJson(
@@ -200,14 +217,16 @@ CesiumAsync::Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadJson(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::string& url,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    const gsl::span<const std::byte>& data) const noexcept {
+    const gsl::span<const std::byte>& data
+) const noexcept {
   ReadJsonResult<Subtree> result = this->_reader.readFromJson(data);
   return postprocess(
       asyncSystem,
       pAssetAccessor,
       url,
       requestHeaders,
-      std::move(result));
+      std::move(result)
+  );
 }
 
 namespace {
@@ -222,11 +241,13 @@ CesiumAsync::Future<RequestedSubtreeBuffer> requestBuffer(
     const CesiumAsync::AsyncSystem& asyncSystem,
     size_t bufferIdx,
     std::string&& subtreeUrl,
-    const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders) {
+    const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders
+) {
   return pAssetAccessor->get(asyncSystem, subtreeUrl, requestHeaders)
       .thenInWorkerThread(
           [bufferIdx](
-              std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest) {
+              std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest
+          ) {
             const CesiumAsync::IAssetResponse* pResponse =
                 pCompletedRequest->response();
             if (!pResponse) {
@@ -242,7 +263,8 @@ CesiumAsync::Future<RequestedSubtreeBuffer> requestBuffer(
             return RequestedSubtreeBuffer{
                 bufferIdx,
                 std::vector<std::byte>(data.begin(), data.end())};
-          });
+          }
+      );
 }
 
 } // namespace
@@ -252,7 +274,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::string& url,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    ReadJsonResult<Subtree>&& loaded) const noexcept {
+    ReadJsonResult<Subtree>&& loaded
+) const noexcept {
   if (!loaded.value) {
     return asyncSystem.createResolvedFuture(std::move(loaded));
   }
@@ -269,15 +292,17 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
           asyncSystem,
           i,
           std::move(bufferUrl),
-          requestHeaders));
+          requestHeaders
+      ));
     }
   }
 
   if (!bufferRequests.empty()) {
     return asyncSystem.all(std::move(bufferRequests))
         .thenInMainThread(
-            [loaded = std::move(loaded)](std::vector<RequestedSubtreeBuffer>&&
-                                             completedBuffers) mutable {
+            [loaded = std::move(loaded)](
+                std::vector<RequestedSubtreeBuffer>&& completedBuffers
+            ) mutable {
               for (RequestedSubtreeBuffer& completedBuffer : completedBuffers) {
                 Buffer& buffer = loaded.value->buffers[completedBuffer.index];
                 if (buffer.byteLength >
@@ -287,7 +312,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
                       "downloaded resource ({} bytes). The byteLength will be "
                       "updated to match.",
                       buffer.byteLength,
-                      completedBuffer.data.size()));
+                      completedBuffer.data.size()
+                  ));
                   buffer.byteLength =
                       static_cast<int64_t>(completedBuffer.data.size());
                 }
@@ -295,7 +321,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
               }
 
               return std::move(loaded);
-            });
+            }
+        );
   }
 
   return asyncSystem.createResolvedFuture(std::move(loaded));

@@ -20,7 +20,8 @@ std::vector<std::byte> decodeBase64(gsl::span<const std::byte> data) {
   const size_t resultLength = modp_b64_decode(
       reinterpret_cast<char*>(result.data()),
       reinterpret_cast<const char*>(data.data()),
-      data.size());
+      data.size()
+  );
   if (resultLength == size_t(-1)) {
     result.clear();
     result.shrink_to_fit();
@@ -61,16 +62,19 @@ std::optional<DecodeResult> tryDecode(const std::string& uri) {
   if (result.mimeType.size() >= base64IndicatorLength &&
       result.mimeType.substr(
           result.mimeType.size() - base64IndicatorLength,
-          base64IndicatorLength) == base64Indicator) {
+          base64IndicatorLength
+      ) == base64Indicator) {
     isBase64Encoded = true;
     result.mimeType = result.mimeType.substr(
         0,
-        result.mimeType.size() - base64IndicatorLength);
+        result.mimeType.size() - base64IndicatorLength
+    );
   }
 
   const gsl::span<const std::byte> data(
       reinterpret_cast<const std::byte*>(uri.data()) + dataDelimeter + 1,
-      uri.size() - dataDelimeter - 1);
+      uri.size() - dataDelimeter - 1
+  );
 
   if (isBase64Encoded) {
     result.data = decodeBase64(data);
@@ -89,7 +93,8 @@ std::optional<DecodeResult> tryDecode(const std::string& uri) {
 void decodeDataUrls(
     const GltfReader& reader,
     GltfReaderResult& readGltf,
-    const GltfReaderOptions& options) {
+    const GltfReaderOptions& options
+) {
   CESIUM_TRACE("CesiumGltfReader::decodeDataUrls");
   if (!readGltf.model) {
     return;
@@ -119,7 +124,8 @@ void decodeDataUrls(
           "does not match the declared byteLength of the buffer "
           "({} bytes). The byteLength has been updated to match.",
           buffer.cesium.data.size(),
-          buffer.byteLength));
+          buffer.byteLength
+      ));
       buffer.byteLength = int64_t(buffer.cesium.data.size());
     }
   }

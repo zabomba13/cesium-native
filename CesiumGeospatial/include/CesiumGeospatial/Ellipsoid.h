@@ -73,7 +73,8 @@ public:
         _oneOverRadiiSquared(
             1.0 / (radii.x * radii.x),
             1.0 / (radii.y * radii.y),
-            1.0 / (radii.z * radii.z)),
+            1.0 / (radii.z * radii.z)
+        ),
         _centerToleranceSquared(CesiumUtility::Math::Epsilon1) {}
 
   /**
@@ -99,8 +100,8 @@ public:
    * determine the surface normal.
    * @return The normal.
    */
-  glm::dvec3
-  geodeticSurfaceNormal(const Cartographic& cartographic) const noexcept;
+  glm::dvec3 geodeticSurfaceNormal(const Cartographic& cartographic
+  ) const noexcept;
 
   /**
    * @brief Converts the provided {@link Cartographic} to cartesian
@@ -109,8 +110,8 @@ public:
    * @param cartographic The {@link Cartographic} position.
    * @return The cartesian representation.
    */
-  glm::dvec3
-  cartographicToCartesian(const Cartographic& cartographic) const noexcept;
+  glm::dvec3 cartographicToCartesian(const Cartographic& cartographic
+  ) const noexcept;
 
   /**
    * @brief Converts the provided cartesian to a {@link Cartographic}
@@ -137,8 +138,8 @@ public:
    * @return The scaled position, or the empty optional if
    * the cartesian is at the center of this ellipsoid.
    */
-  std::optional<glm::dvec3>
-  scaleToGeodeticSurface(const glm::dvec3& cartesian) const noexcept;
+  std::optional<glm::dvec3> scaleToGeodeticSurface(const glm::dvec3& cartesian
+  ) const noexcept;
 
   /**
    * @brief Scales the provided cartesian position along the geocentric
@@ -148,8 +149,8 @@ public:
    * @retun The scaled position, or the empty optional if the cartesian is at
    * the center of this ellipsoid.
    */
-  std::optional<glm::dvec3>
-  scaleToGeocentricSurface(const glm::dvec3& cartesian) const noexcept;
+  std::optional<glm::dvec3> scaleToGeocentricSurface(const glm::dvec3& cartesian
+  ) const noexcept;
 
   /**
    * @brief The maximum radius in any dimension.

@@ -108,8 +108,8 @@ public:
 };
 
 template <typename T>
-PropertyViewStatusType
-validatePropertyType(const ClassProperty& classProperty) {
+PropertyViewStatusType validatePropertyType(const ClassProperty& classProperty
+) {
   if (TypeToPropertyType<T>::value !=
       convertStringToPropertyType(classProperty.type)) {
     return PropertyViewStatus::ErrorTypeMismatch;
@@ -178,8 +178,8 @@ static std::optional<T> getScalar(const CesiumUtility::JsonValue& jsonValue) {
 }
 
 template <typename VecType>
-static std::optional<VecType>
-getVecN(const CesiumUtility::JsonValue& jsonValue) {
+static std::optional<VecType> getVecN(const CesiumUtility::JsonValue& jsonValue
+) {
   if (!jsonValue.isArray()) {
     return std::nullopt;
   }
@@ -206,8 +206,8 @@ getVecN(const CesiumUtility::JsonValue& jsonValue) {
 }
 
 template <typename MatType>
-static std::optional<MatType>
-getMatN(const CesiumUtility::JsonValue& jsonValue) {
+static std::optional<MatType> getMatN(const CesiumUtility::JsonValue& jsonValue
+) {
   if (!jsonValue.isArray()) {
     return std::nullopt;
   }
@@ -362,7 +362,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& property)
+      const PropertyTableProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -378,7 +379,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTextureProperty& property)
+      const PropertyTextureProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -394,7 +396,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyAttributeProperty& property)
+      const PropertyAttributeProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -627,7 +630,8 @@ private:
             }
           }
         },
-        inProperty);
+        inProperty
+    );
   }
 };
 
@@ -744,7 +748,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& property)
+      const PropertyTableProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -760,7 +765,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTextureProperty& property)
+      const PropertyTextureProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -776,7 +782,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyAttributeProperty& property)
+      const PropertyAttributeProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -948,7 +955,8 @@ private:
             }
           }
         },
-        inProperty);
+        inProperty
+    );
   }
 };
 
@@ -1016,7 +1024,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& /*property*/)
+      const PropertyTableProperty& /*property*/
+  )
       : PropertyView(classProperty) {}
 
 public:
@@ -1189,7 +1198,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& /*property*/)
+      const PropertyTableProperty& /*property*/
+  )
       : PropertyView(classProperty) {}
 
 public:
@@ -1336,7 +1346,8 @@ public:
    */
   PropertyView(const ClassProperty& classProperty)
       : _status(validateArrayPropertyType<PropertyArrayView<ElementType>>(
-            classProperty)),
+            classProperty
+        )),
         _name(classProperty.name),
         _semantic(classProperty.semantic),
         _description(classProperty.description),
@@ -1412,7 +1423,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& property)
+      const PropertyTableProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -1428,7 +1440,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTextureProperty& property)
+      const PropertyTextureProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -1482,7 +1495,8 @@ public:
     }
 
     return PropertyArrayView<ElementType>(
-        gsl::span<const std::byte>(_offset->data(), _offset->size()));
+        gsl::span<const std::byte>(_offset->data(), _offset->size())
+    );
   }
 
   /**
@@ -1494,7 +1508,8 @@ public:
     }
 
     return PropertyArrayView<ElementType>(
-        gsl::span<const std::byte>(_scale->data(), _scale->size()));
+        gsl::span<const std::byte>(_scale->data(), _scale->size())
+    );
   }
 
   /**
@@ -1506,7 +1521,8 @@ public:
     }
 
     return PropertyArrayView<ElementType>(
-        gsl::span<const std::byte>(_max->data(), _max->size()));
+        gsl::span<const std::byte>(_max->data(), _max->size())
+    );
   }
 
   /**
@@ -1518,7 +1534,8 @@ public:
     }
 
     return PropertyArrayView<ElementType>(
-        gsl::span<const std::byte>(_min->data(), _min->size()));
+        gsl::span<const std::byte>(_min->data(), _min->size())
+    );
   }
 
   /**
@@ -1535,7 +1552,8 @@ public:
     }
 
     return PropertyArrayView<ElementType>(
-        gsl::span<const std::byte>(_noData->data(), _noData->size()));
+        gsl::span<const std::byte>(_noData->data(), _noData->size())
+    );
   }
 
   /**
@@ -1546,9 +1564,9 @@ public:
       return std::nullopt;
     }
 
-    return PropertyArrayView<ElementType>(gsl::span<const std::byte>(
-        _defaultValue->data(),
-        _defaultValue->size()));
+    return PropertyArrayView<ElementType>(
+        gsl::span<const std::byte>(_defaultValue->data(), _defaultValue->size())
+    );
   }
 
 protected:
@@ -1639,7 +1657,8 @@ private:
             }
           }
         },
-        inProperty);
+        inProperty
+    );
   }
 
   static std::optional<std::vector<std::byte>>
@@ -1732,7 +1751,8 @@ public:
    */
   PropertyView(const ClassProperty& classProperty)
       : _status(validateArrayPropertyType<PropertyArrayView<ElementType>>(
-            classProperty)),
+            classProperty
+        )),
         _name(classProperty.name),
         _semantic(classProperty.semantic),
         _description(classProperty.description),
@@ -1808,7 +1828,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& property)
+      const PropertyTableProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -1824,7 +1845,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTextureProperty& property)
+      const PropertyTextureProperty& property
+  )
       : PropertyView(classProperty) {
     if (_status != PropertyViewStatus::Valid) {
       return;
@@ -1878,7 +1900,8 @@ public:
     }
 
     return PropertyArrayView<NormalizedType>(
-        gsl::span<const std::byte>(_offset->data(), _offset->size()));
+        gsl::span<const std::byte>(_offset->data(), _offset->size())
+    );
   }
 
   /**
@@ -1890,7 +1913,8 @@ public:
     }
 
     return PropertyArrayView<NormalizedType>(
-        gsl::span<const std::byte>(_scale->data(), _scale->size()));
+        gsl::span<const std::byte>(_scale->data(), _scale->size())
+    );
   }
 
   /**
@@ -1902,7 +1926,8 @@ public:
     }
 
     return PropertyArrayView<NormalizedType>(
-        gsl::span<const std::byte>(_max->data(), _max->size()));
+        gsl::span<const std::byte>(_max->data(), _max->size())
+    );
   }
 
   /**
@@ -1914,7 +1939,8 @@ public:
     }
 
     return PropertyArrayView<NormalizedType>(
-        gsl::span<const std::byte>(_min->data(), _min->size()));
+        gsl::span<const std::byte>(_min->data(), _min->size())
+    );
   }
 
   /**
@@ -1931,7 +1957,8 @@ public:
     }
 
     return PropertyArrayView<ElementType>(
-        gsl::span<const std::byte>(_noData->data(), _noData->size()));
+        gsl::span<const std::byte>(_noData->data(), _noData->size())
+    );
   }
 
   /**
@@ -1943,9 +1970,9 @@ public:
       return std::nullopt;
     }
 
-    return PropertyArrayView<NormalizedType>(gsl::span<const std::byte>(
-        _defaultValue->data(),
-        _defaultValue->size()));
+    return PropertyArrayView<NormalizedType>(
+        gsl::span<const std::byte>(_defaultValue->data(), _defaultValue->size())
+    );
   }
 
 protected:
@@ -2016,7 +2043,8 @@ private:
             }
           }
         },
-        inProperty);
+        inProperty
+    );
   }
 
   template <typename T>
@@ -2093,8 +2121,8 @@ public:
    * @brief Constructs a property instance from a class definition only.
    */
   PropertyView(const ClassProperty& classProperty)
-      : _status(
-            validateArrayPropertyType<PropertyArrayView<bool>>(classProperty)),
+      : _status(validateArrayPropertyType<PropertyArrayView<bool>>(classProperty
+        )),
         _name(classProperty.name),
         _semantic(classProperty.semantic),
         _description(classProperty.description),
@@ -2141,7 +2169,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& /*property*/)
+      const PropertyTableProperty& /*property*/
+  )
       : PropertyView(classProperty) {}
 
 public:
@@ -2227,9 +2256,11 @@ public:
       return PropertyArrayView<bool>(
           gsl::span<const std::byte>(
               _defaultValue.data(),
-              _defaultValue.size()),
+              _defaultValue.size()
+          ),
           /* bitOffset = */ 0,
-          _size);
+          _size
+      );
     }
 
     return std::nullopt;
@@ -2251,7 +2282,8 @@ private:
 
   static std::vector<std::byte> getBooleanArrayValue(
       const CesiumUtility::JsonValue& jsonValue,
-      int64_t& size) {
+      int64_t& size
+  ) {
     if (!jsonValue.isArray()) {
       return std::vector<std::byte>();
     }
@@ -2313,7 +2345,8 @@ public:
    */
   PropertyView(const ClassProperty& classProperty)
       : _status(validateArrayPropertyType<PropertyArrayView<std::string_view>>(
-            classProperty)),
+            classProperty
+        )),
         _name(classProperty.name),
         _semantic(classProperty.semantic),
         _description(classProperty.description),
@@ -2372,7 +2405,8 @@ protected:
    */
   PropertyView(
       const ClassProperty& classProperty,
-      const PropertyTableProperty& /*property*/)
+      const PropertyTableProperty& /*property*/
+  )
       : PropertyView(classProperty) {}
 
 public:
@@ -2452,9 +2486,11 @@ public:
           gsl::span<const std::byte>(_noData.data.data(), _noData.data.size()),
           gsl::span<const std::byte>(
               _noData.offsets.data(),
-              _noData.offsets.size()),
+              _noData.offsets.size()
+          ),
           _noData.offsetType,
-          _noData.size);
+          _noData.size
+      );
     }
 
     return std::nullopt;
@@ -2469,12 +2505,15 @@ public:
       return PropertyArrayView<std::string_view>(
           gsl::span<const std::byte>(
               _defaultValue.data.data(),
-              _defaultValue.data.size()),
+              _defaultValue.data.size()
+          ),
           gsl::span<const std::byte>(
               _defaultValue.offsets.data(),
-              _defaultValue.offsets.size()),
+              _defaultValue.offsets.size()
+          ),
           _defaultValue.offsetType,
-          _defaultValue.size);
+          _defaultValue.size
+      );
     }
 
     return std::nullopt;
@@ -2533,7 +2572,8 @@ private:
       std::memcpy(
           result.data.data() + stringOffsets[i],
           strings[i].data(),
-          strings[i].size());
+          strings[i].size()
+      );
     };
 
     if (totalLength <= std::numeric_limits<uint8_t>::max()) {
@@ -2550,7 +2590,8 @@ private:
       std::memcpy(
           result.offsets.data(),
           stringOffsets.data(),
-          result.offsets.size());
+          result.offsets.size()
+      );
       result.offsetType = PropertyComponentType::Uint64;
     }
 

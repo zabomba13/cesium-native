@@ -29,7 +29,8 @@ public:
    */
   virtual void* prepareRasterInLoadThread(
       CesiumGltf::ImageCesium& image,
-      const std::any& rendererOptions) = 0;
+      const std::any& rendererOptions
+  ) = 0;
 
   /**
    * @brief Further preprares a raster overlay tile.
@@ -49,7 +50,8 @@ public:
    */
   virtual void* prepareRasterInMainThread(
       RasterOverlayTile& rasterTile,
-      void* pLoadThreadResult) = 0;
+      void* pLoadThreadResult
+  ) = 0;
 
   /**
    * @brief Frees previously-prepared renderer resources for a raster tile.
@@ -70,7 +72,8 @@ public:
   virtual void freeRaster(
       const RasterOverlayTile& rasterTile,
       void* pLoadThreadResult,
-      void* pMainThreadResult) noexcept = 0;
+      void* pMainThreadResult
+  ) noexcept = 0;
 };
 
 } // namespace CesiumRasterOverlays

@@ -34,13 +34,15 @@ Cartographic GlobeRectangle::computeCenter() const noexcept {
       return Cartographic(
           glm::min(Math::OnePi, this->_west + total * 0.5),
           latitudeCenter,
-          0.0);
+          0.0
+      );
     } else {
       // Center is in the Western hemisphere.
       return Cartographic(
           glm::max(-Math::OnePi, this->_east - total * 0.5),
           latitudeCenter,
-          0.0);
+          0.0
+      );
     }
   }
 }
@@ -65,8 +67,9 @@ bool GlobeRectangle::isEmpty() const noexcept {
   return this->_south > this->_north;
 }
 
-std::optional<GlobeRectangle> GlobeRectangle::computeIntersection(
-    const GlobeRectangle& other) const noexcept {
+std::optional<GlobeRectangle>
+GlobeRectangle::computeIntersection(const GlobeRectangle& other
+) const noexcept {
   double rectangleEast = this->_east;
   double rectangleWest = this->_west;
 
@@ -86,9 +89,11 @@ std::optional<GlobeRectangle> GlobeRectangle::computeIntersection(
   }
 
   const double west = CesiumUtility::Math::negativePiToPi(
-      glm::max(rectangleWest, otherRectangleWest));
+      glm::max(rectangleWest, otherRectangleWest)
+  );
   const double east = CesiumUtility::Math::negativePiToPi(
-      glm::min(rectangleEast, otherRectangleEast));
+      glm::min(rectangleEast, otherRectangleEast)
+  );
 
   if ((this->_west < this->_east || other._west < other._east) &&
       east <= west) {
@@ -105,8 +110,8 @@ std::optional<GlobeRectangle> GlobeRectangle::computeIntersection(
   return GlobeRectangle(west, south, east, north);
 }
 
-GlobeRectangle
-GlobeRectangle::computeUnion(const GlobeRectangle& other) const noexcept {
+GlobeRectangle GlobeRectangle::computeUnion(const GlobeRectangle& other
+) const noexcept {
   double rectangleEast = this->_east;
   double rectangleWest = this->_west;
 
@@ -126,15 +131,18 @@ GlobeRectangle::computeUnion(const GlobeRectangle& other) const noexcept {
   }
 
   const double west = CesiumUtility::Math::convertLongitudeRange(
-      glm::min(rectangleWest, otherRectangleWest));
+      glm::min(rectangleWest, otherRectangleWest)
+  );
   const double east = CesiumUtility::Math::convertLongitudeRange(
-      glm::max(rectangleEast, otherRectangleEast));
+      glm::max(rectangleEast, otherRectangleEast)
+  );
 
   return GlobeRectangle(
       west,
       glm::min(this->_south, other._south),
       east,
-      glm::max(this->_north, other._north));
+      glm::max(this->_north, other._north)
+  );
 }
 
 std::pair<GlobeRectangle, std::optional<GlobeRectangle>>
@@ -155,7 +163,8 @@ GlobeRectangle::splitAtAntiMeridian() const noexcept {
 
 bool GlobeRectangle::equals(
     const GlobeRectangle& left,
-    const GlobeRectangle& right) noexcept {
+    const GlobeRectangle& right
+) noexcept {
   return left._north == right._north && left._west == right._west &&
          left._south == right._south && left._east == right._east;
 }
@@ -163,7 +172,8 @@ bool GlobeRectangle::equals(
 bool GlobeRectangle::equalsEpsilon(
     const GlobeRectangle& left,
     const GlobeRectangle& right,
-    double relativeEpsilon) noexcept {
+    double relativeEpsilon
+) noexcept {
   return Math::equalsEpsilon(left._north, right._north, relativeEpsilon) &&
          Math::equalsEpsilon(left._west, right._west, relativeEpsilon) &&
          Math::equalsEpsilon(left._south, right._south, relativeEpsilon) &&

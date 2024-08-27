@@ -14,7 +14,9 @@ TEST_CASE("getOrientedBoundingBoxFromBoundingVolume") {
         glm::dmat3(
             glm::dvec3(1.0, 2.0, 3.0),
             glm::dvec3(4.0, 5.0, 6.0),
-            glm::dvec3(7.0, 8.0, 9.0)));
+            glm::dvec3(7.0, 8.0, 9.0)
+        )
+    );
     BoundingVolume bv = obb;
     OrientedBoundingBox newObb = getOrientedBoundingBoxFromBoundingVolume(bv);
     CHECK(obb.getCenter() == newObb.getCenter());
@@ -34,7 +36,8 @@ TEST_CASE("getOrientedBoundingBoxFromBoundingVolume") {
         GlobeRectangle(0.5, 1.0, 1.5, 2.0),
         100.0,
         200.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
     BoundingVolume bv = region;
     OrientedBoundingBox newObb = getOrientedBoundingBoxFromBoundingVolume(bv);
     CHECK(region.getBoundingBox().getCenter() == newObb.getCenter());
@@ -50,14 +53,17 @@ TEST_CASE("getOrientedBoundingBoxFromBoundingVolume") {
         S2CellID::fromQuadtreeTileID(1, QuadtreeTileID(10, 1, 2)),
         100.0,
         200.0,
-        Ellipsoid::WGS84);
+        Ellipsoid::WGS84
+    );
     bv = s2;
     newObb = getOrientedBoundingBoxFromBoundingVolume(bv);
     CHECK(
         s2.computeBoundingRegion().getBoundingBox().getCenter() ==
-        newObb.getCenter());
+        newObb.getCenter()
+    );
     CHECK(
         s2.computeBoundingRegion().getBoundingBox().getHalfAxes() ==
-        newObb.getHalfAxes());
+        newObb.getHalfAxes()
+    );
   }
 }

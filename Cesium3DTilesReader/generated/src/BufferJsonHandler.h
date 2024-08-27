@@ -16,8 +16,8 @@ class BufferJsonHandler : public CesiumJsonReader::ExtensibleObjectJsonHandler {
 public:
   using ValueType = Cesium3DTiles::Buffer;
 
-  BufferJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  BufferJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(IJsonHandler* pParentHandler, Cesium3DTiles::Buffer* pObject);
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
@@ -26,7 +26,8 @@ protected:
   IJsonHandler* readObjectKeyBuffer(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::Buffer& o);
+      Cesium3DTiles::Buffer& o
+  );
 
 private:
   Cesium3DTiles::Buffer* _pObject = nullptr;

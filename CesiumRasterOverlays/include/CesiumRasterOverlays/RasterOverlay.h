@@ -141,7 +141,8 @@ public:
    */
   RasterOverlay(
       const std::string& name,
-      const RasterOverlayOptions& overlayOptions = RasterOverlayOptions());
+      const RasterOverlayOptions& overlayOptions = RasterOverlayOptions()
+  );
   virtual ~RasterOverlay() noexcept;
 
   /**
@@ -197,8 +198,8 @@ public:
   CesiumUtility::IntrusivePointer<RasterOverlayTileProvider> createPlaceholder(
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
-      const CesiumGeospatial::Ellipsoid& ellipsoid
-          CESIUM_DEFAULT_ELLIPSOID) const;
+      const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID
+  ) const;
 
   using CreateTileProviderResult = nonstd::expected<
       CesiumUtility::IntrusivePointer<RasterOverlayTileProvider>,
@@ -229,7 +230,8 @@ public:
       const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
-      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner) const = 0;
+      CesiumUtility::IntrusivePointer<const RasterOverlay> pOwner
+  ) const = 0;
 
 private:
   struct DestructionCompleteDetails {

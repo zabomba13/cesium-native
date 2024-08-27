@@ -90,9 +90,9 @@ void registerReaderExtensions(CesiumJsonReader::JsonReaderOptions& options) {
   options.registerExtension<
       CesiumGltf::Texture,
       ExtensionKhrTextureBasisuJsonHandler>();
-  options.registerExtension<
-      CesiumGltf::Texture,
-      ExtensionTextureWebpJsonHandler>();
+  options
+      .registerExtension<CesiumGltf::Texture, ExtensionTextureWebpJsonHandler>(
+      );
   options.registerExtension<
       CesiumGltf::TextureInfo,
       ExtensionKhrTextureTransformJsonHandler>();

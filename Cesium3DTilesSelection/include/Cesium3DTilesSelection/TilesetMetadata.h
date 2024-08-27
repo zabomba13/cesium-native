@@ -66,7 +66,8 @@ public:
    */
   CesiumAsync::SharedFuture<void>& loadSchemaUri(
       const CesiumAsync::AsyncSystem& asyncSystem,
-      const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor);
+      const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor
+  );
 
 private:
   std::optional<CesiumAsync::SharedFuture<void>> _loadingFuture;

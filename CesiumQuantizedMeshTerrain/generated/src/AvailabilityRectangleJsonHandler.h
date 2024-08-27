@@ -17,10 +17,12 @@ public:
   using ValueType = CesiumQuantizedMeshTerrain::AvailabilityRectangle;
 
   AvailabilityRectangleJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumQuantizedMeshTerrain::AvailabilityRectangle* pObject);
+      CesiumQuantizedMeshTerrain::AvailabilityRectangle* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -28,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyAvailabilityRectangle(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumQuantizedMeshTerrain::AvailabilityRectangle& o);
+      CesiumQuantizedMeshTerrain::AvailabilityRectangle& o
+  );
 
 private:
   CesiumQuantizedMeshTerrain::AvailabilityRectangle* _pObject = nullptr;

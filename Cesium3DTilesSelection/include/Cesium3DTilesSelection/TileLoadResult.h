@@ -136,7 +136,8 @@ struct CESIUM3DTILESSELECTION_API TileLoadResult {
    * @param pCompletedRequest The failed request
    */
   static TileLoadResult createFailedResult(
-      std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest);
+      std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest
+  );
 
   /**
    * @brief Create a result with RetryLater state
@@ -144,7 +145,8 @@ struct CESIUM3DTILESSELECTION_API TileLoadResult {
    * @param pCompletedRequest The failed request
    */
   static TileLoadResult createRetryLaterResult(
-      std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest);
+      std::shared_ptr<CesiumAsync::IAssetRequest> pCompletedRequest
+  );
 };
 
 } // namespace Cesium3DTilesSelection

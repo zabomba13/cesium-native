@@ -61,7 +61,8 @@ public:
       size_t sourceRowStride,
       size_t sourceWidth,
       size_t sourceHeight,
-      size_t bytesPerPixel);
+      size_t bytesPerPixel
+  );
 
   /**
    * @brief Copies pixels from a source image to a target image.
@@ -94,7 +95,8 @@ public:
       CesiumGltf::ImageCesium& target,
       const PixelRectangle& targetPixels,
       const CesiumGltf::ImageCesium& source,
-      const PixelRectangle& sourcePixels);
+      const PixelRectangle& sourcePixels
+  );
 
   /**
    * @brief Saves an image to a new byte buffer in PNG format.

@@ -24,8 +24,8 @@ BoundingRegionBuilder::BoundingRegionBuilder() noexcept
       _maximumHeight(std::numeric_limits<double>::lowest()),
       _longitudeRangeIsEmpty(true) {}
 
-BoundingRegion
-BoundingRegionBuilder::toRegion(const Ellipsoid& ellipsoid) const {
+BoundingRegion BoundingRegionBuilder::toRegion(const Ellipsoid& ellipsoid
+) const {
   if (this->_longitudeRangeIsEmpty) {
     return BoundingRegion(GlobeRectangle::EMPTY, 1.0, -1.0, ellipsoid);
   } else {
@@ -33,7 +33,8 @@ BoundingRegionBuilder::toRegion(const Ellipsoid& ellipsoid) const {
         this->_rectangle,
         this->_minimumHeight,
         this->_maximumHeight,
-        ellipsoid);
+        ellipsoid
+    );
   }
 }
 
@@ -53,8 +54,8 @@ double BoundingRegionBuilder::getPoleTolerance() const noexcept {
   return this->_poleTolerance;
 }
 
-bool BoundingRegionBuilder::expandToIncludePosition(
-    const Cartographic& position) {
+bool BoundingRegionBuilder::expandToIncludePosition(const Cartographic& position
+) {
 
   // Always update the latitude and height ranges
   bool modified = false;

@@ -31,7 +31,8 @@ protected:
   IJsonHandler* readObjectKeyTile(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::Tile& o);
+      Cesium3DTiles::Tile& o
+  );
 
 private:
   Cesium3DTiles::Tile* _pObject = nullptr;

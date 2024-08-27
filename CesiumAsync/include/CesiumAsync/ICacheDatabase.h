@@ -51,7 +51,8 @@ public:
       const HttpHeaders& requestHeaders,
       uint16_t statusCode,
       const HttpHeaders& responseHeaders,
-      const gsl::span<const std::byte>& responseData) = 0;
+      const gsl::span<const std::byte>& responseData
+  ) = 0;
 
   /**
    * @brief Remove cache entries from the database to satisfy the database

@@ -81,7 +81,8 @@ public:
     std::memcpy(
         this->_storage.data(),
         reinterpret_cast<const std::byte*>(values.data()),
-        sizeInBytes);
+        sizeInBytes
+    );
     this->_view = PropertyArrayView<ElementType>(this->_storage);
   }
 
@@ -144,7 +145,8 @@ public:
   PropertyArrayView(
       const gsl::span<const std::byte>& buffer,
       int64_t bitOffset,
-      int64_t size) noexcept
+      int64_t size
+  ) noexcept
       : _values{buffer}, _bitOffset{bitOffset}, _size{size} {}
 
   bool operator[](int64_t index) const noexcept {
@@ -186,7 +188,8 @@ public:
       const gsl::span<const std::byte>& values,
       const gsl::span<const std::byte>& stringOffsets,
       PropertyComponentType stringOffsetType,
-      int64_t size) noexcept
+      int64_t size
+  ) noexcept
       : _values{values},
         _stringOffsets{stringOffsets},
         _stringOffsetType{stringOffsetType},
@@ -198,10 +201,12 @@ public:
     const size_t nextOffset = getOffsetFromOffsetsBuffer(
         index + 1,
         _stringOffsets,
-        _stringOffsetType);
+        _stringOffsetType
+    );
     return std::string_view(
         reinterpret_cast<const char*>(_values.data() + currentOffset),
-        (nextOffset - currentOffset));
+        (nextOffset - currentOffset)
+    );
   }
 
   int64_t size() const noexcept { return _size; }
@@ -216,7 +221,8 @@ private:
 template <typename T>
 bool operator==(
     const PropertyArrayView<T>& lhs,
-    const PropertyArrayView<T>& rhs) {
+    const PropertyArrayView<T>& rhs
+) {
   int64_t size = lhs.size();
   if (size != rhs.size()) {
     return false;
@@ -234,49 +240,56 @@ bool operator==(
 template <typename T>
 bool operator==(
     const PropertyArrayView<T>& lhs,
-    const PropertyArrayCopy<T>& rhs) {
+    const PropertyArrayCopy<T>& rhs
+) {
   return lhs == PropertyArrayView(rhs);
 }
 
 template <typename T>
 bool operator==(
     const PropertyArrayCopy<T>& lhs,
-    const PropertyArrayView<T>& rhs) {
+    const PropertyArrayView<T>& rhs
+) {
   return lhs.view() == rhs;
 }
 
 template <typename T>
 bool operator==(
     const PropertyArrayCopy<T>& lhs,
-    const PropertyArrayCopy<T>& rhs) {
+    const PropertyArrayCopy<T>& rhs
+) {
   return lhs.view() == rhs.view();
 }
 
 template <typename T>
 bool operator!=(
     const PropertyArrayView<T>& lhs,
-    const PropertyArrayView<T>& rhs) {
+    const PropertyArrayView<T>& rhs
+) {
   return !(lhs == rhs);
 }
 
 template <typename T>
 bool operator!=(
     const PropertyArrayView<T>& lhs,
-    const PropertyArrayCopy<T>& rhs) {
+    const PropertyArrayCopy<T>& rhs
+) {
   return !(lhs == rhs);
 }
 
 template <typename T>
 bool operator!=(
     const PropertyArrayCopy<T>& lhs,
-    const PropertyArrayView<T>& rhs) {
+    const PropertyArrayView<T>& rhs
+) {
   return !(lhs == rhs);
 }
 
 template <typename T>
 bool operator!=(
     const PropertyArrayCopy<T>& lhs,
-    const PropertyArrayCopy<T>& rhs) {
+    const PropertyArrayCopy<T>& rhs
+) {
   return !(lhs == rhs);
 }
 

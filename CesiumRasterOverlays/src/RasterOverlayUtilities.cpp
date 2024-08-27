@@ -28,7 +28,8 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
     std::vector<CesiumGeospatial::Projection>&& projections,
     bool invertVCoordinate,
     const std::string_view& textureCoordinateAttributeBaseName,
-    int32_t firstTextureCoordinateID) {
+    int32_t firstTextureCoordinateID
+) {
   if (projections.empty()) {
     return std::nullopt;
   }
@@ -41,7 +42,8 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
                      : GltfUtilities::computeBoundingRegion(
                            model,
                            modelToEcefTransform,
-                           ellipsoid)
+                           ellipsoid
+                       )
                            .getRectangle();
 
   // Don't let the bounding rectangle cross the anti-meridian. If it does, split
@@ -70,7 +72,8 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
   std::vector<int> positionAccessorsToTextureCoordinateAccessor;
   positionAccessorsToTextureCoordinateAccessor.resize(
       model.accessors.size(),
-      0);
+      0
+  );
 
   // When computing the tile's bounds, ignore vertices that are less than
   // 1/1000th of a tile height from the North or South pole. Longitudes cannot
@@ -78,233 +81,241 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
   CesiumGeospatial::BoundingRegionBuilder computedBounds;
   computedBounds.setPoleTolerance(0.001 * bounds.computeHeight());
 
-  auto createTextureCoordinatesForPrimitive =
-      [&](CesiumGltf::Model& gltf,
-          CesiumGltf::Node& /*node*/,
-          CesiumGltf::Mesh& /*mesh*/,
-          CesiumGltf::MeshPrimitive& primitive,
-          const glm::dmat4& nodeTransform) {
-        auto positionIt = primitive.attributes.find("POSITION");
-        if (positionIt == primitive.attributes.end()) {
-          return;
+  auto createTextureCoordinatesForPrimitive = [&](CesiumGltf::Model& gltf,
+                                                  CesiumGltf::Node& /*node*/,
+                                                  CesiumGltf::Mesh& /*mesh*/,
+                                                  CesiumGltf::MeshPrimitive&
+                                                      primitive,
+                                                  const glm::dmat4&
+                                                      nodeTransform) {
+    auto positionIt = primitive.attributes.find("POSITION");
+    if (positionIt == primitive.attributes.end()) {
+      return;
+    }
+
+    const int positionAccessorIndex = positionIt->second;
+    if (positionAccessorIndex < 0 ||
+        positionAccessorIndex >= static_cast<int>(gltf.accessors.size())) {
+      return;
+    }
+
+    const int32_t firstTextureCoordinateAccessorIndex =
+        positionAccessorsToTextureCoordinateAccessor[static_cast<size_t>(
+            positionAccessorIndex
+        )];
+    if (firstTextureCoordinateAccessorIndex > 0) {
+      // Already created texture coordinates for this projection, so use
+      // them.
+      for (size_t i = 0; i < projections.size(); ++i) {
+        std::string attributeName =
+            std::string(textureCoordinateAttributeBaseName) +
+            std::to_string(firstTextureCoordinateID + int32_t(i));
+        primitive.attributes[attributeName] =
+            firstTextureCoordinateAccessorIndex + int32_t(i);
+      }
+      return;
+    }
+
+    const glm::dmat4 fullTransform = rootTransform * nodeTransform;
+
+    std::vector<CesiumGltf::Buffer>& buffers = gltf.buffers;
+    std::vector<CesiumGltf::BufferView>& bufferViews = gltf.bufferViews;
+    std::vector<CesiumGltf::Accessor>& accessors = gltf.accessors;
+
+    positionAccessorsToTextureCoordinateAccessor[size_t(positionAccessorIndex
+    )] = int32_t(gltf.accessors.size());
+
+    // Create a buffer, bufferView, accessor, and writer for each set of
+    // coordinates. Reserve space for them to avoid unnecessary
+    // reallocations and to prevent earlier buffers from becoming invalid
+    // after we've created an AccessorWriter for it and then add _another_
+    // buffer.
+    std::vector<CesiumGltf::AccessorWriter<glm::vec2>> uvWriters;
+    std::vector<std::vector<double>*> mins;
+    std::vector<std::vector<double>*> maxs;
+    uvWriters.reserve(projections.size());
+    mins.reserve(projections.size());
+    maxs.reserve(projections.size());
+    buffers.reserve(buffers.size() + projections.size());
+    bufferViews.reserve(bufferViews.size() + projections.size());
+    accessors.reserve(accessors.size() + projections.size());
+
+    const CesiumGltf::AccessorView<glm::vec3> positionView(
+        gltf,
+        positionAccessorIndex
+    );
+    if (positionView.status() != CesiumGltf::AccessorViewStatus::Valid) {
+      return;
+    }
+
+    std::optional<SkirtMeshMetadata> skirtMeshMetadata =
+        SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
+    int64_t vertexBegin, vertexEnd;
+    if (skirtMeshMetadata.has_value()) {
+      vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
+      vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
+                  skirtMeshMetadata->noSkirtVerticesCount;
+    } else {
+      vertexBegin = 0;
+      vertexEnd = positionView.size();
+    }
+
+    for (size_t i = 0; i < projections.size(); ++i) {
+      const int uvBufferId = static_cast<int>(buffers.size());
+      CesiumGltf::Buffer& uvBuffer = buffers.emplace_back();
+
+      const int uvBufferViewId = static_cast<int>(bufferViews.size());
+      bufferViews.emplace_back();
+
+      const int uvAccessorId = static_cast<int>(accessors.size());
+      accessors.emplace_back();
+
+      uvBuffer.cesium.data.resize(
+          size_t(positionView.size()) * 2 * sizeof(float)
+      );
+
+      uvBuffer.byteLength = int64_t(uvBuffer.cesium.data.size());
+
+      CesiumGltf::BufferView& uvBufferView =
+          gltf.bufferViews[static_cast<size_t>(uvBufferViewId)];
+      uvBufferView.buffer = uvBufferId;
+      uvBufferView.byteOffset = 0;
+      uvBufferView.byteStride = 2 * sizeof(float);
+      uvBufferView.byteLength = int64_t(uvBuffer.cesium.data.size());
+      uvBufferView.target = CesiumGltf::BufferView::Target::ARRAY_BUFFER;
+
+      CesiumGltf::Accessor& uvAccessor =
+          gltf.accessors[static_cast<size_t>(uvAccessorId)];
+      uvAccessor.bufferView = uvBufferViewId;
+      uvAccessor.byteOffset = 0;
+      uvAccessor.componentType = CesiumGltf::Accessor::ComponentType::FLOAT;
+      uvAccessor.count = int64_t(positionView.size());
+      uvAccessor.type = CesiumGltf::Accessor::Type::VEC2;
+      uvAccessor.min = {1.0, 1.0};
+      uvAccessor.max = {0.0, 0.0};
+
+      [[maybe_unused]] CesiumGltf::AccessorWriter<glm::vec2>& uvWriter =
+          uvWriters.emplace_back(gltf, uvAccessorId);
+      CESIUM_ASSERT(uvWriter.status() == CesiumGltf::AccessorViewStatus::Valid);
+
+      std::string attributeName =
+          std::string(textureCoordinateAttributeBaseName) +
+          std::to_string(firstTextureCoordinateID + int32_t(i));
+      primitive.attributes[attributeName] = uvAccessorId;
+
+      mins.emplace_back(&uvAccessor.min);
+      maxs.emplace_back(&uvAccessor.max);
+    }
+
+    // Generate texture coordinates for each position.
+    for (int64_t positionIndex = 0; positionIndex < positionView.size();
+         ++positionIndex) {
+      // Get the ECEF position
+      const glm::vec3 position = positionView[positionIndex];
+      const glm::dvec3 positionEcef =
+          glm::dvec3(fullTransform * glm::dvec4(position, 1.0));
+
+      // Convert it to cartographic
+      const std::optional<CesiumGeospatial::Cartographic> cartographic =
+          ellipsoid.cartesianToCartographic(positionEcef);
+      if (!cartographic) {
+        for (CesiumGltf::AccessorWriter<glm::vec2>& uvWriter : uvWriters) {
+          uvWriter[positionIndex] = glm::dvec2(0.0, 0.0);
         }
+        continue;
+      }
 
-        const int positionAccessorIndex = positionIt->second;
-        if (positionAccessorIndex < 0 ||
-            positionAccessorIndex >= static_cast<int>(gltf.accessors.size())) {
-          return;
-        }
+      // exclude skirt vertices from bounds
+      if (positionIndex >= vertexBegin && positionIndex < vertexEnd) {
+        computedBounds.expandToIncludePosition(*cartographic);
+      }
 
-        const int32_t firstTextureCoordinateAccessorIndex =
-            positionAccessorsToTextureCoordinateAccessor[static_cast<size_t>(
-                positionAccessorIndex)];
-        if (firstTextureCoordinateAccessorIndex > 0) {
-          // Already created texture coordinates for this projection, so use
-          // them.
-          for (size_t i = 0; i < projections.size(); ++i) {
-            std::string attributeName =
-                std::string(textureCoordinateAttributeBaseName) +
-                std::to_string(firstTextureCoordinateID + int32_t(i));
-            primitive.attributes[attributeName] =
-                firstTextureCoordinateAccessorIndex + int32_t(i);
-          }
-          return;
-        }
+      // Generate texture coordinates at this position for each projection
+      for (size_t projectionIndex = 0; projectionIndex < projections.size();
+           ++projectionIndex) {
+        const CesiumGeospatial::Projection& projection =
+            projections[projectionIndex];
+        const CesiumGeometry::Rectangle& rectangle =
+            rectangles[projectionIndex];
 
-        const glm::dmat4 fullTransform = rootTransform * nodeTransform;
+        // Project it with the raster overlay's projection
+        glm::dvec3 projectedPosition =
+            projectPosition(projection, cartographic.value());
 
-        std::vector<CesiumGltf::Buffer>& buffers = gltf.buffers;
-        std::vector<CesiumGltf::BufferView>& bufferViews = gltf.bufferViews;
-        std::vector<CesiumGltf::Accessor>& accessors = gltf.accessors;
+        double longitude = cartographic.value().longitude;
+        const double latitude = cartographic.value().latitude;
+        const double ellipsoidHeight = cartographic.value().height;
 
-        positionAccessorsToTextureCoordinateAccessor[size_t(
-            positionAccessorIndex)] = int32_t(gltf.accessors.size());
+        // If the position is near the anti-meridian and the projected
+        // position is outside the expected range, try using the equivalent
+        // longitude on the other side of the anti-meridian to see if that
+        // gets us closer.
+        if (glm::abs(
+                glm::abs(cartographic.value().longitude) -
+                CesiumUtility::Math::OnePi
+            ) < CesiumUtility::Math::Epsilon5 &&
+            (projectedPosition.x < rectangle.minimumX ||
+             projectedPosition.x > rectangle.maximumX ||
+             projectedPosition.y < rectangle.minimumY ||
+             projectedPosition.y > rectangle.maximumY)) {
+          const double testLongitude = longitude + longitude < 0.0
+                                           ? CesiumUtility::Math::TwoPi
+                                           : -CesiumUtility::Math::TwoPi;
+          const glm::dvec3 projectedPosition2 = projectPosition(
+              projection,
+              CesiumGeospatial::Cartographic(
+                  testLongitude,
+                  latitude,
+                  ellipsoidHeight
+              )
+          );
 
-        // Create a buffer, bufferView, accessor, and writer for each set of
-        // coordinates. Reserve space for them to avoid unnecessary
-        // reallocations and to prevent earlier buffers from becoming invalid
-        // after we've created an AccessorWriter for it and then add _another_
-        // buffer.
-        std::vector<CesiumGltf::AccessorWriter<glm::vec2>> uvWriters;
-        std::vector<std::vector<double>*> mins;
-        std::vector<std::vector<double>*> maxs;
-        uvWriters.reserve(projections.size());
-        mins.reserve(projections.size());
-        maxs.reserve(projections.size());
-        buffers.reserve(buffers.size() + projections.size());
-        bufferViews.reserve(bufferViews.size() + projections.size());
-        accessors.reserve(accessors.size() + projections.size());
+          const double distance1 =
+              rectangle.computeSignedDistance(glm::dvec2(projectedPosition));
+          const double distance2 =
+              rectangle.computeSignedDistance(glm::dvec2(projectedPosition2));
 
-        const CesiumGltf::AccessorView<glm::vec3> positionView(
-            gltf,
-            positionAccessorIndex);
-        if (positionView.status() != CesiumGltf::AccessorViewStatus::Valid) {
-          return;
-        }
-
-        std::optional<SkirtMeshMetadata> skirtMeshMetadata =
-            SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-        int64_t vertexBegin, vertexEnd;
-        if (skirtMeshMetadata.has_value()) {
-          vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
-          vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
-                      skirtMeshMetadata->noSkirtVerticesCount;
-        } else {
-          vertexBegin = 0;
-          vertexEnd = positionView.size();
-        }
-
-        for (size_t i = 0; i < projections.size(); ++i) {
-          const int uvBufferId = static_cast<int>(buffers.size());
-          CesiumGltf::Buffer& uvBuffer = buffers.emplace_back();
-
-          const int uvBufferViewId = static_cast<int>(bufferViews.size());
-          bufferViews.emplace_back();
-
-          const int uvAccessorId = static_cast<int>(accessors.size());
-          accessors.emplace_back();
-
-          uvBuffer.cesium.data.resize(
-              size_t(positionView.size()) * 2 * sizeof(float));
-
-          uvBuffer.byteLength = int64_t(uvBuffer.cesium.data.size());
-
-          CesiumGltf::BufferView& uvBufferView =
-              gltf.bufferViews[static_cast<size_t>(uvBufferViewId)];
-          uvBufferView.buffer = uvBufferId;
-          uvBufferView.byteOffset = 0;
-          uvBufferView.byteStride = 2 * sizeof(float);
-          uvBufferView.byteLength = int64_t(uvBuffer.cesium.data.size());
-          uvBufferView.target = CesiumGltf::BufferView::Target::ARRAY_BUFFER;
-
-          CesiumGltf::Accessor& uvAccessor =
-              gltf.accessors[static_cast<size_t>(uvAccessorId)];
-          uvAccessor.bufferView = uvBufferViewId;
-          uvAccessor.byteOffset = 0;
-          uvAccessor.componentType = CesiumGltf::Accessor::ComponentType::FLOAT;
-          uvAccessor.count = int64_t(positionView.size());
-          uvAccessor.type = CesiumGltf::Accessor::Type::VEC2;
-          uvAccessor.min = {1.0, 1.0};
-          uvAccessor.max = {0.0, 0.0};
-
-          [[maybe_unused]] CesiumGltf::AccessorWriter<glm::vec2>& uvWriter =
-              uvWriters.emplace_back(gltf, uvAccessorId);
-          CESIUM_ASSERT(
-              uvWriter.status() == CesiumGltf::AccessorViewStatus::Valid);
-
-          std::string attributeName =
-              std::string(textureCoordinateAttributeBaseName) +
-              std::to_string(firstTextureCoordinateID + int32_t(i));
-          primitive.attributes[attributeName] = uvAccessorId;
-
-          mins.emplace_back(&uvAccessor.min);
-          maxs.emplace_back(&uvAccessor.max);
-        }
-
-        // Generate texture coordinates for each position.
-        for (int64_t positionIndex = 0; positionIndex < positionView.size();
-             ++positionIndex) {
-          // Get the ECEF position
-          const glm::vec3 position = positionView[positionIndex];
-          const glm::dvec3 positionEcef =
-              glm::dvec3(fullTransform * glm::dvec4(position, 1.0));
-
-          // Convert it to cartographic
-          const std::optional<CesiumGeospatial::Cartographic> cartographic =
-              ellipsoid.cartesianToCartographic(positionEcef);
-          if (!cartographic) {
-            for (CesiumGltf::AccessorWriter<glm::vec2>& uvWriter : uvWriters) {
-              uvWriter[positionIndex] = glm::dvec2(0.0, 0.0);
-            }
-            continue;
-          }
-
-          // exclude skirt vertices from bounds
-          if (positionIndex >= vertexBegin && positionIndex < vertexEnd) {
-            computedBounds.expandToIncludePosition(*cartographic);
-          }
-
-          // Generate texture coordinates at this position for each projection
-          for (size_t projectionIndex = 0; projectionIndex < projections.size();
-               ++projectionIndex) {
-            const CesiumGeospatial::Projection& projection =
-                projections[projectionIndex];
-            const CesiumGeometry::Rectangle& rectangle =
-                rectangles[projectionIndex];
-
-            // Project it with the raster overlay's projection
-            glm::dvec3 projectedPosition =
-                projectPosition(projection, cartographic.value());
-
-            double longitude = cartographic.value().longitude;
-            const double latitude = cartographic.value().latitude;
-            const double ellipsoidHeight = cartographic.value().height;
-
-            // If the position is near the anti-meridian and the projected
-            // position is outside the expected range, try using the equivalent
-            // longitude on the other side of the anti-meridian to see if that
-            // gets us closer.
-            if (glm::abs(
-                    glm::abs(cartographic.value().longitude) -
-                    CesiumUtility::Math::OnePi) <
-                    CesiumUtility::Math::Epsilon5 &&
-                (projectedPosition.x < rectangle.minimumX ||
-                 projectedPosition.x > rectangle.maximumX ||
-                 projectedPosition.y < rectangle.minimumY ||
-                 projectedPosition.y > rectangle.maximumY)) {
-              const double testLongitude = longitude + longitude < 0.0
-                                               ? CesiumUtility::Math::TwoPi
-                                               : -CesiumUtility::Math::TwoPi;
-              const glm::dvec3 projectedPosition2 = projectPosition(
-                  projection,
-                  CesiumGeospatial::Cartographic(
-                      testLongitude,
-                      latitude,
-                      ellipsoidHeight));
-
-              const double distance1 = rectangle.computeSignedDistance(
-                  glm::dvec2(projectedPosition));
-              const double distance2 = rectangle.computeSignedDistance(
-                  glm::dvec2(projectedPosition2));
-
-              if (distance2 < distance1) {
-                projectedPosition = projectedPosition2;
-                longitude = testLongitude;
-              }
-            }
-
-            // Scale to (0.0, 0.0) at the (minimumX, minimumY) corner, and
-            // (1.0, 1.0) at the (maximumX, maximumY) corner. The coordinates
-            // should stay inside these bounds if the input rectangle actually
-            // bounds the vertices, but we'll clamp to be safe.
-            glm::vec2 uv(
-                CesiumUtility::Math::clamp(
-                    (projectedPosition.x - rectangle.minimumX) /
-                        rectangle.computeWidth(),
-                    0.0,
-                    1.0),
-                CesiumUtility::Math::clamp(
-                    (projectedPosition.y - rectangle.minimumY) /
-                        rectangle.computeHeight(),
-                    0.0,
-                    1.0));
-
-            if (invertVCoordinate) {
-              uv.y = 1.0f - uv.y;
-            }
-
-            mins[projectionIndex]->at(0) =
-                glm::min(mins[projectionIndex]->at(0), double(uv.x));
-            mins[projectionIndex]->at(1) =
-                glm::min(mins[projectionIndex]->at(1), double(uv.y));
-            maxs[projectionIndex]->at(0) =
-                glm::max(maxs[projectionIndex]->at(0), double(uv.x));
-            maxs[projectionIndex]->at(1) =
-                glm::max(maxs[projectionIndex]->at(1), double(uv.y));
-            uvWriters[projectionIndex][positionIndex] = uv;
+          if (distance2 < distance1) {
+            projectedPosition = projectedPosition2;
+            longitude = testLongitude;
           }
         }
-      };
+
+        // Scale to (0.0, 0.0) at the (minimumX, minimumY) corner, and
+        // (1.0, 1.0) at the (maximumX, maximumY) corner. The coordinates
+        // should stay inside these bounds if the input rectangle actually
+        // bounds the vertices, but we'll clamp to be safe.
+        glm::vec2 uv(
+            CesiumUtility::Math::clamp(
+                (projectedPosition.x - rectangle.minimumX) /
+                    rectangle.computeWidth(),
+                0.0,
+                1.0
+            ),
+            CesiumUtility::Math::clamp(
+                (projectedPosition.y - rectangle.minimumY) /
+                    rectangle.computeHeight(),
+                0.0,
+                1.0
+            )
+        );
+
+        if (invertVCoordinate) {
+          uv.y = 1.0f - uv.y;
+        }
+
+        mins[projectionIndex]->at(0) =
+            glm::min(mins[projectionIndex]->at(0), double(uv.x));
+        mins[projectionIndex]->at(1) =
+            glm::min(mins[projectionIndex]->at(1), double(uv.y));
+        maxs[projectionIndex]->at(0) =
+            glm::max(maxs[projectionIndex]->at(0), double(uv.x));
+        maxs[projectionIndex]->at(1) =
+            glm::max(maxs[projectionIndex]->at(1), double(uv.y));
+        uvWriters[projectionIndex][positionIndex] = uv;
+      }
+    }
+  };
 
   model.forEachPrimitiveInScene(-1, createTextureCoordinatesForPrimitive);
 
@@ -336,7 +347,8 @@ bool upsamplePrimitiveForRasterOverlays(
     bool hasInvertedVCoordinate,
     const std::string_view& textureCoordinateAttributeBaseName,
     int32_t textureCoordinateIndex,
-    const CesiumGeospatial::Ellipsoid& ellipsoid);
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+);
 
 struct FloatVertexAttribute {
   const std::vector<std::byte>& buffer;
@@ -355,7 +367,8 @@ void addClippedPolygon(
     std::vector<uint32_t>& vertexMap,
     std::vector<uint32_t>& clipVertexToIndices,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
-    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult);
+    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult
+);
 
 void addEdge(
     EdgeIndices& edgeIndices,
@@ -367,7 +380,8 @@ void addEdge(
     const AccessorView<glm::vec2>& uvs,
     const std::vector<uint32_t>& clipVertexToIndices,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
-    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult);
+    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult
+);
 
 void addSkirt(
     std::vector<float>& output,
@@ -378,7 +392,8 @@ void addSkirt(
     double skirtHeight,
     int64_t vertexSizeFloats,
     int32_t positionAttributeIndex,
-    const CesiumGeospatial::Ellipsoid& ellipsoid);
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+);
 
 void addSkirts(
     std::vector<float>& output,
@@ -391,7 +406,8 @@ void addSkirts(
     int64_t vertexSizeFloats,
     int32_t positionAttributeIndex,
     bool hasInvertedVCoordinate,
-    const CesiumGeospatial::Ellipsoid& ellipsoid);
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+);
 
 bool isWestChild(CesiumGeometry::UpsampledQuadtreeNode childID) noexcept {
   return (childID.tileID.x % 2) == 0;
@@ -412,7 +428,8 @@ RasterOverlayUtilities::upsampleGltfForRasterOverlays(
     bool hasInvertedVCoordinate,
     const std::string_view& textureCoordinateAttributeBaseName,
     int32_t textureCoordinateIndex,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   CESIUM_TRACE("upsampleGltfForRasterOverlays");
   Model result;
 
@@ -474,7 +491,8 @@ RasterOverlayUtilities::upsampleGltfForRasterOverlays(
           hasInvertedVCoordinate,
           textureCoordinateAttributeBaseName,
           textureCoordinateIndex,
-          ellipsoid);
+          ellipsoid
+      );
 
       // We're assuming here that nothing references primitives by index, so we
       // can remove them without any drama.
@@ -495,7 +513,8 @@ RasterOverlayUtilities::upsampleGltfForRasterOverlays(
     double maximumScreenSpaceError,
     const CesiumGeospatial::Projection& projection,
     const CesiumGeometry::Rectangle& rectangle,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   // We're aiming to estimate the maximum number of pixels (in each projected
   // direction) the tile will occupy on the screen. They will be determined by
   // the tile's geometric error, because when less error is needed (i.e. the
@@ -530,13 +549,15 @@ RasterOverlayUtilities::upsampleGltfForRasterOverlays(
       projection,
       rectangle,
       heightForSizeEstimation,
-      ellipsoid);
+      ellipsoid
+  );
   return diameters * maximumScreenSpaceError / geometricError;
 }
 
 /*static*/ glm::dvec4 RasterOverlayUtilities::computeTranslationAndScale(
     const Rectangle& geometryRectangle,
-    const Rectangle& overlayRectangle) {
+    const Rectangle& overlayRectangle
+) {
   const double geometryWidth = geometryRectangle.computeWidth();
   const double geometryHeight = geometryRectangle.computeHeight();
 
@@ -546,7 +567,8 @@ RasterOverlayUtilities::upsampleGltfForRasterOverlays(
       (scaleX * (geometryRectangle.minimumX - overlayRectangle.minimumX)) /
           geometryWidth,
       (scaleY * (geometryRectangle.minimumY - overlayRectangle.minimumY)) /
-          geometryHeight);
+          geometryHeight
+  );
   glm::dvec2 scale = glm::dvec2(scaleX, scaleY);
 
   return glm::dvec4(translation, scale);
@@ -558,7 +580,8 @@ void copyVertexAttributes(
     std::vector<FloatVertexAttribute>& vertexAttributes,
     const CesiumGeometry::TriangleClipVertex& vertex,
     std::vector<float>& output,
-    bool skipMinMaxUpdate = false) {
+    bool skipMinMaxUpdate = false
+) {
   struct Operation {
     std::vector<FloatVertexAttribute>& vertexAttributes;
     std::vector<float>& output;
@@ -568,17 +591,20 @@ void copyVertexAttributes(
       for (FloatVertexAttribute& attribute : vertexAttributes) {
         const float* pInput = reinterpret_cast<const float*>(
             attribute.buffer.data() + attribute.offset +
-            attribute.stride * vertexIndex);
+            attribute.stride * vertexIndex
+        );
         for (int32_t i = 0; i < attribute.numberOfFloatsPerVertex; ++i) {
           const float value = *pInput;
           output.push_back(value);
           if (!skipMinMaxUpdate) {
             attribute.minimums[static_cast<size_t>(i)] = glm::min(
                 attribute.minimums[static_cast<size_t>(i)],
-                static_cast<double>(value));
+                static_cast<double>(value)
+            );
             attribute.maximums[static_cast<size_t>(i)] = glm::max(
                 attribute.maximums[static_cast<size_t>(i)],
-                static_cast<double>(value));
+                static_cast<double>(value)
+            );
           }
           ++pInput;
         }
@@ -589,20 +615,24 @@ void copyVertexAttributes(
       for (FloatVertexAttribute& attribute : vertexAttributes) {
         const float* pInput0 = reinterpret_cast<const float*>(
             attribute.buffer.data() + attribute.offset +
-            attribute.stride * vertex.first);
+            attribute.stride * vertex.first
+        );
         const float* pInput1 = reinterpret_cast<const float*>(
             attribute.buffer.data() + attribute.offset +
-            attribute.stride * vertex.second);
+            attribute.stride * vertex.second
+        );
         for (int32_t i = 0; i < attribute.numberOfFloatsPerVertex; ++i) {
           const float value = glm::mix(*pInput0, *pInput1, vertex.t);
           output.push_back(value);
           if (!skipMinMaxUpdate) {
             attribute.minimums[static_cast<size_t>(i)] = glm::min(
                 attribute.minimums[static_cast<size_t>(i)],
-                static_cast<double>(value));
+                static_cast<double>(value)
+            );
             attribute.maximums[static_cast<size_t>(i)] = glm::max(
                 attribute.maximums[static_cast<size_t>(i)],
-                static_cast<double>(value));
+                static_cast<double>(value)
+            );
           }
           ++pInput0;
           ++pInput1;
@@ -618,7 +648,8 @@ void copyVertexAttributes(
     std::vector<FloatVertexAttribute>& vertexAttributes,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
     const CesiumGeometry::TriangleClipVertex& vertex,
-    std::vector<float>& output) {
+    std::vector<float>& output
+) {
   struct Operation {
     std::vector<FloatVertexAttribute>& vertexAttributes;
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements;
@@ -629,7 +660,8 @@ void copyVertexAttributes(
         copyVertexAttributes(
             vertexAttributes,
             complements[static_cast<size_t>(~vertexIndex)],
-            output);
+            output
+        );
       } else {
         copyVertexAttributes(vertexAttributes, vertexIndex, output);
       }
@@ -644,7 +676,8 @@ void copyVertexAttributes(
             vertexAttributes,
             complements[static_cast<size_t>(~vertex.first)],
             output,
-            true);
+            true
+        );
       } else {
         copyVertexAttributes(vertexAttributes, vertex.first, output, true);
       }
@@ -656,7 +689,8 @@ void copyVertexAttributes(
             vertexAttributes,
             complements[static_cast<size_t>(~vertex.second)],
             output,
-            true);
+            true
+        );
       } else {
         copyVertexAttributes(vertexAttributes, vertex.second, output, true);
       }
@@ -669,10 +703,12 @@ void copyVertexAttributes(
           output[outputIndex0] = value;
           attribute.minimums[static_cast<size_t>(i)] = glm::min(
               attribute.minimums[static_cast<size_t>(i)],
-              static_cast<double>(value));
+              static_cast<double>(value)
+          );
           attribute.maximums[static_cast<size_t>(i)] = glm::max(
               attribute.maximums[static_cast<size_t>(i)],
-              static_cast<double>(value));
+              static_cast<double>(value)
+          );
           ++outputIndex0;
           ++outputIndex1;
         }
@@ -682,8 +718,10 @@ void copyVertexAttributes(
       output.erase(
           output.begin() +
               static_cast<std::vector<float>::iterator::difference_type>(
-                  outputIndex0),
-          output.end());
+                  outputIndex0
+              ),
+          output.end()
+      );
     }
   };
 
@@ -693,13 +731,15 @@ void copyVertexAttributes(
           complements,
           output,
       },
-      vertex);
+      vertex
+  );
 }
 
 template <class T>
 T getVertexValue(
     const AccessorView<T>& accessor,
-    const CesiumGeometry::TriangleClipVertex& vertex) {
+    const CesiumGeometry::TriangleClipVertex& vertex
+) {
   struct Operation {
     const AccessorView<T>& accessor;
 
@@ -719,7 +759,8 @@ template <class T>
 T getVertexValue(
     const AccessorView<T>& accessor,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
-    const CesiumGeometry::TriangleClipVertex& vertex) {
+    const CesiumGeometry::TriangleClipVertex& vertex
+) {
   struct Operation {
     const AccessorView<T>& accessor;
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements;
@@ -729,7 +770,8 @@ T getVertexValue(
         return getVertexValue(
             accessor,
             complements,
-            complements[static_cast<size_t>(~vertexIndex)]);
+            complements[static_cast<size_t>(~vertexIndex)]
+        );
       }
 
       return accessor[vertexIndex];
@@ -741,7 +783,8 @@ T getVertexValue(
         v0 = getVertexValue(
             accessor,
             complements,
-            complements[static_cast<size_t>(~vertex.first)]);
+            complements[static_cast<size_t>(~vertex.first)]
+        );
       } else {
         v0 = accessor[vertex.first];
       }
@@ -751,7 +794,8 @@ T getVertexValue(
         v1 = getVertexValue(
             accessor,
             complements,
-            complements[static_cast<size_t>(~vertex.second)]);
+            complements[static_cast<size_t>(~vertex.second)]
+        );
       } else {
         v1 = accessor[vertex.second];
       }
@@ -773,7 +817,8 @@ bool upsamplePrimitiveForRasterOverlays(
     bool hasInvertedVCoordinate,
     const std::string_view& textureCoordinateAttributeBaseName,
     int32_t textureCoordinateIndex,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   CESIUM_TRACE("upsamplePrimitiveForRasterOverlays");
 
   // Add up the per-vertex size of all attributes and create buffers,
@@ -877,10 +922,12 @@ bool upsamplePrimitiveForRasterOverlays(
         attribute.second,
         std::vector<double>(
             static_cast<size_t>(accessorComponentElements),
-            std::numeric_limits<double>::max()),
+            std::numeric_limits<double>::max()
+        ),
         std::vector<double>(
             static_cast<size_t>(accessorComponentElements),
-            std::numeric_limits<double>::lowest()),
+            std::numeric_limits<double>::lowest()
+        ),
     });
 
     // get position to be used to create skirts later
@@ -928,7 +975,8 @@ bool upsamplePrimitiveForRasterOverlays(
   // Maps old (parentModel) vertex indices to new (model) vertex indices.
   std::vector<uint32_t> vertexMap(
       size_t(uvView.size()),
-      std::numeric_limits<uint32_t>::max());
+      std::numeric_limits<uint32_t>::max()
+  );
 
   // std::vector<unsigned char> newVertexBuffer(vertexSizeFloats *
   // sizeof(float)); gsl::span<float>
@@ -958,7 +1006,8 @@ bool upsamplePrimitiveForRasterOverlays(
         uv0.x,
         uv1.x,
         uv2.x,
-        clippedA);
+        clippedA
+    );
 
     if (clippedA.size() < 3) {
       // No part of this triangle is inside the target tile.
@@ -977,7 +1026,8 @@ bool upsamplePrimitiveForRasterOverlays(
         getVertexValue(uvView, clippedA[0]).y,
         getVertexValue(uvView, clippedA[1]).y,
         getVertexValue(uvView, clippedA[2]).y,
-        clippedB);
+        clippedB
+    );
 
     // Add the clipped triangle or quad, if any
     addClippedPolygon(
@@ -987,7 +1037,8 @@ bool upsamplePrimitiveForRasterOverlays(
         vertexMap,
         clipVertexToIndices,
         clippedA,
-        clippedB);
+        clippedB
+    );
     if (hasSkirt) {
       addEdge(
           edgeIndices,
@@ -999,7 +1050,8 @@ bool upsamplePrimitiveForRasterOverlays(
           uvView,
           clipVertexToIndices,
           clippedA,
-          clippedB);
+          clippedB
+      );
     }
 
     // If the East-West clip yielded a quad (rather than a triangle), clip the
@@ -1016,7 +1068,8 @@ bool upsamplePrimitiveForRasterOverlays(
           getVertexValue(uvView, clippedA[0]).y,
           getVertexValue(uvView, clippedA[2]).y,
           getVertexValue(uvView, clippedA[3]).y,
-          clippedB);
+          clippedB
+      );
 
       // Add the clipped triangle or quad, if any
       addClippedPolygon(
@@ -1026,7 +1079,8 @@ bool upsamplePrimitiveForRasterOverlays(
           vertexMap,
           clipVertexToIndices,
           clippedA,
-          clippedB);
+          clippedB
+      );
       if (hasSkirt) {
         addEdge(
             edgeIndices,
@@ -1038,7 +1092,8 @@ bool upsamplePrimitiveForRasterOverlays(
             uvView,
             clipVertexToIndices,
             clippedA,
-            clippedB);
+            clippedB
+        );
       }
     }
   }
@@ -1065,7 +1120,8 @@ bool upsamplePrimitiveForRasterOverlays(
         vertexSizeFloats,
         positionAttributeIndex,
         hasInvertedVCoordinate,
-        ellipsoid);
+        ellipsoid
+    );
   }
 
   if (newVertexFloats.empty() || indices.empty()) {
@@ -1180,7 +1236,8 @@ uint32_t getOrCreateVertex(
     std::vector<FloatVertexAttribute>& attributes,
     std::vector<uint32_t>& vertexMap,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
-    const CesiumGeometry::TriangleClipVertex& clipVertex) {
+    const CesiumGeometry::TriangleClipVertex& clipVertex
+) {
   const int* pIndex = std::get_if<int>(&clipVertex);
   if (pIndex) {
     if (*pIndex < 0) {
@@ -1189,7 +1246,8 @@ uint32_t getOrCreateVertex(
           attributes,
           vertexMap,
           complements,
-          complements[static_cast<size_t>(~(*pIndex))]);
+          complements[static_cast<size_t>(~(*pIndex))]
+      );
     }
 
     const uint32_t existingIndex = vertexMap[static_cast<size_t>(*pIndex)];
@@ -1217,7 +1275,8 @@ void addClippedPolygon(
     std::vector<uint32_t>& vertexMap,
     std::vector<uint32_t>& clipVertexToIndices,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
-    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult) {
+    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult
+) {
   if (clipResult.size() < 3) {
     return;
   }
@@ -1227,19 +1286,22 @@ void addClippedPolygon(
       attributes,
       vertexMap,
       complements,
-      clipResult[0]);
+      clipResult[0]
+  );
   const uint32_t i1 = getOrCreateVertex(
       output,
       attributes,
       vertexMap,
       complements,
-      clipResult[1]);
+      clipResult[1]
+  );
   const uint32_t i2 = getOrCreateVertex(
       output,
       attributes,
       vertexMap,
       complements,
-      clipResult[2]);
+      clipResult[2]
+  );
 
   indices.push_back(i0);
   indices.push_back(i1);
@@ -1255,7 +1317,8 @@ void addClippedPolygon(
         attributes,
         vertexMap,
         complements,
-        clipResult[3]);
+        clipResult[3]
+    );
 
     indices.push_back(i0);
     indices.push_back(i2);
@@ -1275,28 +1338,32 @@ void addEdge(
     const AccessorView<glm::vec2>& uvs,
     const std::vector<uint32_t>& clipVertexToIndices,
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
-    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult) {
+    const std::vector<CesiumGeometry::TriangleClipVertex>& clipResult
+) {
   for (uint32_t i = 0; i < clipVertexToIndices.size(); ++i) {
     const glm::vec2 uv = getVertexValue(uvs, complements, clipResult[i]);
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.x,
             0.0,
-            CesiumUtility::Math::Epsilon4)) {
+            CesiumUtility::Math::Epsilon4
+        )) {
       edgeIndices.west.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
     }
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.x,
             1.0,
-            CesiumUtility::Math::Epsilon4)) {
+            CesiumUtility::Math::Epsilon4
+        )) {
       edgeIndices.east.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
     }
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.x,
             thresholdU,
-            CesiumUtility::Math::Epsilon4)) {
+            CesiumUtility::Math::Epsilon4
+        )) {
       if (keepAboveU) {
         edgeIndices.west.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
       } else {
@@ -1307,21 +1374,24 @@ void addEdge(
     if (CesiumUtility::Math::equalsEpsilon(
             uv.y,
             invertV ? 1.0f : 0.0f,
-            CesiumUtility::Math::Epsilon4)) {
+            CesiumUtility::Math::Epsilon4
+        )) {
       edgeIndices.south.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
     }
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.y,
             invertV ? 0.0f : 1.0f,
-            CesiumUtility::Math::Epsilon4)) {
+            CesiumUtility::Math::Epsilon4
+        )) {
       edgeIndices.north.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
     }
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.y,
             thresholdV,
-            CesiumUtility::Math::Epsilon4)) {
+            CesiumUtility::Math::Epsilon4
+        )) {
       if (keepAboveV) {
         edgeIndices.south.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
       } else {
@@ -1340,7 +1410,8 @@ void addSkirt(
     double skirtHeight,
     int64_t vertexSizeFloats,
     int32_t positionAttributeIndex,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   uint32_t newEdgeIndex = uint32_t(output.size() / size_t(vertexSizeFloats));
   for (size_t i = 0; i < edgeIndices.size(); ++i) {
     const uint32_t edgeIdx = edgeIndices[i];
@@ -1371,10 +1442,12 @@ void addSkirt(
           output.push_back(output[valueIndex + c]);
           attribute.minimums[c] = glm::min(
               attribute.minimums[c],
-              static_cast<double>(output.back()));
+              static_cast<double>(output.back())
+          );
           attribute.maximums[c] = glm::max(
               attribute.maximums[c],
-              static_cast<double>(output.back()));
+              static_cast<double>(output.back())
+          );
         }
       }
 
@@ -1407,7 +1480,8 @@ void addSkirts(
     int64_t vertexSizeFloats,
     int32_t positionAttributeIndex,
     bool hasInvertedVCoordinate,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   CESIUM_TRACE("addSkirts");
 
   const glm::dvec3 center = currentSkirt.meshCenter;
@@ -1431,12 +1505,14 @@ void addSkirts(
       edgeIndices.west.end(),
       [](const EdgeVertex& lhs, const EdgeVertex& rhs) {
         return lhs.uv.y < rhs.uv.y;
-      });
+      }
+  );
   std::transform(
       edgeIndices.west.begin(),
       edgeIndices.west.end(),
       sortEdgeIndices.begin(),
-      [](const EdgeVertex& v) { return v.index; });
+      [](const EdgeVertex& v) { return v.index; }
+  );
   addSkirt(
       output,
       indices,
@@ -1446,7 +1522,8 @@ void addSkirts(
       currentSkirt.skirtWestHeight,
       vertexSizeFloats,
       positionAttributeIndex,
-      ellipsoid);
+      ellipsoid
+  );
 
   // south
   if (isSouthChild(childID)) {
@@ -1461,19 +1538,22 @@ void addSkirts(
       edgeIndices.south.end(),
       [](const EdgeVertex& lhs, const EdgeVertex& rhs) {
         return lhs.uv.x > rhs.uv.x;
-      });
+      }
+  );
   if (hasInvertedVCoordinate) {
     std::transform(
         edgeIndices.south.rbegin(),
         edgeIndices.south.rend(),
         sortEdgeIndices.begin(),
-        [](const EdgeVertex& v) { return v.index; });
+        [](const EdgeVertex& v) { return v.index; }
+    );
   } else {
     std::transform(
         edgeIndices.south.begin(),
         edgeIndices.south.end(),
         sortEdgeIndices.begin(),
-        [](const EdgeVertex& v) { return v.index; });
+        [](const EdgeVertex& v) { return v.index; }
+    );
   }
 
   addSkirt(
@@ -1485,7 +1565,8 @@ void addSkirts(
       currentSkirt.skirtSouthHeight,
       vertexSizeFloats,
       positionAttributeIndex,
-      ellipsoid);
+      ellipsoid
+  );
 
   // east
   if (!isWestChild(childID)) {
@@ -1500,12 +1581,14 @@ void addSkirts(
       edgeIndices.east.end(),
       [](const EdgeVertex& lhs, const EdgeVertex& rhs) {
         return lhs.uv.y > rhs.uv.y;
-      });
+      }
+  );
   std::transform(
       edgeIndices.east.begin(),
       edgeIndices.east.end(),
       sortEdgeIndices.begin(),
-      [](const EdgeVertex& v) { return v.index; });
+      [](const EdgeVertex& v) { return v.index; }
+  );
   addSkirt(
       output,
       indices,
@@ -1515,7 +1598,8 @@ void addSkirts(
       currentSkirt.skirtEastHeight,
       vertexSizeFloats,
       positionAttributeIndex,
-      ellipsoid);
+      ellipsoid
+  );
 
   // north
   if (!isSouthChild(childID)) {
@@ -1530,19 +1614,22 @@ void addSkirts(
       edgeIndices.north.end(),
       [](const EdgeVertex& lhs, const EdgeVertex& rhs) {
         return lhs.uv.x < rhs.uv.x;
-      });
+      }
+  );
   if (hasInvertedVCoordinate) {
     std::transform(
         edgeIndices.north.rbegin(),
         edgeIndices.north.rend(),
         sortEdgeIndices.begin(),
-        [](const EdgeVertex& v) { return v.index; });
+        [](const EdgeVertex& v) { return v.index; }
+    );
   } else {
     std::transform(
         edgeIndices.north.begin(),
         edgeIndices.north.end(),
         sortEdgeIndices.begin(),
-        [](const EdgeVertex& v) { return v.index; });
+        [](const EdgeVertex& v) { return v.index; }
+    );
   }
 
   addSkirt(
@@ -1554,7 +1641,8 @@ void addSkirts(
       currentSkirt.skirtNorthHeight,
       vertexSizeFloats,
       positionAttributeIndex,
-      ellipsoid);
+      ellipsoid
+  );
 }
 
 bool upsamplePrimitiveForRasterOverlays(
@@ -1566,7 +1654,8 @@ bool upsamplePrimitiveForRasterOverlays(
     bool hasInvertedVCoordinate,
     const std::string_view& textureCoordinateAttributeBaseName,
     int32_t textureCoordinateIndex,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   if (primitive.mode != MeshPrimitive::Mode::TRIANGLES ||
       primitive.indices < 0 ||
       primitive.indices >= static_cast<int>(parentModel.accessors.size())) {
@@ -1588,10 +1677,9 @@ bool upsamplePrimitiveForRasterOverlays(
         hasInvertedVCoordinate,
         textureCoordinateAttributeBaseName,
         textureCoordinateIndex,
-        ellipsoid);
-  } else if (
-      indicesAccessorGltf.componentType ==
-      Accessor::ComponentType::UNSIGNED_SHORT) {
+        ellipsoid
+    );
+  } else if (indicesAccessorGltf.componentType == Accessor::ComponentType::UNSIGNED_SHORT) {
     return upsamplePrimitiveForRasterOverlays<uint16_t>(
         parentModel,
         model,
@@ -1601,10 +1689,9 @@ bool upsamplePrimitiveForRasterOverlays(
         hasInvertedVCoordinate,
         textureCoordinateAttributeBaseName,
         textureCoordinateIndex,
-        ellipsoid);
-  } else if (
-      indicesAccessorGltf.componentType ==
-      Accessor::ComponentType::UNSIGNED_INT) {
+        ellipsoid
+    );
+  } else if (indicesAccessorGltf.componentType == Accessor::ComponentType::UNSIGNED_INT) {
     return upsamplePrimitiveForRasterOverlays<uint32_t>(
         parentModel,
         model,
@@ -1614,7 +1701,8 @@ bool upsamplePrimitiveForRasterOverlays(
         hasInvertedVCoordinate,
         textureCoordinateAttributeBaseName,
         textureCoordinateIndex,
-        ellipsoid);
+        ellipsoid
+    );
   }
 
   return false;
@@ -1626,7 +1714,8 @@ bool upsamplePrimitiveForRasterOverlays(
 int32_t copyBufferView(
     const Model& parentModel,
     int32_t parentBufferViewId,
-    Model& result) {
+    Model& result
+) {
 
   // Check invalid buffer view.
   if (parentBufferViewId < 0 || static_cast<size_t>(parentBufferViewId) >=
@@ -1638,9 +1727,8 @@ int32_t copyBufferView(
       parentModel.bufferViews[static_cast<size_t>(parentBufferViewId)];
 
   // Check invalid buffer.
-  if (parentBufferView.buffer < 0 ||
-      static_cast<size_t>(parentBufferView.buffer) >=
-          parentModel.buffers.size()) {
+  if (parentBufferView.buffer < 0 || static_cast<size_t>(parentBufferView.buffer
+                                     ) >= parentModel.buffers.size()) {
     // Should we return a valid buffer view with an invalid buffer instead?
     return -1;
   }
@@ -1656,7 +1744,8 @@ int32_t copyBufferView(
       buffer.cesium.data.data(),
       &parentBuffer.cesium
            .data[static_cast<size_t>(parentBufferView.byteOffset)],
-      static_cast<size_t>(parentBufferView.byteLength));
+      static_cast<size_t>(parentBufferView.byteLength)
+  );
 
   size_t bufferViewId = result.bufferViews.size();
   BufferView& bufferView = result.bufferViews.emplace_back();

@@ -21,17 +21,20 @@ public:
   static inline constexpr const char* ExtensionName = "EXT_mesh_gpu_instancing";
 
   ExtensionExtMeshGpuInstancingJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionExtMeshGpuInstancing* pObject);
+      CesiumGltf::ExtensionExtMeshGpuInstancing* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -39,7 +42,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionExtMeshGpuInstancing(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionExtMeshGpuInstancing& o);
+      CesiumGltf::ExtensionExtMeshGpuInstancing& o
+  );
 
 private:
   CesiumGltf::ExtensionExtMeshGpuInstancing* _pObject = nullptr;

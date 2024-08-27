@@ -58,12 +58,14 @@ TEST_CASE("Rectangle::computeSignedDistance") {
       TestCase{
           negative,
           glm::dvec2(-35.0, -45.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)});
+          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)}
+  );
 
   CHECK(CesiumUtility::Math::equalsEpsilon(
       testCase.rectangle.computeSignedDistance(testCase.position),
       testCase.expectedResult,
-      CesiumUtility::Math::Epsilon13));
+      CesiumUtility::Math::Epsilon13
+  ));
 }
 
 TEST_CASE("Rectangle::computeUnion") {

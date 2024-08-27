@@ -53,7 +53,8 @@ public:
       uint32_t minimumLevel,
       uint32_t maximumLevel,
       uint32_t imageWidth,
-      uint32_t imageHeight) noexcept;
+      uint32_t imageHeight
+  ) noexcept;
 
   /**
    * @brief Returns the minimum tile level of this instance.
@@ -94,7 +95,8 @@ public:
    */
   uint32_t computeLevelFromTargetScreenPixels(
       const CesiumGeometry::Rectangle& rectangle,
-      const glm::dvec2& screenPixels);
+      const glm::dvec2& screenPixels
+  );
 
 protected:
   /**
@@ -132,7 +134,8 @@ private:
   std::vector<CesiumAsync::SharedFuture<LoadedQuadtreeImage>>
   mapRasterTilesToGeometryTile(
       const CesiumGeometry::Rectangle& geometryRectangle,
-      const glm::dvec2 targetScreenPixels);
+      const glm::dvec2 targetScreenPixels
+  );
 
   void unloadCachedTiles();
 
@@ -146,12 +149,14 @@ private:
 
   static CombinedImageMeasurements measureCombinedImage(
       const CesiumGeometry::Rectangle& targetRectangle,
-      const std::vector<LoadedQuadtreeImage>& images);
+      const std::vector<LoadedQuadtreeImage>& images
+  );
 
   static LoadedRasterOverlayImage combineImages(
       const CesiumGeometry::Rectangle& targetRectangle,
       const CesiumGeospatial::Projection& projection,
-      std::vector<LoadedQuadtreeImage>&& images);
+      std::vector<LoadedQuadtreeImage>&& images
+  );
 
   uint32_t _minimumLevel;
   uint32_t _maximumLevel;

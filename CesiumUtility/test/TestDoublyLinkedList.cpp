@@ -16,7 +16,8 @@ public:
 
 void assertOrder(
     DoublyLinkedList<TestNode, &TestNode::links>& linkedList,
-    const std::vector<uint32_t>& expectedOrder) {
+    const std::vector<uint32_t>& expectedOrder
+) {
   CHECK(linkedList.size() == expectedOrder.size());
   if (expectedOrder.size() > 0) {
     REQUIRE(linkedList.head() != nullptr);

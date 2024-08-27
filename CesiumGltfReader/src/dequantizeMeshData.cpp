@@ -27,7 +27,8 @@ void normalizeQuantized(
     float* fPtr,
     int64_t count,
     const std::byte* bPtr,
-    int64_t stride) {
+    int64_t stride
+) {
   for (int i = 0; i < count; i++, bPtr += stride) {
     for (unsigned int j = 0; j < N; j++) {
       *fPtr++ = intToFloat<T>(reinterpret_cast<const T*>(bPtr)[j]);
@@ -40,7 +41,8 @@ void castQuantizedToFloat(
     float* fPtr,
     int64_t count,
     const std::byte* bPtr,
-    int64_t stride) {
+    int64_t stride
+) {
   for (int i = 0; i < count; i++, bPtr += stride) {
     for (unsigned int j = 0; j < N; j++) {
       *fPtr++ = static_cast<float>(reinterpret_cast<const T*>(bPtr)[j]);
@@ -72,7 +74,8 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
 
   if (static_cast<size_t>(
           pBufferView->byteOffset + accessor.byteOffset +
-          accessor.count * byteStride) > pBuffer->cesium.data.size() ||
+          accessor.count * byteStride
+      ) > pBuffer->cesium.data.size() ||
       static_cast<int64_t>(sizeof(T) * N) > byteStride) {
     return;
   }
@@ -93,7 +96,8 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
         reinterpret_cast<float*>(data.data()),
         accessor.count,
         bPtr,
-        byteStride);
+        byteStride
+    );
     for (double& d : accessor.min) {
       d = intToFloat<T>(static_cast<T>(d));
     }
@@ -105,7 +109,8 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
         reinterpret_cast<float*>(data.data()),
         accessor.count,
         bPtr,
-        byteStride);
+        byteStride
+    );
   }
   accessor.componentType = AccessorSpec::ComponentType::FLOAT;
   accessor.byteOffset = 0;

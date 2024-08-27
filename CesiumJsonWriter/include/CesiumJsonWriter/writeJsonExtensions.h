@@ -10,7 +10,8 @@ template <typename TExtended>
 void writeJsonExtensions(
     const TExtended& obj,
     JsonWriter& jsonWriter,
-    const ExtensionWriterContext& context) {
+    const ExtensionWriterContext& context
+) {
   if (obj.extensions.empty()) {
     return;
   }
@@ -19,14 +20,16 @@ void writeJsonExtensions(
     auto handler = context.createExtensionHandler(
         item.first,
         item.second,
-        TExtended::TypeName);
+        TExtended::TypeName
+    );
     if (!handler) {
       if (context.getExtensionState(item.first) != ExtensionState::Disabled) {
         jsonWriter.emplaceWarning(fmt::format(
             "Encountered unregistered extension {}. This extension will be "
             "ignored. To silence this warning, disable the extension with "
             "ExtensionWriterContext::setExtensionState.",
-            item.first));
+            item.first
+        ));
       }
       continue;
     }

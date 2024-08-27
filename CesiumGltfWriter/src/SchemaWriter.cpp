@@ -22,7 +22,8 @@ SchemaWriter::getExtensions() const {
 
 SchemaWriterResult SchemaWriter::writeSchema(
     const CesiumGltf::Schema& schema,
-    const SchemaWriterOptions& options) const {
+    const SchemaWriterOptions& options
+) const {
   CESIUM_TRACE("SchemaWriter::writeSchema");
 
   const CesiumJsonWriter::ExtensionWriterContext& context =

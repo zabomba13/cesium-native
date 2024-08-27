@@ -17,7 +17,8 @@ TEST_CASE("ImageManipulation::unsafeBlitImage entire image") {
 
   std::vector<std::byte> target(
       (imagePixels + bufferPixels) * bytesPerPixel,
-      std::byte(1));
+      std::byte(1)
+  );
   std::vector<std::byte> source(imagePixels * bytesPerPixel, std::byte(2));
   ImageManipulation::unsafeBlitImage(
       target.data() + bytesPerPixel,
@@ -26,7 +27,8 @@ TEST_CASE("ImageManipulation::unsafeBlitImage entire image") {
       width * bytesPerPixel,
       width,
       height,
-      bytesPerPixel);
+      bytesPerPixel
+  );
 
   // Verify we haven't overflowed the target
   CHECK(target[0] == std::byte(1));
@@ -53,10 +55,12 @@ TEST_CASE("ImageManipulation::unsafeBlitImage subset of target") {
 
   std::vector<std::byte> target(
       (targetImagePixels + bufferPixels) * bytesPerPixel,
-      std::byte(1));
+      std::byte(1)
+  );
   std::vector<std::byte> source(
       sourceImagePixels * bytesPerPixel,
-      std::byte(2));
+      std::byte(2)
+  );
   ImageManipulation::unsafeBlitImage(
       target.data() + bytesPerPixel,
       targetWidth * bytesPerPixel,
@@ -64,7 +68,8 @@ TEST_CASE("ImageManipulation::unsafeBlitImage subset of target") {
       sourceWidth * bytesPerPixel,
       sourceWidth,
       sourceHeight,
-      bytesPerPixel);
+      bytesPerPixel
+  );
 
   // Verify we haven't overflowed the target
   CHECK(target[0] == std::byte(1));
@@ -97,10 +102,12 @@ TEST_CASE("ImageManipulation::unsafeBlitImage subset of source") {
 
   std::vector<std::byte> target(
       (targetImagePixels + bufferPixels) * bytesPerPixel,
-      std::byte(1));
+      std::byte(1)
+  );
   std::vector<std::byte> source(
       sourceImagePixels * bytesPerPixel,
-      std::byte(2));
+      std::byte(2)
+  );
   ImageManipulation::unsafeBlitImage(
       target.data() + bytesPerPixel,
       targetWidth * bytesPerPixel,
@@ -108,7 +115,8 @@ TEST_CASE("ImageManipulation::unsafeBlitImage subset of source") {
       sourceTotalWidth * bytesPerPixel,
       sourceWidth,
       sourceHeight,
-      bytesPerPixel);
+      bytesPerPixel
+  );
 
   // Verify we haven't overflowed the target
   CHECK(target[0] == std::byte(1));
@@ -136,8 +144,10 @@ TEST_CASE("ImageManipulation::blitImage") {
   target.pixelData = std::vector<std::byte>(
       size_t(
           target.width * target.height * target.channels *
-          target.bytesPerChannel),
-      std::byte(1));
+          target.bytesPerChannel
+      ),
+      std::byte(1)
+  );
 
   ImageCesium source;
   source.bytesPerChannel = 2;
@@ -147,8 +157,10 @@ TEST_CASE("ImageManipulation::blitImage") {
   source.pixelData = std::vector<std::byte>(
       size_t(
           source.width * source.height * source.channels *
-          source.bytesPerChannel),
-      std::byte(2));
+          source.bytesPerChannel
+      ),
+      std::byte(2)
+  );
 
   PixelRectangle sourceRect;
   sourceRect.x = 1;
@@ -166,7 +178,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     CHECK(std::all_of(
         target.pixelData.begin(),
         target.pixelData.end(),
-        [](std::byte b) { return b == std::byte(1); }));
+        [](std::byte b) { return b == std::byte(1); }
+    ));
   };
 
   auto contains = [](const PixelRectangle& rectangle, size_t x, size_t y) {
@@ -204,7 +217,8 @@ TEST_CASE("ImageManipulation::blitImage") {
   SECTION("succeeds for non-scaled blit") {
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        true);
+        true
+    );
     verifySuccessfulCopy();
   }
 
@@ -219,7 +233,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     targetRect.height = 5;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        true);
+        true
+    );
     verifySuccessfulCopy();
   }
 
@@ -233,7 +248,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     targetRect.height = 3;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        true);
+        true
+    );
     verifySuccessfulCopy();
   }
 
@@ -241,7 +257,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     target.bytesPerChannel = 1;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -249,7 +266,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     target.channels = 3;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -257,7 +275,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     targetRect.x = 14;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -265,7 +284,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     targetRect.y = 6;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -273,7 +293,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     targetRect.x = -1;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -281,7 +302,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     targetRect.y = -1;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -289,7 +311,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     sourceRect.x = 9;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -297,7 +320,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     sourceRect.y = 9;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -305,7 +329,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     sourceRect.x = -1;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -313,7 +338,8 @@ TEST_CASE("ImageManipulation::blitImage") {
     sourceRect.y = -1;
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 
@@ -321,14 +347,16 @@ TEST_CASE("ImageManipulation::blitImage") {
     target.pixelData.resize(10);
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
   }
 
   SECTION("returns false for a too-small source") {
     source.pixelData.resize(10);
     CHECK(
         ImageManipulation::blitImage(target, targetRect, source, sourceRect) ==
-        false);
+        false
+    );
     verifyTargetUnchanged();
   }
 }

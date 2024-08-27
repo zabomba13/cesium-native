@@ -129,11 +129,12 @@ TEST_CASE("Test FeatureIdTextureView on feature ID texture with too many bytes "
   FeatureIdTextureView view(model, featureIdTexture);
   REQUIRE(
       view.status() ==
-      FeatureIdTextureViewStatus::ErrorInvalidImageBytesPerChannel);
+      FeatureIdTextureViewStatus::ErrorInvalidImageBytesPerChannel
+  );
 }
 
-TEST_CASE(
-    "Test FeatureIdTextureView on feature ID texture with zero channels") {
+TEST_CASE("Test FeatureIdTextureView on feature ID texture with zero channels"
+) {
   Model model;
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
@@ -165,7 +166,8 @@ TEST_CASE(
 }
 
 TEST_CASE(
-    "Test FeatureIdTextureView on feature ID texture with too many channels") {
+    "Test FeatureIdTextureView on feature ID texture with too many channels"
+) {
   Model model;
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
@@ -356,7 +358,8 @@ TEST_CASE("Test FeatureIdTextureView with applyKhrTextureTransformExtension = "
 
   // Texcoord is overridden by value in KHR_texture_transform.
   REQUIRE(
-      view.getTexCoordSetIndex() == textureTransform->getTexCoordSetIndex());
+      view.getTexCoordSetIndex() == textureTransform->getTexCoordSetIndex()
+  );
   REQUIRE(textureTransform->getTexCoordSetIndex() == 10);
 }
 
@@ -379,7 +382,8 @@ TEST_CASE("Test FeatureIdTextureView with makeImageCopy = true") {
   std::memcpy(
       image.cesium.pixelData.data(),
       featureIDs.data(),
-      featureIDs.size());
+      featureIDs.size()
+  );
 
   Texture& texture = model.textures.emplace_back();
   texture.sampler = 0;
@@ -465,7 +469,8 @@ TEST_CASE("Test getFeatureID on valid feature ID texture view") {
   std::memcpy(
       image.cesium.pixelData.data(),
       featureIDs.data(),
-      featureIDs.size());
+      featureIDs.size()
+  );
 
   Texture& texture = model.textures.emplace_back();
   texture.sampler = 0;
@@ -510,7 +515,8 @@ TEST_CASE("Test getFeatureID on view with applyKhrTextureTransformExtension = "
   std::memcpy(
       image.cesium.pixelData.data(),
       featureIDs.data(),
-      featureIDs.size());
+      featureIDs.size()
+  );
 
   Texture& texture = model.textures.emplace_back();
   texture.sampler = 0;
@@ -542,7 +548,8 @@ TEST_CASE("Test getFeatureID on view with applyKhrTextureTransformExtension = "
 }
 
 TEST_CASE(
-    "Test getFeatureID on view with applyKhrTextureTransformExtension = true") {
+    "Test getFeatureID on view with applyKhrTextureTransformExtension = true"
+) {
   Model model;
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
@@ -561,7 +568,8 @@ TEST_CASE(
   std::memcpy(
       image.cesium.pixelData.data(),
       featureIDs.data(),
-      featureIDs.size());
+      featureIDs.size()
+  );
 
   Texture& texture = model.textures.emplace_back();
   texture.sampler = 0;
@@ -617,7 +625,8 @@ TEST_CASE("Test getFeatureId on view with makeImageCopy = true") {
   std::memcpy(
       image.cesium.pixelData.data(),
       featureIDs.data(),
-      featureIDs.size());
+      featureIDs.size()
+  );
 
   Texture& texture = model.textures.emplace_back();
   texture.sampler = 0;
@@ -668,7 +677,8 @@ TEST_CASE("Test getFeatureID rounds to nearest pixel") {
   std::memcpy(
       image.cesium.pixelData.data(),
       featureIDs.data(),
-      featureIDs.size());
+      featureIDs.size()
+  );
 
   Texture& texture = model.textures.emplace_back();
   texture.sampler = 0;

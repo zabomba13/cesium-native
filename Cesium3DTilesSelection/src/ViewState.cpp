@@ -16,7 +16,8 @@ namespace Cesium3DTilesSelection {
     const glm::dvec2& viewportSize,
     double horizontalFieldOfView,
     double verticalFieldOfView,
-    const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   return ViewState(
       position,
       direction,
@@ -25,7 +26,8 @@ namespace Cesium3DTilesSelection {
       horizontalFieldOfView,
       verticalFieldOfView,
       ellipsoid.cartesianToCartographic(position),
-      ellipsoid);
+      ellipsoid
+  );
 }
 
 ViewState::ViewState(
@@ -36,7 +38,8 @@ ViewState::ViewState(
     double horizontalFieldOfView,
     double verticalFieldOfView,
     const std::optional<CesiumGeospatial::Cartographic>& positionCartographic,
-    const CesiumGeospatial::Ellipsoid& ellipsoid)
+    const CesiumGeospatial::Ellipsoid& ellipsoid
+)
     : _position(position),
       _direction(direction),
       _up(up),
@@ -51,12 +54,14 @@ ViewState::ViewState(
           direction,
           up,
           horizontalFieldOfView,
-          verticalFieldOfView)) {}
+          verticalFieldOfView
+      )) {}
 
 template <class T>
 static bool isBoundingVolumeVisible(
     const T& boundingVolume,
-    const CullingVolume& cullingVolume) noexcept {
+    const CullingVolume& cullingVolume
+) noexcept {
   const CullingResult left =
       boundingVolume.intersectPlane(cullingVolume.leftPlane);
   if (left == CullingResult::Outside) {
@@ -84,8 +89,8 @@ static bool isBoundingVolumeVisible(
   return true;
 }
 
-bool ViewState::isBoundingVolumeVisible(
-    const BoundingVolume& boundingVolume) const noexcept {
+bool ViewState::isBoundingVolumeVisible(const BoundingVolume& boundingVolume
+) const noexcept {
   // TODO: use plane masks
   struct Operation {
     const ViewState& viewState;
@@ -93,32 +98,37 @@ bool ViewState::isBoundingVolumeVisible(
     bool operator()(const OrientedBoundingBox& boundingBox) noexcept {
       return Cesium3DTilesSelection::isBoundingVolumeVisible(
           boundingBox,
-          viewState._cullingVolume);
+          viewState._cullingVolume
+      );
     }
 
     bool operator()(const BoundingRegion& boundingRegion) noexcept {
       return Cesium3DTilesSelection::isBoundingVolumeVisible(
           boundingRegion,
-          viewState._cullingVolume);
+          viewState._cullingVolume
+      );
     }
 
     bool operator()(const BoundingSphere& boundingSphere) noexcept {
       return Cesium3DTilesSelection::isBoundingVolumeVisible(
           boundingSphere,
-          viewState._cullingVolume);
+          viewState._cullingVolume
+      );
     }
 
-    bool operator()(
-        const BoundingRegionWithLooseFittingHeights& boundingRegion) noexcept {
+    bool operator()(const BoundingRegionWithLooseFittingHeights& boundingRegion
+    ) noexcept {
       return Cesium3DTilesSelection::isBoundingVolumeVisible(
           boundingRegion.getBoundingRegion(),
-          viewState._cullingVolume);
+          viewState._cullingVolume
+      );
     }
 
     bool operator()(const S2CellBoundingVolume& s2Cell) noexcept {
       return Cesium3DTilesSelection::isBoundingVolumeVisible(
           s2Cell,
-          viewState._cullingVolume);
+          viewState._cullingVolume
+      );
     }
   };
 
@@ -126,7 +136,8 @@ bool ViewState::isBoundingVolumeVisible(
 }
 
 double ViewState::computeDistanceSquaredToBoundingVolume(
-    const BoundingVolume& boundingVolume) const noexcept {
+    const BoundingVolume& boundingVolume
+) const noexcept {
   struct Operation {
     const ViewState& viewState;
 
@@ -138,28 +149,33 @@ double ViewState::computeDistanceSquaredToBoundingVolume(
       if (viewState._positionCartographic) {
         return boundingRegion.computeDistanceSquaredToPosition(
             viewState._positionCartographic.value(),
-            viewState._position);
+            viewState._position
+        );
       }
       return boundingRegion.computeDistanceSquaredToPosition(
           viewState._position,
-          viewState._ellipsoid);
+          viewState._ellipsoid
+      );
     }
 
     double operator()(const BoundingSphere& boundingSphere) noexcept {
-      return boundingSphere.computeDistanceSquaredToPosition(
-          viewState._position);
+      return boundingSphere.computeDistanceSquaredToPosition(viewState._position
+      );
     }
 
-    double operator()(
-        const BoundingRegionWithLooseFittingHeights& boundingRegion) noexcept {
+    double
+    operator()(const BoundingRegionWithLooseFittingHeights& boundingRegion
+    ) noexcept {
       if (viewState._positionCartographic) {
         return boundingRegion.computeConservativeDistanceSquaredToPosition(
             viewState._positionCartographic.value(),
-            viewState._position);
+            viewState._position
+        );
       }
       return boundingRegion.computeConservativeDistanceSquaredToPosition(
           viewState._position,
-          viewState._ellipsoid);
+          viewState._ellipsoid
+      );
     }
 
     double operator()(const S2CellBoundingVolume& s2Cell) noexcept {
@@ -172,7 +188,8 @@ double ViewState::computeDistanceSquaredToBoundingVolume(
 
 double ViewState::computeScreenSpaceError(
     double geometricError,
-    double distance) const noexcept {
+    double distance
+) const noexcept {
   // Avoid divide by zero when viewer is inside the tile
   distance = glm::max(distance, 1e-7);
   const double sseDenominator = this->_sseDenominator;

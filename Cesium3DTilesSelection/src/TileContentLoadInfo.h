@@ -25,7 +25,8 @@ struct TileContentLoadInfo {
           pPrepareRendererResources,
       const std::shared_ptr<spdlog::logger>& pLogger,
       const TilesetContentOptions& contentOptions,
-      const Tile& tile);
+      const Tile& tile
+  );
 
   CesiumAsync::AsyncSystem asyncSystem;
 

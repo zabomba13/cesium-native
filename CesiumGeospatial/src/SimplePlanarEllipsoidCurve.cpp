@@ -11,7 +11,8 @@ std::optional<SimplePlanarEllipsoidCurve>
 SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
     const Ellipsoid& ellipsoid,
     const glm::dvec3& sourceEcef,
-    const glm::dvec3& destinationEcef) {
+    const glm::dvec3& destinationEcef
+) {
   std::optional<glm::dvec3> scaledSourceEcef =
       ellipsoid.scaleToGeocentricSurface(sourceEcef);
   std::optional<glm::dvec3> scaledDestinationEcef =
@@ -28,23 +29,27 @@ SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
       scaledSourceEcef.value(),
       scaledDestinationEcef.value(),
       sourceEcef,
-      destinationEcef);
+      destinationEcef
+  );
 }
 
 std::optional<SimplePlanarEllipsoidCurve>
 SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight(
     const Ellipsoid& ellipsoid,
     const Cartographic& source,
-    const Cartographic& destination) {
+    const Cartographic& destination
+) {
   return SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
       ellipsoid,
       ellipsoid.cartographicToCartesian(source),
-      ellipsoid.cartographicToCartesian(destination));
+      ellipsoid.cartographicToCartesian(destination)
+  );
 }
 
 glm::dvec3 SimplePlanarEllipsoidCurve::getPosition(
     double percentage,
-    double additionalHeight) const {
+    double additionalHeight
+) const {
   if (percentage <= 0.0) {
     return this->_sourceEcef;
   } else if (percentage >= 1.0) {
@@ -80,7 +85,8 @@ SimplePlanarEllipsoidCurve::SimplePlanarEllipsoidCurve(
     const glm::dvec3& scaledSourceEcef,
     const glm::dvec3& scaledDestinationEcef,
     const glm::dvec3& originalSourceEcef,
-    const glm::dvec3& originalDestinationEcef)
+    const glm::dvec3& originalDestinationEcef
+)
     : _ellipsoid(ellipsoid),
       _sourceEcef(originalSourceEcef),
       _destinationEcef(originalDestinationEcef) {
@@ -90,7 +96,8 @@ SimplePlanarEllipsoidCurve::SimplePlanarEllipsoidCurve(
 
   glm::dquat flyQuat = glm::rotation(
       glm::normalize(scaledSourceEcef),
-      glm::normalize(scaledDestinationEcef));
+      glm::normalize(scaledDestinationEcef)
+  );
 
   this->_rotationAxis = glm::axis(flyQuat);
   this->_totalAngle = glm::angle(flyQuat);

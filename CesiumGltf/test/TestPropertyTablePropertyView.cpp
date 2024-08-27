@@ -43,7 +43,8 @@ template <typename T> static void checkNumeric(const std::vector<T>& expected) {
       propertyTableProperty,
       classProperty,
       static_cast<int64_t>(expected.size()),
-      gsl::span<const std::byte>(data.data(), data.size()));
+      gsl::span<const std::byte>(data.data(), data.size())
+  );
 
   REQUIRE(property.size() == static_cast<int64_t>(expected.size()));
 
@@ -60,7 +61,8 @@ static void checkNumeric(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   std::vector<std::byte> data;
   data.resize(values.size() * sizeof(T));
   std::memcpy(data.data(), values.data(), data.size());
@@ -83,7 +85,8 @@ static void checkNumeric(
       propertyTableProperty,
       classProperty,
       static_cast<int64_t>(expected.size()),
-      gsl::span<const std::byte>(data.data(), data.size()));
+      gsl::span<const std::byte>(data.data(), data.size())
+  );
 
   REQUIRE(property.size() == static_cast<int64_t>(expected.size()));
   REQUIRE(!property.normalized());
@@ -105,7 +108,8 @@ static void checkNormalizedNumeric(
     const std::optional<JsonValue> offset = std::nullopt,
     const std::optional<JsonValue> scale = std::nullopt,
     const std::optional<JsonValue> noData = std::nullopt,
-    const std::optional<JsonValue> defaultValue = std::nullopt) {
+    const std::optional<JsonValue> defaultValue = std::nullopt
+) {
   std::vector<std::byte> data;
   data.resize(values.size() * sizeof(T));
   std::memcpy(data.data(), values.data(), data.size());
@@ -130,7 +134,8 @@ static void checkNormalizedNumeric(
       propertyTableProperty,
       classProperty,
       static_cast<int64_t>(expected.size()),
-      gsl::span<const std::byte>(data.data(), data.size()));
+      gsl::span<const std::byte>(data.data(), data.size())
+  );
 
   REQUIRE(property.size() == static_cast<int64_t>(expected.size()));
   REQUIRE(property.normalized());
@@ -146,7 +151,8 @@ static void checkVariableLengthArray(
     const std::vector<DataType>& data,
     const std::vector<OffsetType>& offsets,
     PropertyComponentType offsetType,
-    int64_t instanceCount) {
+    int64_t instanceCount
+) {
   // copy data to buffer
   std::vector<std::byte> buffer;
   buffer.resize(data.size() * sizeof(DataType));
@@ -158,7 +164,8 @@ static void checkVariableLengthArray(
   std::memcpy(
       offsetBuffer.data(),
       offsets.data(),
-      offsets.size() * sizeof(OffsetType));
+      offsets.size() * sizeof(OffsetType)
+  );
 
   PropertyTableProperty propertyTableProperty;
   ClassProperty classProperty;
@@ -181,7 +188,8 @@ static void checkVariableLengthArray(
       gsl::span<const std::byte>(offsetBuffer.data(), offsetBuffer.size()),
       gsl::span<const std::byte>(),
       offsetType,
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.arrayCount() == 0);
 
@@ -211,7 +219,8 @@ static void checkVariableLengthArray(
     int64_t instanceCount,
     const std::vector<std::optional<std::vector<DataType>>>& expected,
     const std::optional<JsonValue::Array> noData = std::nullopt,
-    const std::optional<JsonValue::Array> defaultValue = std::nullopt) {
+    const std::optional<JsonValue::Array> defaultValue = std::nullopt
+) {
   // copy data to buffer
   std::vector<std::byte> buffer;
   buffer.resize(data.size() * sizeof(DataType));
@@ -223,7 +232,8 @@ static void checkVariableLengthArray(
   std::memcpy(
       offsetBuffer.data(),
       offsets.data(),
-      offsets.size() * sizeof(OffsetType));
+      offsets.size() * sizeof(OffsetType)
+  );
 
   PropertyTableProperty propertyTableProperty;
   ClassProperty classProperty;
@@ -248,7 +258,8 @@ static void checkVariableLengthArray(
       gsl::span<const std::byte>(offsetBuffer.data(), offsetBuffer.size()),
       gsl::span<const std::byte>(),
       offsetType,
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.arrayCount() == 0);
 
@@ -292,7 +303,8 @@ static void checkNormalizedVariableLengthArray(
     int64_t instanceCount,
     const std::vector<std::optional<std::vector<NormalizedType>>>& expected,
     const std::optional<JsonValue::Array> noData = std::nullopt,
-    const std::optional<JsonValue::Array> defaultValue = std::nullopt) {
+    const std::optional<JsonValue::Array> defaultValue = std::nullopt
+) {
   // copy data to buffer
   std::vector<std::byte> buffer;
   buffer.resize(data.size() * sizeof(DataType));
@@ -304,7 +316,8 @@ static void checkNormalizedVariableLengthArray(
   std::memcpy(
       offsetBuffer.data(),
       offsets.data(),
-      offsets.size() * sizeof(OffsetType));
+      offsets.size() * sizeof(OffsetType)
+  );
 
   PropertyTableProperty propertyTableProperty;
   ClassProperty classProperty;
@@ -326,7 +339,8 @@ static void checkNormalizedVariableLengthArray(
       instanceCount,
       gsl::span<const std::byte>(buffer.data(), buffer.size()),
       gsl::span<const std::byte>(offsetBuffer.data(), offsetBuffer.size()),
-      offsetType);
+      offsetType
+  );
 
   REQUIRE(property.arrayCount() == 0);
 
@@ -363,7 +377,8 @@ static void checkNormalizedVariableLengthArray(
 template <typename T>
 static void checkFixedLengthArray(
     const std::vector<T>& data,
-    int64_t fixedLengthArrayCount) {
+    int64_t fixedLengthArrayCount
+) {
   int64_t instanceCount =
       static_cast<int64_t>(data.size()) / fixedLengthArrayCount;
 
@@ -393,7 +408,8 @@ static void checkFixedLengthArray(
       gsl::span<const std::byte>(),
       gsl::span<const std::byte>(),
       PropertyComponentType::None,
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.arrayCount() == fixedLengthArrayCount);
 
@@ -423,7 +439,8 @@ static void checkFixedLengthArray(
     const std::optional<JsonValue::Array> offset = std::nullopt,
     const std::optional<JsonValue::Array> scale = std::nullopt,
     const std::optional<JsonValue::Array> noData = std::nullopt,
-    const std::optional<JsonValue::Array> defaultValue = std::nullopt) {
+    const std::optional<JsonValue::Array> defaultValue = std::nullopt
+) {
   int64_t instanceCount =
       static_cast<int64_t>(data.size()) / fixedLengthArrayCount;
 
@@ -457,7 +474,8 @@ static void checkFixedLengthArray(
       gsl::span<const std::byte>(),
       gsl::span<const std::byte>(),
       PropertyComponentType::None,
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.arrayCount() == fixedLengthArrayCount);
 
@@ -498,7 +516,8 @@ static void checkNormalizedFixedLengthArray(
     const std::optional<JsonValue::Array> offset = std::nullopt,
     const std::optional<JsonValue::Array> scale = std::nullopt,
     const std::optional<JsonValue::Array> noData = std::nullopt,
-    const std::optional<JsonValue::Array> defaultValue = std::nullopt) {
+    const std::optional<JsonValue::Array> defaultValue = std::nullopt
+) {
   int64_t instanceCount =
       static_cast<int64_t>(data.size()) / fixedLengthArrayCount;
 
@@ -530,7 +549,8 @@ static void checkNormalizedFixedLengthArray(
       instanceCount,
       gsl::span<const std::byte>(buffer.data(), buffer.size()),
       gsl::span<const std::byte>(),
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.arrayCount() == fixedLengthArrayCount);
 
@@ -611,7 +631,8 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   };
 
   SECTION("Int16 with NoData and Default") {
@@ -629,7 +650,8 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 
   SECTION("Overrides class property values") {
@@ -656,7 +678,8 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
         propertyTableProperty,
         classProperty,
         static_cast<int64_t>(values.size()),
-        gsl::span<const std::byte>(data.data(), data.size()));
+        gsl::span<const std::byte>(data.data(), data.size())
+    );
 
     REQUIRE(property.offset() == 1.0f);
     REQUIRE(property.scale() == 2.0f);
@@ -721,7 +744,8 @@ TEST_CASE("Check scalar PropertyTablePropertyView (normalized)") {
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -785,7 +809,8 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   };
 
   SECTION("Int16 Vec2 with NoData and Default") {
@@ -805,7 +830,8 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   };
 
   SECTION("Overrides class property values") {
@@ -835,7 +861,8 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
         propertyTableProperty,
         classProperty,
         static_cast<int64_t>(values.size()),
-        gsl::span<const std::byte>(data.data(), data.size()));
+        gsl::span<const std::byte>(data.data(), data.size())
+    );
 
     REQUIRE(property.offset() == glm::vec2(1.0f, 0.5f));
     REQUIRE(property.scale() == glm::vec2(2.0f, 1.0f));
@@ -914,7 +941,8 @@ TEST_CASE("Check vecN PropertyTablePropertyView (normalized)") {
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -1043,7 +1071,8 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   };
 
   SECTION("Int16 Mat3 with NoData and DefaultValue") {
@@ -1080,7 +1109,8 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   };
 
   SECTION("Overrides class property values") {
@@ -1132,7 +1162,8 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
         propertyTableProperty,
         classProperty,
         static_cast<int64_t>(values.size()),
-        gsl::span<const std::byte>(data.data(), data.size()));
+        gsl::span<const std::byte>(data.data(), data.size())
+    );
 
     // clang-format off
     REQUIRE(property.offset() == glm::mat2(
@@ -1272,7 +1303,8 @@ TEST_CASE("Check matN PropertyTablePropertyView (normalized)") {
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -1291,7 +1323,8 @@ TEST_CASE("Check boolean PropertyTablePropertyView") {
       propertyTableProperty,
       classProperty,
       static_cast<int64_t>(instanceCount),
-      gsl::span<const std::byte>(data.data(), data.size()));
+      gsl::span<const std::byte>(data.data(), data.size())
+  );
 
   for (int64_t i = 0; i < property.size(); ++i) {
     REQUIRE(property.getRaw(i) == bits[static_cast<size_t>(i)]);
@@ -1316,7 +1349,8 @@ TEST_CASE("Check string PropertyTablePropertyView") {
     std::memcpy(
         buffer.data() + currentOffset,
         strings[i].data(),
-        strings[i].size());
+        strings[i].size()
+    );
     currentOffset += static_cast<uint32_t>(strings[i].size());
   }
 
@@ -1328,13 +1362,15 @@ TEST_CASE("Check string PropertyTablePropertyView") {
     std::memcpy(
         offsetBuffer.data() + i * sizeof(uint32_t),
         &currentOffset,
-        sizeof(uint32_t));
+        sizeof(uint32_t)
+    );
     currentOffset += static_cast<uint32_t>(strings[i].size());
   }
   std::memcpy(
       offsetBuffer.data() + strings.size() * sizeof(uint32_t),
       &currentOffset,
-      sizeof(uint32_t));
+      sizeof(uint32_t)
+  );
 
   SECTION("Returns correct values") {
     PropertyTableProperty propertyTableProperty;
@@ -1349,7 +1385,8 @@ TEST_CASE("Check string PropertyTablePropertyView") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(offsetBuffer.data(), offsetBuffer.size()),
         PropertyComponentType::None,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     for (int64_t i = 0; i < property.size(); ++i) {
       REQUIRE(property.getRaw(i) == strings[static_cast<size_t>(i)]);
@@ -1371,7 +1408,8 @@ TEST_CASE("Check string PropertyTablePropertyView") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(offsetBuffer.data(), offsetBuffer.size()),
         PropertyComponentType::None,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     std::vector<std::optional<std::string_view>> expected{
         strings[0],
@@ -1399,7 +1437,8 @@ TEST_CASE("Check string PropertyTablePropertyView") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(offsetBuffer.data(), offsetBuffer.size()),
         PropertyComponentType::None,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     std::vector<std::optional<std::string_view>> expected{
         strings[0],
@@ -1546,7 +1585,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   }
 
   SECTION("Array of 2 int32_ts with noData and default value") {
@@ -1569,7 +1609,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 
   SECTION("Overrides class property values") {
@@ -1610,7 +1651,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(),
         PropertyComponentType::None,
-        PropertyComponentType::None);
+        PropertyComponentType::None
+    );
 
     REQUIRE(property.arrayCount() == count);
     REQUIRE(property.size() == instanceCount);
@@ -1639,7 +1681,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
         REQUIRE(rawValues[j] == data[expectedIdx]);
         REQUIRE(
             (*values)[j] ==
-            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]);
+            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]
+        );
         ++expectedIdx;
       }
     }
@@ -1647,7 +1690,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
 }
 
 TEST_CASE(
-    "Check fixed-length scalar array PropertyTablePropertyView (normalized)") {
+    "Check fixed-length scalar array PropertyTablePropertyView (normalized)"
+) {
   SECTION("Array of 4 uint8_ts") {
     // clang-format off
     std::vector<uint8_t> data{
@@ -1684,7 +1728,8 @@ TEST_CASE(
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -1760,7 +1805,8 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   }
 
   SECTION("Array of 2 ivec2 with noData and default value") {
@@ -1783,7 +1829,8 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 
   SECTION("Overrides class property values") {
@@ -1824,7 +1871,8 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(),
         PropertyComponentType::None,
-        PropertyComponentType::None);
+        PropertyComponentType::None
+    );
 
     REQUIRE(property.arrayCount() == count);
     REQUIRE(property.size() == instanceCount);
@@ -1838,12 +1886,14 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
     REQUIRE(property.min());
     checkArrayEqual(
         *property.min(),
-        {glm::vec2{0.0f, 1.0f}, glm::vec2{1.0f, -2.0f}});
+        {glm::vec2{0.0f, 1.0f}, glm::vec2{1.0f, -2.0f}}
+    );
 
     REQUIRE(property.max());
     checkArrayEqual(
         *property.max(),
-        {glm::vec2(1.0f, 1.0f), glm::vec2(3.0f, 4.0f)});
+        {glm::vec2(1.0f, 1.0f), glm::vec2(3.0f, 4.0f)}
+    );
 
     std::vector<std::vector<glm::vec2>> expected{
         {glm::vec2(3.0f, 1.0f), glm::vec2(3.0f, -5.0f)},
@@ -1857,15 +1907,16 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
         REQUIRE(rawValues[j] == data[expectedIdx]);
         REQUIRE(
             (*values)[j] ==
-            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]);
+            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]
+        );
         ++expectedIdx;
       }
     }
   }
 }
 
-TEST_CASE(
-    "Check fixed-length vecN array PropertyTablePropertyView (normalized)") {
+TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView (normalized)"
+) {
   SECTION("Array of 2 u8vec2s") {
     std::vector<glm::u8vec2> data{
         glm::u8vec2(255, 64),
@@ -1908,7 +1959,8 @@ TEST_CASE(
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 
   SECTION("Overrides class property values") {
@@ -1949,7 +2001,8 @@ TEST_CASE(
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(),
         PropertyComponentType::None,
-        PropertyComponentType::None);
+        PropertyComponentType::None
+    );
 
     REQUIRE(property.arrayCount() == count);
     REQUIRE(property.size() == instanceCount);
@@ -1963,12 +2016,14 @@ TEST_CASE(
     REQUIRE(property.min());
     checkArrayEqual(
         *property.min(),
-        {glm::vec2{0.0f, 1.0f}, glm::vec2{1.0f, -2.0f}});
+        {glm::vec2{0.0f, 1.0f}, glm::vec2{1.0f, -2.0f}}
+    );
 
     REQUIRE(property.max());
     checkArrayEqual(
         *property.max(),
-        {glm::vec2(1.0f, 1.0f), glm::vec2(3.0f, 4.0f)});
+        {glm::vec2(1.0f, 1.0f), glm::vec2(3.0f, 4.0f)}
+    );
 
     std::vector<std::vector<glm::vec2>> expected{
         {glm::vec2(3.0f, 1.0f), glm::vec2(3.0f, -5.0f)},
@@ -1982,7 +2037,8 @@ TEST_CASE(
         REQUIRE(rawValues[j] == data[expectedIdx]);
         REQUIRE(
             (*values)[j] ==
-            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]);
+            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]
+        );
         ++expectedIdx;
       }
     }
@@ -2177,7 +2233,8 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        std::nullopt);
+        std::nullopt
+    );
   }
 
   SECTION("Array of 2 imat2x2 with noData and default value") {
@@ -2231,7 +2288,8 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
         std::nullopt,
         std::nullopt,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 
   SECTION("Overrides class property values") {
@@ -2310,7 +2368,8 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(),
         PropertyComponentType::None,
-        PropertyComponentType::None);
+        PropertyComponentType::None
+    );
 
     REQUIRE(property.arrayCount() == count);
     REQUIRE(property.size() == instanceCount);
@@ -2375,15 +2434,16 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
         REQUIRE(rawValues[j] == data[expectedIdx]);
         REQUIRE(
             (*values)[j] ==
-            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]);
+            expected[static_cast<size_t>(i)][static_cast<size_t>(j)]
+        );
         ++expectedIdx;
       }
     }
   }
 }
 
-TEST_CASE(
-    "Check fixed-length matN array PropertyTablePropertyView (normalized)") {
+TEST_CASE("Check fixed-length matN array PropertyTablePropertyView (normalized)"
+) {
   SECTION("Array of 2 u8mat2x2s") {
     // clang-format off
     std::vector<glm::u8mat2x2> data{
@@ -2485,7 +2545,8 @@ TEST_CASE(
         offset,
         scale,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -2549,7 +2610,8 @@ TEST_CASE("Check variable-length scalar array PropertyTablePropertyView") {
         offsets,
         PropertyComponentType::Uint32,
         3,
-        expected);
+        expected
+    );
   }
 
   SECTION("Array of int32_t with NoData") {
@@ -2578,7 +2640,8 @@ TEST_CASE("Check variable-length scalar array PropertyTablePropertyView") {
         PropertyComponentType::Uint32,
         5,
         expected,
-        noData);
+        noData
+    );
   }
 
   SECTION("Array of int32_t with NoData and DefaultValue") {
@@ -2609,7 +2672,8 @@ TEST_CASE("Check variable-length scalar array PropertyTablePropertyView") {
         5,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 
   SECTION("Array of normalized uint8_t with NoData and DefaultValue") {
@@ -2640,7 +2704,8 @@ TEST_CASE("Check variable-length scalar array PropertyTablePropertyView") {
         4,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -2666,7 +2731,8 @@ TEST_CASE("Check variable-length scalar array PropertyTablePropertyView "
         offsets,
         PropertyComponentType::Uint32,
         3,
-        expected);
+        expected
+    );
   }
 
   SECTION("Array of uint8_t with NoData and DefaultValue") {
@@ -2697,7 +2763,8 @@ TEST_CASE("Check variable-length scalar array PropertyTablePropertyView "
         4,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -2773,7 +2840,8 @@ TEST_CASE("Check variable-length vecN array PropertyTablePropertyView") {
         PropertyComponentType::Uint32,
         5,
         expected,
-        noData);
+        noData
+    );
   }
 
   SECTION("Array of ivec3 with NoData and DefaultValue") {
@@ -2809,12 +2877,14 @@ TEST_CASE("Check variable-length vecN array PropertyTablePropertyView") {
         5,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
 TEST_CASE(
-    "Check variable-length vecN array PropertyTablePropertyView (normalized)") {
+    "Check variable-length vecN array PropertyTablePropertyView (normalized)"
+) {
   SECTION("Array of u8vec2") {
     // clang-format off
     std::vector<glm::u8vec2> data{
@@ -2840,7 +2910,8 @@ TEST_CASE(
         offsets,
         PropertyComponentType::Uint32,
         3,
-        expected);
+        expected
+    );
   }
 
   SECTION("Array of normalized u8vec2 with NoData and DefaultValue") {
@@ -2875,7 +2946,8 @@ TEST_CASE(
         3,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -3050,7 +3122,8 @@ TEST_CASE("Check variable-length matN array PropertyTablePropertyView") {
         PropertyComponentType::Uint32,
         5,
         expected,
-        noData);
+        noData
+    );
   }
 
   SECTION("Array of imat3x3 with NoData and DefaultValue") {
@@ -3094,12 +3167,14 @@ TEST_CASE("Check variable-length matN array PropertyTablePropertyView") {
         5,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
 TEST_CASE(
-    "Check variable-length matN array PropertyTablePropertyView (normalized)") {
+    "Check variable-length matN array PropertyTablePropertyView (normalized)"
+) {
   SECTION("Array of u8mat2x2") {
     // clang-format off
     std::vector<glm::u8mat2x2> data{
@@ -3123,7 +3198,8 @@ TEST_CASE(
         offsets,
         PropertyComponentType::Uint32,
         3,
-        expected);
+        expected
+    );
   }
 
   SECTION("Array of u8mat2x2 with NoData and DefaultValue") {
@@ -3161,7 +3237,8 @@ TEST_CASE(
         3,
         expected,
         noData,
-        defaultValue);
+        defaultValue
+    );
   }
 }
 
@@ -3189,7 +3266,8 @@ TEST_CASE("Check fixed-length array of string") {
     std::memcpy(
         buffer.data() + currentStringOffset,
         strings[i].data(),
-        strings[i].size());
+        strings[i].size()
+    );
     currentStringOffset += static_cast<uint32_t>(strings[i].size());
   }
 
@@ -3201,14 +3279,16 @@ TEST_CASE("Check fixed-length array of string") {
     std::memcpy(
         stringOffsets.data() + i * sizeof(uint32_t),
         &currentStringOffset,
-        sizeof(uint32_t));
+        sizeof(uint32_t)
+    );
     currentStringOffset += static_cast<uint32_t>(strings[i].size());
   }
 
   std::memcpy(
       stringOffsets.data() + stringCount * sizeof(uint32_t),
       &currentStringOffset,
-      sizeof(uint32_t));
+      sizeof(uint32_t)
+  );
 
   SECTION("Returns correct values") {
     PropertyTableProperty propertyTableProperty;
@@ -3225,7 +3305,8 @@ TEST_CASE("Check fixed-length array of string") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(stringOffsets.data(), stringOffsets.size()),
         PropertyComponentType::None,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     REQUIRE(property.arrayCount() == classProperty.count);
 
@@ -3261,7 +3342,8 @@ TEST_CASE("Check fixed-length array of string") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(stringOffsets.data(), stringOffsets.size()),
         PropertyComponentType::None,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     REQUIRE(property.arrayCount() == classProperty.count);
 
@@ -3319,7 +3401,8 @@ TEST_CASE("Check fixed-length array of string") {
         gsl::span<const std::byte>(),
         gsl::span<const std::byte>(stringOffsets.data(), stringOffsets.size()),
         PropertyComponentType::None,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     REQUIRE(property.arrayCount() == classProperty.count);
 
@@ -3392,7 +3475,8 @@ TEST_CASE("Check variable-length string array PropertyTablePropertyView") {
     std::memcpy(
         buffer.data() + currentOffset,
         strings[i].data(),
-        strings[i].size());
+        strings[i].size()
+    );
     currentOffset += static_cast<uint32_t>(strings[i].size());
   }
 
@@ -3403,13 +3487,15 @@ TEST_CASE("Check variable-length string array PropertyTablePropertyView") {
     std::memcpy(
         stringOffsets.data() + i * sizeof(uint32_t),
         &currentOffset,
-        sizeof(uint32_t));
+        sizeof(uint32_t)
+    );
     currentOffset += static_cast<uint32_t>(strings[i].size());
   }
   std::memcpy(
       stringOffsets.data() + stringCount * sizeof(uint32_t),
       &currentOffset,
-      sizeof(uint32_t));
+      sizeof(uint32_t)
+  );
 
   SECTION("Returns correct values") {
     PropertyTableProperty propertyTableProperty;
@@ -3424,10 +3510,12 @@ TEST_CASE("Check variable-length string array PropertyTablePropertyView") {
         gsl::span<const std::byte>(buffer.data(), buffer.size()),
         gsl::span<const std::byte>(
             reinterpret_cast<const std::byte*>(arrayOffsets.data()),
-            arrayOffsets.size() * sizeof(uint32_t)),
+            arrayOffsets.size() * sizeof(uint32_t)
+        ),
         gsl::span<const std::byte>(stringOffsets.data(), stringOffsets.size()),
         PropertyComponentType::Uint32,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     REQUIRE(property.arrayCount() == 0);
 
@@ -3461,10 +3549,12 @@ TEST_CASE("Check variable-length string array PropertyTablePropertyView") {
         gsl::span<const std::byte>(buffer.data(), buffer.size()),
         gsl::span<const std::byte>(
             reinterpret_cast<const std::byte*>(arrayOffsets.data()),
-            arrayOffsets.size() * sizeof(uint32_t)),
+            arrayOffsets.size() * sizeof(uint32_t)
+        ),
         gsl::span<const std::byte>(stringOffsets.data(), stringOffsets.size()),
         PropertyComponentType::Uint32,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     REQUIRE(property.arrayCount() == 0);
 
@@ -3522,10 +3612,12 @@ TEST_CASE("Check variable-length string array PropertyTablePropertyView") {
         gsl::span<const std::byte>(buffer.data(), buffer.size()),
         gsl::span<const std::byte>(
             reinterpret_cast<const std::byte*>(arrayOffsets.data()),
-            arrayOffsets.size() * sizeof(uint32_t)),
+            arrayOffsets.size() * sizeof(uint32_t)
+        ),
         gsl::span<const std::byte>(stringOffsets.data(), stringOffsets.size()),
         PropertyComponentType::Uint32,
-        PropertyComponentType::Uint32);
+        PropertyComponentType::Uint32
+    );
 
     REQUIRE(property.arrayCount() == 0);
 
@@ -3589,7 +3681,8 @@ TEST_CASE("Check fixed-length boolean array PropertyTablePropertyView") {
       gsl::span<const std::byte>(),
       gsl::span<const std::byte>(),
       PropertyComponentType::Uint32,
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.size() == 2);
   REQUIRE(property.arrayCount() == classProperty.count);
@@ -3655,10 +3748,12 @@ TEST_CASE("Check variable-length boolean array PropertyTablePropertyView") {
       gsl::span<const std::byte>(buffer.data(), buffer.size()),
       gsl::span<const std::byte>(
           reinterpret_cast<const std::byte*>(offsetBuffer.data()),
-          offsetBuffer.size() * sizeof(uint32_t)),
+          offsetBuffer.size() * sizeof(uint32_t)
+      ),
       gsl::span<const std::byte>(),
       PropertyComponentType::Uint32,
-      PropertyComponentType::None);
+      PropertyComponentType::None
+  );
 
   REQUIRE(property.size() == 3);
   REQUIRE(property.arrayCount() == 0);

@@ -24,19 +24,23 @@ TEST_CASE("Math::equalsEpsilon example") {
   bool a = CesiumUtility::Math::equalsEpsilon(
       0.0,
       0.01,
-      CesiumUtility::Math::Epsilon2); // true
+      CesiumUtility::Math::Epsilon2
+  ); // true
   bool b = CesiumUtility::Math::equalsEpsilon(
       0.0,
       0.1,
-      CesiumUtility::Math::Epsilon2); // false
+      CesiumUtility::Math::Epsilon2
+  ); // false
   bool c = CesiumUtility::Math::equalsEpsilon(
       3699175.1634344,
       3699175.2,
-      CesiumUtility::Math::Epsilon7); // true
+      CesiumUtility::Math::Epsilon7
+  ); // true
   bool d = CesiumUtility::Math::equalsEpsilon(
       3699175.1634344,
       3699175.2,
-      CesiumUtility::Math::Epsilon9); // false
+      CesiumUtility::Math::Epsilon9
+  ); // false
   //! [equalsEpsilon]
 
   CHECK(a == true);
@@ -49,7 +53,8 @@ TEST_CASE("Math::convertLongitudeRange example") {
   //! [convertLongitudeRange]
   // Convert 270 degrees to -90 degrees longitude
   double longitude = CesiumUtility::Math::convertLongitudeRange(
-      CesiumUtility::Math::degreesToRadians(270.0));
+      CesiumUtility::Math::degreesToRadians(270.0)
+  );
   //! [convertLongitudeRange]
   CHECK(longitude == CesiumUtility::Math::degreesToRadians(-90.0));
 }
@@ -85,7 +90,8 @@ TEST_CASE("Math::negativePitoPi") {
   CHECK(Math::equalsEpsilon(
       Math::negativePiToPi(+Math::OnePi + 0.1),
       -Math::OnePi + 0.1,
-      Math::Epsilon15));
+      Math::Epsilon15
+  ));
   CHECK(Math::negativePiToPi(+2.0 * Math::OnePi) == 0.0);
   CHECK(Math::negativePiToPi(-2.0 * Math::OnePi) == 0.0);
   CHECK(Math::negativePiToPi(+3.0 * Math::OnePi) == Math::OnePi);
@@ -106,12 +112,14 @@ TEST_CASE("Math::zeroToTwoPi") {
   CHECK(Math::equalsEpsilon(
       Math::zeroToTwoPi(-Math::OnePi + 1.0),
       +Math::OnePi + 1.0,
-      Math::Epsilon15));
+      Math::Epsilon15
+  ));
   CHECK(Math::zeroToTwoPi(+Math::OnePi - 0.1) == (+Math::OnePi - 0.1));
   CHECK(Math::equalsEpsilon(
       Math::zeroToTwoPi(-Math::OnePi + 0.1),
       +Math::OnePi + 0.1,
-      Math::Epsilon15));
+      Math::Epsilon15
+  ));
   CHECK(Math::zeroToTwoPi(+2.0 * Math::OnePi) == (2.0 * Math::OnePi));
   CHECK(Math::zeroToTwoPi(-2.0 * Math::OnePi) == (2.0 * Math::OnePi));
   CHECK(Math::zeroToTwoPi(+3.0 * Math::OnePi) == Math::OnePi);

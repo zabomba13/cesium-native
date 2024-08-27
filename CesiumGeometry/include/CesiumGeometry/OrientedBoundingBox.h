@@ -33,7 +33,8 @@ public:
    */
   OrientedBoundingBox(
       const glm::dvec3& center,
-      const glm::dmat3& halfAxes) noexcept
+      const glm::dmat3& halfAxes
+  ) noexcept
       : _center(center),
         _halfAxes(halfAxes),
         // TODO: what should we do if halfAxes is singular?
@@ -41,7 +42,8 @@ public:
         _lengths(
             2.0 * glm::length(_halfAxes[0]),
             2.0 * glm::length(_halfAxes[1]),
-            2.0 * glm::length(_halfAxes[2])) {}
+            2.0 * glm::length(_halfAxes[2])
+        ) {}
 
   /**
    * @brief Gets the center of the box.
@@ -96,8 +98,8 @@ public:
    *
    * @snippet TestOrientedBoundingBox.cpp distanceSquaredTo
    */
-  double
-  computeDistanceSquaredToPosition(const glm::dvec3& position) const noexcept;
+  double computeDistanceSquaredToPosition(const glm::dvec3& position
+  ) const noexcept;
 
   /**
    * @brief Computes whether the given position is contained within the bounding
@@ -115,8 +117,8 @@ public:
    * @param transformation The transformation.
    * @return The oriented bounding box in the new coordinate system.
    */
-  OrientedBoundingBox
-  transform(const glm::dmat4& transformation) const noexcept;
+  OrientedBoundingBox transform(const glm::dmat4& transformation
+  ) const noexcept;
 
   /**
    * @brief Converts this oriented bounding box to an axis-aligned bounding box.
@@ -132,8 +134,8 @@ public:
    * @brief Creates an oriented bounding box from the given axis-aligned
    * bounding box.
    */
-  static OrientedBoundingBox
-  fromAxisAligned(const AxisAlignedBox& axisAligned) noexcept;
+  static OrientedBoundingBox fromAxisAligned(const AxisAlignedBox& axisAligned
+  ) noexcept;
 
   /**
    * @brief Creates an oriented bounding box from the given bounding sphere.

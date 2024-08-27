@@ -19,10 +19,12 @@ public:
   using ValueType = CesiumGltf::PropertyTextureProperty;
 
   PropertyTexturePropertyJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::PropertyTextureProperty* pObject);
+      CesiumGltf::PropertyTextureProperty* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -30,7 +32,8 @@ protected:
   IJsonHandler* readObjectKeyPropertyTextureProperty(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::PropertyTextureProperty& o);
+      CesiumGltf::PropertyTextureProperty& o
+  );
 
 private:
   CesiumGltf::PropertyTextureProperty* _pObject = nullptr;

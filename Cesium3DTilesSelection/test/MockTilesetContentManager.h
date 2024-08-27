@@ -7,10 +7,12 @@ class MockTilesetContentManagerTestFixture {
 public:
   static void setTileLoadState(
       Cesium3DTilesSelection::Tile& tile,
-      Cesium3DTilesSelection::TileLoadState loadState);
+      Cesium3DTilesSelection::TileLoadState loadState
+  );
 
   static void setTileShouldContinueUpdating(
       Cesium3DTilesSelection::Tile& tile,
-      bool shouldContinueToBeUpdating);
+      bool shouldContinueToBeUpdating
+  );
 };
 } // namespace Cesium3DTilesSelection

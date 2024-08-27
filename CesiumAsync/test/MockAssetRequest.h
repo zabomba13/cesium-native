@@ -12,7 +12,8 @@ public:
       const std::string& method,
       const std::string& url,
       const CesiumAsync::HttpHeaders& headers,
-      std::unique_ptr<CesiumAsync::IAssetResponse> response)
+      std::unique_ptr<CesiumAsync::IAssetResponse> response
+  )
       : _method{method},
         _url{url},
         _headers{headers},

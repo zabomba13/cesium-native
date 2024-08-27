@@ -17,8 +17,8 @@ class BoundingVolumeJsonHandler
 public:
   using ValueType = Cesium3DTiles::BoundingVolume;
 
-  BoundingVolumeJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+  BoundingVolumeJsonHandler(const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void
   reset(IJsonHandler* pParentHandler, Cesium3DTiles::BoundingVolume* pObject);
 
@@ -28,7 +28,8 @@ protected:
   IJsonHandler* readObjectKeyBoundingVolume(
       const std::string& objectType,
       const std::string_view& str,
-      Cesium3DTiles::BoundingVolume& o);
+      Cesium3DTiles::BoundingVolume& o
+  );
 
 private:
   Cesium3DTiles::BoundingVolume* _pObject = nullptr;

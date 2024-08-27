@@ -29,8 +29,8 @@ TEST_CASE("OrientedBoundingBox::intersectPlane") {
       // rotated
       TestCase{
           glm::dvec3(0.0),
-          glm::dmat3(
-              glm::rotate(glm::dmat4(), 1.2, glm::dvec3(0.5, 1.5, -1.2)))},
+          glm::dmat3(glm::rotate(glm::dmat4(), 1.2, glm::dvec3(0.5, 1.5, -1.2))
+          )},
       // scaled
       TestCase{
           glm::dvec3(0.0),
@@ -53,7 +53,9 @@ TEST_CASE("OrientedBoundingBox::intersectPlane") {
           glm::dmat3(glm::rotate(
               glm::scale(glm::dmat4(), glm::dvec3(1.5, 80.4, 2.6)),
               1.2,
-              glm::dvec3(0.5, 1.5, -1.2)))});
+              glm::dvec3(0.5, 1.5, -1.2)
+          ))}
+  );
 
   SECTION("test corners, edges, faces") {
     const double SQRT1_2 = pow(1.0 / 2.0, 1 / 2.0);
@@ -328,7 +330,8 @@ TEST_CASE("OrientedBoundingBox constructor example") {
   glm::dmat3 halfAxes = glm::dmat3(
       glm::dvec3(1.0, 0.0, 0.0),
       glm::dvec3(0.0, 3.0, 0.0),
-      glm::dvec3(0.0, 0.0, 2.0));
+      glm::dvec3(0.0, 0.0, 2.0)
+  );
 
   auto obb = OrientedBoundingBox(center, halfAxes);
   //! [Constructor]
@@ -364,7 +367,9 @@ TEST_CASE("OrientedBoundingBox::toAxisAligned") {
         glm::dmat3(
             glm::dvec3(10.0, 0.0, 0.0),
             glm::dvec3(0.0, 20.0, 0.0),
-            glm::dvec3(0.0, 0.0, 30.0)));
+            glm::dvec3(0.0, 0.0, 30.0)
+        )
+    );
     AxisAlignedBox aabb = obb.toAxisAligned();
     CHECK(aabb.minimumX == -9.0);
     CHECK(aabb.maximumX == 11.0);
@@ -397,7 +402,9 @@ TEST_CASE("OrientedBoundingBox::toSphere") {
         glm::dmat3(
             glm::dvec3(1.0, 0.0, 0.0),
             glm::dvec3(0.0, 1.0, 0.0),
-            glm::dvec3(0.0, 0.0, 1.0)));
+            glm::dvec3(0.0, 0.0, 1.0)
+        )
+    );
 
     BoundingSphere sphere = obb.toSphere();
     CHECK(sphere.getCenter().x == Approx(1.0));
@@ -428,7 +435,9 @@ TEST_CASE("OrientedBoundingBox::toSphere") {
         glm::dmat3(
             glm::dvec3(10.0, 0.0, 0.0),
             glm::dvec3(0.0, 20.0, 0.0),
-            glm::dvec3(0.0, 0.0, 30.0)));
+            glm::dvec3(0.0, 0.0, 30.0)
+        )
+    );
 
     BoundingSphere sphere = obb.toSphere();
     CHECK(sphere.getCenter().x == Approx(1.0));
@@ -437,7 +446,8 @@ TEST_CASE("OrientedBoundingBox::toSphere") {
 
     CHECK(
         sphere.getRadius() ==
-        Approx(glm::sqrt(10.0 * 10.0 + 20.0 * 20.0 + 30.0 * 30.0)));
+        Approx(glm::sqrt(10.0 * 10.0 + 20.0 * 20.0 + 30.0 * 30.0))
+    );
   }
 }
 
@@ -448,7 +458,9 @@ TEST_CASE("OrientedBoundingBox::contains") {
         glm::dmat3(
             glm::dvec3(2.0, 0.0, 0.0),
             glm::dvec3(0.0, 3.0, 0.0),
-            glm::dvec3(0.0, 0.0, 4.0)));
+            glm::dvec3(0.0, 0.0, 4.0)
+        )
+    );
     CHECK(!obb.contains(glm::dvec3(0.0, 0.0, 0.0)));
     CHECK(obb.contains(glm::dvec3(10.0, 20.0, 30.0)));
     CHECK(obb.contains(glm::dvec3(12.0, 23.0, 34.0)));
@@ -464,7 +476,8 @@ TEST_CASE("OrientedBoundingBox::contains") {
     glm::dmat3 halfAngles(
         glm::dvec3(2.0, 0.0, 0.0),
         glm::dvec3(0.0, 3.0, 0.0),
-        glm::dvec3(0.0, 0.0, 4.0));
+        glm::dvec3(0.0, 0.0, 4.0)
+    );
     glm::dmat3 rotation = glm::dmat3(glm::eulerAngleY(fortyFiveDegrees));
     glm::dmat3 transformed = rotation * halfAngles;
     glm::dvec3 center(10.0, 20.0, 30.0);

@@ -19,23 +19,27 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
   const Tile* pParent = loadInput.tile.getParent();
   if (pParent == nullptr) {
     return loadInput.asyncSystem.createResolvedFuture(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   const CesiumGeometry::UpsampledQuadtreeNode* pTileID =
       std::get_if<CesiumGeometry::UpsampledQuadtreeNode>(
-          &loadInput.tile.getTileID());
+          &loadInput.tile.getTileID()
+      );
   if (pTileID == nullptr) {
     // this tile is not marked to be upsampled, so just fail it
     return loadInput.asyncSystem.createResolvedFuture(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   // The tile content manager guarantees that the parent tile is already loaded
   // before upsampled tile is loaded. If that's not the case, it's a bug
   CESIUM_ASSERT(
       pParent->getState() == TileLoadState::Done &&
-      "Parent must be loaded before upsampling");
+      "Parent must be loaded before upsampling"
+  );
 
   const TileContent& parentContent = pParent->getContent();
   const TileRenderContent* pParentRenderContent =
@@ -43,7 +47,8 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
   if (!pParentRenderContent) {
     // parent doesn't have mesh, so it's not possible to upsample
     return loadInput.asyncSystem.createResolvedFuture(
-        TileLoadResult::createFailedResult(nullptr));
+        TileLoadResult::createFailedResult(nullptr)
+    );
   }
 
   size_t index = 0;
@@ -56,7 +61,8 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
       auto it = std::find(
           parentProjections.begin(),
           parentProjections.end(),
-          projection);
+          projection
+      );
       index = static_cast<size_t>(it - parentProjections.begin());
       break;
     }
@@ -79,7 +85,8 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
             false,
             RasterOverlayUtilities::DEFAULT_TEXTURE_COORDINATE_BASE_NAME,
             static_cast<int32_t>(textureCoordinateIndex),
-            ellipsoid);
+            ellipsoid
+        );
         if (!model) {
           return TileLoadResult::createFailedResult(nullptr);
         }
@@ -92,7 +99,8 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
         auto upIt = model->extras.find("gltfUpAxis");
         if (upIt != model->extras.end()) {
           upAxis = CesiumGeometry::Axis(
-              upIt->second.getInt64OrDefault(int64_t(CesiumGeometry::Axis::Y)));
+              upIt->second.getInt64OrDefault(int64_t(CesiumGeometry::Axis::Y))
+          );
         }
 
         return TileLoadResult{
@@ -105,12 +113,14 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
             {},
             TileLoadResultState::Success,
             ellipsoid};
-      });
+      }
+  );
 }
 
 TileChildrenResult RasterOverlayUpsampler::createTileChildren(
     [[maybe_unused]] const Tile& tile,
-    [[maybe_unused]] const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    [[maybe_unused]] const CesiumGeospatial::Ellipsoid& ellipsoid
+) {
   return {{}, TileLoadResultState::Failed};
 }
 } // namespace Cesium3DTilesSelection

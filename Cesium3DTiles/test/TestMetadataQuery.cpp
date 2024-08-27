@@ -31,20 +31,23 @@ TEST_CASE("MetadataQuery") {
     MetadataEntity withSemantic = withoutSemantic;
     withSemantic.properties.emplace(
         "somePropertyWithSemantic",
-        JsonValue("the value"));
+        JsonValue("the value")
+    );
 
     std::optional<FoundMetadataProperty> foundProperty1 =
         MetadataQuery::findFirstPropertyWithSemantic(
             schema,
             withoutSemantic,
-            "SOME_SEMANTIC");
+            "SOME_SEMANTIC"
+        );
     CHECK(!foundProperty1);
 
     std::optional<FoundMetadataProperty> foundProperty2 =
         MetadataQuery::findFirstPropertyWithSemantic(
             schema,
             withSemantic,
-            "SOME_SEMANTIC");
+            "SOME_SEMANTIC"
+        );
     REQUIRE(foundProperty2);
     CHECK(foundProperty2->classIdentifier == "someClass");
     CHECK(&foundProperty2->classDefinition == &classDefinition);

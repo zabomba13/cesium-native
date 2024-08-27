@@ -23,7 +23,8 @@ static void checkSkirt(
     const glm::vec3& edgeUpsampledPosition,
     const glm::vec3& skirtUpsampledPosition,
     glm::dvec3 center,
-    double skirtHeight) {
+    double skirtHeight
+) {
   glm::dvec3 edgePosition =
       static_cast<glm::dvec3>(edgeUpsampledPosition) + center;
   glm::dvec3 geodeticNormal = ellipsoid.geodeticSurfaceNormal(edgePosition);
@@ -32,11 +33,14 @@ static void checkSkirt(
   glm::dvec3 skirtPosition =
       static_cast<glm::dvec3>(skirtUpsampledPosition) + center;
   REQUIRE(
-      Math::equalsEpsilon(expectedPosition.x, skirtPosition.x, Math::Epsilon7));
+      Math::equalsEpsilon(expectedPosition.x, skirtPosition.x, Math::Epsilon7)
+  );
   REQUIRE(
-      Math::equalsEpsilon(expectedPosition.y, skirtPosition.y, Math::Epsilon7));
+      Math::equalsEpsilon(expectedPosition.y, skirtPosition.y, Math::Epsilon7)
+  );
   REQUIRE(
-      Math::equalsEpsilon(expectedPosition.z, skirtPosition.z, Math::Epsilon7));
+      Math::equalsEpsilon(expectedPosition.z, skirtPosition.z, Math::Epsilon7)
+  );
 }
 
 TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
@@ -61,13 +65,17 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
   glm::dvec3 center = ellipsoid.cartographicToCartesian(centerCart);
   std::vector<glm::vec3> positions{
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(bottomLeftCart) - center),
+          ellipsoid.cartographicToCartesian(bottomLeftCart) - center
+      ),
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(topLeftCart) - center),
+          ellipsoid.cartographicToCartesian(topLeftCart) - center
+      ),
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(topRightCart) - center),
+          ellipsoid.cartographicToCartesian(topRightCart) - center
+      ),
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(bottomRightCart) - center),
+          ellipsoid.cartographicToCartesian(bottomRightCart) - center
+      ),
   };
   std::vector<glm::vec2> uvs{
       glm::vec2{0.0, 0.0},
@@ -88,16 +96,19 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
   model.buffers.emplace_back();
   Buffer& buffer = model.buffers.back();
   buffer.cesium.data.resize(
-      positionsBufferSize + uvsBufferSize + indicesBufferSize);
+      positionsBufferSize + uvsBufferSize + indicesBufferSize
+  );
   std::memcpy(buffer.cesium.data.data(), positions.data(), positionsBufferSize);
   std::memcpy(
       buffer.cesium.data.data() + positionsBufferSize,
       uvs.data(),
-      uvsBufferSize);
+      uvsBufferSize
+  );
   std::memcpy(
       buffer.cesium.data.data() + positionsBufferSize + uvsBufferSize,
       indices.data(),
-      indicesBufferSize);
+      indicesBufferSize
+  );
 
   // create position
   model.bufferViews.emplace_back();
@@ -198,7 +209,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
         *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
             model,
             lowerLeft,
-            false);
+            false
+        );
 
     REQUIRE(upsampledModel.meshes.size() == 1);
     const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -209,62 +221,79 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(upsampledPrimitive.indices >= 0);
     REQUIRE(
         upsampledPrimitive.attributes.find("POSITION") !=
-        upsampledPrimitive.attributes.end());
+        upsampledPrimitive.attributes.end()
+    );
     AccessorView<glm::vec3> upsampledPosition(
         upsampledModel,
-        upsampledPrimitive.attributes.at("POSITION"));
+        upsampledPrimitive.attributes.at("POSITION")
+    );
     AccessorView<uint32_t> upsampledIndices(
         upsampledModel,
-        upsampledPrimitive.indices);
+        upsampledPrimitive.indices
+    );
 
     glm::vec3 p0 = upsampledPosition[0];
     REQUIRE(
         glm::epsilonEqual(
             p0,
             positions[0],
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p1 = upsampledPosition[1];
     REQUIRE(
         glm::epsilonEqual(
             p1,
             (positions[0] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
             (upsampledPosition[1] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
             (positions[0] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
             (positions[0] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
             (upsampledPosition[4] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
   }
 
   SECTION("Upsample bottom left child with inverted texture coordinates") {
@@ -278,7 +307,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
         *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
             model,
             lowerLeft,
-            true);
+            true
+        );
 
     REQUIRE(upsampledModel.meshes.size() == 1);
     const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -289,62 +319,79 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(upsampledPrimitive.indices >= 0);
     REQUIRE(
         upsampledPrimitive.attributes.find("POSITION") !=
-        upsampledPrimitive.attributes.end());
+        upsampledPrimitive.attributes.end()
+    );
     AccessorView<glm::vec3> upsampledPosition(
         upsampledModel,
-        upsampledPrimitive.attributes.at("POSITION"));
+        upsampledPrimitive.attributes.at("POSITION")
+    );
     AccessorView<uint32_t> upsampledIndices(
         upsampledModel,
-        upsampledPrimitive.indices);
+        upsampledPrimitive.indices
+    );
 
     glm::vec3 p0 = upsampledPosition[0];
     REQUIRE(
         glm::epsilonEqual(
             p0,
             positions[0],
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p1 = upsampledPosition[1];
     REQUIRE(
         glm::epsilonEqual(
             p1,
             (positions[0] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
             (upsampledPosition[1] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
             (positions[0] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
             (positions[0] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
             (upsampledPosition[4] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
   }
 
   SECTION("Upsample upper left child") {
@@ -352,7 +399,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
         *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
             model,
             upperLeft,
-            false);
+            false
+        );
 
     REQUIRE(upsampledModel.meshes.size() == 1);
     const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -363,62 +411,79 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(upsampledPrimitive.indices >= 0);
     REQUIRE(
         upsampledPrimitive.attributes.find("POSITION") !=
-        upsampledPrimitive.attributes.end());
+        upsampledPrimitive.attributes.end()
+    );
     AccessorView<glm::vec3> upsampledPosition(
         upsampledModel,
-        upsampledPrimitive.attributes.at("POSITION"));
+        upsampledPrimitive.attributes.at("POSITION")
+    );
     AccessorView<uint32_t> upsampledIndices(
         upsampledModel,
-        upsampledPrimitive.indices);
+        upsampledPrimitive.indices
+    );
 
     glm::vec3 p0 = upsampledPosition[0];
     REQUIRE(
         glm::epsilonEqual(
             p0,
             positions[1],
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p1 = upsampledPosition[1];
     REQUIRE(
         glm::epsilonEqual(
             p1,
             (positions[0] + positions[1]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
             (positions[1] + 0.5f * (positions[0] + positions[2])) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
             p2,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
             (positions[1] + positions[3]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
   }
 
   SECTION("Upsample upper right child") {
@@ -426,7 +491,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
         *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
             model,
             upperRight,
-            false);
+            false
+        );
 
     REQUIRE(upsampledModel.meshes.size() == 1);
     const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -437,62 +503,79 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(upsampledPrimitive.indices >= 0);
     REQUIRE(
         upsampledPrimitive.attributes.find("POSITION") !=
-        upsampledPrimitive.attributes.end());
+        upsampledPrimitive.attributes.end()
+    );
     AccessorView<glm::vec3> upsampledPosition(
         upsampledModel,
-        upsampledPrimitive.attributes.at("POSITION"));
+        upsampledPrimitive.attributes.at("POSITION")
+    );
     AccessorView<uint32_t> upsampledIndices(
         upsampledModel,
-        upsampledPrimitive.indices);
+        upsampledPrimitive.indices
+    );
 
     glm::vec3 p0 = upsampledPosition[0];
     REQUIRE(
         glm::epsilonEqual(
             p0,
             positions[3],
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p1 = upsampledPosition[1];
     REQUIRE(
         glm::epsilonEqual(
             p1,
             (positions[1] + positions[3]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
             (positions[2] + 0.5f * (positions[1] + positions[3])) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
             (positions[3] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
             (positions[1] + positions[3]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
             p2,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
   }
 
   SECTION("Upsample bottom right child") {
@@ -500,7 +583,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
         *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
             model,
             lowerRight,
-            false);
+            false
+        );
 
     REQUIRE(upsampledModel.meshes.size() == 1);
     const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -511,62 +595,79 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(upsampledPrimitive.indices >= 0);
     REQUIRE(
         upsampledPrimitive.attributes.find("POSITION") !=
-        upsampledPrimitive.attributes.end());
+        upsampledPrimitive.attributes.end()
+    );
     AccessorView<glm::vec3> upsampledPosition(
         upsampledModel,
-        upsampledPrimitive.attributes.at("POSITION"));
+        upsampledPrimitive.attributes.at("POSITION")
+    );
     AccessorView<uint32_t> upsampledIndices(
         upsampledModel,
-        upsampledPrimitive.indices);
+        upsampledPrimitive.indices
+    );
 
     glm::vec3 p0 = upsampledPosition[0];
     REQUIRE(
         glm::epsilonEqual(
             p0,
             positions[2],
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p1 = upsampledPosition[1];
     REQUIRE(
         glm::epsilonEqual(
             p1,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
             (positions[0] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
             (positions[2] + positions[3]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
             (positions[2] + (positions[1] + positions[3]) * 0.5f) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
             (positions[1] + positions[2]) * 0.5f,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
             p4,
-            glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+            glm::vec3(static_cast<float>(Math::Epsilon7))
+        ) == glm::bvec3(true)
+    );
   }
 
   SECTION("Check skirt") {
@@ -589,7 +690,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
               model,
               lowerLeft,
-              false);
+              false
+          );
 
       REQUIRE(upsampledModel.meshes.size() == 1);
       const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -600,13 +702,16 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
       REQUIRE(upsampledPrimitive.indices >= 0);
       REQUIRE(
           upsampledPrimitive.attributes.find("POSITION") !=
-          upsampledPrimitive.attributes.end());
+          upsampledPrimitive.attributes.end()
+      );
       AccessorView<glm::vec3> upsampledPosition(
           upsampledModel,
-          upsampledPrimitive.attributes.at("POSITION"));
+          upsampledPrimitive.attributes.at("POSITION")
+      );
       AccessorView<uint32_t> upsampledIndices(
           upsampledModel,
-          upsampledPrimitive.indices);
+          upsampledPrimitive.indices
+      );
 
       // check west edge
       checkSkirt(
@@ -614,13 +719,15 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[0],
           upsampledPosition[7],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[3],
           upsampledPosition[8],
           center,
-          skirtHeight);
+          skirtHeight
+      );
 
       // check south edge
       checkSkirt(
@@ -628,19 +735,22 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[1],
           upsampledPosition[9],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[4],
           upsampledPosition[10],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[11],
           center,
-          skirtHeight);
+          skirtHeight
+      );
 
       // check east edge
       checkSkirt(
@@ -648,19 +758,22 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[5],
           upsampledPosition[12],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[1],
           upsampledPosition[13],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[4],
           upsampledPosition[14],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
 
       // check north edge
       checkSkirt(
@@ -668,25 +781,29 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[3],
           upsampledPosition[15],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[2],
           upsampledPosition[16],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[6],
           upsampledPosition[17],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[5],
           upsampledPosition[18],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
     }
 
     SECTION("Check upper left skirt") {
@@ -694,7 +811,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
               model,
               upperLeft,
-              false);
+              false
+          );
 
       REQUIRE(upsampledModel.meshes.size() == 1);
       const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -705,13 +823,16 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
       REQUIRE(upsampledPrimitive.indices >= 0);
       REQUIRE(
           upsampledPrimitive.attributes.find("POSITION") !=
-          upsampledPrimitive.attributes.end());
+          upsampledPrimitive.attributes.end()
+      );
       AccessorView<glm::vec3> upsampledPosition(
           upsampledModel,
-          upsampledPrimitive.attributes.at("POSITION"));
+          upsampledPrimitive.attributes.at("POSITION")
+      );
       AccessorView<uint32_t> upsampledIndices(
           upsampledModel,
-          upsampledPrimitive.indices);
+          upsampledPrimitive.indices
+      );
 
       // check west edge
       checkSkirt(
@@ -719,25 +840,29 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[1],
           upsampledPosition[7],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[8],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[9],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[10],
           center,
-          skirtHeight);
+          skirtHeight
+      );
 
       // check south edge
       checkSkirt(
@@ -745,31 +870,36 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[3],
           upsampledPosition[11],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[5],
           upsampledPosition[12],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[2],
           upsampledPosition[13],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[4],
           upsampledPosition[14],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[1],
           upsampledPosition[15],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
 
       // check east edge
       checkSkirt(
@@ -777,19 +907,22 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[6],
           upsampledPosition[16],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[3],
           upsampledPosition[17],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[5],
           upsampledPosition[18],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
 
       // check north edge
       checkSkirt(
@@ -797,25 +930,29 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[0],
           upsampledPosition[19],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[20],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[21],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[6],
           upsampledPosition[22],
           center,
-          skirtHeight);
+          skirtHeight
+      );
     }
 
     SECTION("Check upper right skirt") {
@@ -823,7 +960,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
               model,
               upperRight,
-              false);
+              false
+          );
 
       REQUIRE(upsampledModel.meshes.size() == 1);
       const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -834,13 +972,16 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
       REQUIRE(upsampledPrimitive.indices >= 0);
       REQUIRE(
           upsampledPrimitive.attributes.find("POSITION") !=
-          upsampledPrimitive.attributes.end());
+          upsampledPrimitive.attributes.end()
+      );
       AccessorView<glm::vec3> upsampledPosition(
           upsampledModel,
-          upsampledPrimitive.attributes.at("POSITION"));
+          upsampledPrimitive.attributes.at("POSITION")
+      );
       AccessorView<uint32_t> upsampledIndices(
           upsampledModel,
-          upsampledPrimitive.indices);
+          upsampledPrimitive.indices
+      );
 
       // check west edge
       checkSkirt(
@@ -848,19 +989,22 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[5],
           upsampledPosition[7],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[1],
           upsampledPosition[8],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[4],
           upsampledPosition[9],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
 
       // check south edge
       checkSkirt(
@@ -868,25 +1012,29 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[3],
           upsampledPosition[10],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[2],
           upsampledPosition[11],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[6],
           upsampledPosition[12],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[5],
           upsampledPosition[13],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
 
       // check east edge
       checkSkirt(
@@ -894,13 +1042,15 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[0],
           upsampledPosition[14],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[3],
           upsampledPosition[15],
           center,
-          skirtHeight);
+          skirtHeight
+      );
 
       // check north edge
       checkSkirt(
@@ -908,19 +1058,22 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[1],
           upsampledPosition[16],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[4],
           upsampledPosition[17],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[18],
           center,
-          skirtHeight);
+          skirtHeight
+      );
     }
 
     SECTION("Check bottom right skirt") {
@@ -928,7 +1081,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
               model,
               lowerRight,
-              false);
+              false
+          );
 
       REQUIRE(upsampledModel.meshes.size() == 1);
       const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -939,13 +1093,16 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
       REQUIRE(upsampledPrimitive.indices >= 0);
       REQUIRE(
           upsampledPrimitive.attributes.find("POSITION") !=
-          upsampledPrimitive.attributes.end());
+          upsampledPrimitive.attributes.end()
+      );
       AccessorView<glm::vec3> upsampledPosition(
           upsampledModel,
-          upsampledPrimitive.attributes.at("POSITION"));
+          upsampledPrimitive.attributes.at("POSITION")
+      );
       AccessorView<uint32_t> upsampledIndices(
           upsampledModel,
-          upsampledPrimitive.indices);
+          upsampledPrimitive.indices
+      );
 
       // check west edge
       checkSkirt(
@@ -953,19 +1110,22 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[2],
           upsampledPosition[7],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[1],
           upsampledPosition[8],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[5],
           upsampledPosition[9],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
 
       // check south edge
       checkSkirt(
@@ -973,25 +1133,29 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[0],
           upsampledPosition[10],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[11],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[12],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[2],
           upsampledPosition[13],
           center,
-          skirtHeight);
+          skirtHeight
+      );
 
       // check east edge
       checkSkirt(
@@ -999,25 +1163,29 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[3],
           upsampledPosition[14],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[15],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[16],
           center,
-          skirtHeight);
+          skirtHeight
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[0],
           upsampledPosition[17],
           center,
-          skirtHeight);
+          skirtHeight
+      );
 
       // check north edge
       checkSkirt(
@@ -1025,31 +1193,36 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
           upsampledPosition[1],
           upsampledPosition[18],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[5],
           upsampledPosition[19],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[4],
           upsampledPosition[20],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[6],
           upsampledPosition[21],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
       checkSkirt(
           ellipsoid,
           upsampledPosition[3],
           upsampledPosition[22],
           center,
-          skirtHeight * 0.5);
+          skirtHeight * 0.5
+      );
     }
   }
 }
@@ -1076,13 +1249,17 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   glm::dvec3 center = ellipsoid.cartographicToCartesian(centerCart);
   std::vector<glm::vec3> positions{
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(bottomLeftCart) - center),
+          ellipsoid.cartographicToCartesian(bottomLeftCart) - center
+      ),
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(topLeftCart) - center),
+          ellipsoid.cartographicToCartesian(topLeftCart) - center
+      ),
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(topRightCart) - center),
+          ellipsoid.cartographicToCartesian(topRightCart) - center
+      ),
       static_cast<glm::vec3>(
-          ellipsoid.cartographicToCartesian(bottomRightCart) - center),
+          ellipsoid.cartographicToCartesian(bottomRightCart) - center
+      ),
   };
   std::vector<glm::vec2> uvs{
       glm::vec2{0.0, 0.0},
@@ -1103,16 +1280,19 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   model.buffers.emplace_back();
   Buffer& buffer = model.buffers.back();
   buffer.cesium.data.resize(
-      positionsBufferSize + uvsBufferSize + indicesBufferSize);
+      positionsBufferSize + uvsBufferSize + indicesBufferSize
+  );
   std::memcpy(buffer.cesium.data.data(), positions.data(), positionsBufferSize);
   std::memcpy(
       buffer.cesium.data.data() + positionsBufferSize,
       uvs.data(),
-      uvsBufferSize);
+      uvsBufferSize
+  );
   std::memcpy(
       buffer.cesium.data.data() + positionsBufferSize + uvsBufferSize,
       indices.data(),
-      indicesBufferSize);
+      indicesBufferSize
+  );
 
   // create position
   model.bufferViews.emplace_back();
@@ -1205,7 +1385,8 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   Model upsampledModel = *RasterOverlayUtilities::upsampleGltfForRasterOverlays(
       model,
       lowerLeft,
-      false);
+      false
+  );
 
   REQUIRE(upsampledModel.meshes.size() == 1);
   const Mesh& upsampledMesh = upsampledModel.meshes.back();
@@ -1216,60 +1397,77 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   REQUIRE(upsampledPrimitive.indices >= 0);
   REQUIRE(
       upsampledPrimitive.attributes.find("POSITION") !=
-      upsampledPrimitive.attributes.end());
+      upsampledPrimitive.attributes.end()
+  );
   AccessorView<glm::vec3> upsampledPosition(
       upsampledModel,
-      upsampledPrimitive.attributes.at("POSITION"));
+      upsampledPrimitive.attributes.at("POSITION")
+  );
   AccessorView<uint32_t> upsampledIndices(
       upsampledModel,
-      upsampledPrimitive.indices);
+      upsampledPrimitive.indices
+  );
 
   glm::vec3 p0 = upsampledPosition[0];
   REQUIRE(
       glm::epsilonEqual(
           p0,
           positions[0],
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 
   glm::vec3 p1 = upsampledPosition[1];
   REQUIRE(
       glm::epsilonEqual(
           p1,
           (positions[0] + positions[2]) * 0.5f,
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 
   glm::vec3 p2 = upsampledPosition[2];
   REQUIRE(
       glm::epsilonEqual(
           p2,
           (upsampledPosition[1] + positions[1]) * 0.5f,
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 
   glm::vec3 p3 = upsampledPosition[3];
   REQUIRE(
       glm::epsilonEqual(
           p3,
           (positions[0] + positions[1]) * 0.5f,
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 
   glm::vec3 p4 = upsampledPosition[4];
   REQUIRE(
       glm::epsilonEqual(
           p4,
           (positions[0] + positions[2]) * 0.5f,
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 
   glm::vec3 p5 = upsampledPosition[5];
   REQUIRE(
       glm::epsilonEqual(
           p5,
           (positions[1] + positions[2]) * 0.5f,
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 
   glm::vec3 p6 = upsampledPosition[6];
   REQUIRE(
       glm::epsilonEqual(
           p6,
           (upsampledPosition[4] + positions[1]) * 0.5f,
-          glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
+          glm::vec3(static_cast<float>(Math::Epsilon7))
+      ) == glm::bvec3(true)
+  );
 }

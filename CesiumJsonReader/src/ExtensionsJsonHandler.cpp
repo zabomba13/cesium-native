@@ -6,7 +6,8 @@ namespace CesiumJsonReader {
 void ExtensionsJsonHandler::reset(
     IJsonHandler* pParent,
     CesiumUtility::ExtensibleObject* pObject,
-    const std::string& objectType) {
+    const std::string& objectType
+) {
   ObjectJsonHandler::reset(pParent);
   this->_pObject = pObject;
 
@@ -15,8 +16,8 @@ void ExtensionsJsonHandler::reset(
   }
 }
 
-IJsonHandler*
-ExtensionsJsonHandler::readObjectKey(const std::string_view& str) {
+IJsonHandler* ExtensionsJsonHandler::readObjectKey(const std::string_view& str
+) {
   this->_currentExtensionHandler =
       this->_context.createExtensionHandler(str, this->_objectType);
   if (this->_currentExtensionHandler) {

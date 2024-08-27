@@ -21,28 +21,33 @@ Tile::Tile(TilesetContentLoader* pLoader) noexcept
 
 Tile::Tile(
     TilesetContentLoader* pLoader,
-    std::unique_ptr<TileExternalContent>&& externalContent) noexcept
+    std::unique_ptr<TileExternalContent>&& externalContent
+) noexcept
     : Tile(
           TileConstructorImpl{},
           TileLoadState::ContentLoaded,
           pLoader,
-          TileContent(std::move(externalContent))) {}
+          TileContent(std::move(externalContent))
+      ) {}
 
 Tile::Tile(
     TilesetContentLoader* pLoader,
-    TileEmptyContent emptyContent) noexcept
+    TileEmptyContent emptyContent
+) noexcept
     : Tile(
           TileConstructorImpl{},
           TileLoadState::ContentLoaded,
           pLoader,
-          emptyContent) {}
+          emptyContent
+      ) {}
 
 template <typename... TileContentArgs, typename TileContentEnable>
 Tile::Tile(
     TileConstructorImpl,
     TileLoadState loadState,
     TilesetContentLoader* pLoader,
-    TileContentArgs&&... args)
+    TileContentArgs&&... args
+)
     : _pParent(nullptr),
       _children(),
       _id(""s),
@@ -198,7 +203,8 @@ bool Tile::isRenderable() const noexcept {
           this->_rasterTiles.end(),
           [](const RasterMappedTo3DTile& rasterTile) noexcept {
             return rasterTile.getReadyTile() != nullptr;
-          });
+          }
+      );
     }
   }
 
@@ -231,8 +237,8 @@ bool Tile::shouldContentContinueUpdating() const noexcept {
   return this->_shouldContentContinueUpdating;
 }
 
-void Tile::setContentShouldContinueUpdating(
-    bool shouldContentContinueUpdating) noexcept {
+void Tile::setContentShouldContinueUpdating(bool shouldContentContinueUpdating
+) noexcept {
   this->_shouldContentContinueUpdating = shouldContentContinueUpdating;
 }
 } // namespace Cesium3DTilesSelection

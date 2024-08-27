@@ -19,7 +19,8 @@ TilesetMetadata::~TilesetMetadata() noexcept {
 
 SharedFuture<void>& TilesetMetadata::loadSchemaUri(
     const AsyncSystem& asyncSystem,
-    const std::shared_ptr<IAssetAccessor>& pAssetAccessor) {
+    const std::shared_ptr<IAssetAccessor>& pAssetAccessor
+) {
   if (!this->_loadingFuture || this->_loadingSchemaUri != this->schemaUri) {
     this->_loadingSchemaUri = this->schemaUri;
 
@@ -36,13 +37,15 @@ SharedFuture<void>& TilesetMetadata::loadSchemaUri(
       this->_loadingFuture =
           pAssetAccessor->get(asyncSystem, *this->schemaUri)
               .thenInMainThread([pLoadingCanceled, this, asyncSystem](
-                                    std::shared_ptr<IAssetRequest>&& pRequest) {
+                                    std::shared_ptr<IAssetRequest>&& pRequest
+                                ) {
                 Promise<void> promise = asyncSystem.createPromise<void>();
 
                 if (*pLoadingCanceled) {
                   promise.reject(std::runtime_error(fmt::format(
                       "Loading of schema URI {} was canceled.",
-                      pRequest->url())));
+                      pRequest->url()
+                  )));
                   return promise.getFuture();
                 }
 
@@ -50,7 +53,8 @@ SharedFuture<void>& TilesetMetadata::loadSchemaUri(
                 if (!pResponse) {
                   promise.reject(std::runtime_error(fmt::format(
                       "Did not receive a valid response for schema URI {}",
-                      pRequest->url())));
+                      pRequest->url()
+                  )));
                   return promise.getFuture();
                 }
 
@@ -60,7 +64,8 @@ SharedFuture<void>& TilesetMetadata::loadSchemaUri(
                   promise.reject(std::runtime_error(fmt::format(
                       "Received status code {} for schema URI {}.",
                       statusCode,
-                      pRequest->url())));
+                      pRequest->url()
+                  )));
                   return promise.getFuture();
                 }
 
@@ -75,7 +80,8 @@ SharedFuture<void>& TilesetMetadata::loadSchemaUri(
                   promise.reject(std::runtime_error(fmt::format(
                       "Error reading Schema from {}.{}",
                       pRequest->url(),
-                      errors)));
+                      errors
+                  )));
                 }
 
                 this->schema = std::move(*result.value);

@@ -19,17 +19,20 @@ public:
   static inline constexpr const char* ExtensionName = "KHR_materials_unlit";
 
   ExtensionKhrMaterialsUnlitJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::ExtensionKhrMaterialsUnlit* pObject);
+      CesiumGltf::ExtensionKhrMaterialsUnlit* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
   virtual void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
-      const std::string_view& extensionName) override;
+      const std::string_view& extensionName
+  ) override;
 
   virtual IJsonHandler& getHandler() override { return *this; }
 
@@ -37,7 +40,8 @@ protected:
   IJsonHandler* readObjectKeyExtensionKhrMaterialsUnlit(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::ExtensionKhrMaterialsUnlit& o);
+      CesiumGltf::ExtensionKhrMaterialsUnlit& o
+  );
 
 private:
   CesiumGltf::ExtensionKhrMaterialsUnlit* _pObject = nullptr;

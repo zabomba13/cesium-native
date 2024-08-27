@@ -17,10 +17,12 @@ public:
   using ValueType = CesiumGltf::AccessorSparseIndices;
 
   AccessorSparseIndicesJsonHandler(
-      const CesiumJsonReader::JsonReaderOptions& options) noexcept;
+      const CesiumJsonReader::JsonReaderOptions& options
+  ) noexcept;
   void reset(
       IJsonHandler* pParentHandler,
-      CesiumGltf::AccessorSparseIndices* pObject);
+      CesiumGltf::AccessorSparseIndices* pObject
+  );
 
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
@@ -28,7 +30,8 @@ protected:
   IJsonHandler* readObjectKeyAccessorSparseIndices(
       const std::string& objectType,
       const std::string_view& str,
-      CesiumGltf::AccessorSparseIndices& o);
+      CesiumGltf::AccessorSparseIndices& o
+  );
 
 private:
   CesiumGltf::AccessorSparseIndices* _pObject = nullptr;

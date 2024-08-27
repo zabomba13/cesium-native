@@ -24,7 +24,8 @@ template <typename Type>
 static void checkBufferContents(
     const std::vector<std::byte>& buffer,
     const std::vector<Type>& expected,
-    [[maybe_unused]] const double epsilon = Math::Epsilon6) {
+    [[maybe_unused]] const double epsilon = Math::Epsilon6
+) {
   REQUIRE(buffer.size() == expected.size() * sizeof(Type));
   const int32_t byteStride = sizeof(Type);
   if constexpr (std::is_same_v<Type, glm::vec3>) {
@@ -35,7 +36,8 @@ static void checkBufferContents(
       REQUIRE(Math::equalsEpsilon(
           static_cast<glm::dvec3>(value),
           static_cast<glm::dvec3>(expectedValue),
-          epsilon));
+          epsilon
+      ));
     }
   } else if constexpr (std::is_same_v<Type, glm::vec4>) {
     for (size_t i = 0; i < expected.size(); ++i) {
@@ -45,7 +47,8 @@ static void checkBufferContents(
       REQUIRE(Math::equalsEpsilon(
           static_cast<glm::dvec4>(value),
           static_cast<glm::dvec4>(expectedValue),
-          epsilon));
+          epsilon
+      ));
     }
   } else if constexpr (std::is_floating_point_v<Type>) {
     for (size_t i = 0; i < expected.size(); ++i) {
@@ -54,9 +57,7 @@ static void checkBufferContents(
       const Type& expectedValue = expected[i];
       REQUIRE(value == Approx(expectedValue));
     }
-  } else if constexpr (
-      std::is_integral_v<Type> || std::is_same_v<Type, glm::u8vec2> ||
-      std::is_same_v<Type, glm::u8vec3> || std::is_same_v<Type, glm::u8vec4>) {
+  } else if constexpr (std::is_integral_v<Type> || std::is_same_v<Type, glm::u8vec2> || std::is_same_v<Type, glm::u8vec3> || std::is_same_v<Type, glm::u8vec4>) {
     for (size_t i = 0; i < expected.size(); ++i) {
       const Type& value =
           *reinterpret_cast<const Type*>(buffer.data() + i * byteStride);
@@ -73,7 +74,8 @@ static void checkAttribute(
     const Model& gltf,
     const MeshPrimitive& primitive,
     const std::string& attributeSemantic,
-    const uint32_t expectedCount) {
+    const uint32_t expectedCount
+) {
   const auto& attributes = primitive.attributes;
   REQUIRE(attributes.find(attributeSemantic) != attributes.end());
 
@@ -231,7 +233,8 @@ TEST_CASE("Converts simple point cloud to glTF") {
   const glm::vec3 expectedRtcCenter(
       1215012.8828876,
       -4736313.0511995,
-      4081605.2212604);
+      4081605.2212604
+  );
   CHECK(rtcExtension->center[0] == Approx(expectedRtcCenter.x));
   CHECK(rtcExtension->center[1] == Approx(expectedRtcCenter.y));
   CHECK(rtcExtension->center[2] == Approx(expectedRtcCenter.z));
@@ -689,8 +692,8 @@ TEST_CASE("Converts point cloud with oct-encoded normals to glTF") {
   checkBufferContents<glm::vec3>(normalBuffer.cesium.data, expectedNormals);
 }
 
-std::set<int32_t>
-getUniqueBufferIds(const std::vector<BufferView>& bufferViews) {
+std::set<int32_t> getUniqueBufferIds(const std::vector<BufferView>& bufferViews
+) {
   std::set<int32_t> result;
   for (auto it = bufferViews.begin(); it != bufferViews.end(); it++) {
     result.insert(it->buffer);
@@ -985,7 +988,8 @@ TEST_CASE("Converts point cloud with Draco compression to glTF") {
     checkBufferContents<glm::vec3>(
         buffer.cesium.data,
         expected,
-        Math::Epsilon1);
+        Math::Epsilon1
+    );
   }
 }
 
@@ -1277,7 +1281,8 @@ TEST_CASE("Converts batched point cloud with Draco compression to glTF") {
     checkBufferContents<glm::vec3>(
         buffer.cesium.data,
         expected,
-        Math::Epsilon1);
+        Math::Epsilon1
+    );
   }
 
   {

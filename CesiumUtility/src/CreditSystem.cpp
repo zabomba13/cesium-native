@@ -61,8 +61,10 @@ void CreditSystem::addCreditToFrame(Credit credit) {
         std::remove(
             _creditsToNoLongerShowThisFrame.begin(),
             _creditsToNoLongerShowThisFrame.end(),
-            credit),
-        _creditsToNoLongerShowThisFrame.end());
+            credit
+        ),
+        _creditsToNoLongerShowThisFrame.end()
+    );
   }
 
   // update the last frame this credit was shown
@@ -93,7 +95,8 @@ const std::vector<Credit>& CreditSystem::getCreditsToShowThisFrame() noexcept {
           return a.id < b.id;
         else
           return aCounts > bCounts;
-      });
+      }
+  );
   return _creditsToShowThisFrame;
 }
 } // namespace CesiumUtility

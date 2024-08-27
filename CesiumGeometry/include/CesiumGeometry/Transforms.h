@@ -59,7 +59,8 @@ struct CESIUMGEOMETRY_API Transforms final {
   static glm::dmat4 createTranslationRotationScaleMatrix(
       const glm::dvec3& translation,
       const glm::dquat& rotation,
-      const glm::dvec3& scale);
+      const glm::dvec3& scale
+  );
 
   /**
    * @brief Decomposes a matrix into translation, rotation, and scale
@@ -82,7 +83,8 @@ struct CESIUMGEOMETRY_API Transforms final {
       const glm::dmat4& matrix,
       glm::dvec3* pTranslation,
       glm::dquat* pRotation,
-      glm::dvec3* pScale);
+      glm::dvec3* pScale
+  );
 };
 
 } // namespace CesiumGeometry

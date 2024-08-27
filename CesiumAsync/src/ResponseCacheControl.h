@@ -41,7 +41,8 @@ public:
       bool proxyRevalidate,
       std::optional<int> maxAge,
       std::optional<int> sharedMaxAge,
-      std::optional<int> staleWhileRevalidate);
+      std::optional<int> staleWhileRevalidate
+  );
 
   /**
    * @brief Must-Revalidate directive that appears in the Cache-Control header.

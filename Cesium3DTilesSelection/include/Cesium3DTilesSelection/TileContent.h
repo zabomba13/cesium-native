@@ -119,7 +119,8 @@ public:
    * @param rasterOverlayDetails The {@link RasterOverlayDetails} that will be owned by this content
    */
   void setRasterOverlayDetails(
-      const CesiumRasterOverlays::RasterOverlayDetails& rasterOverlayDetails);
+      const CesiumRasterOverlays::RasterOverlayDetails& rasterOverlayDetails
+  );
 
   /**
    * @brief Set the {@link RasterOverlayDetails} which is the result of generating raster overlay UVs for the glTF model
@@ -127,7 +128,8 @@ public:
    * @param rasterOverlayDetails The {@link RasterOverlayDetails} that will be owned by this content
    */
   void setRasterOverlayDetails(
-      CesiumRasterOverlays::RasterOverlayDetails&& rasterOverlayDetails);
+      CesiumRasterOverlays::RasterOverlayDetails&& rasterOverlayDetails
+  );
 
   /**
    * @brief Get the list of {@link Credit} of the content
