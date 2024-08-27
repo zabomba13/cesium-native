@@ -1,5 +1,13 @@
 #include "CesiumGeometry/OctreeTilingScheme.h"
 
+#include "CesiumGeometry/AxisAlignedBox.h"
+#include "CesiumGeometry/OctreeTileID.h"
+
+#include <glm/ext/vector_double3.hpp>
+
+#include <cstdint>
+#include <optional>
+
 namespace CesiumGeometry {
 
 OctreeTilingScheme::OctreeTilingScheme(
@@ -43,17 +51,17 @@ std::optional<OctreeTileID> OctreeTilingScheme::positionToTile(
   double yTileSize = this->_box.lengthY / yTiles;
   double zTileSize = this->_box.lengthZ / zTiles;
 
-  uint32_t xTileCoordinate =
+  auto xTileCoordinate =
       static_cast<uint32_t>((position.x - this->_box.minimumX) / xTileSize);
   if (xTileCoordinate >= xTiles) {
     xTileCoordinate = xTiles - 1;
   }
-  uint32_t yTileCoordinate =
+  auto yTileCoordinate =
       static_cast<uint32_t>((position.y - this->_box.minimumY) / yTileSize);
   if (yTileCoordinate >= yTiles) {
     yTileCoordinate = yTiles - 1;
   }
-  uint32_t zTileCoordinate =
+  auto zTileCoordinate =
       static_cast<uint32_t>((position.z - this->_box.minimumZ) / zTileSize);
   if (zTileCoordinate >= zTiles) {
     zTileCoordinate = zTiles - 1;

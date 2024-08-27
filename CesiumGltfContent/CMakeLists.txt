@@ -43,13 +43,12 @@ target_sources(
 
 target_include_directories(
     CesiumGltfContent
-    SYSTEM PUBLIC
+    PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${CMAKE_CURRENT_LIST_DIR}/generated/include
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src
         ${CMAKE_CURRENT_LIST_DIR}/generated/src
-        ${CESIUM_NATIVE_STB_INCLUDE_DIR}
 )
 
 target_link_libraries(CesiumGltfContent

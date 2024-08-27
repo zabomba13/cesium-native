@@ -1,5 +1,13 @@
 #include "CesiumGeometry/QuadtreeTilingScheme.h"
 
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/Rectangle.h"
+
+#include <glm/ext/vector_double2.hpp>
+
+#include <cstdint>
+#include <optional>
+
 namespace CesiumGeometry {
 
 QuadtreeTilingScheme::QuadtreeTilingScheme(
@@ -37,13 +45,11 @@ QuadtreeTilingScheme::positionToTile(const glm::dvec2& position, uint32_t level)
   const double distanceFromWest = position.x - this->getRectangle().minimumX;
   const double distanceFromSouth = position.y - this->getRectangle().minimumY;
 
-  uint32_t xTileCoordinate =
-      static_cast<uint32_t>(distanceFromWest / xTileWidth);
+  auto xTileCoordinate = static_cast<uint32_t>(distanceFromWest / xTileWidth);
   if (xTileCoordinate >= xTiles) {
     xTileCoordinate = xTiles - 1;
   }
-  uint32_t yTileCoordinate =
-      static_cast<uint32_t>(distanceFromSouth / yTileHeight);
+  auto yTileCoordinate = static_cast<uint32_t>(distanceFromSouth / yTileHeight);
   if (yTileCoordinate >= yTiles) {
     yTileCoordinate = yTiles - 1;
   }

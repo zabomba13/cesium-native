@@ -1,6 +1,14 @@
 #include "TileContentLoadInfo.h"
 
+#include <Cesium3DTilesSelection/IPrepareRendererResources.h>
 #include <Cesium3DTilesSelection/TilesetContentLoader.h>
+#include <Cesium3DTilesSelection/TilesetOptions.h>
+#include <CesiumAsync/AsyncSystem.h>
+#include <CesiumAsync/IAssetAccessor.h>
+
+#include <spdlog/logger.h>
+
+#include <memory>
 
 namespace Cesium3DTilesSelection {
 TileContentLoadInfo::TileContentLoadInfo(

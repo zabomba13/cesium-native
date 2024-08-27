@@ -1,6 +1,6 @@
-#include "CesiumUtility/Assert.h"
-
 #if defined CESIUM_FORCE_ASSERTIONS && defined NDEBUG
+
+#include "CesiumUtility/Assert.h"
 
 #undef NDEBUG
 #include <cassert>

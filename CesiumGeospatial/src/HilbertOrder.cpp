@@ -2,6 +2,8 @@
 
 #include "CesiumUtility/Assert.h"
 
+#include <cstdint>
+
 using namespace CesiumGeospatial;
 
 namespace {
@@ -31,7 +33,7 @@ HilbertOrder::encode2D(uint32_t level, uint32_t x, uint32_t y) {
 
   uint64_t index = 0;
 
-  for (uint64_t s = n >> 1; s > 0; s >>= 1) {
+  for (uint64_t s = n >> uint64_t(1); s > 0; s >>= uint64_t(1)) {
     bool rx = (x & s) > 0;
     bool ry = (y & s) > 0;
 

@@ -42,11 +42,10 @@ target_sources(
 
 target_include_directories(
     Cesium3DTiles
-    SYSTEM PUBLIC
+    PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${CMAKE_CURRENT_LIST_DIR}/generated/include
     PRIVATE
-        ${CESIUM_NATIVE_RAPIDJSON_INCLUDE_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/src
         ${CMAKE_CURRENT_LIST_DIR}/generated/src
 )

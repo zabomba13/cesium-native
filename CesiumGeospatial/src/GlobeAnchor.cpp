@@ -1,8 +1,13 @@
+#include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumGeospatial/GlobeAnchor.h>
 #include <CesiumGeospatial/LocalHorizontalCoordinateSystem.h>
 
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_double4.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/vec3.hpp>
 
 namespace {
 
@@ -11,8 +16,9 @@ glm::dmat4 adjustOrientationForMove(
     const glm::dvec3& oldPosition,
     const glm::dvec3& newPosition,
     const glm::dmat4& anchorToFixed) {
-  if (oldPosition == newPosition)
+  if (oldPosition == newPosition) {
     return anchorToFixed;
+  }
 
   glm::dvec3 oldNormal = ellipsoid.geodeticSurfaceNormal(oldPosition);
   glm::dvec3 newNormal = ellipsoid.geodeticSurfaceNormal(newPosition);
@@ -57,8 +63,8 @@ void GlobeAnchor::setAnchorToFixedTransform(
     bool adjustOrientation,
     const Ellipsoid& ellipsoid) {
   if (adjustOrientation) {
-    glm::dvec3 oldPosition = glm::dvec3(this->_anchorToFixed[3]);
-    glm::dvec3 newPosition = glm::dvec3(newAnchorToFixed[3]);
+    glm::dvec3 oldPosition(this->_anchorToFixed[3]);
+    glm::dvec3 newPosition(newAnchorToFixed[3]);
     this->_anchorToFixed = adjustOrientationForMove(
         ellipsoid,
         oldPosition,

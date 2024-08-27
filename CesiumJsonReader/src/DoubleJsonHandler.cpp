@@ -1,9 +1,13 @@
 #include "CesiumJsonReader/DoubleJsonHandler.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
+#include "CesiumJsonReader/JsonHandler.h"
 #include "CesiumUtility/Assert.h"
 
+#include <cstdint>
+
 namespace CesiumJsonReader {
-DoubleJsonHandler::DoubleJsonHandler() noexcept : JsonHandler() {}
+DoubleJsonHandler::DoubleJsonHandler() noexcept = default;
 
 void DoubleJsonHandler::reset(IJsonHandler* pParent, double* pDouble) {
   JsonHandler::reset(pParent);

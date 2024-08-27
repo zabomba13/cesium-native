@@ -1,7 +1,7 @@
 #pragma once
 
 //
-// Define our own assertion, so that users can forcebly turn them on if needed
+// Define our own assertion, so that users can forcibly turn them on if needed
 //
 #if defined CESIUM_FORCE_ASSERTIONS && defined NDEBUG
 // Asserts are defined in cassert and normally compiled out when NDEBUG is

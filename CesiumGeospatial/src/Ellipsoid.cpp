@@ -1,9 +1,17 @@
 #include "CesiumGeospatial/Ellipsoid.h"
 
+#include "CesiumGeospatial/Cartographic.h"
+
 #include <CesiumUtility/Math.h>
 
+#include <glm/common.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
+
+#include <cmath>
+#include <optional>
 
 using namespace CesiumUtility;
 
@@ -17,6 +25,7 @@ Ellipsoid::geodeticSurfaceNormal(const glm::dvec3& position) const noexcept {
   return glm::normalize(position * this->_oneOverRadiiSquared);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 glm::dvec3 Ellipsoid::geodeticSurfaceNormal(
     const Cartographic& cartographic) const noexcept {
   const double longitude = cartographic.longitude;
@@ -33,7 +42,7 @@ glm::dvec3 Ellipsoid::cartographicToCartesian(
     const Cartographic& cartographic) const noexcept {
   glm::dvec3 n = this->geodeticSurfaceNormal(cartographic);
   glm::dvec3 k = this->_radiiSquared * n;
-  const double gamma = sqrt(glm::dot(n, k));
+  const double gamma = glm::sqrt(glm::dot(n, k));
   k /= gamma;
   n *= cartographic.height;
   return k + n;
@@ -73,7 +82,7 @@ Ellipsoid::scaleToGeodeticSurface(const glm::dvec3& cartesian) const noexcept {
 
   // Compute the squared ellipsoid norm.
   const double squaredNorm = x2 + y2 + z2;
-  const double ratio = sqrt(1.0 / squaredNorm);
+  const double ratio = glm::sqrt(1.0 / squaredNorm);
 
   // As an initial approximation, assume that the radial intersection is the
   // projection point.
@@ -100,17 +109,17 @@ Ellipsoid::scaleToGeodeticSurface(const glm::dvec3& cartesian) const noexcept {
       ((1.0 - ratio) * glm::length(cartesian)) / (0.5 * glm::length(gradient));
   double correction = 0.0;
 
-  double func;
-  double denominator;
-  double xMultiplier;
-  double yMultiplier;
-  double zMultiplier;
-  double xMultiplier2;
-  double yMultiplier2;
-  double zMultiplier2;
-  double xMultiplier3;
-  double yMultiplier3;
-  double zMultiplier3;
+  double func = 0.0;
+  double denominator = 0.0;
+  double xMultiplier = 0.0;
+  double yMultiplier = 0.0;
+  double zMultiplier = 0.0;
+  double xMultiplier2 = 0.0;
+  double yMultiplier2 = 0.0;
+  double zMultiplier2 = 0.0;
+  double xMultiplier3 = 0.0;
+  double yMultiplier3 = 0.0;
+  double zMultiplier3 = 0.0;
 
   do {
     lambda -= correction;
@@ -163,7 +172,7 @@ std::optional<glm::dvec3> Ellipsoid::scaleToGeocentricSurface(
   const double oneOverRadiiSquaredY = this->_oneOverRadiiSquared.y;
   const double oneOverRadiiSquaredZ = this->_oneOverRadiiSquared.z;
 
-  const double beta = 1.0 / sqrt(
+  const double beta = 1.0 / glm::sqrt(
                                 positionX * positionX * oneOverRadiiSquaredX +
                                 positionY * positionY * oneOverRadiiSquaredY +
                                 positionZ * positionZ * oneOverRadiiSquaredZ);

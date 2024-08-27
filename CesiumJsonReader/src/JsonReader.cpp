@@ -1,53 +1,68 @@
 #include "CesiumJsonReader/JsonReader.h"
 
+#include <CesiumJsonReader/IJsonHandler.h>
 #include <CesiumUtility/Assert.h>
 
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <rapidjson/error/error.h>
 #include <rapidjson/reader.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumJsonReader {
 namespace {
 
-struct Dispatcher {
-  IJsonHandler* pCurrent;
+class Dispatcher {
+public:
+  explicit Dispatcher(IJsonHandler* pCurrent) : _pCurrent(pCurrent) {}
 
   bool update(IJsonHandler* pNext) noexcept {
     if (pNext == nullptr) {
       return false;
     }
 
-    this->pCurrent = pNext;
+    this->_pCurrent = pNext;
     return true;
   }
 
-  bool Null() { return update(pCurrent->readNull()); }
-  bool Bool(bool b) { return update(pCurrent->readBool(b)); }
-  bool Int(int i) { return update(pCurrent->readInt32(i)); }
-  bool Uint(unsigned i) { return update(pCurrent->readUint32(i)); }
-  bool Int64(int64_t i) { return update(pCurrent->readInt64(i)); }
-  bool Uint64(uint64_t i) { return update(pCurrent->readUint64(i)); }
-  bool Double(double d) { return update(pCurrent->readDouble(d)); }
-  bool RawNumber(
+  bool Null() { return update(_pCurrent->readNull()); }
+  bool Bool(bool b) { return update(_pCurrent->readBool(b)); }
+  bool Int(int i) { return update(_pCurrent->readInt32(i)); }
+  bool Uint(unsigned i) { return update(_pCurrent->readUint32(i)); }
+  bool Int64(int64_t i) { return update(_pCurrent->readInt64(i)); }
+  bool Uint64(uint64_t i) { return update(_pCurrent->readUint64(i)); }
+  bool Double(double d) { return update(_pCurrent->readDouble(d)); }
+  bool RawNumber( // NOLINT(readability-convert-member-functions-to-static)
       const char* /* str */,
       size_t /* length */,
       bool /* copy */) noexcept {
     // This should not be called.
+    // NOLINTNEXTLINE(misc-static-assert,cert-dcl03-c,hicpp-static-assert)
     CESIUM_ASSERT(false);
     return false;
   }
   bool String(const char* str, size_t length, bool /* copy */) {
-    return update(pCurrent->readString(std::string_view(str, length)));
+    return update(_pCurrent->readString(std::string_view(str, length)));
   }
-  bool StartObject() { return update(pCurrent->readObjectStart()); }
+  bool StartObject() { return update(_pCurrent->readObjectStart()); }
   bool Key(const char* str, size_t length, bool /* copy */) {
-    return update(pCurrent->readObjectKey(std::string_view(str, length)));
+    return update(_pCurrent->readObjectKey(std::string_view(str, length)));
   }
   bool EndObject(size_t /* memberCount */) {
-    return update(pCurrent->readObjectEnd());
+    return update(_pCurrent->readObjectEnd());
   }
-  bool StartArray() { return update(pCurrent->readArrayStart()); }
+  bool StartArray() { return update(_pCurrent->readArrayStart()); }
   bool EndArray(size_t /* elementCount */) {
-    return update(pCurrent->readArrayEnd());
+    return update(_pCurrent->readArrayEnd());
   }
+
+private:
+  IJsonHandler* _pCurrent;
 };
 
 std::string getMessageFromRapidJsonError(rapidjson::ParseErrorCode code) {
@@ -94,13 +109,14 @@ std::string getMessageFromRapidJsonError(rapidjson::ParseErrorCode code) {
 
 JsonReader::FinalJsonHandler::FinalJsonHandler(
     std::vector<std::string>& warnings)
-    : JsonHandler(), _warnings(warnings), _pInputStream(nullptr) {
+    : _warnings(warnings), _pInputStream(nullptr) {
   reset(this);
 }
 
 void JsonReader::FinalJsonHandler::reportWarning(
     const std::string& warning,
-    std::vector<std::string>&& context) {
+    std::vector<std::string>&&
+        context) { // NOLINT(cppcoreguidelines-rvalue-reference-param-not-moved)
   std::string fullWarning = warning;
   fullWarning += "\n  While parsing: ";
   for (auto it = context.rbegin(); it != context.rend(); ++it) {
@@ -108,7 +124,7 @@ void JsonReader::FinalJsonHandler::reportWarning(
   }
 
   fullWarning += "\n  From byte offset: ";
-  fullWarning += this->_pInputStream
+  fullWarning += (this->_pInputStream != nullptr)
                      ? std::to_string(this->_pInputStream->Tell())
                      : "unknown";
 
@@ -134,7 +150,7 @@ void JsonReader::FinalJsonHandler::setInputStream(
 
   finalHandler.setInputStream(&inputStream);
 
-  Dispatcher dispatcher{&handler};
+  Dispatcher dispatcher(&handler);
 
   reader.IterativeParseInit();
 
@@ -158,9 +174,9 @@ void JsonReader::FinalJsonHandler::setInputStream(
 void CesiumJsonReader::JsonReader::internalRead(
     const rapidjson::Value& jsonValue,
     IJsonHandler& handler,
-    FinalJsonHandler&,
-    std::vector<std::string>&,
-    std::vector<std::string>&) {
+    FinalJsonHandler& /* finalHandler */,
+    std::vector<std::string>& /* errors */,
+    std::vector<std::string>& /* warnings */) {
   Dispatcher dispatcher{&handler};
   jsonValue.Accept(dispatcher);
 }

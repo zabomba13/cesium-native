@@ -1,6 +1,11 @@
 #include <CesiumUtility/CreditSystem.h>
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumUtility {
 
@@ -89,10 +94,10 @@ const std::vector<Credit>& CreditSystem::getCreditsToShowThisFrame() noexcept {
       [this](const Credit& a, const Credit& b) {
         int32_t aCounts = _credits[a.id].count;
         int32_t bCounts = _credits[b.id].count;
-        if (aCounts == bCounts)
+        if (aCounts == bCounts) {
           return a.id < b.id;
-        else
-          return aCounts > bCounts;
+        }
+        return aCounts > bCounts;
       });
   return _creditsToShowThisFrame;
 }

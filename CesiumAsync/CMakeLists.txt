@@ -30,8 +30,7 @@ target_sources(
 
 target_include_directories(
     CesiumAsync
-    SYSTEM PUBLIC
-        ${CESIUM_NATIVE_RAPIDJSON_INCLUDE_DIR}
+    PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/include
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src/

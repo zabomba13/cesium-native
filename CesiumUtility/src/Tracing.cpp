@@ -1,13 +1,13 @@
 
 #ifndef CESIUM_OVERRIDE_TRACING
 
+#if CESIUM_TRACING_ENABLED
+
 #include "CesiumUtility/Tracing.h"
 
 #include <CesiumUtility/Assert.h>
 
 #include <algorithm>
-
-#if CESIUM_TRACING_ENABLED
 
 namespace CesiumUtility {
 namespace CesiumImpl {
