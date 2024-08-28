@@ -1,28 +1,27 @@
 #include "CesiumGeometry/Plane.h"
 
+#include <CesiumUtility/Assert.h>
 #include <CesiumUtility/Math.h>
 
 #include <glm/geometric.hpp>
-
-#include <stdexcept>
 
 using namespace CesiumUtility;
 
 namespace CesiumGeometry {
 
+// NOLINTBEGIN(cert-err58-cpp)
 const Plane Plane::ORIGIN_XY_PLANE{glm::dvec3(0.0, 0.0, 1.0), 0.0};
 const Plane Plane::ORIGIN_YZ_PLANE{glm::dvec3(1.0, 0.0, 0.0), 0.0};
 const Plane Plane::ORIGIN_ZX_PLANE{glm::dvec3(0.0, 1.0, 0.0), 0.0};
+// NOLINTEND(cert-err58-cpp)
 
 Plane::Plane() noexcept : Plane(glm::dvec3(0.0, 0.0, 1.0), 0.0) {}
 
 Plane::Plane(const glm::dvec3& normal, double distance)
     : _normal(normal), _distance(distance) {
-  //>>includeStart('debug', pragmas.debug);
-  if (!Math::equalsEpsilon(glm::length(normal), 1.0, Math::Epsilon6)) {
-    throw std::invalid_argument("normal must be normalized.");
-  }
-  //>>includeEnd('debug');
+  CESIUM_ASSERT(
+      Math::equalsEpsilon(glm::length(normal), 1.0, Math::Epsilon6) &&
+      "normal must be normalized.");
 }
 
 Plane::Plane(const glm::dvec3& point, const glm::dvec3& normal)

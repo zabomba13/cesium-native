@@ -1,7 +1,9 @@
 #include "fillWithRandomBytes.h"
 
+#include <gsl/span>
 #include <openssl/rand.h>
 
+#include <cstdint>
 #include <stdexcept>
 
 namespace CesiumIonClient {

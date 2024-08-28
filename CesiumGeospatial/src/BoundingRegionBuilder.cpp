@@ -1,7 +1,11 @@
 #include "CesiumGeospatial/BoundingRegionBuilder.h"
 
+#include <CesiumGeospatial/BoundingRegion.h>
 #include <CesiumGeospatial/Cartographic.h>
+#include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumUtility/Math.h>
+
+#include <glm/common.hpp>
 
 #include <limits>
 
@@ -28,21 +32,19 @@ BoundingRegion
 BoundingRegionBuilder::toRegion(const Ellipsoid& ellipsoid) const {
   if (this->_longitudeRangeIsEmpty) {
     return BoundingRegion(GlobeRectangle::EMPTY, 1.0, -1.0, ellipsoid);
-  } else {
-    return BoundingRegion(
-        this->_rectangle,
-        this->_minimumHeight,
-        this->_maximumHeight,
-        ellipsoid);
   }
+  return BoundingRegion(
+      this->_rectangle,
+      this->_minimumHeight,
+      this->_maximumHeight,
+      ellipsoid);
 }
 
 GlobeRectangle BoundingRegionBuilder::toGlobeRectangle() const {
   if (this->_longitudeRangeIsEmpty) {
     return GlobeRectangle::EMPTY;
-  } else {
-    return this->_rectangle;
   }
+  return this->_rectangle;
 }
 
 void BoundingRegionBuilder::setPoleTolerance(double tolerance) noexcept {

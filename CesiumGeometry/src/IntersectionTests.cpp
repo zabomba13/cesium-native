@@ -8,11 +8,11 @@
 
 #include <CesiumUtility/Math.h>
 
-#include <glm/ext/matrix_transform.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtx/norm.hpp>
 
 #include <limits>
+#include <optional>
 
 using namespace CesiumUtility;
 
@@ -112,16 +112,16 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
 
 std::optional<glm::dvec3> IntersectionTests::rayTriangle(
     const Ray& ray,
-    const glm::dvec3& v0,
-    const glm::dvec3& v1,
-    const glm::dvec3& v2,
+    const glm::dvec3& p0,
+    const glm::dvec3& p1,
+    const glm::dvec3& p2,
     bool cullBackFaces) {
   std::optional<double> t =
-      rayTriangleParametric(ray, v0, v1, v2, cullBackFaces);
-  if (t && t.value() >= 0)
+      rayTriangleParametric(ray, p0, p1, p2, cullBackFaces);
+  if (t && t.value() >= 0) {
     return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
-  else
-    return std::nullopt;
+  }
+  return std::nullopt;
 }
 
 std::optional<double> IntersectionTests::rayTriangleParametric(

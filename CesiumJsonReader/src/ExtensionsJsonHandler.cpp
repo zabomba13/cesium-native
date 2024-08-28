@@ -1,6 +1,13 @@
 #include "CesiumJsonReader/ExtensionsJsonHandler.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
 #include "CesiumJsonReader/JsonReaderOptions.h"
+#include "CesiumJsonReader/ObjectJsonHandler.h"
+
+#include <CesiumUtility/ExtensibleObject.h>
+
+#include <string>
+#include <string_view>
 
 namespace CesiumJsonReader {
 void ExtensionsJsonHandler::reset(
@@ -22,8 +29,7 @@ ExtensionsJsonHandler::readObjectKey(const std::string_view& str) {
   if (this->_currentExtensionHandler) {
     this->_currentExtensionHandler->reset(this, *this->_pObject, str);
     return &this->_currentExtensionHandler->getHandler();
-  } else {
-    return this->ignoreAndContinue();
   }
+  return this->ignoreAndContinue();
 }
 } // namespace CesiumJsonReader

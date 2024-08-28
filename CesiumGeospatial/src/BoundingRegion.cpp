@@ -1,13 +1,22 @@
 #include "CesiumGeospatial/BoundingRegion.h"
 
+#include "CesiumGeometry/CullingResult.h"
+#include "CesiumGeospatial/Ellipsoid.h"
 #include "CesiumGeospatial/EllipsoidTangentPlane.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
 
 #include <CesiumGeometry/IntersectionTests.h>
 #include <CesiumGeometry/Plane.h>
 #include <CesiumGeometry/Ray.h>
+#include <CesiumUtility/Assert.h>
 #include <CesiumUtility/Math.h>
 
-#include <stdexcept>
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/geometric.hpp>
+
+#include <optional>
 
 using namespace CesiumUtility;
 using namespace CesiumGeometry;
@@ -228,7 +237,8 @@ BoundingRegion BoundingRegion::computeUnion(
       ellipsoid);
 }
 
-static OrientedBoundingBox fromPlaneExtents(
+namespace {
+OrientedBoundingBox fromPlaneExtents(
     const glm::dvec3& planeOrigin,
     const glm::dvec3& planeXAxis,
     const glm::dvec3& planeYAxis,
@@ -260,23 +270,27 @@ static OrientedBoundingBox fromPlaneExtents(
       planeOrigin + (halfAxes * centerOffset),
       scaledHalfAxes);
 }
+} // namespace
 
 /*static*/ OrientedBoundingBox BoundingRegion::_computeBoundingBox(
     const GlobeRectangle& rectangle,
     double minimumHeight,
     double maximumHeight,
     const Ellipsoid& ellipsoid) {
-  //>>includeStart('debug', pragmas.debug);
-  if (!Math::equalsEpsilon(
+  CESIUM_ASSERT(
+      Math::equalsEpsilon(
           ellipsoid.getRadii().x,
           ellipsoid.getRadii().y,
-          Math::Epsilon15)) {
-    throw std::runtime_error(
-        "Ellipsoid must be an ellipsoid of revolution (radii.x == radii.y)");
-  }
-  //>>includeEnd('debug');
+          Math::Epsilon15) &&
+      "Ellipsoid must be an ellipsoid of revolution (radii.x == radii.y)");
 
-  double minX, maxX, minY, maxY, minZ, maxZ;
+  double minX = 0.0;
+  double maxX = 0.0;
+  double minY = 0.0;
+  double maxY = 0.0;
+  double minZ = 0.0;
+  double maxZ = 0.0;
+
   Plane plane(glm::dvec3(0.0, 0.0, 1.0), 0.0);
 
   if (rectangle.computeWidth() <= Math::OnePi) {

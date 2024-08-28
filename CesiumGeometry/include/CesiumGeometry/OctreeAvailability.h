@@ -95,7 +95,7 @@ public:
    */
   bool addLoadedSubtree(
       AvailabilityNode* pNode,
-      AvailabilitySubtree&& newSubtree) noexcept;
+      AvailabilitySubtree&& newSubtree) const noexcept;
   /**
    * @brief Find the child node index corresponding to this tile ID and parent
    * node.
