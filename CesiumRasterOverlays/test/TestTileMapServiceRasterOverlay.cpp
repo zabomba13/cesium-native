@@ -6,7 +6,7 @@
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumRasterOverlays/TileMapServiceRasterOverlay.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <filesystem>
 
@@ -19,23 +19,24 @@ TEST_CASE("TileMapServiceRasterOverlay") {
   // Set up some mock resources for the raster overlay.
   std::filesystem::path dataDir(CesiumRasterOverlays_TEST_DATA_DIR);
   auto pMockTaskProcessor = std::make_shared<SimpleTaskProcessor>();
-  CesiumAsync::AsyncSystem asyncSystem{pMockTaskProcessor};
+  CesiumAsync::AsyncSystem asyncSystem(pMockTaskProcessor);
 
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
            dataDir / "Cesium_Logo_Color")) {
-    if (!entry.is_regular_file())
+    if (!entry.is_regular_file()) {
       continue;
+    }
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
-        CesiumAsync::HttpHeaders{},
+        CesiumAsync::HttpHeaders(),
         readFile(entry.path()));
     std::string url = "file:///" + entry.path().generic_u8string();
     auto pRequest = std::make_unique<SimpleAssetRequest>(
         "GET",
         url,
-        CesiumAsync::HttpHeaders{},
+        CesiumAsync::HttpHeaders(),
         std::move(pResponse));
     mapUrlToRequest[url] = std::move(pRequest);
   }
@@ -93,6 +94,7 @@ TEST_CASE("TileMapServiceRasterOverlay") {
                 "",
                 CesiumAsync::HttpHeaders(),
                 std::vector<std::byte>()));
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     pRasterOverlay = new TileMapServiceRasterOverlay("test", url);
 
     RasterOverlay::CreateTileProviderResult result = waitForFuture(
@@ -122,13 +124,15 @@ TEST_CASE("TileMapServiceRasterOverlay") {
         std::make_unique<SimpleAssetRequest>(
             "GET",
             xmlUrlWithParameter,
-            CesiumAsync::HttpHeaders{},
+            CesiumAsync::HttpHeaders(),
             std::make_unique<SimpleAssetResponse>(
-                *static_cast<const SimpleAssetResponse*>(
+                *reinterpret_cast<const SimpleAssetResponse*>(
                     pExistingRequest->response())));
 
+    // NOLINTBEGIN(cppcoreguidelines-owning-memory)
     pRasterOverlay =
         new TileMapServiceRasterOverlay("test", xmlUrlWithParameter);
+    // NOLINTEND(cppcoreguidelines-owning-memory)
 
     RasterOverlay::CreateTileProviderResult result = waitForFuture(
         asyncSystem,

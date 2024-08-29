@@ -11,7 +11,7 @@
 #include <CesiumNativeTests/waitForFuture.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/vec3.hpp>
 #include <gsl/span>
 #include <rapidjson/reader.h>
@@ -203,7 +203,7 @@ TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
       REQUIRE(result.warnings.empty());
       const Model& model = result.model.value();
       VertexAttributeRange compressedVar = getVertexAttributeRange(model);
-      double error = 1.0f / (pow(2, n - 1));
+      double error = 1.0f / (glm::pow(2, n - 1));
       REQUIRE(epsilonCompare(
           originalVar.positionRange,
           compressedVar.positionRange,
@@ -287,10 +287,10 @@ TEST_CASE("Nested extras deserializes properly") {
   std::vector<JsonValue>& array = std::get<std::vector<JsonValue>>(pC2->value);
   CHECK(array.size() == 5);
   CHECK(array[0].getSafeNumber<double>() == 1.0);
-  CHECK(array[1].getSafeNumber<std::uint64_t>() == 2);
-  CHECK(array[2].getSafeNumber<std::uint8_t>() == 3);
-  CHECK(array[3].getSafeNumber<std::int16_t>() == 4);
-  CHECK(array[4].getSafeNumber<std::int32_t>() == 5);
+  CHECK(array[1].getSafeNumber<uint64_t>() == 2);
+  CHECK(array[2].getSafeNumber<uint8_t>() == 3);
+  CHECK(array[3].getSafeNumber<int16_t>() == 4);
+  CHECK(array[4].getSafeNumber<int32_t>() == 5);
 }
 
 TEST_CASE("Can deserialize KHR_draco_mesh_compression") {

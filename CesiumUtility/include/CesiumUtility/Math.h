@@ -2,7 +2,9 @@
 
 #include "Library.h"
 
+#include <glm/exponential.hpp>
 #include <glm/gtc/epsilon.hpp>
+#include <glm/gtx/common.hpp>
 
 namespace CesiumUtility {
 
@@ -308,7 +310,7 @@ public:
       // unnecessary math which could introduce floating point error.
       return m;
     }
-    return fmod(fmod(m, n) + n, n);
+    return glm::fmod(glm::fmod(m, n) + n, n);
   }
 
   /**
@@ -462,9 +464,9 @@ public:
     // This constructs a vector whose dot product with v will be 0, hence
     // perpendicular to v. As seen in the "Physically Based Rendering".
     if (glm::abs(v.x) > glm::abs(v.y)) {
-      return glm::vec<3, T, Q>(-v.z, 0, v.x) / std::sqrt(v.x * v.x + v.z * v.z);
+      return glm::vec<3, T, Q>(-v.z, 0, v.x) / glm::sqrt(v.x * v.x + v.z * v.z);
     }
-    return glm::vec<3, T, Q>(0, v.z, -v.y) / std::sqrt(v.y * v.y + v.z * v.z);
+    return glm::vec<3, T, Q>(0, v.z, -v.y) / glm::sqrt(v.y * v.y + v.z * v.z);
   }
 
   /** @brief Compute the rotation between two unit vectors.

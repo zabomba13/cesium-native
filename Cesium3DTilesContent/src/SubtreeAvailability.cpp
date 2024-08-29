@@ -59,7 +59,7 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
       Cesium3DTiles::Buffer& buffer = buffers[size_t(bufferView.buffer)];
       std::vector<std::byte>& data = buffer.cesium.data;
       int64_t bufferSize =
-          std::min(static_cast<int64_t>(data.size()), buffer.byteLength);
+          glm::min(static_cast<int64_t>(data.size()), buffer.byteLength);
       if (bufferView.byteLength >= 0 &&
           bufferView.byteOffset + bufferView.byteLength <= bufferSize) {
         return SubtreeAvailability::SubtreeBufferViewAvailability{
@@ -186,15 +186,17 @@ SubtreeAvailability::SubtreeAvailability(
     AvailabilityView subtreeAvailability,
     std::vector<AvailabilityView>&& contentAvailability,
     Cesium3DTiles::Subtree&& subtree)
-    : _powerOf2{subdivisionScheme == ImplicitTileSubdivisionScheme::Quadtree ? 2U : 3U},
-      _levelsInSubtree{levelsInSubtree},
-      _subtree{std::move(subtree)},
-      _childCount{
+    : _powerOf2(
+          subdivisionScheme == ImplicitTileSubdivisionScheme::Quadtree ? 2U
+                                                                       : 3U),
+      _levelsInSubtree(levelsInSubtree),
+      _subtree(std::move(subtree)),
+      _childCount(
           subdivisionScheme == ImplicitTileSubdivisionScheme::Quadtree ? 4U
-                                                                       : 8U},
-      _tileAvailability{tileAvailability},
-      _subtreeAvailability{subtreeAvailability},
-      _contentAvailability{std::move(contentAvailability)} {
+                                                                       : 8U),
+      _tileAvailability(tileAvailability),
+      _subtreeAvailability(subtreeAvailability),
+      _contentAvailability(std::move(contentAvailability)) {
   CESIUM_ASSERT(
       (this->_childCount == 4 || this->_childCount == 8) &&
       "Only support quadtree and octree");

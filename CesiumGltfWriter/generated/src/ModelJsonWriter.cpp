@@ -71,8 +71,16 @@
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
 #include <CesiumJsonWriter/JsonObjectWriter.h>
 #include <CesiumJsonWriter/JsonWriter.h>
-#include <CesiumJsonWriter/writeJsonExtensions.h>
 #include <CesiumUtility/JsonValue.h>
+
+// NOLINTNEXTLINE(misc-include-cleaner)
+#include <CesiumJsonWriter/writeJsonExtensions.h>
+
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace CesiumGltfWriter {
 
@@ -654,7 +662,7 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  if (obj.fallback != false) {
+  if (obj.fallback) {
     jsonWriter.Key("fallback");
     writeJson(obj.fallback, jsonWriter, context);
   }
@@ -1385,7 +1393,7 @@ void writeJson(
     writeJson(obj.enumType, jsonWriter, context);
   }
 
-  if (obj.array != false) {
+  if (obj.array) {
     jsonWriter.Key("array");
     writeJson(obj.array, jsonWriter, context);
   }
@@ -1395,7 +1403,7 @@ void writeJson(
     writeJson(obj.count, jsonWriter, context);
   }
 
-  if (obj.normalized != false) {
+  if (obj.normalized) {
     jsonWriter.Key("normalized");
     writeJson(obj.normalized, jsonWriter, context);
   }
@@ -1420,7 +1428,7 @@ void writeJson(
     writeJson(obj.min, jsonWriter, context);
   }
 
-  if (obj.required != false) {
+  if (obj.required) {
     jsonWriter.Key("required");
     writeJson(obj.required, jsonWriter, context);
   }
@@ -1883,7 +1891,7 @@ void writeJson(
     writeJson(obj.alphaCutoff, jsonWriter, context);
   }
 
-  if (obj.doubleSided != false) {
+  if (obj.doubleSided) {
     jsonWriter.Key("doubleSided");
     writeJson(obj.doubleSided, jsonWriter, context);
   }
@@ -2249,7 +2257,7 @@ void writeJson(
   jsonWriter.Key("componentType");
   writeJson(obj.componentType, jsonWriter, context);
 
-  if (obj.normalized != false) {
+  if (obj.normalized) {
     jsonWriter.Key("normalized");
     writeJson(obj.normalized, jsonWriter, context);
   }

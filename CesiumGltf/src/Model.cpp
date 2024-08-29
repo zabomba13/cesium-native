@@ -172,8 +172,8 @@ ErrorList Model::merge(Model&& rhs) {
     updateIndex(accessor.bufferView, firstBufferView);
 
     if (accessor.sparse) {
-      updateIndex(accessor.sparse.value().indices.bufferView, firstBufferView);
-      updateIndex(accessor.sparse.value().values.bufferView, firstBufferView);
+      updateIndex(accessor.sparse->indices.bufferView, firstBufferView);
+      updateIndex(accessor.sparse->values.bufferView, firstBufferView);
     }
   }
 
@@ -329,22 +329,22 @@ ErrorList Model::merge(Model&& rhs) {
     Material& material = this->materials[i];
 
     if (material.normalTexture) {
-      updateIndex(material.normalTexture.value().index, firstTexture);
+      updateIndex(material.normalTexture->index, firstTexture);
     }
     if (material.occlusionTexture) {
-      updateIndex(material.occlusionTexture.value().index, firstTexture);
+      updateIndex(material.occlusionTexture->index, firstTexture);
     }
     if (material.pbrMetallicRoughness) {
-      MaterialPBRMetallicRoughness& pbr = material.pbrMetallicRoughness.value();
+      MaterialPBRMetallicRoughness& pbr = *material.pbrMetallicRoughness;
       if (pbr.baseColorTexture) {
-        updateIndex(pbr.baseColorTexture.value().index, firstTexture);
+        updateIndex(pbr.baseColorTexture->index, firstTexture);
       }
       if (pbr.metallicRoughnessTexture) {
-        updateIndex(pbr.metallicRoughnessTexture.value().index, firstTexture);
+        updateIndex(pbr.metallicRoughnessTexture->index, firstTexture);
       }
     }
     if (material.emissiveTexture) {
-      updateIndex(material.emissiveTexture.value().index, firstTexture);
+      updateIndex(material.emissiveTexture->index, firstTexture);
     }
   }
 

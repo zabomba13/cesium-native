@@ -33,7 +33,7 @@ struct InterpolatedVertex {
 
   constexpr bool operator==(const InterpolatedVertex& other) const noexcept {
     return this->first == other.first && this->second == other.second &&
-           std::fabs(this->t - other.t) <=
+           glm::abs(this->t - other.t) <=
                std::numeric_limits<double>::epsilon();
   }
 

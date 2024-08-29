@@ -21,8 +21,8 @@ public:
   virtual bool Bool(bool b);
   virtual bool Int(int i);
   virtual bool Uint(unsigned int i);
-  virtual bool Uint64(std::uint64_t i);
-  virtual bool Int64(std::int64_t i);
+  virtual bool Uint64(uint64_t i);
+  virtual bool Int64(int64_t i);
   virtual bool Double(double d);
   virtual bool RawNumber(const char* str, unsigned int length, bool copy);
   virtual bool Key(std::string_view string);
@@ -33,20 +33,20 @@ public:
   virtual bool EndArray();
 
   // Primitive overloads
-  virtual void Primitive(std::int32_t value);
-  virtual void Primitive(std::uint32_t value);
-  virtual void Primitive(std::int64_t value);
-  virtual void Primitive(std::uint64_t value);
+  virtual void Primitive(int32_t value);
+  virtual void Primitive(uint32_t value);
+  virtual void Primitive(int64_t value);
+  virtual void Primitive(uint64_t value);
   virtual void Primitive(float value);
   virtual void Primitive(double value);
   virtual void Primitive(std::nullptr_t value);
   virtual void Primitive(std::string_view string);
 
   // Integral
-  virtual void KeyPrimitive(std::string_view keyName, std::int32_t value);
-  virtual void KeyPrimitive(std::string_view keyName, std::uint32_t value);
-  virtual void KeyPrimitive(std::string_view keyName, std::int64_t value);
-  virtual void KeyPrimitive(std::string_view keyName, std::uint64_t value);
+  virtual void KeyPrimitive(std::string_view keyName, int32_t value);
+  virtual void KeyPrimitive(std::string_view keyName, uint32_t value);
+  virtual void KeyPrimitive(std::string_view keyName, int64_t value);
+  virtual void KeyPrimitive(std::string_view keyName, uint64_t value);
 
   // String
   virtual void KeyPrimitive(std::string_view keyName, std::string_view value);

@@ -8,7 +8,6 @@
 #include "CesiumGltf/TextureView.h"
 
 #include <algorithm>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <optional>

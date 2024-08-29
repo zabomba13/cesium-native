@@ -1,8 +1,15 @@
 #include <CesiumGeometry/Transforms.h>
+#include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumGeospatial/GlobeAnchor.h>
 #include <CesiumGeospatial/LocalHorizontalCoordinateSystem.h>
+#include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/quaternion_double.hpp>
+#include <glm/ext/quaternion_trigonometric.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 using namespace CesiumGeometry;
@@ -45,16 +52,15 @@ TEST_CASE("GlobeAnchor") {
             glm::dvec4(0.0, 1.0, 0.0, 0.0),
             glm::dvec4(0.0, 0.0, 1.0, 0.0),
             glm::dvec4(1.0, 2.0, 3.0, 1.0)));
-    glm::dvec3 originInEcef =
-        glm::dvec3(leftHandedEastUpNorth.getLocalToEcefTransformation()[3]);
+    glm::dvec3 originInEcef(
+        leftHandedEastUpNorth.getLocalToEcefTransformation()[3]);
 
     // +X in local is East, which is +Y in ECEF.
     // +Y in local is Up, which is +X in ECEF.
     // +Z in local is North, which is +Z in ECEF.
     glm::dvec3 expectedPositionInEcef =
         originInEcef + glm::dvec3(2.0, 1.0, 3.0);
-    glm::dvec3 actualPositionInEcef =
-        glm::dvec3(anchor.getAnchorToFixedTransform()[3]);
+    glm::dvec3 actualPositionInEcef(anchor.getAnchorToFixedTransform()[3]);
 
     CHECK(Math::equalsEpsilon(
         expectedPositionInEcef,

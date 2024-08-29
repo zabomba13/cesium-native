@@ -1,7 +1,10 @@
 #include <CesiumGltfContent/SkirtMeshMetadata.h>
+#include <CesiumUtility/JsonValue.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <optional>
 
 using namespace CesiumGltfContent;
 using namespace CesiumUtility;
@@ -84,8 +87,16 @@ TEST_CASE("Test converting gltf extras to skirt mesh metadata") {
   SECTION("Gltf Extras has correct format") {
     JsonValue::Object extras = {{"skirtMeshMetadata", gltfSkirtMeshMetadata}};
 
-    SkirtMeshMetadata skirtMeshMetadata =
-        *SkirtMeshMetadata::parseFromGltfExtras(extras);
+    std::optional<SkirtMeshMetadata> maybeSkirtMeshMetadata =
+        SkirtMeshMetadata::parseFromGltfExtras(extras);
+
+    REQUIRE(maybeSkirtMeshMetadata.has_value());
+
+    if (!maybeSkirtMeshMetadata) {
+      return;
+    }
+
+    const SkirtMeshMetadata& skirtMeshMetadata = *maybeSkirtMeshMetadata;
 
     REQUIRE(skirtMeshMetadata.noSkirtIndicesBegin == 0);
     REQUIRE(skirtMeshMetadata.noSkirtIndicesCount == 12);

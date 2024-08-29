@@ -8,7 +8,6 @@
 
 #include <CesiumUtility/Assert.h>
 
-#include <cmath>
 #include <cstdint>
 
 namespace CesiumGltf {

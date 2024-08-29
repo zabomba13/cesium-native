@@ -5,7 +5,6 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include <cmath>
 #include <random>
 
 namespace CesiumNativeTests {
@@ -34,7 +33,7 @@ template <typename Vec> struct RandomUnitVectorGenerator {
       }
       length2 = dot(result, result);
     } while (length2 > 1 || length2 == 0);
-    return result / std::sqrt(length2);
+    return result / glm::sqrt(length2);
   }
 };
 

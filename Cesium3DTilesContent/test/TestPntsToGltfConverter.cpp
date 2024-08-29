@@ -8,7 +8,8 @@
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <rapidjson/document.h>
 #include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/spdlog.h>
@@ -24,7 +25,7 @@ template <typename Type>
 static void checkBufferContents(
     const std::vector<std::byte>& buffer,
     const std::vector<Type>& expected,
-    [[maybe_unused]] const double epsilon = Math::Epsilon6) {
+    const double epsilon = Math::Epsilon6) {
   REQUIRE(buffer.size() == expected.size() * sizeof(Type));
   const int32_t byteStride = sizeof(Type);
   if constexpr (std::is_same_v<Type, glm::vec3>) {
@@ -52,7 +53,7 @@ static void checkBufferContents(
       const Type& value =
           *reinterpret_cast<const Type*>(buffer.data() + i * byteStride);
       const Type& expectedValue = expected[i];
-      REQUIRE(value == Approx(expectedValue));
+      REQUIRE(value == Catch::Approx(expectedValue));
     }
   } else if constexpr (
       std::is_integral_v<Type> || std::is_same_v<Type, glm::u8vec2> ||
@@ -188,14 +189,14 @@ TEST_CASE("Converts simple point cloud to glTF") {
   CHECK(accessor.type == Accessor::Type::VEC3);
 
   const glm::vec3 expectedMin(-3.2968313, -4.0330467, -3.5223078);
-  CHECK(accessor.min[0] == Approx(expectedMin.x));
-  CHECK(accessor.min[1] == Approx(expectedMin.y));
-  CHECK(accessor.min[2] == Approx(expectedMin.z));
+  CHECK(accessor.min[0] == Catch::Approx(expectedMin.x));
+  CHECK(accessor.min[1] == Catch::Approx(expectedMin.y));
+  CHECK(accessor.min[2] == Catch::Approx(expectedMin.z));
 
   const glm::vec3 expectedMax(3.2968313, 4.0330467, 3.5223078);
-  CHECK(accessor.max[0] == Approx(expectedMax.x));
-  CHECK(accessor.max[1] == Approx(expectedMax.y));
-  CHECK(accessor.max[2] == Approx(expectedMax.z));
+  CHECK(accessor.max[0] == Catch::Approx(expectedMax.x));
+  CHECK(accessor.max[1] == Catch::Approx(expectedMax.y));
+  CHECK(accessor.max[2] == Catch::Approx(expectedMax.z));
 
   // Check for single bufferView
   REQUIRE(gltf.bufferViews.size() == 1);
@@ -232,9 +233,9 @@ TEST_CASE("Converts simple point cloud to glTF") {
       1215012.8828876,
       -4736313.0511995,
       4081605.2212604);
-  CHECK(rtcExtension->center[0] == Approx(expectedRtcCenter.x));
-  CHECK(rtcExtension->center[1] == Approx(expectedRtcCenter.y));
-  CHECK(rtcExtension->center[2] == Approx(expectedRtcCenter.z));
+  CHECK(rtcExtension->center[0] == Catch::Approx(expectedRtcCenter.x));
+  CHECK(rtcExtension->center[1] == Catch::Approx(expectedRtcCenter.y));
+  CHECK(rtcExtension->center[2] == Catch::Approx(expectedRtcCenter.z));
 }
 
 TEST_CASE("Converts point cloud with RGBA to glTF") {
@@ -465,16 +466,16 @@ TEST_CASE("Converts point cloud with CONSTANT_RGBA") {
   Material& material = gltf.materials[0];
   REQUIRE(material.pbrMetallicRoughness);
   MaterialPBRMetallicRoughness& pbrMetallicRoughness =
-      material.pbrMetallicRoughness.value();
+      *material.pbrMetallicRoughness;
   const auto& baseColorFactor = pbrMetallicRoughness.baseColorFactor;
 
   // Check that CONSTANT_RGBA is stored in the material base color
   const glm::vec4 expectedConstantRGBA =
       glm::vec4(1.0f, 1.0f, 0.0f, 51.0f / 255.0f);
-  CHECK(baseColorFactor[0] == Approx(expectedConstantRGBA.x));
-  CHECK(baseColorFactor[1] == Approx(expectedConstantRGBA.y));
-  CHECK(baseColorFactor[2] == Approx(expectedConstantRGBA.z));
-  CHECK(baseColorFactor[3] == Approx(expectedConstantRGBA.w));
+  CHECK(baseColorFactor[0] == Catch::Approx(expectedConstantRGBA.x));
+  CHECK(baseColorFactor[1] == Catch::Approx(expectedConstantRGBA.y));
+  CHECK(baseColorFactor[2] == Catch::Approx(expectedConstantRGBA.z));
+  CHECK(baseColorFactor[3] == Catch::Approx(expectedConstantRGBA.w));
 
   CHECK(material.alphaMode == Material::AlphaMode::BLEND);
   CHECK(material.hasExtension<ExtensionKhrMaterialsUnlit>());
@@ -528,14 +529,14 @@ TEST_CASE("Converts point cloud with quantized positions to glTF") {
   CHECK(!positionAccessor.normalized);
 
   const glm::vec3 expectedMin(1215009.59, -4736317.08, 4081601.7);
-  CHECK(positionAccessor.min[0] == Approx(expectedMin.x));
-  CHECK(positionAccessor.min[1] == Approx(expectedMin.y));
-  CHECK(positionAccessor.min[2] == Approx(expectedMin.z));
+  CHECK(positionAccessor.min[0] == Catch::Approx(expectedMin.x));
+  CHECK(positionAccessor.min[1] == Catch::Approx(expectedMin.y));
+  CHECK(positionAccessor.min[2] == Catch::Approx(expectedMin.z));
 
   const glm::vec3 expectedMax(1215016.18, -4736309.02, 4081608.74);
-  CHECK(positionAccessor.max[0] == Approx(expectedMax.x));
-  CHECK(positionAccessor.max[1] == Approx(expectedMax.y));
-  CHECK(positionAccessor.max[2] == Approx(expectedMax.z));
+  CHECK(positionAccessor.max[0] == Catch::Approx(expectedMax.x));
+  CHECK(positionAccessor.max[1] == Catch::Approx(expectedMax.y));
+  CHECK(positionAccessor.max[2] == Catch::Approx(expectedMax.z));
 
   uint32_t positionBufferViewId =
       static_cast<uint32_t>(positionAccessor.bufferView);
@@ -907,14 +908,14 @@ TEST_CASE("Converts point cloud with Draco compression to glTF") {
     Accessor& accessor = gltf.accessors[accessorId];
 
     const glm::vec3 expectedMin(-4.9270443f, -3.9144449f, -4.8131480f);
-    CHECK(accessor.min[0] == Approx(expectedMin.x));
-    CHECK(accessor.min[1] == Approx(expectedMin.y));
-    CHECK(accessor.min[2] == Approx(expectedMin.z));
+    CHECK(accessor.min[0] == Catch::Approx(expectedMin.x));
+    CHECK(accessor.min[1] == Catch::Approx(expectedMin.y));
+    CHECK(accessor.min[2] == Catch::Approx(expectedMin.z));
 
     const glm::vec3 expectedMax(3.7791683f, 4.8152132f, 3.2142156f);
-    CHECK(accessor.max[0] == Approx(expectedMax.x));
-    CHECK(accessor.max[1] == Approx(expectedMax.y));
-    CHECK(accessor.max[2] == Approx(expectedMax.z));
+    CHECK(accessor.max[0] == Catch::Approx(expectedMax.x));
+    CHECK(accessor.max[1] == Catch::Approx(expectedMax.y));
+    CHECK(accessor.max[2] == Catch::Approx(expectedMax.z));
 
     uint32_t bufferViewId = static_cast<uint32_t>(accessor.bufferView);
     BufferView& bufferView = gltf.bufferViews[bufferViewId];
@@ -1055,14 +1056,14 @@ TEST_CASE("Converts point cloud with partial Draco compression to glTF") {
     Accessor& accessor = gltf.accessors[accessorId];
 
     const glm::vec3 expectedMin(-4.9270443f, -3.9144449f, -4.8131480f);
-    CHECK(accessor.min[0] == Approx(expectedMin.x));
-    CHECK(accessor.min[1] == Approx(expectedMin.y));
-    CHECK(accessor.min[2] == Approx(expectedMin.z));
+    CHECK(accessor.min[0] == Catch::Approx(expectedMin.x));
+    CHECK(accessor.min[1] == Catch::Approx(expectedMin.y));
+    CHECK(accessor.min[2] == Catch::Approx(expectedMin.z));
 
     const glm::vec3 expectedMax(3.7791683f, 4.8152132f, 3.2142156f);
-    CHECK(accessor.max[0] == Approx(expectedMax.x));
-    CHECK(accessor.max[1] == Approx(expectedMax.y));
-    CHECK(accessor.max[2] == Approx(expectedMax.z));
+    CHECK(accessor.max[0] == Catch::Approx(expectedMax.x));
+    CHECK(accessor.max[1] == Catch::Approx(expectedMax.y));
+    CHECK(accessor.max[2] == Catch::Approx(expectedMax.z));
 
     uint32_t bufferViewId = static_cast<uint32_t>(accessor.bufferView);
     BufferView& bufferView = gltf.bufferViews[bufferViewId];
@@ -1199,14 +1200,14 @@ TEST_CASE("Converts batched point cloud with Draco compression to glTF") {
     Accessor& accessor = gltf.accessors[accessorId];
 
     const glm::vec3 expectedMin(-4.9270443f, -3.9144449f, -4.8131480f);
-    CHECK(accessor.min[0] == Approx(expectedMin.x));
-    CHECK(accessor.min[1] == Approx(expectedMin.y));
-    CHECK(accessor.min[2] == Approx(expectedMin.z));
+    CHECK(accessor.min[0] == Catch::Approx(expectedMin.x));
+    CHECK(accessor.min[1] == Catch::Approx(expectedMin.y));
+    CHECK(accessor.min[2] == Catch::Approx(expectedMin.z));
 
     const glm::vec3 expectedMax(3.7791683f, 4.8152132f, 3.2142156f);
-    CHECK(accessor.max[0] == Approx(expectedMax.x));
-    CHECK(accessor.max[1] == Approx(expectedMax.y));
-    CHECK(accessor.max[2] == Approx(expectedMax.z));
+    CHECK(accessor.max[0] == Catch::Approx(expectedMax.x));
+    CHECK(accessor.max[1] == Catch::Approx(expectedMax.y));
+    CHECK(accessor.max[2] == Catch::Approx(expectedMax.z));
 
     uint32_t bufferViewId = static_cast<uint32_t>(accessor.bufferView);
     BufferView& bufferView = gltf.bufferViews[bufferViewId];

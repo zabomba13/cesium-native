@@ -84,16 +84,10 @@ int decodeBufferView(
         reinterpret_cast<const unsigned char*>(buffer.data()),
         buffer.size());
   } else {
-    if (meshOpt.byteStride == sizeof(std::uint16_t)) {
-      return decodeIndices(
-          reinterpret_cast<std::uint16_t*>(data),
-          buffer,
-          meshOpt);
-    } else if (meshOpt.byteStride == sizeof(std::uint32_t)) {
-      return decodeIndices(
-          reinterpret_cast<std::uint32_t*>(data),
-          buffer,
-          meshOpt);
+    if (meshOpt.byteStride == sizeof(uint16_t)) {
+      return decodeIndices(reinterpret_cast<uint16_t*>(data), buffer, meshOpt);
+    } else if (meshOpt.byteStride == sizeof(uint32_t)) {
+      return decodeIndices(reinterpret_cast<uint32_t*>(data), buffer, meshOpt);
     } else {
       return -1;
     }

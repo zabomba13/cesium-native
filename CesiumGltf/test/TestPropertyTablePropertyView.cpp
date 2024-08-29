@@ -1,6 +1,7 @@
 #include "CesiumGltf/PropertyTablePropertyView.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <gsl/span>
 
 #include <bitset>
@@ -91,7 +92,8 @@ static void checkNumeric(
   for (int64_t i = 0; i < property.size(); ++i) {
     REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
     if constexpr (IsMetadataFloating<T>::value) {
-      REQUIRE(property.get(i) == Approx(*expected[static_cast<size_t>(i)]));
+      REQUIRE(
+          property.get(i) == Catch::Approx(*expected[static_cast<size_t>(i)]));
     } else {
       REQUIRE(property.get(i) == expected[static_cast<size_t>(i)]);
     }
@@ -666,7 +668,8 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
     std::vector<float> expected{3.0, 7.0f, 5.0f, 9.0f};
     for (int64_t i = 0; i < property.size(); ++i) {
       REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
-      REQUIRE(property.get(i) == Approx(expected[static_cast<size_t>(i)]));
+      REQUIRE(
+          property.get(i) == Catch::Approx(expected[static_cast<size_t>(i)]));
     }
   }
 }
@@ -1277,7 +1280,7 @@ TEST_CASE("Check matN PropertyTablePropertyView (normalized)") {
 }
 
 TEST_CASE("Check boolean PropertyTablePropertyView") {
-  std::bitset<sizeof(unsigned long)* CHAR_BIT> bits = 0b11110101;
+  std::bitset<sizeof(unsigned long) * CHAR_BIT> bits = 0b11110101;
   unsigned long val = bits.to_ulong();
   std::vector<std::byte> data(sizeof(val));
   std::memcpy(data.data(), &val, sizeof(val));

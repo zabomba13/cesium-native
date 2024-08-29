@@ -1,6 +1,6 @@
 #pragma once
+#include <fmt/core.h>
 #include <rapidjson/document.h>
-#include <spdlog/fmt/fmt.h>
 
 template <>
 struct fmt::formatter<rapidjson::ParseErrorCode> : formatter<string_view> {

@@ -462,8 +462,7 @@ QuadtreeRasterOverlayTileProvider::loadTileImage(
             images.begin(),
             images.end(),
             [](const LoadedQuadtreeImage& image) {
-              return image.pLoaded->image.has_value() &&
-                     !image.subset.has_value();
+              return image.pLoaded->image && !image.subset;
             });
 
         if (!haveAnyUsefulImageData) {

@@ -6,7 +6,6 @@
 #include <CesiumGeometry/OrientedBoundingBox.h>
 #include <CesiumGeospatial/BoundingRegion.h>
 
-#include <cmath>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -27,13 +26,13 @@ public:
       uint32_t subtreeLevels,
       uint32_t availableLevels,
       ImplicitBoundingVolumeType&& volume)
-      : _baseUrl{baseUrl},
-        _contentUrlTemplate{contentUrlTemplate},
-        _subtreeUrlTemplate{subtreeUrlTemplate},
-        _subtreeLevels{subtreeLevels},
-        _availableLevels{availableLevels},
-        _boundingVolume{std::forward<ImplicitBoundingVolumeType>(volume)},
-        _loadedSubtrees(static_cast<size_t>(std::ceil(
+      : _baseUrl(baseUrl),
+        _contentUrlTemplate(contentUrlTemplate),
+        _subtreeUrlTemplate(subtreeUrlTemplate),
+        _subtreeLevels(subtreeLevels),
+        _availableLevels(availableLevels),
+        _boundingVolume(std::forward<ImplicitBoundingVolumeType>(volume)),
+        _loadedSubtrees(static_cast<size_t>(glm::ceil(
             static_cast<float>(availableLevels) /
             static_cast<float>(subtreeLevels)))) {}
 

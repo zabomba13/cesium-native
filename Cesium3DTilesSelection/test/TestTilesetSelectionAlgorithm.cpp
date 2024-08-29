@@ -12,7 +12,7 @@
 #include <CesiumNativeTests/readFile.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/mat4x4.hpp>
 
 #include <algorithm>
@@ -57,7 +57,7 @@ static void initializeTileset(Tileset& tileset) {
   double aspectRatio = viewPortSize.x / viewPortSize.y;
   double horizontalFieldOfView = Math::degreesToRadians(60.0);
   double verticalFieldOfView =
-      std::atan(std::tan(horizontalFieldOfView * 0.5) / aspectRatio) * 2.0;
+      glm::atan(glm::tan(horizontalFieldOfView * 0.5) / aspectRatio) * 2.0;
   ViewState viewState = ViewState::create(
       viewPosition,
       glm::normalize(viewFocus - viewPosition),
@@ -89,7 +89,7 @@ static ViewState zoomToTile(const Tile& tile) {
   double aspectRatio = viewPortSize.x / viewPortSize.y;
   double horizontalFieldOfView = Math::degreesToRadians(60.0);
   double verticalFieldOfView =
-      std::atan(std::tan(horizontalFieldOfView * 0.5) / aspectRatio) * 2.0;
+      glm::atan(glm::tan(horizontalFieldOfView * 0.5) / aspectRatio) * 2.0;
   return ViewState::create(
       viewPosition,
       glm::normalize(viewFocus - viewPosition),
@@ -1200,7 +1200,7 @@ TEST_CASE("Makes metadata available on external tilesets") {
 
   TileExternalContent* pExternalContent = nullptr;
 
-  for (int i = 0; i < 10 && pExternalContent == nullptr; ++i) {
+  for (int i = 0; i < 10 && !pExternalContent; ++i) {
     ViewState zoomToTileViewState = zoomToTile(*pExternal);
     tileset.updateView({zoomToTileViewState});
     pExternalContent = pExternal->getContent().getExternalContent();
@@ -1336,7 +1336,7 @@ TEST_CASE("Allows access to material variants in an external schema") {
   Tileset tileset(tilesetExternals, "tileset-external-schema.json");
 
   // getMetadata returns nullptr before the root tile is loaded.
-  CHECK(tileset.getMetadata() == nullptr);
+  CHECK(!tileset.getMetadata());
 
   bool wasCalled = false;
   tileset.loadMetadata().thenInMainThread(
@@ -1441,7 +1441,7 @@ TEST_CASE("Future from loadSchema rejects if schemaUri can't be loaded") {
   Tileset tileset(tilesetExternals, "tileset-external-schema.json");
 
   // getMetadata returns nullptr before the root tile is loaded.
-  CHECK(tileset.getMetadata() == nullptr);
+  CHECK(!tileset.getMetadata());
 
   bool wasResolved = false;
   bool wasRejected = false;
@@ -1520,7 +1520,7 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
         result.contentKind = TileEmptyContent();
         return input.asyncSystem.createResolvedFuture(std::move(result));
       } else if (
-          input.tile.getParent() != nullptr &&
+          input.tile.getParent() &&
           input.tile.getParent()->getParent() == this->_pRootTile) {
         this->_grandchildPromise =
             input.asyncSystem.createPromise<TileLoadResult>();

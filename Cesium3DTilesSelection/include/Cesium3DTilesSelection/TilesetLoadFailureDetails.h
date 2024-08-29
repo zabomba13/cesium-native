@@ -46,12 +46,12 @@ public:
   /**
    * The status code of the HTTP response.
    */
-  uint16_t statusCode{200};
+  uint16_t statusCode = 200;
 
   /**
    * @brief A human-readable explanation of what failed.
    */
-  std::string message = "";
+  std::string message;
 };
 
 } // namespace Cesium3DTilesSelection

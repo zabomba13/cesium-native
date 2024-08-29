@@ -2,9 +2,17 @@
 #include <CesiumGeospatial/EarthGravitationalModel1996Grid.h>
 #include <CesiumUtility/Math.h>
 
+#include <gsl/span>
+
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <ios>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 using namespace CesiumUtility;
@@ -36,7 +44,7 @@ CesiumGeospatial::EarthGravitationalModel1996Grid::fromFile(
     return std::nullopt;
   }
 
-  size_t size = std::min(size_t(file.tellg()), size_t(TOTAL_BYTES));
+  size_t size = glm::min(size_t(file.tellg()), size_t(TOTAL_BYTES));
   file.seekg(0, std::ios::beg);
 
   std::vector<std::byte> buffer(size);
@@ -56,7 +64,7 @@ CesiumGeospatial::EarthGravitationalModel1996Grid::fromBuffer(
   gridValues.resize(TOTAL_VALUES);
 
   const std::byte* pRead = buffer.data();
-  std::byte* pWrite = reinterpret_cast<std::byte*>(gridValues.data());
+  auto* pWrite = reinterpret_cast<std::byte*>(gridValues.data());
 
   for (size_t i = 0; i < TOTAL_BYTES; i += 2) {
     // WW15MGH.DAC is in big endian, so we swap the bytes
@@ -74,11 +82,11 @@ double EarthGravitationalModel1996Grid::sampleHeight(
       Math::clamp(position.latitude, -Math::PiOverTwo, Math::PiOverTwo);
 
   const double horizontalIndexDecimal = (NUM_COLUMNS * longitude) / Math::TwoPi;
-  const size_t horizontalIndex = static_cast<size_t>(horizontalIndexDecimal);
+  const auto horizontalIndex = static_cast<size_t>(horizontalIndexDecimal);
 
   const double verticalIndexDecimal =
       ((NUM_ROWS - 1) * (Math::PiOverTwo - latitude)) / Math::OnePi;
-  const size_t verticalIndex = static_cast<size_t>(verticalIndexDecimal);
+  const auto verticalIndex = static_cast<size_t>(verticalIndexDecimal);
 
   // Get the normalized position of the coordinates within the grid tile
   const double xn = horizontalIndexDecimal - double(horizontalIndex);
@@ -102,7 +110,7 @@ double EarthGravitationalModel1996Grid::sampleHeight(
 
 EarthGravitationalModel1996Grid::EarthGravitationalModel1996Grid(
     std::vector<int16_t>&& gridValues)
-    : _gridValues(gridValues) {}
+    : _gridValues(std::move(gridValues)) {}
 
 double EarthGravitationalModel1996Grid::getHeightForIndices(
     const size_t horizontal,

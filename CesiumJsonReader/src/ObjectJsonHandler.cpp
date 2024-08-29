@@ -34,7 +34,7 @@ IJsonHandler* ObjectJsonHandler::EndSubObject() noexcept { return nullptr; }
 void ObjectJsonHandler::reportWarning(
     const std::string& warning,
     std::vector<std::string>&& context) {
-  if (this->getCurrentKey() != nullptr) {
+  if (this->getCurrentKey()) {
     context.emplace_back(std::string(".") + this->getCurrentKey());
   }
   this->parent()->reportWarning(warning, std::move(context));

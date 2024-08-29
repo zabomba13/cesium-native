@@ -3,7 +3,9 @@
 #include <Cesium3DTilesSelection/ViewState.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -56,8 +58,8 @@ TEST_CASE("OrientedBoundingBox::intersectPlane") {
               glm::dvec3(0.5, 1.5, -1.2)))});
 
   SECTION("test corners, edges, faces") {
-    const double SQRT1_2 = pow(1.0 / 2.0, 1 / 2.0);
-    const double SQRT3_4 = pow(3.0 / 4.0, 1 / 2.0);
+    const double SQRT1_2 = glm::pow(1.0 / 2.0, 1 / 2.0);
+    const double SQRT3_4 = glm::pow(3.0 / 4.0, 1 / 2.0);
 
     auto box = OrientedBoundingBox(testCase.center, testCase.axes * 0.5);
 
@@ -400,11 +402,11 @@ TEST_CASE("OrientedBoundingBox::toSphere") {
             glm::dvec3(0.0, 0.0, 1.0)));
 
     BoundingSphere sphere = obb.toSphere();
-    CHECK(sphere.getCenter().x == Approx(1.0));
-    CHECK(sphere.getCenter().y == Approx(2.0));
-    CHECK(sphere.getCenter().z == Approx(3.0));
+    CHECK(sphere.getCenter().x == Catch::Approx(1.0));
+    CHECK(sphere.getCenter().y == Catch::Approx(2.0));
+    CHECK(sphere.getCenter().z == Catch::Approx(3.0));
 
-    CHECK(sphere.getRadius() == Approx(glm::sqrt(3.0)));
+    CHECK(sphere.getRadius() == Catch::Approx(glm::sqrt(3.0)));
   }
 
   SECTION("rotating the box does not change the bounding sphere") {
@@ -415,11 +417,11 @@ TEST_CASE("OrientedBoundingBox::toSphere") {
     OrientedBoundingBox obb(glm::dvec3(1.0, 2.0, 3.0), rotation);
 
     BoundingSphere sphere = obb.toSphere();
-    CHECK(sphere.getCenter().x == Approx(1.0));
-    CHECK(sphere.getCenter().y == Approx(2.0));
-    CHECK(sphere.getCenter().z == Approx(3.0));
+    CHECK(sphere.getCenter().x == Catch::Approx(1.0));
+    CHECK(sphere.getCenter().y == Catch::Approx(2.0));
+    CHECK(sphere.getCenter().z == Catch::Approx(3.0));
 
-    CHECK(sphere.getRadius() == Approx(glm::sqrt(3.0)));
+    CHECK(sphere.getRadius() == Catch::Approx(glm::sqrt(3.0)));
   }
 
   SECTION("a scaled axis-aligned box") {
@@ -431,13 +433,13 @@ TEST_CASE("OrientedBoundingBox::toSphere") {
             glm::dvec3(0.0, 0.0, 30.0)));
 
     BoundingSphere sphere = obb.toSphere();
-    CHECK(sphere.getCenter().x == Approx(1.0));
-    CHECK(sphere.getCenter().y == Approx(2.0));
-    CHECK(sphere.getCenter().z == Approx(3.0));
+    CHECK(sphere.getCenter().x == Catch::Approx(1.0));
+    CHECK(sphere.getCenter().y == Catch::Approx(2.0));
+    CHECK(sphere.getCenter().z == Catch::Approx(3.0));
 
     CHECK(
         sphere.getRadius() ==
-        Approx(glm::sqrt(10.0 * 10.0 + 20.0 * 20.0 + 30.0 * 30.0)));
+        Catch::Approx(glm::sqrt(10.0 * 10.0 + 20.0 * 20.0 + 30.0 * 30.0)));
   }
 }
 

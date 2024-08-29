@@ -2,7 +2,9 @@
 
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <glm/ext/vector_double2.hpp>
 
 using namespace CesiumGeometry;
 
@@ -30,35 +32,35 @@ TEST_CASE("Rectangle::computeSignedDistance") {
       TestCase{
           positive,
           glm::dvec2(5.0, 15.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           negative,
           glm::dvec2(-5.0, -15.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           positive,
           glm::dvec2(5.0, 45.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           negative,
           glm::dvec2(-5.0, -45.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           positive,
           glm::dvec2(35.0, 15.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           negative,
           glm::dvec2(-35.0, -15.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           positive,
           glm::dvec2(35.0, 45.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)},
       TestCase{
           negative,
           glm::dvec2(-35.0, -45.0),
-          std::sqrt(5.0 * 5.0 + 5.0 * 5.0)});
+          glm::sqrt(5.0 * 5.0 + 5.0 * 5.0)});
 
   CHECK(CesiumUtility::Math::equalsEpsilon(
       testCase.rectangle.computeSignedDistance(testCase.position),

@@ -29,11 +29,11 @@ MetadataQuery::findFirstPropertyWithSemantic(
     const ClassProperty& classProperty = propertyIt->second;
     if (classProperty.semantic == semantic) {
       return FoundMetadataProperty{
-          classId,
-          klass,
-          propertyId,
-          propertyIt->second,
-          property};
+          &classId,
+          &klass,
+          &propertyId,
+          &propertyIt->second,
+          &property};
     }
   }
 

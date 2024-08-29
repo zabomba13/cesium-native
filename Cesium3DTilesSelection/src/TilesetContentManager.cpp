@@ -121,7 +121,7 @@ getTileBoundingRegionForUpsampling(const Tile& parent) {
     if (mapped.isMoreDetailAvailable()) {
       const RasterOverlayTile* pReadyTile = mapped.getReadyTile();
       if (!pReadyTile) {
-        assert(false);
+        CESIUM_ASSERT(false);
         continue;
       }
       const CesiumGeospatial::Projection& projection =
@@ -129,7 +129,7 @@ getTileBoundingRegionForUpsampling(const Tile& parent) {
       const CesiumGeometry::Rectangle* pRectangle =
           details.findRectangleForOverlayProjection(projection);
       if (!pRectangle) {
-        assert(false);
+        CESIUM_ASSERT(false);
         continue;
       }
 
@@ -490,7 +490,7 @@ void calcFittestBoundingRegionForLooseTile(
       result.updatedBoundingVolume,
       result.updatedContentBoundingVolume);
   if (std::get_if<CesiumGeospatial::BoundingRegionWithLooseFittingHeights>(
-          &boundingVolume) != nullptr) {
+          &boundingVolume)) {
     if (result.rasterOverlayDetails) {
       // We already computed the bounding region for overlays, so use it.
       result.updatedBoundingVolume =
@@ -647,10 +647,9 @@ TilesetContentManager::TilesetContentManager(
       _userCredit(
           (tilesetOptions.credit && externals.pCreditSystem)
               ? std::optional<Credit>(externals.pCreditSystem->createCredit(
-                    tilesetOptions.credit.value(),
+                    *tilesetOptions.credit,
                     tilesetOptions.showCreditsOnScreen))
               : std::nullopt),
-      _tilesetCredits{},
       _overlayCollection{std::move(overlayCollection)},
       _tileLoadsInProgress{0},
       _loadedTilesCount{0},
@@ -670,16 +669,12 @@ TilesetContentManager::TilesetContentManager(
     RasterOverlayCollection&& overlayCollection,
     const std::string& url)
     : _externals{externals},
-      _requestHeaders{},
-      _pLoader{},
-      _pRootTile{},
       _userCredit(
           (tilesetOptions.credit && externals.pCreditSystem)
               ? std::optional<Credit>(externals.pCreditSystem->createCredit(
-                    tilesetOptions.credit.value(),
+                    *tilesetOptions.credit,
                     tilesetOptions.showCreditsOnScreen))
               : std::nullopt),
-      _tilesetCredits{},
       _overlayCollection{std::move(overlayCollection)},
       _tileLoadsInProgress{0},
       _loadedTilesCount{0},
@@ -821,16 +816,12 @@ TilesetContentManager::TilesetContentManager(
     const std::string& ionAccessToken,
     const std::string& ionAssetEndpointUrl)
     : _externals{externals},
-      _requestHeaders{},
-      _pLoader{},
-      _pRootTile{},
       _userCredit(
           (tilesetOptions.credit && externals.pCreditSystem)
               ? std::optional<Credit>(externals.pCreditSystem->createCredit(
-                    tilesetOptions.credit.value(),
+                    *tilesetOptions.credit,
                     tilesetOptions.showCreditsOnScreen))
               : std::nullopt),
-      _tilesetCredits{},
       _overlayCollection{std::move(overlayCollection)},
       _tileLoadsInProgress{0},
       _loadedTilesCount{0},
@@ -1505,7 +1496,7 @@ void TilesetContentManager::unloadDoneState(Tile& tile) {
 }
 
 void TilesetContentManager::notifyTileStartLoading(
-    [[maybe_unused]] const Tile* pTile) noexcept {
+    const Tile* /* pTile */) noexcept {
   ++this->_tileLoadsInProgress;
 }
 

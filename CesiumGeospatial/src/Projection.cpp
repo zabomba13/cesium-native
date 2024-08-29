@@ -22,8 +22,10 @@ namespace CesiumGeospatial {
 glm::dvec3
 projectPosition(const Projection& projection, const Cartographic& position) {
   struct Operation {
-    const Cartographic&
-        position; // NOLINT(misc-non-private-member-variables-in-classes,cppcoreguidelines-avoid-const-or-ref-data-members)
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
+    const Cartographic& position;
+    // clang-format on
 
     glm::dvec3 operator()(const GeographicProjection& geographic) noexcept {
       return geographic.project(position);
@@ -40,8 +42,10 @@ projectPosition(const Projection& projection, const Cartographic& position) {
 Cartographic
 unprojectPosition(const Projection& projection, const glm::dvec3& position) {
   struct Operation {
-    const glm::dvec3&
-        position; // NOLINT(misc-non-private-member-variables-in-classes,cppcoreguidelines-avoid-const-or-ref-data-members)
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
+    const glm::dvec3& position;
+    // clang-format on
 
     Cartographic operator()(const GeographicProjection& geographic) noexcept {
       return geographic.unproject(position);
@@ -59,8 +63,10 @@ CesiumGeometry::Rectangle projectRectangleSimple(
     const Projection& projection,
     const GlobeRectangle& rectangle) {
   struct Operation {
-    const GlobeRectangle&
-        rectangle; // NOLINT(misc-non-private-member-variables-in-classes,cppcoreguidelines-avoid-const-or-ref-data-members)
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
+    const GlobeRectangle& rectangle;
+    // clang-format on
 
     CesiumGeometry::Rectangle
     operator()(const GeographicProjection& geographic) noexcept {
@@ -80,8 +86,10 @@ GlobeRectangle unprojectRectangleSimple(
     const Projection& projection,
     const CesiumGeometry::Rectangle& rectangle) {
   struct Operation {
-    const CesiumGeometry::Rectangle&
-        rectangle; // NOLINT(misc-non-private-member-variables-in-classes,cppcoreguidelines-avoid-const-or-ref-data-members)
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
+    const CesiumGeometry::Rectangle& rectangle;
+    // clang-format on
 
     GlobeRectangle operator()(const GeographicProjection& geographic) noexcept {
       return geographic.unproject(rectangle);
@@ -235,8 +243,10 @@ double computeApproximateConversionFactorToMetersNearPosition(
     const Projection& projection,
     const glm::dvec2& position) {
   struct Operation {
-    const glm::dvec2&
-        position; // NOLINT(misc-non-private-member-variables-in-classes,cppcoreguidelines-avoid-const-or-ref-data-members)
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
+    const glm::dvec2& position;
+    // clang-format on
 
     double operator()(const GeographicProjection& /*geographic*/) noexcept {
       return 1.0;

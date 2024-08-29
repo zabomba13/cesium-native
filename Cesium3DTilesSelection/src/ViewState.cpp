@@ -1,13 +1,58 @@
 #include "Cesium3DTilesSelection/ViewState.h"
 
+#include <Cesium3DTilesSelection/BoundingVolume.h>
+#include <CesiumGeometry/BoundingSphere.h>
+#include <CesiumGeometry/CullingResult.h>
 #include <CesiumGeometry/CullingVolume.h>
+#include <CesiumGeometry/OrientedBoundingBox.h>
+#include <CesiumGeospatial/BoundingRegion.h>
+#include <CesiumGeospatial/BoundingRegionWithLooseFittingHeights.h>
+#include <CesiumGeospatial/Cartographic.h>
+#include <CesiumGeospatial/Ellipsoid.h>
+#include <CesiumGeospatial/S2CellBoundingVolume.h>
 
+#include <glm/common.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/trigonometric.hpp>
+
+#include <optional>
+#include <variant>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
 
 namespace Cesium3DTilesSelection {
+
+namespace {
+template <class T>
+bool isBoundingVolumeVisible(
+    const T& boundingVolume,
+    const CullingVolume& cullingVolume) noexcept {
+  const CullingResult left =
+      boundingVolume.intersectPlane(cullingVolume.leftPlane);
+  if (left == CullingResult::Outside) {
+    return false;
+  }
+
+  const CullingResult right =
+      boundingVolume.intersectPlane(cullingVolume.rightPlane);
+  if (right == CullingResult::Outside) {
+    return false;
+  }
+
+  const CullingResult top =
+      boundingVolume.intersectPlane(cullingVolume.topPlane);
+  if (top == CullingResult::Outside) {
+    return false;
+  }
+
+  const CullingResult bottom =
+      boundingVolume.intersectPlane(cullingVolume.bottomPlane);
+
+  return bottom != CullingResult::Outside;
+}
+} // namespace
 
 /* static */ ViewState ViewState::create(
     const glm::dvec3& position,
@@ -53,42 +98,15 @@ ViewState::ViewState(
           horizontalFieldOfView,
           verticalFieldOfView)) {}
 
-template <class T>
-static bool isBoundingVolumeVisible(
-    const T& boundingVolume,
-    const CullingVolume& cullingVolume) noexcept {
-  const CullingResult left =
-      boundingVolume.intersectPlane(cullingVolume.leftPlane);
-  if (left == CullingResult::Outside) {
-    return false;
-  }
-
-  const CullingResult right =
-      boundingVolume.intersectPlane(cullingVolume.rightPlane);
-  if (right == CullingResult::Outside) {
-    return false;
-  }
-
-  const CullingResult top =
-      boundingVolume.intersectPlane(cullingVolume.topPlane);
-  if (top == CullingResult::Outside) {
-    return false;
-  }
-
-  const CullingResult bottom =
-      boundingVolume.intersectPlane(cullingVolume.bottomPlane);
-  if (bottom == CullingResult::Outside) {
-    return false;
-  }
-
-  return true;
-}
-
+// NOLINTNEXTLINE(bugprone-exception-escape)
 bool ViewState::isBoundingVolumeVisible(
     const BoundingVolume& boundingVolume) const noexcept {
   // TODO: use plane masks
   struct Operation {
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
     const ViewState& viewState;
+    // clang-format on
 
     bool operator()(const OrientedBoundingBox& boundingBox) noexcept {
       return Cesium3DTilesSelection::isBoundingVolumeVisible(
@@ -125,10 +143,14 @@ bool ViewState::isBoundingVolumeVisible(
   return std::visit(Operation{*this}, boundingVolume);
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 double ViewState::computeDistanceSquaredToBoundingVolume(
     const BoundingVolume& boundingVolume) const noexcept {
   struct Operation {
+    // clang-format off
+    // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-const-or-ref-data-members)
     const ViewState& viewState;
+    // clang-format on
 
     double operator()(const OrientedBoundingBox& boundingBox) noexcept {
       return boundingBox.computeDistanceSquaredToPosition(viewState._position);
@@ -137,7 +159,7 @@ double ViewState::computeDistanceSquaredToBoundingVolume(
     double operator()(const BoundingRegion& boundingRegion) noexcept {
       if (viewState._positionCartographic) {
         return boundingRegion.computeDistanceSquaredToPosition(
-            viewState._positionCartographic.value(),
+            *viewState._positionCartographic,
             viewState._position);
       }
       return boundingRegion.computeDistanceSquaredToPosition(
@@ -154,7 +176,7 @@ double ViewState::computeDistanceSquaredToBoundingVolume(
         const BoundingRegionWithLooseFittingHeights& boundingRegion) noexcept {
       if (viewState._positionCartographic) {
         return boundingRegion.computeConservativeDistanceSquaredToPosition(
-            viewState._positionCartographic.value(),
+            *viewState._positionCartographic,
             viewState._position);
       }
       return boundingRegion.computeConservativeDistanceSquaredToPosition(

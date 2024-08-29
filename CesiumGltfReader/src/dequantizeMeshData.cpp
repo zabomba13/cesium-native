@@ -10,17 +10,15 @@ namespace {
 
 template <typename T> float intToFloat(T t) = delete;
 
-template <> float intToFloat(std::int8_t c) {
-  return std::max(c / 127.0f, -1.0f);
+template <> float intToFloat(int8_t c) { return glm::max(c / 127.0f, -1.0f); }
+
+template <> float intToFloat(uint8_t c) { return c / 127.0f; }
+
+template <> float intToFloat(int16_t c) {
+  return glm::max(c / 65535.0f, -1.0f);
 }
 
-template <> float intToFloat(std::uint8_t c) { return c / 127.0f; }
-
-template <> float intToFloat(std::int16_t c) {
-  return std::max(c / 65535.0f, -1.0f);
-}
-
-template <> float intToFloat(std::uint16_t c) { return c / 65535.0f; }
+template <> float intToFloat(uint16_t c) { return c / 65535.0f; }
 
 template <typename T, size_t N>
 void normalizeQuantized(
@@ -126,16 +124,16 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
 template <size_t N> void dequantizeAccessor(Model& model, Accessor& accessor) {
   switch (accessor.componentType) {
   case Accessor::ComponentType::BYTE:
-    dequantizeAccessor<std::int8_t, N>(model, accessor);
+    dequantizeAccessor<int8_t, N>(model, accessor);
     break;
   case Accessor::ComponentType::UNSIGNED_BYTE:
-    dequantizeAccessor<std::uint8_t, N>(model, accessor);
+    dequantizeAccessor<uint8_t, N>(model, accessor);
     break;
   case Accessor::ComponentType::SHORT:
-    dequantizeAccessor<std::int16_t, N>(model, accessor);
+    dequantizeAccessor<int16_t, N>(model, accessor);
     break;
   case Accessor::ComponentType::UNSIGNED_SHORT:
-    dequantizeAccessor<std::uint16_t, N>(model, accessor);
+    dequantizeAccessor<uint16_t, N>(model, accessor);
     break;
   }
 }

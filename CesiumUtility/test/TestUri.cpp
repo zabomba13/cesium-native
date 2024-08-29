@@ -1,6 +1,6 @@
 #include <CesiumUtility/Uri.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace CesiumUtility;
 
@@ -22,12 +22,12 @@ TEST_CASE("Uri::getPath") {
   }
 
   SECTION("returns empty path for nonexistent paths") {
-    CHECK(Uri::getPath("https://example.com") == "");
-    CHECK(Uri::getPath("https://example.com?some=parameter") == "");
+    CHECK(Uri::getPath("https://example.com").empty());
+    CHECK(Uri::getPath("https://example.com?some=parameter").empty());
   }
 
   SECTION("returns empty path for invalid uri") {
-    CHECK(Uri::getPath("not a valid uri") == "");
+    CHECK(Uri::getPath("not a valid uri").empty());
   }
 }
 
@@ -78,7 +78,7 @@ TEST_CASE("Uri::setPath") {
   }
 
   SECTION("returns empty path for invalid uri") {
-    CHECK(Uri::setPath("not a valid uri", "/foo/") == "");
+    CHECK(Uri::setPath("not a valid uri", "/foo/").empty());
   }
 }
 

@@ -392,10 +392,11 @@ Tileset::updateView(const std::vector<ViewState>& frustums, float deltaTime) {
     // per-raster overlay credit
     const RasterOverlayCollection& overlayCollection =
         this->_pTilesetContentManager->getRasterOverlayCollection();
-    for (auto& pTileProvider : overlayCollection.getTileProviders()) {
-      const std::optional<Credit>& overlayCredit = pTileProvider->getCredit();
-      if (overlayCredit) {
-        pCreditSystem->addCreditToFrame(overlayCredit.value());
+    for (const auto& pTileProvider : overlayCollection.getTileProviders()) {
+      const std::optional<Credit>& maybeOverlayCredit =
+          pTileProvider->getCredit();
+      if (maybeOverlayCredit) {
+        pCreditSystem->addCreditToFrame(*maybeOverlayCredit);
       }
     }
 
@@ -407,7 +408,7 @@ Tileset::updateView(const std::vector<ViewState>& frustums, float deltaTime) {
       for (const RasterMappedTo3DTile& mappedRasterTile : mappedRasterTiles) {
         const RasterOverlayTile* pRasterOverlayTile =
             mappedRasterTile.getReadyTile();
-        if (pRasterOverlayTile != nullptr) {
+        if (pRasterOverlayTile) {
           for (const Credit& credit : pRasterOverlayTile->getCredits()) {
             pCreditSystem->addCreditToFrame(credit);
           }
@@ -471,15 +472,16 @@ int64_t Tileset::getTotalDataBytes() const noexcept {
 }
 
 const TilesetMetadata* Tileset::getMetadata(const Tile* pTile) const {
-  if (pTile == nullptr) {
+  if (!pTile) {
     pTile = this->getRootTile();
   }
 
-  while (pTile != nullptr) {
+  while (pTile) {
     const TileExternalContent* pExternal =
         pTile->getContent().getExternalContent();
-    if (pExternal)
+    if (pExternal) {
       return &pExternal->metadata;
+    }
     pTile = pTile->getParent();
   }
 
@@ -607,7 +609,7 @@ static bool isVisibleFromCamera(
     return false;
   }
 
-  const std::optional<CesiumGeospatial::Cartographic>& position =
+  const std::optional<CesiumGeospatial::Cartographic>& maybePosition =
       viewState.getPositionCartographic();
 
   // TODO: it would be better to test a line pointing down (and up?) from the
@@ -615,8 +617,8 @@ static bool isVisibleFromCamera(
   // bounding volume to a region.
   std::optional<GlobeRectangle> maybeRectangle =
       estimateGlobeRectangle(boundingVolume, ellipsoid);
-  if (position && maybeRectangle) {
-    return maybeRectangle->contains(position.value());
+  if (maybePosition && maybeRectangle) {
+    return maybeRectangle->contains(*maybePosition);
   }
   return false;
 }
@@ -864,7 +866,7 @@ Tileset::TraversalDetails Tileset::_visitTileIfNeeded(
     // visited as well, otherwise we won't load anything at all.
     if ((this->_options.forbidHoles &&
          tile.getRefine() == TileRefine::Replace) ||
-        tile.getParent() == nullptr) {
+        !tile.getParent()) {
       cullResult.shouldVisit = true;
     }
   }
@@ -1032,7 +1034,7 @@ bool Tileset::_kickDescendantsAndRenderTile(
   // kicked.
   for (size_t i = firstRenderedDescendantIndex; i < renderList.size(); ++i) {
     Tile* pWorkTile = renderList[i];
-    while (pWorkTile != nullptr &&
+    while (pWorkTile &&
            !pWorkTile->getLastSelectionState().wasKicked(
                frameState.currentFrameNumber) &&
            pWorkTile != &tile) {
@@ -1484,7 +1486,7 @@ void Tileset::_unloadCachedTiles(double timeBudget) noexcept {
                                 static_cast<long long>(timeBudget)));
 
   while (this->getTotalDataBytes() > maxBytes) {
-    if (pTile == nullptr || pTile == pRootTile) {
+    if (!pTile || pTile == pRootTile) {
       // We've either removed all tiles or the next tile is the root.
       // The root tile marks the beginning of the tiles that were used
       // for rendering last frame.

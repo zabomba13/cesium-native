@@ -618,7 +618,7 @@ ImageReaderResult GltfReader::readImage(
     KTX_error_code errorCode;
 
     errorCode = ktxTexture2_CreateFromMemory(
-        reinterpret_cast<const std::uint8_t*>(data.data()),
+        reinterpret_cast<const uint8_t*>(data.data()),
         data.size(),
         KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
         &pTexture);
@@ -787,8 +787,7 @@ ImageReaderResult GltfReader::readImage(
               ktxTexture_GetDataSize(ktxTexture(pTexture));
 
           image.pixelData.resize(pixelDataSize);
-          std::uint8_t* u8Pointer =
-              reinterpret_cast<std::uint8_t*>(image.pixelData.data());
+          auto* u8Pointer = reinterpret_cast<uint8_t*>(image.pixelData.data());
           std::copy(pixelData, pixelData + pixelDataSize, u8Pointer);
 
           ktxTexture_Destroy(ktxTexture(pTexture));
@@ -878,13 +877,12 @@ ImageReaderResult GltfReader::readImage(
             std::to_string(image.height) + "x" +
             std::to_string(image.channels) + "x" +
             std::to_string(image.bytesPerChannel));
-        // std::uint8_t is not implicitly convertible to std::byte, so we must
+        // uint8_t is not implicitly convertible to std::byte, so we must
         // use reinterpret_cast to (safely) force the conversion.
         const auto lastByte =
             image.width * image.height * image.channels * image.bytesPerChannel;
         image.pixelData.resize(static_cast<std::size_t>(lastByte));
-        std::uint8_t* u8Pointer =
-            reinterpret_cast<std::uint8_t*>(image.pixelData.data());
+        auto* u8Pointer = reinterpret_cast<uint8_t*>(image.pixelData.data());
         std::copy(pImage, pImage + lastByte, u8Pointer);
         stbi_image_free(pImage);
       } else {

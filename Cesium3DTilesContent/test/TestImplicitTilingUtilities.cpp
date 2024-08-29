@@ -5,7 +5,7 @@
 #include <CesiumGeospatial/BoundingRegion.h>
 #include <CesiumGeospatial/S2CellBoundingVolume.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <libmorton/morton.h>
 
 #include <algorithm>
@@ -457,7 +457,7 @@ TEST_CASE("ImplicitTilingUtilities::computeBoundingVolume") {
 
   SECTION("BoundingVolume") {
     SECTION("quadtree") {
-      BoundingVolume root{};
+      BoundingVolume root;
 
       TileBoundingVolumes::setOrientedBoundingBox(
           root,
@@ -519,7 +519,7 @@ TEST_CASE("ImplicitTilingUtilities::computeBoundingVolume") {
     }
 
     SECTION("octree") {
-      BoundingVolume root{};
+      BoundingVolume root;
 
       TileBoundingVolumes::setOrientedBoundingBox(
           root,

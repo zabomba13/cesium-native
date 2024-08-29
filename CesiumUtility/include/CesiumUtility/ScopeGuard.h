@@ -27,8 +27,8 @@ public:
               ScopeGuard<ExitFunction>>,
           int> = 0>
   explicit ScopeGuard(ExitFunctionArg&& _exitFunc)
-      : _callExitFuncOnDestruct{true},
-        _exitFunc{std::forward<ExitFunctionArg>(_exitFunc)} {}
+      : _callExitFuncOnDestruct(true),
+        _exitFunc(std::forward<ExitFunctionArg>(_exitFunc)) {}
 
   ScopeGuard(const ScopeGuard& rhs) = delete;
 
@@ -37,8 +37,8 @@ public:
    * rhs will not call its lambda upon exiting a scope
    */
   ScopeGuard(ScopeGuard&& rhs) noexcept
-      : _callExitFuncOnDestruct{rhs._callExitFuncOnDestruct},
-        _exitFunc{std::move(rhs._exitFunc)} {
+      : _callExitFuncOnDestruct(rhs._callExitFuncOnDestruct),
+        _exitFunc(std::move(rhs._exitFunc)) {
     rhs.release();
   }
 

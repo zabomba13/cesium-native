@@ -308,7 +308,7 @@ void decodePrimitive(
     const int32_t dracoAttrIndex = attribute.second;
     const draco::PointAttribute* pAttribute =
         pMesh->GetAttributeByUniqueId(static_cast<uint32_t>(dracoAttrIndex));
-    if (pAttribute == nullptr) {
+    if (!pAttribute) {
       readGltf.warnings.emplace_back(
           "Draco attribute with unique ID " + std::to_string(dracoAttrIndex) +
           " does not exist.");

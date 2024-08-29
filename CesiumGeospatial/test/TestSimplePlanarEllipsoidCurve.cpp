@@ -1,6 +1,6 @@
 #include <CesiumGeospatial/SimplePlanarEllipsoidCurve.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/geometric.hpp>
 
 using namespace CesiumGeospatial;
@@ -43,11 +43,11 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
 
     CHECK(curve.has_value());
     CHECK(Math::equalsEpsilon(
-        curve.value().getPosition(0.0),
+        curve->getPosition(0.0),
         philadelphiaEcef,
         Math::Epsilon6));
     CHECK(Math::equalsEpsilon(
-        curve.value().getPosition(1.0),
+        curve->getPosition(1.0),
         tokyoEcef,
         Math::Epsilon6));
   }
@@ -61,7 +61,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
 
     CHECK(curve.has_value());
     // needs three points to form a plane - get midpoint to make third point
-    glm::dvec3 midpoint = curve.value().getPosition(0.5);
+    glm::dvec3 midpoint = curve->getPosition(0.5);
     glm::dvec3 planeNormal = glm::normalize(
         glm::cross(philadelphiaEcef - midpoint, tokyoEcef - midpoint));
 
@@ -69,8 +69,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
 
     for (int i = 0; i <= steps; i++) {
       double time = 1.0 / (double)steps;
-      double dot =
-          glm::abs(glm::dot(curve.value().getPosition(time), planeNormal));
+      double dot = glm::abs(glm::dot(curve->getPosition(time), planeNormal));
       // If the dot product of the point and normal are 0, they're coplanar
       CHECK(Math::equalsEpsilon(dot, 0, Math::Epsilon5));
     }
@@ -88,7 +87,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
     int steps = 100;
     for (int i = 0; i <= steps; i++) {
       double time = 1.0 / (double)steps;
-      glm::dvec3 actualResult = curve.value().getPosition(time);
+      glm::dvec3 actualResult = curve->getPosition(time);
 
       Cartographic cartographicResult =
           Ellipsoid::WGS84.cartesianToCartographic(actualResult)
@@ -106,7 +105,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             tokyoEcef);
 
     CHECK(forwardCurve.has_value());
-    glm::dvec3 forwardResult = forwardCurve.value().getPosition(0.5);
+    glm::dvec3 forwardResult = forwardCurve->getPosition(0.5);
 
     std::optional<SimplePlanarEllipsoidCurve> reverseCurve =
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
@@ -115,7 +114,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             philadelphiaEcef);
 
     CHECK(reverseCurve.has_value());
-    glm::dvec3 reverseResult = reverseCurve.value().getPosition(0.5);
+    glm::dvec3 reverseResult = reverseCurve->getPosition(0.5);
 
     CHECK(Math::equalsEpsilon(forwardResult, reverseResult, Math::Epsilon6));
   }
@@ -133,7 +132,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
     // same
     const int steps = 25;
     for (int i = 0; i <= steps; i++) {
-      glm::dvec3 result = curve.value().getPosition(i / (double)steps);
+      glm::dvec3 result = curve->getPosition(i / (double)steps);
       CHECK(Math::equalsEpsilon(result, philadelphiaEcef, Math::Epsilon6));
     }
   }
@@ -151,28 +150,25 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
     CHECK(flightPath.has_value());
 
     std::optional<Cartographic> position25Percent =
-        Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.25));
+        Ellipsoid::WGS84.cartesianToCartographic(flightPath->getPosition(0.25));
     std::optional<Cartographic> position50Percent =
-        Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.5));
+        Ellipsoid::WGS84.cartesianToCartographic(flightPath->getPosition(0.5));
     std::optional<Cartographic> position75Percent =
-        Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.75));
+        Ellipsoid::WGS84.cartesianToCartographic(flightPath->getPosition(0.75));
 
     CHECK(position25Percent.has_value());
     CHECK(Math::equalsEpsilon(
-        position25Percent.value().height,
+        position25Percent->height,
         (endHeight - startHeight) * 0.25 + startHeight,
         Math::Epsilon6));
     CHECK(position50Percent.has_value());
     CHECK(Math::equalsEpsilon(
-        position50Percent.value().height,
+        position50Percent->height,
         (endHeight - startHeight) * 0.5 + startHeight,
         Math::Epsilon6));
     CHECK(position75Percent.has_value());
     CHECK(Math::equalsEpsilon(
-        position75Percent.value().height,
+        position75Percent->height,
         (endHeight - startHeight) * 0.75 + startHeight,
         Math::Epsilon6));
   }
@@ -238,8 +234,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight") {
     for (int i = 0; i <= steps; i++) {
       double n = 1.0 / (double)steps;
       CHECK(Math::equalsEpsilon(
-          ecefCurve.value().getPosition(n),
-          llhCurve.value().getPosition(n),
+          ecefCurve->getPosition(n),
+          llhCurve->getPosition(n),
           Math::Epsilon6));
     }
   }

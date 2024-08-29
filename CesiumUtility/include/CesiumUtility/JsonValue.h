@@ -2,16 +2,15 @@
 
 #include "Library.h"
 
+#include <glm/common.hpp>
 #include <gsl/narrow>
 
-#include <cmath>
 #include <cstdint>
 #include <initializer_list>
 #include <map>
 #include <optional>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #include <variant>
 #include <vector>
@@ -107,7 +106,7 @@ public:
    * NaN and ±Infinity are represented as {@link JsonValue::Null}.
    */
   JsonValue(double v) noexcept {
-    if (std::isnan(v) || std::isinf(v)) {
+    if (glm::isnan(v) || glm::isinf(v)) {
       value = nullptr;
     } else {
       value = v;
@@ -115,50 +114,44 @@ public:
   }
 
   /**
-   * @brief Creates a `std::int64_t` JSON value (Widening conversion from
-   * std::int8_t).
+   * @brief Creates a `int64_t` JSON value (Widening conversion from int8_t).
    */
-  JsonValue(std::int8_t v) noexcept : value(static_cast<std::int64_t>(v)) {}
+  JsonValue(int8_t v) noexcept : value(static_cast<int64_t>(v)) {}
 
   /**
-   * @brief Creates a `std::uint64_t` JSON value (Widening conversion from
-   * std::uint8_t).
+   * @brief Creates a `uint64_t` JSON value (Widening conversion from uint8_t).
    */
-  JsonValue(std::uint8_t v) noexcept : value(static_cast<std::uint64_t>(v)) {}
+  JsonValue(uint8_t v) noexcept : value(static_cast<uint64_t>(v)) {}
 
   /**
-   * @brief Creates a `std::int64_t` JSON value (Widening conversion from
-   * std::int16_t).
+   * @brief Creates a `int64_t` JSON value (Widening conversion from int16_t).
    */
-  JsonValue(std::int16_t v) noexcept : value(static_cast<std::int64_t>(v)) {}
+  JsonValue(int16_t v) noexcept : value(static_cast<int64_t>(v)) {}
 
   /**
-   * @brief Creates a `std::uint64_t` JSON value (Widening conversion from
-   * std::uint16_t).
+   * @brief Creates a `uint64_t` JSON value (Widening conversion from uint16_t).
    */
-  JsonValue(std::uint16_t v) noexcept : value(static_cast<std::uint64_t>(v)) {}
+  JsonValue(uint16_t v) noexcept : value(static_cast<uint64_t>(v)) {}
 
   /**
-   * @brief Creates a `std::int64_t` JSON value (Widening conversion from
-   * std::int32_t).
+   * @brief Creates a `int64_t` JSON value (Widening conversion from int32_t).
    */
-  JsonValue(std::int32_t v) noexcept : value(static_cast<std::int64_t>(v)) {}
+  JsonValue(int32_t v) noexcept : value(static_cast<int64_t>(v)) {}
 
   /**
-   * @brief Creates a `std::uint64_t` JSON value (Widening conversion from
-   * std::uint32_t).
+   * @brief Creates a `uint64_t` JSON value (Widening conversion from uint32_t).
    */
-  JsonValue(std::uint32_t v) noexcept : value(static_cast<std::uint64_t>(v)) {}
+  JsonValue(uint32_t v) noexcept : value(static_cast<uint64_t>(v)) {}
 
   /**
-   * @brief Creates a `std::int64_t` JSON value.
+   * @brief Creates a `int64_t` JSON value.
    */
-  JsonValue(std::int64_t v) noexcept : value(v) {}
+  JsonValue(int64_t v) noexcept : value(v) {}
 
   /**
-   * @brief Creates a `std::uint64_t` JSON value.
+   * @brief Creates a `uint64_t` JSON value.
    */
-  JsonValue(std::uint64_t v) noexcept : value(v) {}
+  JsonValue(uint64_t v) noexcept : value(v) {}
 
   /**
    * @brief Creates a `Bool` JSON value.
@@ -268,7 +261,7 @@ public:
    * `JsonValueMissingKey`. If the named value does not have a numerical type T,
    *  throws `JsonValueNotRealValue`, if the named value cannot be converted
    from
-   * `double` / `std::uint64_t` / `std::int64_t` without precision loss, throws
+   * `double` / `uint64_t` / `int64_t` without precision loss, throws
    * `gsl::narrowing_error`
    * @tparam To The expected type of the value.
    * @param key The key for which to retrieve the value from this object.
@@ -356,12 +349,12 @@ public:
           std::is_integral<To>::value ||
           std::is_floating_point<To>::value>::type* = nullptr>
   [[nodiscard]] To getSafeNumber() const {
-    const std::uint64_t* uInt = std::get_if<std::uint64_t>(&this->value);
+    const uint64_t* uInt = std::get_if<uint64_t>(&this->value);
     if (uInt) {
       return gsl::narrow<To>(*uInt);
     }
 
-    const std::int64_t* sInt = std::get_if<std::int64_t>(&this->value);
+    const int64_t* sInt = std::get_if<int64_t>(&this->value);
     if (sInt) {
       return gsl::narrow<To>(*sInt);
     }
@@ -387,12 +380,12 @@ public:
           std::is_integral<To>::value ||
           std::is_floating_point<To>::value>::type* = nullptr>
   [[nodiscard]] To getSafeNumberOrDefault(To defaultValue) const noexcept {
-    const std::uint64_t* uInt = std::get_if<std::uint64_t>(&this->value);
+    const uint64_t* uInt = std::get_if<uint64_t>(&this->value);
     if (uInt) {
       return losslessNarrowOrDefault<To>(*uInt, defaultValue);
     }
 
-    const std::int64_t* sInt = std::get_if<std::int64_t>(&this->value);
+    const int64_t* sInt = std::get_if<int64_t>(&this->value);
     if (sInt) {
       return losslessNarrowOrDefault<To>(*sInt, defaultValue);
     }
@@ -467,23 +460,23 @@ public:
   }
 
   /**
-   * @brief Gets the std::uint64_t from the value.
-   * @return The std::uint64_t.
+   * @brief Gets the uint64_t from the value.
+   * @return The uint64_t.
    * @throws std::bad_variant_access if the underlying type is not a
-   * std::uint64_t
+   * uint64_t
    */
-  [[nodiscard]] std::uint64_t getUint64() const {
-    return std::get<std::uint64_t>(this->value);
+  [[nodiscard]] uint64_t getUint64() const {
+    return std::get<uint64_t>(this->value);
   }
 
   /**
-   * @brief Gets the std::int64_t from the value.
-   * @return The std::int64_t.
+   * @brief Gets the int64_t from the value.
+   * @return The int64_t.
    * @throws std::bad_variant_access if the underlying type is not a
-   * std::int64_t
+   * int64_t
    */
-  [[nodiscard]] std::int64_t getInt64() const {
-    return std::get<std::int64_t>(this->value);
+  [[nodiscard]] int64_t getInt64() const {
+    return std::get<int64_t>(this->value);
   }
 
   /**
@@ -531,9 +524,9 @@ public:
    * @brief Gets the uint64_t from the value or returns defaultValue
    * @return The uint64_t or defaultValue if this->value is not a uint64_t.
    */
-  [[nodiscard]] inline std::uint64_t
-  getUint64OrDefault(std::uint64_t defaultValue) const noexcept {
-    const auto* v = std::get_if<std::uint64_t>(&this->value);
+  [[nodiscard]] inline uint64_t
+  getUint64OrDefault(uint64_t defaultValue) const noexcept {
+    const auto* v = std::get_if<uint64_t>(&this->value);
     if (v) {
       return *v;
     }
@@ -545,9 +538,9 @@ public:
    * @brief Gets the int64_t from the value or returns defaultValue
    * @return The int64_t or defaultValue if this->value is not a int64_t.
    */
-  [[nodiscard]] inline std::int64_t
-  getInt64OrDefault(std::int64_t defaultValue) const noexcept {
-    const auto* v = std::get_if<std::int64_t>(&this->value);
+  [[nodiscard]] inline int64_t
+  getInt64OrDefault(int64_t defaultValue) const noexcept {
+    const auto* v = std::get_if<int64_t>(&this->value);
     if (v) {
       return *v;
     }
@@ -563,8 +556,8 @@ public:
   }
 
   /**
-   * @brief Returns whether this value is a `double`, `std::uint64_t` or
-   * `std::int64_t`. Use this function in conjunction with `getNumber` for
+   * @brief Returns whether this value is a `double`, `uint64_t` or
+   * `int64_t`. Use this function in conjunction with `getNumber` for
    *  safely casting to arbitrary types
    */
   [[nodiscard]] inline bool isNumber() const noexcept {
@@ -607,17 +600,17 @@ public:
   }
 
   /**
-   * @brief Returns whether this value is a `std::uint64_t` value.
+   * @brief Returns whether this value is a `uint64_t` value.
    */
   [[nodiscard]] inline bool isUint64() const noexcept {
-    return std::holds_alternative<std::uint64_t>(this->value);
+    return std::holds_alternative<uint64_t>(this->value);
   }
 
   /**
-   * @brief Returns whether this value is a `std::int64_t` value.
+   * @brief Returns whether this value is a `int64_t` value.
    */
   [[nodiscard]] inline bool isInt64() const noexcept {
-    return std::holds_alternative<std::int64_t>(this->value);
+    return std::holds_alternative<int64_t>(this->value);
   }
 
   /**
@@ -632,15 +625,7 @@ public:
    * `Object` values, the properties may be accessed with the
    * `getValueForKey` functions.
    */
-  std::variant<
-      Null,
-      double,
-      std::uint64_t,
-      std::int64_t,
-      Bool,
-      String,
-      Object,
-      Array>
+  std::variant<Null, double, uint64_t, int64_t, Bool, String, Object, Array>
       value;
 };
 } // namespace CesiumUtility

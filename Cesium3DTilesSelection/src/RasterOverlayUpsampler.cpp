@@ -17,7 +17,7 @@ namespace Cesium3DTilesSelection {
 CesiumAsync::Future<TileLoadResult>
 RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
   const Tile* pParent = loadInput.tile.getParent();
-  if (pParent == nullptr) {
+  if (!pParent) {
     return loadInput.asyncSystem.createResolvedFuture(
         TileLoadResult::createFailedResult(nullptr));
   }
@@ -25,7 +25,7 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
   const CesiumGeometry::UpsampledQuadtreeNode* pTileID =
       std::get_if<CesiumGeometry::UpsampledQuadtreeNode>(
           &loadInput.tile.getTileID());
-  if (pTileID == nullptr) {
+  if (!pTileID) {
     // this tile is not marked to be upsampled, so just fail it
     return loadInput.asyncSystem.createResolvedFuture(
         TileLoadResult::createFailedResult(nullptr));
@@ -109,8 +109,8 @@ RasterOverlayUpsampler::loadTileContent(const TileLoadInput& loadInput) {
 }
 
 TileChildrenResult RasterOverlayUpsampler::createTileChildren(
-    [[maybe_unused]] const Tile& tile,
-    [[maybe_unused]] const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const Tile& /* tile */,
+    const CesiumGeospatial::Ellipsoid& /* ellipsoid */) {
   return {{}, TileLoadResultState::Failed};
 }
 } // namespace Cesium3DTilesSelection

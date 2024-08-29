@@ -186,7 +186,7 @@ const rapidjson::Value&
 BatchTableHierarchyPropertyValues::const_iterator::operator*() const {
   // A static null value, to return when there is no value defined for this
   // instance and property.
-  static const rapidjson::Value nullValue{};
+  static const rapidjson::Value nullValue;
 
   if (this->_pCachedValue) {
     return *this->_pCachedValue;
@@ -252,7 +252,7 @@ BatchTableHierarchyPropertyValues::const_iterator::getValue(
   }
 
   const rapidjson::Value* pProperty = this->_propertyInClass[size_t(classId)];
-  if (pProperty == nullptr) {
+  if (!pProperty) {
     return nullptr;
   }
 

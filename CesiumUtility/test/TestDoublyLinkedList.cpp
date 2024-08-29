@@ -1,6 +1,10 @@
 #include "CesiumUtility/DoublyLinkedList.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 using namespace CesiumUtility;
 
@@ -8,17 +12,19 @@ namespace {
 
 class TestNode {
 public:
-  TestNode(uint32_t valueParam) : value(valueParam), links() {}
+  explicit TestNode(uint32_t valueParam) : value(valueParam) {}
 
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   uint32_t value;
   DoublyLinkedListPointers<TestNode> links;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 
 void assertOrder(
     DoublyLinkedList<TestNode, &TestNode::links>& linkedList,
     const std::vector<uint32_t>& expectedOrder) {
   CHECK(linkedList.size() == expectedOrder.size());
-  if (expectedOrder.size() > 0) {
+  if (!expectedOrder.empty()) {
     REQUIRE(linkedList.head() != nullptr);
     REQUIRE(linkedList.tail() != nullptr);
 
@@ -32,16 +38,16 @@ void assertOrder(
       CHECK(pCurrent->value == expectedOrder[i]);
 
       if (i == 0) {
-        CHECK(linkedList.previous(*pCurrent) == nullptr);
+        CHECK(!linkedList.previous(*pCurrent));
       } else {
-        CHECK(linkedList.previous(*pCurrent) != nullptr);
+        CHECK(linkedList.previous(*pCurrent));
         CHECK(linkedList.previous(*pCurrent)->value == expectedOrder[i - 1]);
       }
 
       if (i == expectedOrder.size() - 1) {
-        CHECK(linkedList.next(*pCurrent) == nullptr);
+        CHECK(!linkedList.next(*pCurrent));
       } else {
-        CHECK(linkedList.next(*pCurrent) != nullptr);
+        CHECK(linkedList.next(*pCurrent));
         CHECK(linkedList.next(*pCurrent)->value == expectedOrder[i + 1]);
       }
 
@@ -54,10 +60,10 @@ void assertOrder(
     CHECK(linkedList.previous(nullptr) != nullptr);
     CHECK(linkedList.previous(nullptr)->value == expectedOrder.back());
   } else {
-    CHECK(linkedList.head() == nullptr);
-    CHECK(linkedList.tail() == nullptr);
-    CHECK(linkedList.next(nullptr) == nullptr);
-    CHECK(linkedList.previous(nullptr) == nullptr);
+    CHECK(!linkedList.head());
+    CHECK(!linkedList.tail());
+    CHECK(!linkedList.next(nullptr));
+    CHECK(!linkedList.previous(nullptr));
   }
 }
 

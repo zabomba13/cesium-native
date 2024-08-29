@@ -5,14 +5,13 @@
 #include <CesiumUtility/JsonValue.h>
 
 #include <string>
-#include <unordered_map>
 
 namespace Cesium3DTiles {
 
 /**
  * @brief Holds the details of a found property in a {@link MetadataEntity}.
  *
- * Because this structure holds _references_ to the original {@link Schema} and
+ * Because this structure holds _pointers_ to the original {@link Schema} and
  * {@link MetadataEntity} instances, it will be invalided if either are
  * destroyed or modified. Continuing to access this result in that scenario will
  * result in undefined behavior.
@@ -22,31 +21,31 @@ struct CESIUM3DTILES_API FoundMetadataProperty {
    * @brief A reference to the identifier of the class that contains the found
    * property within the {@link Schema}.
    */
-  const std::string& classIdentifier;
+  const std::string* classIdentifier;
 
   /**
    * @brief A reference to the {@link Class} that contains the found property
    * within the {@link Schema}.
    */
-  const Class& classDefinition;
+  const Class* classDefinition;
 
   /**
    * @brief A reference to the identifier of the found property within the
    * {@link Schema}.
    */
-  const std::string& propertyIdentifier;
+  const std::string* propertyIdentifier;
 
   /**
    * @brief A reference to the {@link ClassProperty} describing the found
    * property within the {@lnik Schema}.
    */
-  const ClassProperty& propertyDefinition;
+  const ClassProperty* propertyDefinition;
 
   /**
    * @brief A reference to the value of the found property within the
    * {@link MetadataEntity}.
    */
-  const CesiumUtility::JsonValue& propertyValue;
+  const CesiumUtility::JsonValue* propertyValue;
 };
 
 /**

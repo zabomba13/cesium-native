@@ -139,7 +139,7 @@ ScopedTrace::~ScopedTrace() {
 void ScopedTrace::reset() {
   this->_reset = true;
 
-  if (TrackReference::current() != nullptr) {
+  if (TrackReference::current()) {
     CESIUM_TRACE_END(_name.c_str());
   } else {
     auto endTimePoint = std::chrono::steady_clock::now();
@@ -321,7 +321,7 @@ TrackReference::~TrackReference() noexcept {
   }
 }
 
-TrackReference::operator bool() const noexcept { return this->pSet != nullptr; }
+TrackReference::operator bool() const noexcept { return this->pSet; }
 
 int64_t TrackReference::getTracingID() const noexcept {
   if (this->pSet) {

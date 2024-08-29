@@ -36,7 +36,7 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::shared_ptr<IAssetRequest>& pRequest) const noexcept {
   const IAssetResponse* pResponse = pRequest->response();
-  if (pResponse == nullptr) {
+  if (!pResponse) {
     ReadJsonResult<Cesium3DTiles::Subtree> result;
     result.errors.emplace_back("Request failed.");
     return asyncSystem.createResolvedFuture(std::move(result));

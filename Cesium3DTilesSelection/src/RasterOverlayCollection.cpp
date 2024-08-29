@@ -123,7 +123,7 @@ void RasterOverlayCollection::add(
               pList->overlays.end(),
               pOverlay);
           if (it != pList->overlays.end()) {
-            std::int64_t index = it - pList->overlays.begin();
+            int64_t index = it - pList->overlays.begin();
             pList->tileProviders[size_t(index)] = *result;
           }
         } else {

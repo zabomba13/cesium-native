@@ -10,7 +10,8 @@
 #include <CesiumGltf/PropertyTableView.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <rapidjson/document.h>
 #include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/spdlog.h>
@@ -58,7 +59,8 @@ static void checkNonArrayProperty(
         std::is_same_v<PropertyViewType, float> ||
         std::is_same_v<PropertyViewType, double>) {
       REQUIRE(
-          propertyView.getRaw(i) == Approx(expected[static_cast<size_t>(i)]));
+          propertyView.getRaw(i) ==
+          Catch::Approx(expected[static_cast<size_t>(i)]));
     } else {
       REQUIRE(
           static_cast<ExpectedType>(propertyView.getRaw(i)) ==
@@ -110,7 +112,8 @@ static void checkArrayProperty(
       if constexpr (
           std::is_same_v<ExpectedType, float> ||
           std::is_same_v<ExpectedType, double>) {
-        REQUIRE(value[static_cast<int64_t>(j)] == Approx(expected[i][j]));
+        REQUIRE(
+            value[static_cast<int64_t>(j)] == Catch::Approx(expected[i][j]));
       } else {
         REQUIRE(value[static_cast<int64_t>(j)] == expected[i][j]);
       }

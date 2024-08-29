@@ -6,10 +6,18 @@
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
 #include <CesiumJsonWriter/JsonObjectWriter.h>
 #include <CesiumJsonWriter/JsonWriter.h>
-#include <CesiumJsonWriter/writeJsonExtensions.h>
 #include <CesiumQuantizedMeshTerrain/AvailabilityRectangle.h>
 #include <CesiumQuantizedMeshTerrain/Layer.h>
 #include <CesiumUtility/JsonValue.h>
+
+// NOLINTNEXTLINE(misc-include-cleaner)
+#include <CesiumJsonWriter/writeJsonExtensions.h>
+
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace CesiumQuantizedMeshTerrain {
 
@@ -161,7 +169,7 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  if (obj.attribution != "") {
+  if (!obj.attribution.empty()) {
     jsonWriter.Key("attribution");
     writeJson(obj.attribution, jsonWriter, context);
   }
@@ -177,7 +185,7 @@ void writeJson(
     writeJson(obj.bounds, jsonWriter, context);
   }
 
-  if (obj.description != "") {
+  if (!obj.description.empty()) {
     jsonWriter.Key("description");
     writeJson(obj.description, jsonWriter, context);
   }

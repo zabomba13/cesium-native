@@ -25,9 +25,9 @@ bool JsonWriter::Int(int i) { return _compact->Int(i); }
 
 bool JsonWriter::Uint(unsigned int i) { return _compact->Uint(i); }
 
-bool JsonWriter::Uint64(std::uint64_t i) { return _compact->Uint64(i); }
+bool JsonWriter::Uint64(uint64_t i) { return _compact->Uint64(i); }
 
-bool JsonWriter::Int64(std::int64_t i) { return _compact->Int64(i); }
+bool JsonWriter::Int64(int64_t i) { return _compact->Int64(i); }
 
 bool JsonWriter::Double(double d) { return _compact->Double(d); }
 
@@ -53,13 +53,13 @@ bool JsonWriter::StartArray() { return _compact->StartArray(); }
 
 bool JsonWriter::EndArray() { return _compact->EndArray(); }
 
-void JsonWriter::Primitive(std::int32_t value) { _compact->Int(value); }
+void JsonWriter::Primitive(int32_t value) { _compact->Int(value); }
 
-void JsonWriter::Primitive(std::uint32_t value) { _compact->Uint(value); }
+void JsonWriter::Primitive(uint32_t value) { _compact->Uint(value); }
 
-void JsonWriter::Primitive(std::int64_t value) { _compact->Int64(value); }
+void JsonWriter::Primitive(int64_t value) { _compact->Int64(value); }
 
-void JsonWriter::Primitive(std::uint64_t value) { _compact->Uint64(value); }
+void JsonWriter::Primitive(uint64_t value) { _compact->Uint64(value); }
 
 void JsonWriter::Primitive(float value) {
   _compact->Double(static_cast<double>(value));
@@ -74,22 +74,22 @@ void JsonWriter::Primitive(std::string_view string) {
 }
 
 // Integral
-void JsonWriter::KeyPrimitive(std::string_view keyName, std::int32_t value) {
+void JsonWriter::KeyPrimitive(std::string_view keyName, int32_t value) {
   Key(keyName);
   Primitive(value);
 }
 
-void JsonWriter::KeyPrimitive(std::string_view keyName, std::uint32_t value) {
+void JsonWriter::KeyPrimitive(std::string_view keyName, uint32_t value) {
   Key(keyName);
   Primitive(value);
 }
 
-void JsonWriter::KeyPrimitive(std::string_view keyName, std::int64_t value) {
+void JsonWriter::KeyPrimitive(std::string_view keyName, int64_t value) {
   Key(keyName);
   Primitive(value);
 }
 
-void JsonWriter::KeyPrimitive(std::string_view keyName, std::uint64_t value) {
+void JsonWriter::KeyPrimitive(std::string_view keyName, uint64_t value) {
   Key(keyName);
   Primitive(value);
 }
@@ -148,7 +148,7 @@ std::string_view JsonWriter::toStringView() {
 std::vector<std::byte> JsonWriter::toBytes() {
   const auto view = this->toStringView();
   std::vector<std::byte> result(view.size(), std::byte(0));
-  auto* u8Pointer = reinterpret_cast<std::uint8_t*>(result.data());
+  auto* u8Pointer = reinterpret_cast<uint8_t*>(result.data());
   std::copy(view.begin(), view.end(), u8Pointer);
   return result;
 }

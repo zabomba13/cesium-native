@@ -28,7 +28,7 @@ struct LoadLayersResult {
   std::vector<LayerJsonTerrainLoader::Layer> layers;
   std::vector<std::string> layerCredits;
   ErrorList errors;
-  uint16_t statusCode{200};
+  uint16_t statusCode = 200;
 };
 
 /**
@@ -138,7 +138,7 @@ convertToTilesetContentLoaderResult(
 
 size_t maxSubtreeInLayer(uint32_t maxZooms, int32_t availabilityLevels) {
   if (availabilityLevels > 0) {
-    return static_cast<size_t>(std::ceil(
+    return static_cast<size_t>(glm::ceil(
         static_cast<float>(maxZooms) / static_cast<float>(availabilityLevels)));
   }
 
@@ -208,14 +208,12 @@ void generateRasterOverlayUVs(
 
   const BoundingRegion* pParentRegion = nullptr;
   if (result.updatedBoundingVolume) {
-    pParentRegion =
-        std::get_if<BoundingRegion>(&result.updatedBoundingVolume.value());
+    pParentRegion = std::get_if<BoundingRegion>(&*result.updatedBoundingVolume);
   } else {
     pParentRegion = std::get_if<BoundingRegion>(&tileBoundingVolume);
   }
 
-  CesiumGltf::Model* pModel =
-      std::get_if<CesiumGltf::Model>(&result.contentKind);
+  auto* pModel = std::get_if<CesiumGltf::Model>(&result.contentKind);
   if (pModel) {
     result.rasterOverlayDetails =
         RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
@@ -923,7 +921,7 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
 
 TileChildrenResult LayerJsonTerrainLoader::createTileChildren(
     const Tile& tile,
-    [[maybe_unused]] const CesiumGeospatial::Ellipsoid& ellipsoid) {
+    const CesiumGeospatial::Ellipsoid& /* ellipsoid */) {
   const CesiumGeometry::QuadtreeTileID* pQuadtreeID =
       std::get_if<CesiumGeometry::QuadtreeTileID>(&tile.getTileID());
   if (pQuadtreeID) {

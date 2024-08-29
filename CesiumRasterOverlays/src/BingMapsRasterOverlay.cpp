@@ -186,8 +186,7 @@ protected:
            creditAndCoverageAreas.coverageAreas) {
         if (coverageArea.zoomMin <= bingTileLevel &&
             bingTileLevel <= coverageArea.zoomMax &&
-            coverageArea.rectangle.computeIntersection(tileRectangle)
-                .has_value()) {
+            coverageArea.rectangle.computeIntersection(tileRectangle)) {
           tileCredits.push_back(creditAndCoverageAreas.credit);
           break;
         }
@@ -200,8 +199,8 @@ protected:
 private:
   static std::string tileXYToQuadKey(uint32_t level, uint32_t x, uint32_t y) {
     std::string quadkey;
-    for (int32_t i = static_cast<int32_t>(level); i >= 0; --i) {
-      const uint32_t bitmask = static_cast<uint32_t>(1 << i);
+    for (auto i = static_cast<int32_t>(level); i >= 0; --i) {
+      const auto bitmask = static_cast<uint32_t>(uint32_t(1) << uint32_t(i));
       uint32_t digit = 0;
 
       if ((x & bitmask) != 0) {
@@ -457,7 +456,7 @@ BingMapsRasterOverlay::createTileProvider(
               -> CreateTileProviderResult {
             const IAssetResponse* pResponse = pRequest->response();
 
-            if (pResponse == nullptr) {
+            if (!pResponse) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                   RasterOverlayLoadType::TileProvider,
                   pRequest,

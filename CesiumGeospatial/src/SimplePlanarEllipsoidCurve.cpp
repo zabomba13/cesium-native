@@ -18,12 +18,12 @@ SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
     const Ellipsoid& ellipsoid,
     const glm::dvec3& sourceEcef,
     const glm::dvec3& destinationEcef) {
-  std::optional<glm::dvec3> scaledSourceEcef =
+  std::optional<glm::dvec3> maybeScaledSourceEcef =
       ellipsoid.scaleToGeocentricSurface(sourceEcef);
-  std::optional<glm::dvec3> scaledDestinationEcef =
+  std::optional<glm::dvec3> maybeScaledDestinationEcef =
       ellipsoid.scaleToGeocentricSurface(destinationEcef);
 
-  if (!scaledSourceEcef.has_value() || !scaledDestinationEcef.has_value()) {
+  if (!maybeScaledSourceEcef || !maybeScaledDestinationEcef) {
     // Unable to scale to geocentric surface coordinates - no curve we can
     // generate
     return std::optional<SimplePlanarEllipsoidCurve>();
@@ -31,8 +31,8 @@ SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
 
   return SimplePlanarEllipsoidCurve(
       ellipsoid,
-      scaledSourceEcef.value(),
-      scaledDestinationEcef.value(),
+      *maybeScaledSourceEcef,
+      *maybeScaledDestinationEcef,
       sourceEcef,
       destinationEcef);
 }

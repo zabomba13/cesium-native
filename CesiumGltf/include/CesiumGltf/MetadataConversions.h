@@ -426,7 +426,7 @@ template <> struct MetadataConversions<float, std::string> {
     char* pLastUsed;
     float parsedValue = std::strtof(from.c_str(), &pLastUsed);
     if (errno == 0 && pLastUsed == from.c_str() + from.size() &&
-        !std::isinf(parsedValue)) {
+        !glm::isinf(parsedValue)) {
       // Successfully parsed the entire string as a float.
       return parsedValue;
     }
@@ -534,7 +534,7 @@ template <> struct MetadataConversions<double, std::string> {
     char* pLastUsed;
     double parsedValue = std::strtod(from.c_str(), &pLastUsed);
     if (errno == 0 && pLastUsed == from.c_str() + from.size() &&
-        !std::isinf(parsedValue)) {
+        !glm::isinf(parsedValue)) {
       // Successfully parsed the entire string as a double.
       return parsedValue;
     }

@@ -2,10 +2,15 @@
 #include "CesiumGeospatial/Ellipsoid.h"
 #include "CesiumGeospatial/GlobeRectangle.h"
 
+#include <CesiumGeometry/CullingResult.h>
 #include <CesiumGeometry/Plane.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/geometric.hpp>
 
 using namespace CesiumUtility;
 using namespace CesiumGeometry;
@@ -83,8 +88,9 @@ TEST_CASE("BoundingRegion") {
     glm::dvec3 position = Ellipsoid::WGS84.cartographicToCartesian(
         Cartographic(testCase.longitude, testCase.latitude, testCase.height));
     CHECK(Math::equalsEpsilon(
-        sqrt(region
-                 .computeDistanceSquaredToPosition(position, Ellipsoid::WGS84)),
+        glm::sqrt(region.computeDistanceSquaredToPosition(
+            position,
+            Ellipsoid::WGS84)),
         testCase.expectedDistance,
         Math::Epsilon6));
   }
@@ -124,8 +130,9 @@ TEST_CASE("BoundingRegion") {
     glm::dvec3 position = Ellipsoid::WGS84.cartographicToCartesian(
         Cartographic(testCase.longitude, testCase.latitude, testCase.height));
     CHECK(Math::equalsEpsilon(
-        sqrt(region
-                 .computeDistanceSquaredToPosition(position, Ellipsoid::WGS84)),
+        glm::sqrt(region.computeDistanceSquaredToPosition(
+            position,
+            Ellipsoid::WGS84)),
         testCase.expectedDistance,
         Math::Epsilon6));
   }

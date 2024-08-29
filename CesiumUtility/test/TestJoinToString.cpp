@@ -1,6 +1,9 @@
 #include <CesiumUtility/joinToString.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <string>
+#include <vector>
 
 using namespace CesiumUtility;
 
@@ -25,10 +28,10 @@ TEST_CASE("joinToString") {
 
   SECTION("handles single-element vector") {
     CHECK(joinToString(std::vector<std::string>{"test"}, "--") == "test");
-    CHECK(joinToString(std::vector<std::string>{""}, "--") == "");
+    CHECK(joinToString(std::vector<std::string>{""}, "--").empty());
   }
 
   SECTION("handles empty vector") {
-    CHECK(joinToString(std::vector<std::string>{}, "--") == "");
+    CHECK(joinToString(std::vector<std::string>{}, "--").empty());
   }
 }

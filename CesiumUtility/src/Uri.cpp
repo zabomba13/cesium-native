@@ -343,7 +343,7 @@ std::string Uri::getPath(const std::string& uri) {
   std::vector<std::string> parts{std::string()};
 
   UriPathSegmentA* pCurrent = parsedUri.pathHead;
-  while (pCurrent != nullptr) {
+  while (pCurrent) {
     parts.emplace_back(std::string(
         pCurrent->text.first,
         size_t(pCurrent->text.afterLast - pCurrent->text.first)));
@@ -365,7 +365,7 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
   // Free the existing path. Strangely, uriparser doesn't provide any simple way
   // to do this.
   UriPathSegmentA* pCurrent = parsedUri.pathHead;
-  while (pCurrent != nullptr) {
+  while (pCurrent) {
     UriPathSegmentA* pNext = pCurrent->next;
     free(pCurrent); // NOLINT(cppcoreguidelines-no-malloc, hicpp-no-malloc,
                     // cppcoreguidelines-owning-memory)
@@ -395,7 +395,7 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
       // NOLINTEND(cppcoreguidelines-owning-memory,
       // cppcoreguidelines-no-malloc)
 
-      if (parsedUri.pathHead == nullptr) {
+      if (!parsedUri.pathHead) {
         parsedUri.pathHead = pSegment;
         parsedUri.pathTail = pSegment;
       } else {

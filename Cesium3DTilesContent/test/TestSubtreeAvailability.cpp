@@ -7,7 +7,7 @@
 #include <CesiumNativeTests/ThreadTaskProcessor.h>
 #include <CesiumNativeTests/waitForFuture.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <libmorton/morton.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -38,7 +38,7 @@ struct SubtreeBuffers {
 
 uint64_t calculateTotalNumberOfTilesForQuadtree(uint64_t subtreeLevels) {
   return static_cast<uint64_t>(
-      (std::pow(4.0, static_cast<double>(subtreeLevels)) - 1) /
+      (glm::pow(4.0, static_cast<double>(subtreeLevels)) - 1) /
       (static_cast<double>(subtreeLevels) - 1));
 }
 
@@ -74,9 +74,9 @@ SubtreeBuffers createSubtreeBuffers(
   uint64_t numTiles = calculateTotalNumberOfTilesForQuadtree(maxSubtreeLevels);
   uint64_t maxSubtreeTiles = uint64_t(1) << (2 * (maxSubtreeLevels));
   uint64_t bufferSize =
-      static_cast<uint64_t>(std::ceil(static_cast<double>(numTiles) / 8.0));
+      static_cast<uint64_t>(glm::ceil(static_cast<double>(numTiles) / 8.0));
   uint64_t subtreeBufferSize = static_cast<uint64_t>(
-      std::ceil(static_cast<double>(maxSubtreeTiles) / 8.0));
+      glm::ceil(static_cast<double>(maxSubtreeTiles) / 8.0));
   std::vector<std::byte> availabilityBuffer(
       bufferSize + bufferSize + subtreeBufferSize);
 
@@ -260,23 +260,23 @@ std::optional<SubtreeAvailability> mockLoadSubtreeJson(
   auto pMockSubtreeResponse = std::make_unique<SimpleAssetResponse>(
       uint16_t(200),
       "test",
-      CesiumAsync::HttpHeaders{},
+      CesiumAsync::HttpHeaders(),
       std::move(buffer));
   auto pMockSubtreeRequest = std::make_unique<SimpleAssetRequest>(
       "GET",
       "test",
-      CesiumAsync::HttpHeaders{},
+      CesiumAsync::HttpHeaders(),
       std::move(pMockSubtreeResponse));
 
   auto pMockBufferResponse = std::make_unique<SimpleAssetResponse>(
       uint16_t(200),
       "buffer",
-      CesiumAsync::HttpHeaders{},
+      CesiumAsync::HttpHeaders(),
       std::move(subtreeBuffers.buffers));
   auto pMockBufferRequest = std::make_unique<SimpleAssetRequest>(
       "GET",
       "buffer",
-      CesiumAsync::HttpHeaders{},
+      CesiumAsync::HttpHeaders(),
       std::move(pMockBufferResponse));
 
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest{
@@ -287,7 +287,7 @@ std::optional<SubtreeAvailability> mockLoadSubtreeJson(
 
   // mock async system
   auto pMockTaskProcessor = std::make_shared<ThreadTaskProcessor>();
-  CesiumAsync::AsyncSystem asyncSystem{pMockTaskProcessor};
+  CesiumAsync::AsyncSystem asyncSystem(pMockTaskProcessor);
 
   auto subtreeFuture = SubtreeAvailability::loadSubtree(
       ImplicitTileSubdivisionScheme::Quadtree,
@@ -304,23 +304,23 @@ std::optional<SubtreeAvailability> mockLoadSubtreeJson(
 
 TEST_CASE("Test SubtreeAvailability methods") {
   SECTION("Availability stored in constant") {
-    SubtreeAvailability subtreeAvailability{
+    SubtreeAvailability subtreeAvailability(
         ImplicitTileSubdivisionScheme::Quadtree,
         5,
         SubtreeAvailability::SubtreeConstantAvailability{true},
         SubtreeAvailability::SubtreeConstantAvailability{false},
         {SubtreeAvailability::SubtreeConstantAvailability{false}},
-        {}};
+        {});
 
     SECTION("isTileAvailable()") {
-      CesiumGeometry::QuadtreeTileID tileID{4, 3, 1};
+      CesiumGeometry::QuadtreeTileID tileID(4, 3, 1);
       CHECK(subtreeAvailability.isTileAvailable(
           tileID.level,
           libmorton::morton2D_64_encode(tileID.x, tileID.y)));
     }
 
     SECTION("isContentAvailable()") {
-      CesiumGeometry::QuadtreeTileID tileID{5, 3, 1};
+      CesiumGeometry::QuadtreeTileID tileID(5, 3, 1);
       CHECK(!subtreeAvailability.isContentAvailable(
           tileID.level,
           libmorton::morton2D_64_encode(tileID.x, tileID.y),
@@ -328,7 +328,7 @@ TEST_CASE("Test SubtreeAvailability methods") {
     }
 
     SECTION("isSubtreeAvailable()") {
-      CesiumGeometry::QuadtreeTileID tileID{6, 3, 1};
+      CesiumGeometry::QuadtreeTileID tileID(6, 3, 1);
       CHECK(!subtreeAvailability.isSubtreeAvailable(
           libmorton::morton2D_64_encode(tileID.x, tileID.y)));
     }
@@ -337,38 +337,38 @@ TEST_CASE("Test SubtreeAvailability methods") {
   SECTION("Availability stored in buffer view") {
     // create expected available tiles
     std::vector<CesiumGeometry::QuadtreeTileID> availableTileIDs{
-        CesiumGeometry::QuadtreeTileID{0, 0, 0},
-        CesiumGeometry::QuadtreeTileID{1, 1, 0},
-        CesiumGeometry::QuadtreeTileID{2, 2, 2},
-        CesiumGeometry::QuadtreeTileID{2, 3, 1}};
+        CesiumGeometry::QuadtreeTileID(0, 0, 0),
+        CesiumGeometry::QuadtreeTileID(1, 1, 0),
+        CesiumGeometry::QuadtreeTileID(2, 2, 2),
+        CesiumGeometry::QuadtreeTileID(2, 3, 1)};
 
     // create expected unavailable tiles
     std::vector<CesiumGeometry::QuadtreeTileID> unavailableTileIDs{
-        CesiumGeometry::QuadtreeTileID{1, 1, 1},
-        CesiumGeometry::QuadtreeTileID{1, 0, 0},
-        CesiumGeometry::QuadtreeTileID{2, 0, 2},
-        CesiumGeometry::QuadtreeTileID{2, 3, 0},
-        CesiumGeometry::QuadtreeTileID{3, 0, 4},
+        CesiumGeometry::QuadtreeTileID(1, 1, 1),
+        CesiumGeometry::QuadtreeTileID(1, 0, 0),
+        CesiumGeometry::QuadtreeTileID(2, 0, 2),
+        CesiumGeometry::QuadtreeTileID(2, 3, 0),
+        CesiumGeometry::QuadtreeTileID(3, 0, 4),
 
         // illegal ID, so it shouldn't crash
-        CesiumGeometry::QuadtreeTileID{0, 1, 1},
-        CesiumGeometry::QuadtreeTileID{2, 12, 1},
-        CesiumGeometry::QuadtreeTileID{12, 16, 14},
+        CesiumGeometry::QuadtreeTileID(0, 1, 1),
+        CesiumGeometry::QuadtreeTileID(2, 12, 1),
+        CesiumGeometry::QuadtreeTileID(12, 16, 14),
     };
 
     // create available subtree
     std::vector<CesiumGeometry::QuadtreeTileID> availableSubtreeIDs{
-        CesiumGeometry::QuadtreeTileID{5, 31, 31},
-        CesiumGeometry::QuadtreeTileID{5, 30, 28},
-        CesiumGeometry::QuadtreeTileID{5, 20, 10},
-        CesiumGeometry::QuadtreeTileID{5, 11, 1}};
+        CesiumGeometry::QuadtreeTileID(5, 31, 31),
+        CesiumGeometry::QuadtreeTileID(5, 30, 28),
+        CesiumGeometry::QuadtreeTileID(5, 20, 10),
+        CesiumGeometry::QuadtreeTileID(5, 11, 1)};
 
     // create unavailable subtree
     std::vector<CesiumGeometry::QuadtreeTileID> unavailableSubtreeIDs{
-        CesiumGeometry::QuadtreeTileID{5, 3, 31},
-        CesiumGeometry::QuadtreeTileID{5, 10, 18},
-        CesiumGeometry::QuadtreeTileID{5, 20, 12},
-        CesiumGeometry::QuadtreeTileID{5, 11, 12}};
+        CesiumGeometry::QuadtreeTileID(5, 3, 31),
+        CesiumGeometry::QuadtreeTileID(5, 10, 18),
+        CesiumGeometry::QuadtreeTileID(5, 20, 12),
+        CesiumGeometry::QuadtreeTileID(5, 11, 12)};
 
     // setup tile availability buffer
     uint64_t maxSubtreeLevels = 5;
@@ -377,9 +377,9 @@ TEST_CASE("Test SubtreeAvailability methods") {
 
     uint64_t maxSubtreeTiles = uint64_t(1) << (2 * (maxSubtreeLevels));
     uint64_t bufferSize =
-        static_cast<uint64_t>(std::ceil(static_cast<double>(numTiles) / 8.0));
+        static_cast<uint64_t>(glm::ceil(static_cast<double>(numTiles) / 8.0));
     uint64_t subtreeBufferSize = static_cast<uint64_t>(
-        std::ceil(static_cast<double>(maxSubtreeTiles) / 8.0));
+        glm::ceil(static_cast<double>(maxSubtreeTiles) / 8.0));
 
     Subtree subtree;
     subtree.buffers.resize(3);
@@ -480,35 +480,35 @@ TEST_CASE("Test parsing subtree format") {
   uint32_t maxSubtreeLevels = 5;
 
   std::vector<CesiumGeometry::QuadtreeTileID> availableTileIDs{
-      CesiumGeometry::QuadtreeTileID{0, 0, 0},
-      CesiumGeometry::QuadtreeTileID{1, 0, 0},
-      CesiumGeometry::QuadtreeTileID{1, 1, 0},
-      CesiumGeometry::QuadtreeTileID{2, 2, 2},
-      CesiumGeometry::QuadtreeTileID{2, 3, 2},
-      CesiumGeometry::QuadtreeTileID{2, 0, 0},
-      CesiumGeometry::QuadtreeTileID{3, 1, 0},
+      CesiumGeometry::QuadtreeTileID(0, 0, 0),
+      CesiumGeometry::QuadtreeTileID(1, 0, 0),
+      CesiumGeometry::QuadtreeTileID(1, 1, 0),
+      CesiumGeometry::QuadtreeTileID(2, 2, 2),
+      CesiumGeometry::QuadtreeTileID(2, 3, 2),
+      CesiumGeometry::QuadtreeTileID(2, 0, 0),
+      CesiumGeometry::QuadtreeTileID(3, 1, 0),
   };
 
   std::vector<CesiumGeometry::QuadtreeTileID> unavailableTileIDs{
-      CesiumGeometry::QuadtreeTileID{1, 0, 1},
-      CesiumGeometry::QuadtreeTileID{1, 1, 1},
-      CesiumGeometry::QuadtreeTileID{2, 2, 3},
-      CesiumGeometry::QuadtreeTileID{2, 3, 1},
-      CesiumGeometry::QuadtreeTileID{2, 1, 0},
-      CesiumGeometry::QuadtreeTileID{3, 2, 0},
+      CesiumGeometry::QuadtreeTileID(1, 0, 1),
+      CesiumGeometry::QuadtreeTileID(1, 1, 1),
+      CesiumGeometry::QuadtreeTileID(2, 2, 3),
+      CesiumGeometry::QuadtreeTileID(2, 3, 1),
+      CesiumGeometry::QuadtreeTileID(2, 1, 0),
+      CesiumGeometry::QuadtreeTileID(3, 2, 0),
   };
 
   std::vector<CesiumGeometry::QuadtreeTileID> availableSubtreeIDs{
-      CesiumGeometry::QuadtreeTileID{5, 31, 31},
-      CesiumGeometry::QuadtreeTileID{5, 30, 28},
-      CesiumGeometry::QuadtreeTileID{5, 20, 10},
-      CesiumGeometry::QuadtreeTileID{5, 11, 1}};
+      CesiumGeometry::QuadtreeTileID(5, 31, 31),
+      CesiumGeometry::QuadtreeTileID(5, 30, 28),
+      CesiumGeometry::QuadtreeTileID(5, 20, 10),
+      CesiumGeometry::QuadtreeTileID(5, 11, 1)};
 
   std::vector<CesiumGeometry::QuadtreeTileID> unavailableSubtreeIDs{
-      CesiumGeometry::QuadtreeTileID{5, 31, 30},
-      CesiumGeometry::QuadtreeTileID{5, 31, 28},
-      CesiumGeometry::QuadtreeTileID{5, 21, 11},
-      CesiumGeometry::QuadtreeTileID{5, 11, 12}};
+      CesiumGeometry::QuadtreeTileID(5, 31, 30),
+      CesiumGeometry::QuadtreeTileID(5, 31, 28),
+      CesiumGeometry::QuadtreeTileID(5, 21, 11),
+      CesiumGeometry::QuadtreeTileID(5, 11, 12)};
 
   auto subtreeBuffers = createSubtreeBuffers(
       maxSubtreeLevels,
@@ -550,12 +550,12 @@ TEST_CASE("Test parsing subtree format") {
     auto pMockResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "test",
-        CesiumAsync::HttpHeaders{},
+        CesiumAsync::HttpHeaders(),
         std::move(buffer));
     auto pMockRequest = std::make_unique<SimpleAssetRequest>(
         "GET",
         "test",
-        CesiumAsync::HttpHeaders{},
+        CesiumAsync::HttpHeaders(),
         std::move(pMockResponse));
     std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest{
         {"test", std::move(pMockRequest)}};

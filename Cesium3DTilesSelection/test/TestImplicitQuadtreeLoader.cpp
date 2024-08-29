@@ -12,7 +12,8 @@
 #include <CesiumNativeTests/readFile.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <filesystem>
 
@@ -389,42 +390,54 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
       const auto& tile_1_0_0 = findTile(tileChildren, QuadtreeTileID(1, 0, 0));
       const auto& region_1_0_0 =
           std::get<BoundingRegion>(tile_1_0_0.getBoundingVolume());
-      CHECK(region_1_0_0.getRectangle().getWest() == Approx(-Math::OnePi));
-      CHECK(region_1_0_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
-      CHECK(region_1_0_0.getRectangle().getEast() == Approx(0.0));
-      CHECK(region_1_0_0.getRectangle().getNorth() == Approx(0.0));
-      CHECK(region_1_0_0.getMinimumHeight() == Approx(0.0));
-      CHECK(region_1_0_0.getMaximumHeight() == Approx(100.0));
+      CHECK(
+          region_1_0_0.getRectangle().getWest() == Catch::Approx(-Math::OnePi));
+      CHECK(
+          region_1_0_0.getRectangle().getSouth() ==
+          Catch::Approx(-Math::PiOverTwo));
+      CHECK(region_1_0_0.getRectangle().getEast() == Catch::Approx(0.0));
+      CHECK(region_1_0_0.getRectangle().getNorth() == Catch::Approx(0.0));
+      CHECK(region_1_0_0.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_1_0_0.getMaximumHeight() == Catch::Approx(100.0));
 
       const auto& tile_1_1_0 = findTile(tileChildren, QuadtreeTileID(1, 1, 0));
       const auto& region_1_1_0 =
           std::get<BoundingRegion>(tile_1_1_0.getBoundingVolume());
-      CHECK(region_1_1_0.getRectangle().getWest() == Approx(0.0));
-      CHECK(region_1_1_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
-      CHECK(region_1_1_0.getRectangle().getEast() == Approx(Math::OnePi));
-      CHECK(region_1_1_0.getRectangle().getNorth() == Approx(0.0));
-      CHECK(region_1_1_0.getMinimumHeight() == Approx(0.0));
-      CHECK(region_1_1_0.getMaximumHeight() == Approx(100.0));
+      CHECK(region_1_1_0.getRectangle().getWest() == Catch::Approx(0.0));
+      CHECK(
+          region_1_1_0.getRectangle().getSouth() ==
+          Catch::Approx(-Math::PiOverTwo));
+      CHECK(
+          region_1_1_0.getRectangle().getEast() == Catch::Approx(Math::OnePi));
+      CHECK(region_1_1_0.getRectangle().getNorth() == Catch::Approx(0.0));
+      CHECK(region_1_1_0.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_1_1_0.getMaximumHeight() == Catch::Approx(100.0));
 
       const auto& tile_1_0_1 = findTile(tileChildren, QuadtreeTileID(1, 0, 1));
       const auto& region_1_0_1 =
           std::get<BoundingRegion>(tile_1_0_1.getBoundingVolume());
-      CHECK(region_1_0_1.getRectangle().getWest() == Approx(-Math::OnePi));
-      CHECK(region_1_0_1.getRectangle().getSouth() == Approx(0.0));
-      CHECK(region_1_0_1.getRectangle().getEast() == Approx(0.0));
-      CHECK(region_1_0_1.getRectangle().getNorth() == Approx(Math::PiOverTwo));
-      CHECK(region_1_0_1.getMinimumHeight() == Approx(0.0));
-      CHECK(region_1_0_1.getMaximumHeight() == Approx(100.0));
+      CHECK(
+          region_1_0_1.getRectangle().getWest() == Catch::Approx(-Math::OnePi));
+      CHECK(region_1_0_1.getRectangle().getSouth() == Catch::Approx(0.0));
+      CHECK(region_1_0_1.getRectangle().getEast() == Catch::Approx(0.0));
+      CHECK(
+          region_1_0_1.getRectangle().getNorth() ==
+          Catch::Approx(Math::PiOverTwo));
+      CHECK(region_1_0_1.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_1_0_1.getMaximumHeight() == Catch::Approx(100.0));
 
       const auto& tile_1_1_1 = findTile(tileChildren, QuadtreeTileID(1, 1, 1));
       const auto& region_1_1_1 =
           std::get<BoundingRegion>(tile_1_1_1.getBoundingVolume());
-      CHECK(region_1_1_1.getRectangle().getWest() == Approx(0.0));
-      CHECK(region_1_1_1.getRectangle().getSouth() == Approx(0.0));
-      CHECK(region_1_1_1.getRectangle().getEast() == Approx(Math::OnePi));
-      CHECK(region_1_1_1.getRectangle().getNorth() == Approx(Math::PiOverTwo));
-      CHECK(region_1_1_1.getMinimumHeight() == Approx(0.0));
-      CHECK(region_1_1_1.getMaximumHeight() == Approx(100.0));
+      CHECK(region_1_1_1.getRectangle().getWest() == Catch::Approx(0.0));
+      CHECK(region_1_1_1.getRectangle().getSouth() == Catch::Approx(0.0));
+      CHECK(
+          region_1_1_1.getRectangle().getEast() == Catch::Approx(Math::OnePi));
+      CHECK(
+          region_1_1_1.getRectangle().getNorth() ==
+          Catch::Approx(Math::PiOverTwo));
+      CHECK(region_1_1_1.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_1_1_1.getMaximumHeight() == Catch::Approx(100.0));
 
       tile.createChildTiles(std::move(tileChildrenResult.children));
     }
@@ -441,46 +454,64 @@ TEST_CASE("Test tile subdivision for implicit quadtree loader") {
       const auto& tile_2_2_0 = findTile(tileChildren, QuadtreeTileID(2, 2, 0));
       const auto& region_2_2_0 =
           std::get<BoundingRegion>(tile_2_2_0.getBoundingVolume());
-      CHECK(region_2_2_0.getRectangle().getWest() == Approx(0.0));
-      CHECK(region_2_2_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
-      CHECK(region_2_2_0.getRectangle().getEast() == Approx(Math::PiOverTwo));
+      CHECK(region_2_2_0.getRectangle().getWest() == Catch::Approx(0.0));
       CHECK(
-          region_2_2_0.getRectangle().getNorth() == Approx(-Math::OnePi / 4.0));
-      CHECK(region_2_2_0.getMinimumHeight() == Approx(0.0));
-      CHECK(region_2_2_0.getMaximumHeight() == Approx(100.0));
+          region_2_2_0.getRectangle().getSouth() ==
+          Catch::Approx(-Math::PiOverTwo));
+      CHECK(
+          region_2_2_0.getRectangle().getEast() ==
+          Catch::Approx(Math::PiOverTwo));
+      CHECK(
+          region_2_2_0.getRectangle().getNorth() ==
+          Catch::Approx(-Math::OnePi / 4.0));
+      CHECK(region_2_2_0.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_2_2_0.getMaximumHeight() == Catch::Approx(100.0));
 
       const auto& tile_2_3_0 = findTile(tileChildren, QuadtreeTileID(2, 3, 0));
       const auto& region_2_3_0 =
           std::get<BoundingRegion>(tile_2_3_0.getBoundingVolume());
-      CHECK(region_2_3_0.getRectangle().getWest() == Approx(Math::PiOverTwo));
-      CHECK(region_2_3_0.getRectangle().getSouth() == Approx(-Math::PiOverTwo));
-      CHECK(region_2_3_0.getRectangle().getEast() == Approx(Math::OnePi));
       CHECK(
-          region_2_3_0.getRectangle().getNorth() == Approx(-Math::OnePi / 4.0));
-      CHECK(region_2_3_0.getMinimumHeight() == Approx(0.0));
-      CHECK(region_2_3_0.getMaximumHeight() == Approx(100.0));
+          region_2_3_0.getRectangle().getWest() ==
+          Catch::Approx(Math::PiOverTwo));
+      CHECK(
+          region_2_3_0.getRectangle().getSouth() ==
+          Catch::Approx(-Math::PiOverTwo));
+      CHECK(
+          region_2_3_0.getRectangle().getEast() == Catch::Approx(Math::OnePi));
+      CHECK(
+          region_2_3_0.getRectangle().getNorth() ==
+          Catch::Approx(-Math::OnePi / 4.0));
+      CHECK(region_2_3_0.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_2_3_0.getMaximumHeight() == Catch::Approx(100.0));
 
       const auto& tile_2_2_1 = findTile(tileChildren, QuadtreeTileID(2, 2, 1));
       const auto& region_2_2_1 =
           std::get<BoundingRegion>(tile_2_2_1.getBoundingVolume());
-      CHECK(region_2_2_1.getRectangle().getWest() == Approx(0.0));
+      CHECK(region_2_2_1.getRectangle().getWest() == Catch::Approx(0.0));
       CHECK(
-          region_2_2_1.getRectangle().getSouth() == Approx(-Math::OnePi / 4.0));
-      CHECK(region_2_2_1.getRectangle().getEast() == Approx(Math::OnePi / 2.0));
-      CHECK(region_2_2_1.getRectangle().getNorth() == Approx(0.0));
-      CHECK(region_2_2_1.getMinimumHeight() == Approx(0.0));
-      CHECK(region_2_2_1.getMaximumHeight() == Approx(100.0));
+          region_2_2_1.getRectangle().getSouth() ==
+          Catch::Approx(-Math::OnePi / 4.0));
+      CHECK(
+          region_2_2_1.getRectangle().getEast() ==
+          Catch::Approx(Math::OnePi / 2.0));
+      CHECK(region_2_2_1.getRectangle().getNorth() == Catch::Approx(0.0));
+      CHECK(region_2_2_1.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_2_2_1.getMaximumHeight() == Catch::Approx(100.0));
 
       const auto& tile_2_3_1 = findTile(tileChildren, QuadtreeTileID(2, 3, 1));
       const auto& region_2_3_1 =
           std::get<BoundingRegion>(tile_2_3_1.getBoundingVolume());
-      CHECK(region_2_3_1.getRectangle().getWest() == Approx(Math::PiOverTwo));
       CHECK(
-          region_2_3_1.getRectangle().getSouth() == Approx(-Math::OnePi / 4.0));
-      CHECK(region_2_3_1.getRectangle().getEast() == Approx(Math::OnePi));
-      CHECK(region_2_3_1.getRectangle().getNorth() == Approx(0.0));
-      CHECK(region_2_3_1.getMinimumHeight() == Approx(0.0));
-      CHECK(region_2_3_1.getMaximumHeight() == Approx(100.0));
+          region_2_3_1.getRectangle().getWest() ==
+          Catch::Approx(Math::PiOverTwo));
+      CHECK(
+          region_2_3_1.getRectangle().getSouth() ==
+          Catch::Approx(-Math::OnePi / 4.0));
+      CHECK(
+          region_2_3_1.getRectangle().getEast() == Catch::Approx(Math::OnePi));
+      CHECK(region_2_3_1.getRectangle().getNorth() == Catch::Approx(0.0));
+      CHECK(region_2_3_1.getMinimumHeight() == Catch::Approx(0.0));
+      CHECK(region_2_3_1.getMaximumHeight() == Catch::Approx(100.0));
     }
   }
 

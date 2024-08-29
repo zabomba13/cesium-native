@@ -8,9 +8,9 @@
 #include <glm/exponential.hpp>
 #include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtx/compatibility.hpp>
 #include <glm/trigonometric.hpp>
 
-#include <cmath>
 #include <optional>
 
 using namespace CesiumUtility;
@@ -56,8 +56,8 @@ Ellipsoid::cartesianToCartographic(const glm::dvec3& cartesian) const noexcept {
     return std::optional<Cartographic>();
   }
 
-  const glm::dvec3 n = this->geodeticSurfaceNormal(p.value());
-  const glm::dvec3 h = cartesian - p.value();
+  const glm::dvec3 n = this->geodeticSurfaceNormal(*p);
+  const glm::dvec3 h = cartesian - *p;
 
   const double longitude = glm::atan(n.y, n.x);
   const double latitude = glm::asin(n.z);
@@ -90,7 +90,7 @@ Ellipsoid::scaleToGeodeticSurface(const glm::dvec3& cartesian) const noexcept {
 
   // If the position is near the center, the iteration will not converge.
   if (squaredNorm < this->_centerToleranceSquared) {
-    return !std::isfinite(ratio) ? std::optional<glm::dvec3>() : intersection;
+    return !glm::isfinite(ratio) ? std::optional<glm::dvec3>() : intersection;
   }
 
   const double oneOverRadiiSquaredX = this->_oneOverRadiiSquared.x;

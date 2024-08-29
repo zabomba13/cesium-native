@@ -31,8 +31,16 @@
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
 #include <CesiumJsonWriter/JsonObjectWriter.h>
 #include <CesiumJsonWriter/JsonWriter.h>
-#include <CesiumJsonWriter/writeJsonExtensions.h>
 #include <CesiumUtility/JsonValue.h>
+
+// NOLINTNEXTLINE(misc-include-cleaner)
+#include <CesiumJsonWriter/writeJsonExtensions.h>
+
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace Cesium3DTilesWriter {
 
@@ -565,7 +573,7 @@ void writeJson(
     writeJson(obj.enumType, jsonWriter, context);
   }
 
-  if (obj.array != false) {
+  if (obj.array) {
     jsonWriter.Key("array");
     writeJson(obj.array, jsonWriter, context);
   }
@@ -575,7 +583,7 @@ void writeJson(
     writeJson(obj.count, jsonWriter, context);
   }
 
-  if (obj.normalized != false) {
+  if (obj.normalized) {
     jsonWriter.Key("normalized");
     writeJson(obj.normalized, jsonWriter, context);
   }
@@ -600,7 +608,7 @@ void writeJson(
     writeJson(obj.min, jsonWriter, context);
   }
 
-  if (obj.required != false) {
+  if (obj.required) {
     jsonWriter.Key("required");
     writeJson(obj.required, jsonWriter, context);
   }

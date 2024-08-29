@@ -12,7 +12,6 @@
 #include <CesiumUtility/Assert.h>
 
 #include <array>
-#include <cmath>
 #include <cstdint>
 #include <optional>
 

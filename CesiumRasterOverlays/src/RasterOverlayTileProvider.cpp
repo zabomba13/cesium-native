@@ -135,7 +135,7 @@ RasterOverlayTileProvider::loadTileImageFromUrl(
               std::shared_ptr<IAssetRequest>&& pRequest) mutable {
             CESIUM_TRACE("load image");
             const IAssetResponse* pResponse = pRequest->response();
-            if (pResponse == nullptr) {
+            if (!pResponse) {
               return LoadedRasterOverlayImage{
                   std::nullopt,
                   options.rectangle,
@@ -241,7 +241,7 @@ static LoadResult createLoadResultFromLoadedImage(
     const std::shared_ptr<spdlog::logger>& pLogger,
     LoadedRasterOverlayImage&& loadedImage,
     const std::any& rendererOptions) {
-  if (!loadedImage.image.has_value()) {
+  if (!loadedImage.image) {
     SPDLOG_LOGGER_ERROR(
         pLogger,
         "Failed to load image for tile {}:\n- {}",

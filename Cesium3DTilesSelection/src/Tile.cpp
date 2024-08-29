@@ -197,7 +197,7 @@ bool Tile::isRenderable() const noexcept {
           this->_rasterTiles.begin(),
           this->_rasterTiles.end(),
           [](const RasterMappedTo3DTile& rasterTile) noexcept {
-            return rasterTile.getReadyTile() != nullptr;
+            return rasterTile.getReadyTile();
           });
     }
   }

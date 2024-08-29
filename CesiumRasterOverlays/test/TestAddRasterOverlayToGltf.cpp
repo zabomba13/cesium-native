@@ -18,7 +18,7 @@
 #include <CesiumRasterOverlays/TileMapServiceRasterOverlay.h>
 #include <CesiumUtility/IntrusivePointer.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <fstream>
@@ -73,18 +73,19 @@ TEST_CASE("Add raster overlay to glTF") {
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
            dataDir / "Cesium_Logo_Color")) {
-    if (!entry.is_regular_file())
+    if (!entry.is_regular_file()) {
       continue;
+    }
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
-        CesiumAsync::HttpHeaders{},
+        CesiumAsync::HttpHeaders(),
         readFile(entry.path()));
     std::string url = "file:///" + entry.path().generic_u8string();
     auto pRequest = std::make_unique<SimpleAssetRequest>(
         "GET",
         url,
-        CesiumAsync::HttpHeaders{},
+        CesiumAsync::HttpHeaders(),
         std::move(pResponse));
     mapUrlToRequest[url] = std::move(pRequest);
   }

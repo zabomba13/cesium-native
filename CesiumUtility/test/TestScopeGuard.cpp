@@ -1,19 +1,22 @@
 #include <CesiumUtility/ScopeGuard.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <utility>
 
 namespace {
 struct ExitFunctor {
-  void operator()() { ++(*check); }
+  void operator()() const { ++(*check); }
 
-  int* check{nullptr};
+  // NOLINTNEXTLINE(misc-non-private-member-variables-in-classes)
+  int* check = nullptr;
 };
 } // namespace
 
 TEST_CASE("Test constructor") {
   bool check = false;
   {
-    CesiumUtility::ScopeGuard guard{[&check]() mutable { check = true; }};
+    CesiumUtility::ScopeGuard guard([&check]() mutable { check = true; });
   }
 
   CHECK(check == true);
@@ -22,8 +25,8 @@ TEST_CASE("Test constructor") {
 TEST_CASE("Test move constructor") {
   int check = 0;
   {
-    CesiumUtility::ScopeGuard rhs{[&check]() mutable { ++check; }};
-    CesiumUtility::ScopeGuard lhs{std::move(rhs)};
+    CesiumUtility::ScopeGuard rhs([&check]() mutable { ++check; });
+    CesiumUtility::ScopeGuard lhs(std::move(rhs));
   }
 
   CHECK(check == 1);
@@ -32,8 +35,8 @@ TEST_CASE("Test move constructor") {
 TEST_CASE("Test move operator") {
   int check = 0;
   {
-    CesiumUtility::ScopeGuard rhs{ExitFunctor{&check}};
-    CesiumUtility::ScopeGuard lhs{ExitFunctor{&check}};
+    CesiumUtility::ScopeGuard rhs(ExitFunctor{&check});
+    CesiumUtility::ScopeGuard lhs(ExitFunctor{&check});
     lhs = std::move(rhs);
   }
 
@@ -43,7 +46,7 @@ TEST_CASE("Test move operator") {
 TEST_CASE("Test release()") {
   int check = 0;
   {
-    CesiumUtility::ScopeGuard guard{ExitFunctor{&check}};
+    CesiumUtility::ScopeGuard guard(ExitFunctor{&check});
     guard.release();
   }
 

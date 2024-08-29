@@ -50,7 +50,7 @@ glm::dvec2 EllipsoidTangentPlane::projectPointToNearestOnPlane(
     }
   }
 
-  const glm::dvec3 v = intersectionPoint.value() - this->_origin;
+  const glm::dvec3 v = *intersectionPoint - this->_origin;
   return glm::dvec2(glm::dot(this->_xAxis, v), glm::dot(this->_yAxis, v));
 }
 
@@ -62,9 +62,7 @@ glm::dvec2 EllipsoidTangentPlane::projectPointToNearestOnPlane(
     throw std::invalid_argument(
         "The origin must not be near the center of the ellipsoid.");
   }
-  return GlobeTransforms::eastNorthUpToFixedFrame(
-      scaledOrigin.value(),
-      ellipsoid);
+  return GlobeTransforms::eastNorthUpToFixedFrame(*scaledOrigin, ellipsoid);
 }
 
 } // namespace CesiumGeospatial

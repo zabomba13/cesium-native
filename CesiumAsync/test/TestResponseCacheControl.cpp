@@ -1,6 +1,10 @@
 #include "ResponseCacheControl.h"
 
-#include <catch2/catch.hpp>
+#include <CesiumAsync/HttpHeaders.h>
+
+#include <catch2/catch_test_macros.hpp>
+
+#include <optional>
 
 using namespace CesiumAsync;
 
@@ -25,17 +29,22 @@ TEST_CASE("Test parsing cache-control header") {
     std::optional<ResponseCacheControl> cacheControl =
         ResponseCacheControl::parseFromResponseHeaders(responseHeader);
     REQUIRE(cacheControl != std::nullopt);
-    REQUIRE(cacheControl->mustRevalidate());
-    REQUIRE(cacheControl->noCache());
-    REQUIRE(cacheControl->noStore());
-    REQUIRE(cacheControl->noTransform());
-    REQUIRE(cacheControl->accessControlPublic());
-    REQUIRE(cacheControl->accessControlPrivate());
-    REQUIRE(cacheControl->proxyRevalidate());
-    REQUIRE(cacheControl->maxAgeExists() == true);
-    REQUIRE(cacheControl->maxAgeValue() == 1000);
-    REQUIRE(cacheControl->sharedMaxAgeExists() == true);
-    REQUIRE(cacheControl->sharedMaxAgeValue() == 10);
+
+    if (!cacheControl) {
+      return;
+    }
+
+    CHECK(cacheControl->mustRevalidate());
+    CHECK(cacheControl->noCache());
+    CHECK(cacheControl->noStore());
+    CHECK(cacheControl->noTransform());
+    CHECK(cacheControl->accessControlPublic());
+    CHECK(cacheControl->accessControlPrivate());
+    CHECK(cacheControl->proxyRevalidate());
+    CHECK(cacheControl->maxAgeExists() == true);
+    CHECK(cacheControl->maxAgeValue() == 1000);
+    CHECK(cacheControl->sharedMaxAgeExists() == true);
+    CHECK(cacheControl->sharedMaxAgeValue() == 10);
   }
 
   SECTION("Header has cache-control header with only some directive") {
@@ -48,16 +57,21 @@ TEST_CASE("Test parsing cache-control header") {
     std::optional<ResponseCacheControl> cacheControl =
         ResponseCacheControl::parseFromResponseHeaders(responseHeader);
     REQUIRE(cacheControl != std::nullopt);
-    REQUIRE(cacheControl->mustRevalidate());
-    REQUIRE(cacheControl->noCache());
-    REQUIRE(cacheControl->noStore());
-    REQUIRE(cacheControl->noTransform() == false);
-    REQUIRE(cacheControl->accessControlPublic());
-    REQUIRE(cacheControl->accessControlPrivate());
-    REQUIRE(cacheControl->proxyRevalidate() == false);
-    REQUIRE(cacheControl->maxAgeExists() == true);
-    REQUIRE(cacheControl->maxAgeValue() == 1000);
-    REQUIRE(cacheControl->sharedMaxAgeExists() == true);
-    REQUIRE(cacheControl->sharedMaxAgeValue() == 10);
+
+    if (!cacheControl) {
+      return;
+    }
+
+    CHECK(cacheControl->mustRevalidate());
+    CHECK(cacheControl->noCache());
+    CHECK(cacheControl->noStore());
+    CHECK(cacheControl->noTransform() == false);
+    CHECK(cacheControl->accessControlPublic());
+    CHECK(cacheControl->accessControlPrivate());
+    CHECK(cacheControl->proxyRevalidate() == false);
+    CHECK(cacheControl->maxAgeExists() == true);
+    CHECK(cacheControl->maxAgeValue() == 1000);
+    CHECK(cacheControl->sharedMaxAgeExists() == true);
+    CHECK(cacheControl->sharedMaxAgeValue() == 10);
   }
 }

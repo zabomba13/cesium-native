@@ -19,7 +19,8 @@
 #include <CesiumUtility/IntrusivePointer.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/glm.hpp>
 
 #include <filesystem>
@@ -44,8 +45,8 @@ public:
   }
 
   TileChildrenResult createTileChildren(
-      [[maybe_unused]] const Tile& tile,
-      [[maybe_unused]] const Ellipsoid& ellipsoid) override {
+      const Tile& /* tile */,
+      const Ellipsoid& /* ellipsoid */) override {
     return std::move(mockCreateTileChildren);
   }
 
@@ -995,9 +996,9 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
     for (int64_t i = 0; i < expectedNormalView.size(); ++i) {
       const glm::vec3& expectedNorm = expectedNormalView[i];
       const glm::vec3& norm = normalView[i];
-      CHECK(expectedNorm.x == Approx(norm.x).epsilon(1e-4));
-      CHECK(expectedNorm.y == Approx(norm.y).epsilon(1e-4));
-      CHECK(expectedNorm.z == Approx(norm.z).epsilon(1e-4));
+      CHECK(expectedNorm.x == Catch::Approx(norm.x).epsilon(1e-4));
+      CHECK(expectedNorm.y == Catch::Approx(norm.y).epsilon(1e-4));
+      CHECK(expectedNorm.z == Catch::Approx(norm.z).epsilon(1e-4));
     }
 
     // unload tile
@@ -1110,12 +1111,14 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       const auto& projectionRectangle =
           rasterOverlayDetails.rasterOverlayRectangles.front();
       auto globeRectangle = geographicProjection.unproject(projectionRectangle);
-      CHECK(globeRectangle.getWest() == Approx(beginCarto.longitude));
-      CHECK(globeRectangle.getSouth() == Approx(beginCarto.latitude));
+      CHECK(globeRectangle.getWest() == Catch::Approx(beginCarto.longitude));
+      CHECK(globeRectangle.getSouth() == Catch::Approx(beginCarto.latitude));
       CHECK(
-          globeRectangle.getEast() == Approx(beginCarto.longitude + 9 * 0.01));
+          globeRectangle.getEast() ==
+          Catch::Approx(beginCarto.longitude + 9 * 0.01));
       CHECK(
-          globeRectangle.getNorth() == Approx(beginCarto.latitude + 9 * 0.01));
+          globeRectangle.getNorth() ==
+          Catch::Approx(beginCarto.latitude + 9 * 0.01));
 
       // check the UVs
       const auto& renderContent = tileContent.getRenderContent();
@@ -1174,26 +1177,34 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       const auto& projectionRectangle =
           rasterOverlayDetails.rasterOverlayRectangles.front();
       auto globeRectangle = geographicProjection.unproject(projectionRectangle);
-      CHECK(globeRectangle.getWest() == Approx(-CesiumUtility::Math::OnePi));
       CHECK(
-          globeRectangle.getSouth() == Approx(-CesiumUtility::Math::PiOverTwo));
-      CHECK(globeRectangle.getEast() == Approx(CesiumUtility::Math::OnePi));
+          globeRectangle.getWest() ==
+          Catch::Approx(-CesiumUtility::Math::OnePi));
       CHECK(
-          globeRectangle.getNorth() == Approx(CesiumUtility::Math::PiOverTwo));
+          globeRectangle.getSouth() ==
+          Catch::Approx(-CesiumUtility::Math::PiOverTwo));
+      CHECK(
+          globeRectangle.getEast() ==
+          Catch::Approx(CesiumUtility::Math::OnePi));
+      CHECK(
+          globeRectangle.getNorth() ==
+          Catch::Approx(CesiumUtility::Math::PiOverTwo));
 
       // check the tile whole region which will be more fitted
       const BoundingRegion& tileRegion =
           std::get<BoundingRegion>(tile.getBoundingVolume());
       CHECK(
-          tileRegion.getRectangle().getWest() == Approx(beginCarto.longitude));
+          tileRegion.getRectangle().getWest() ==
+          Catch::Approx(beginCarto.longitude));
       CHECK(
-          tileRegion.getRectangle().getSouth() == Approx(beginCarto.latitude));
+          tileRegion.getRectangle().getSouth() ==
+          Catch::Approx(beginCarto.latitude));
       CHECK(
           tileRegion.getRectangle().getEast() ==
-          Approx(beginCarto.longitude + 9 * 0.01));
+          Catch::Approx(beginCarto.longitude + 9 * 0.01));
       CHECK(
           tileRegion.getRectangle().getNorth() ==
-          Approx(beginCarto.latitude + 9 * 0.01));
+          Catch::Approx(beginCarto.latitude + 9 * 0.01));
 
       // check the UVs
       const auto& renderContent = tileContent.getRenderContent();
@@ -1255,15 +1266,17 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       const BoundingRegion& tileRegion =
           std::get<BoundingRegion>(tile.getBoundingVolume());
       CHECK(
-          tileRegion.getRectangle().getWest() == Approx(beginCarto.longitude));
+          tileRegion.getRectangle().getWest() ==
+          Catch::Approx(beginCarto.longitude));
       CHECK(
-          tileRegion.getRectangle().getSouth() == Approx(beginCarto.latitude));
+          tileRegion.getRectangle().getSouth() ==
+          Catch::Approx(beginCarto.latitude));
       CHECK(
           tileRegion.getRectangle().getEast() ==
-          Approx(beginCarto.longitude + 9 * 0.01));
+          Catch::Approx(beginCarto.longitude + 9 * 0.01));
       CHECK(
           tileRegion.getRectangle().getNorth() ==
-          Approx(beginCarto.latitude + 9 * 0.01));
+          Catch::Approx(beginCarto.latitude + 9 * 0.01));
     }
   }
 

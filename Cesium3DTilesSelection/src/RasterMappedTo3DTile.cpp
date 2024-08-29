@@ -27,8 +27,9 @@ RasterOverlayTile* findTileOverlay(Tile& tile, const RasterOverlay& overlay) {
       tiles.end(),
       [&overlay](RasterMappedTo3DTile& raster) noexcept {
         RasterOverlayTile* pReady = raster.getReadyTile();
-        if (pReady == nullptr)
+        if (!pReady) {
           return false;
+        }
 
         return &pReady->getTileProvider().getOwner() == &overlay;
       });
@@ -66,7 +67,7 @@ RasterMappedTo3DTile::RasterMappedTo3DTile(
 RasterOverlayTile::MoreDetailAvailable RasterMappedTo3DTile::update(
     IPrepareRendererResources& prepareRendererResources,
     Tile& tile) {
-  CESIUM_ASSERT(this->_pLoadingTile != nullptr || this->_pReadyTile != nullptr);
+  CESIUM_ASSERT(this->_pLoadingTile || this->_pReadyTile);
 
   if (this->getState() == AttachmentState::Attached) {
     return !this->_originalFailed && this->_pReadyTile &&
@@ -171,7 +172,7 @@ RasterOverlayTile::MoreDetailAvailable RasterMappedTo3DTile::update(
                                        : AttachmentState::Attached;
   }
 
-  CESIUM_ASSERT(this->_pLoadingTile != nullptr || this->_pReadyTile != nullptr);
+  CESIUM_ASSERT(this->_pLoadingTile || this->_pReadyTile);
 
   // TODO: check more precise raster overlay tile availability, rather than just
   // max level?

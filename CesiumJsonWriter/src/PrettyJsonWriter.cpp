@@ -31,9 +31,9 @@ bool PrettyJsonWriter::Int(int i) { return pretty->Int(i); }
 
 bool PrettyJsonWriter::Uint(unsigned int i) { return pretty->Uint(i); }
 
-bool PrettyJsonWriter::Uint64(std::uint64_t i) { return pretty->Uint64(i); }
+bool PrettyJsonWriter::Uint64(uint64_t i) { return pretty->Uint64(i); }
 
-bool PrettyJsonWriter::Int64(std::int64_t i) { return pretty->Int64(i); }
+bool PrettyJsonWriter::Int64(int64_t i) { return pretty->Int64(i); }
 
 bool PrettyJsonWriter::Double(double d) { return pretty->Double(d); }
 
@@ -62,13 +62,13 @@ bool PrettyJsonWriter::StartArray() { return pretty->StartArray(); }
 
 bool PrettyJsonWriter::EndArray() { return pretty->EndArray(); }
 
-void PrettyJsonWriter::Primitive(std::int32_t value) { pretty->Int(value); }
+void PrettyJsonWriter::Primitive(int32_t value) { pretty->Int(value); }
 
-void PrettyJsonWriter::Primitive(std::uint32_t value) { pretty->Uint(value); }
+void PrettyJsonWriter::Primitive(uint32_t value) { pretty->Uint(value); }
 
-void PrettyJsonWriter::Primitive(std::int64_t value) { pretty->Int64(value); }
+void PrettyJsonWriter::Primitive(int64_t value) { pretty->Int64(value); }
 
-void PrettyJsonWriter::Primitive(std::uint64_t value) { pretty->Uint64(value); }
+void PrettyJsonWriter::Primitive(uint64_t value) { pretty->Uint64(value); }
 
 void PrettyJsonWriter::Primitive(float value) {
   pretty->Double(static_cast<double>(value));
@@ -83,30 +83,22 @@ void PrettyJsonWriter::Primitive(std::string_view string) {
 }
 
 // Integral
-void PrettyJsonWriter::KeyPrimitive(
-    std::string_view keyName,
-    std::int32_t value) {
+void PrettyJsonWriter::KeyPrimitive(std::string_view keyName, int32_t value) {
   Key(keyName);
   Primitive(value);
 }
 
-void PrettyJsonWriter::KeyPrimitive(
-    std::string_view keyName,
-    std::uint32_t value) {
+void PrettyJsonWriter::KeyPrimitive(std::string_view keyName, uint32_t value) {
   Key(keyName);
   Primitive(value);
 }
 
-void PrettyJsonWriter::KeyPrimitive(
-    std::string_view keyName,
-    std::int64_t value) {
+void PrettyJsonWriter::KeyPrimitive(std::string_view keyName, int64_t value) {
   Key(keyName);
   Primitive(value);
 }
 
-void PrettyJsonWriter::KeyPrimitive(
-    std::string_view keyName,
-    std::uint64_t value) {
+void PrettyJsonWriter::KeyPrimitive(std::string_view keyName, uint64_t value) {
   Key(keyName);
   Primitive(value);
 }
@@ -167,7 +159,7 @@ std::string_view PrettyJsonWriter::toStringView() {
 std::vector<std::byte> PrettyJsonWriter::toBytes() {
   const auto view = this->toStringView();
   std::vector<std::byte> result(view.size(), std::byte(0));
-  auto* u8Pointer = reinterpret_cast<std::uint8_t*>(result.data());
+  auto* u8Pointer = reinterpret_cast<uint8_t*>(result.data());
   std::copy(view.begin(), view.end(), u8Pointer);
   return result;
 }

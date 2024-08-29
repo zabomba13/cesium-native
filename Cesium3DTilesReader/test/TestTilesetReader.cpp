@@ -3,7 +3,8 @@
 #include <CesiumJsonReader/JsonReader.h>
 #include <CesiumNativeTests/readFile.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/vec3.hpp>
 #include <gsl/span>
 #include <rapidjson/reader.h>
@@ -22,7 +23,7 @@ TEST_CASE("Reads tileset JSON") {
   auto result = reader.readFromJson(data);
   REQUIRE(result.value);
 
-  const Cesium3DTiles::Tileset& tileset = result.value.value();
+  const Cesium3DTiles::Tileset& tileset = *result.value;
 
   REQUIRE(tileset.asset.version == "1.0");
   REQUIRE(tileset.geometricError == 494.50961650991815);
@@ -76,11 +77,11 @@ TEST_CASE("Reads tileset JSON") {
 
   REQUIRE_THAT(
       tileset.root.boundingVolume.region,
-      Catch::Matchers::Approx(expectedRegion));
+      Catch::Matchers::Catch::Approx(expectedRegion));
 
   REQUIRE_THAT(
       tileset.root.content->boundingVolume->region,
-      Catch::Matchers::Approx(expectedContentRegion));
+      Catch::Matchers::Catch::Approx(expectedContentRegion));
 
   REQUIRE(tileset.root.children.size() == 4);
 
@@ -88,11 +89,11 @@ TEST_CASE("Reads tileset JSON") {
 
   REQUIRE_THAT(
       child.boundingVolume.region,
-      Catch::Matchers::Approx(expectedChildRegion));
+      Catch::Matchers::Catch::Approx(expectedChildRegion));
 
   REQUIRE_THAT(
       child.content->boundingVolume->region,
-      Catch::Matchers::Approx(expectedChildContentRegion));
+      Catch::Matchers::Catch::Approx(expectedChildContentRegion));
 
   CHECK(child.content->uri == "1/0/0.b3dm");
   CHECK(child.geometricError == 159.43385994848);
@@ -137,7 +138,7 @@ TEST_CASE("Reads extras") {
   REQUIRE(result.warnings.empty());
   REQUIRE(result.value.has_value());
 
-  Cesium3DTiles::Tileset& tileset = result.value.value();
+  Cesium3DTiles::Tileset& tileset = *result.value;
 
   auto ait = tileset.extras.find("A");
   REQUIRE(ait != tileset.extras.end());
@@ -164,10 +165,10 @@ TEST_CASE("Reads extras") {
   CesiumUtility::JsonValue::Array array = pC2->getArray();
   CHECK(array.size() == 5);
   CHECK(array[0].getSafeNumber<double>() == 1.0);
-  CHECK(array[1].getSafeNumber<std::uint64_t>() == 2);
-  CHECK(array[2].getSafeNumber<std::uint8_t>() == 3);
-  CHECK(array[3].getSafeNumber<std::int16_t>() == 4);
-  CHECK(array[4].getSafeNumber<std::int32_t>() == 5);
+  CHECK(array[1].getSafeNumber<uint64_t>() == 2);
+  CHECK(array[2].getSafeNumber<uint8_t>() == 3);
+  CHECK(array[3].getSafeNumber<int16_t>() == 4);
+  CHECK(array[4].getSafeNumber<int32_t>() == 5);
 
   CesiumUtility::JsonValue* pC3 = cit->second.getValuePtrForKey("C3");
   REQUIRE(pC3 != nullptr);
@@ -215,7 +216,7 @@ TEST_CASE("Reads 3DTILES_content_gltf") {
   REQUIRE(result.warnings.empty());
   REQUIRE(result.value.has_value());
 
-  Cesium3DTiles::Tileset& tileset = result.value.value();
+  Cesium3DTiles::Tileset& tileset = *result.value;
   CHECK(tileset.asset.version == "1.0");
 
   const std::vector<std::string> tilesetExtensionUsed{

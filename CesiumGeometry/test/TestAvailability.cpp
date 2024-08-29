@@ -1,25 +1,25 @@
 
 #include "CesiumGeometry/Availability.h"
-#include "CesiumGeometry/AxisAlignedBox.h"
 #include "CesiumGeometry/OctreeAvailability.h"
 #include "CesiumGeometry/OctreeTileID.h"
 #include "CesiumGeometry/QuadtreeAvailability.h"
 #include "CesiumGeometry/QuadtreeTileID.h"
-#include "CesiumGeometry/Rectangle.h"
 #include "CesiumGeometry/TileAvailabilityFlags.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <gsl/span>
 
-#include <algorithm>
-#include <memory>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
 #include <vector>
 
 using namespace CesiumGeometry;
 
 TEST_CASE("Test AvailabilityUtilities") {
   SECTION("Test countOnesInByte") {
-    uint8_t byte = static_cast<uint8_t>(0xFF);
+    uint8_t byte(0xFF);
     for (uint8_t i = 0; i <= 8; ++i) {
       REQUIRE(
           AvailabilityUtilities::countOnesInByte(
@@ -36,7 +36,7 @@ TEST_CASE("Test AvailabilityUtilities") {
     // Each byte is 0xFC which has 6 ones.
     // This means there are 6 x 64 = 384 ones total in the buffer.
     uint32_t onesInBuffer = AvailabilityUtilities::countOnesInBuffer(
-        gsl::span<std::byte>(&buffer[0], 64));
+        gsl::span<std::byte>(buffer.data(), 64));
     REQUIRE(onesInBuffer == 384U);
   }
 }
@@ -205,7 +205,7 @@ TEST_CASE("Test OctreeAvailability") {
 
   SECTION("Test children subtree availability") {
     // Check child subtree availability, none are loaded yet.
-    uint32_t componentLengthAtLevel = 1U << 3;
+    uint32_t componentLengthAtLevel = 1U << 3U;
     for (uint32_t z = 0; z < componentLengthAtLevel; ++z) {
       for (uint32_t y = 0; y < componentLengthAtLevel; ++y) {
         for (uint32_t x = 0; x < componentLengthAtLevel; ++x) {
@@ -272,7 +272,7 @@ TEST_CASE("Test OctreeAvailability") {
     }
 
     // Check that the correct child subtrees are noted to be loaded.
-    uint32_t componentLengthAtLevel = 1U << 3;
+    uint32_t componentLengthAtLevel = 1U << 3U;
     for (uint32_t z = 0; z < componentLengthAtLevel; ++z) {
       for (uint32_t y = 0; y < componentLengthAtLevel; ++y) {
         for (uint32_t x = 0; x < componentLengthAtLevel; ++x) {
@@ -396,7 +396,7 @@ TEST_CASE("Test QuadtreeAvailability") {
 
   SECTION("Test children subtree availability") {
     // Check child subtree availability, none are loaded yet.
-    uint32_t componentLengthAtLevel = 1U << 3;
+    uint32_t componentLengthAtLevel = 1U << 3U;
     for (uint32_t y = 0; y < componentLengthAtLevel; ++y) {
       for (uint32_t x = 0; x < componentLengthAtLevel; ++x) {
         QuadtreeTileID id(3, x, y);
@@ -463,7 +463,7 @@ TEST_CASE("Test QuadtreeAvailability") {
     }
 
     // Check that the correct child subtrees are noted to be loaded.
-    uint32_t componentLengthAtLevel = 1U << 3;
+    uint32_t componentLengthAtLevel = 1U << 3U;
     for (uint32_t y = 0; y < componentLengthAtLevel; ++y) {
       for (uint32_t x = 0; x < componentLengthAtLevel; ++x) {
         QuadtreeTileID id(3, x, y);

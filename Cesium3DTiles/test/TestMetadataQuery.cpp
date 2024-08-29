@@ -1,13 +1,13 @@
 #include <Cesium3DTiles/MetadataQuery.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Cesium3DTiles;
 using namespace CesiumUtility;
 
 TEST_CASE("MetadataQuery") {
   SECTION("findFirstPropertyWithSemantic") {
-    Schema schema{};
+    Schema schema;
     Class& classDefinition =
         schema.classes.emplace("someClass", Class()).first->second;
 

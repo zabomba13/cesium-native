@@ -22,7 +22,7 @@ public:
   explicit Dispatcher(IJsonHandler* pCurrent) : _pCurrent(pCurrent) {}
 
   bool update(IJsonHandler* pNext) noexcept {
-    if (pNext == nullptr) {
+    if (!pNext) {
       return false;
     }
 
@@ -124,7 +124,7 @@ void JsonReader::FinalJsonHandler::reportWarning(
   }
 
   fullWarning += "\n  From byte offset: ";
-  fullWarning += (this->_pInputStream != nullptr)
+  fullWarning += this->_pInputStream
                      ? std::to_string(this->_pInputStream->Tell())
                      : "unknown";
 

@@ -6,7 +6,8 @@
 #include "CesiumGeospatial/Ellipsoid.h"
 #include "CesiumUtility/Math.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <glm/glm.hpp>
 
 #include <array>
@@ -414,11 +415,12 @@ TEST_CASE("IntersectionTests::raySphere") {
 
   std::optional<double> t =
       IntersectionTests::raySphereParametric(testCase.ray, testCase.sphere);
-  if (!t)
+  if (!t) {
     t = -1.0;
+  }
 
   CHECK(CesiumUtility::Math::equalsEpsilon(
-      t.value(),
+      *t,
       testCase.t,
       CesiumUtility::Math::Epsilon6));
 }

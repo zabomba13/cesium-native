@@ -25,11 +25,11 @@ template <class TilesetContentLoaderType> struct TilesetContentLoaderResult {
       std::vector<LoaderCreditResult>&& credits_,
       std::vector<CesiumAsync::IAssetAccessor::THeader>&& requestHeaders_,
       CesiumUtility::ErrorList&& errors_)
-      : pLoader{std::move(pLoader_)},
-        pRootTile{std::move(pRootTile_)},
-        credits{std::move(credits_)},
-        requestHeaders{std::move(requestHeaders_)},
-        errors{std::move(errors_)} {}
+      : pLoader(std::move(pLoader_)),
+        pRootTile(std::move(pRootTile_)),
+        credits(std::move(credits_)),
+        requestHeaders(std::move(requestHeaders_)),
+        errors(std::move(errors_)) {}
 
   TilesetContentLoaderResult(const TilesetContentLoaderResult&) = delete;
 
@@ -51,11 +51,11 @@ template <class TilesetContentLoaderType> struct TilesetContentLoaderResult {
           int>>
   TilesetContentLoaderResult(
       TilesetContentLoaderResult<OtherLoaderType>&& rhs) noexcept
-      : pLoader{std::move(rhs.pLoader)},
-        pRootTile{std::move(rhs.pRootTile)},
-        credits{std::move(rhs.credits)},
-        requestHeaders{std::move(rhs.requestHeaders)},
-        errors{std::move(rhs.errors)} {}
+      : pLoader(std::move(rhs.pLoader)),
+        pRootTile(std::move(rhs.pRootTile)),
+        credits(std::move(rhs.credits)),
+        requestHeaders(std::move(rhs.requestHeaders)),
+        errors(std::move(rhs.errors)) {}
 
   template <
       class OtherLoaderType,
@@ -87,6 +87,6 @@ template <class TilesetContentLoaderType> struct TilesetContentLoaderResult {
 
   CesiumUtility::ErrorList errors;
 
-  uint16_t statusCode{200};
+  uint16_t statusCode = 200;
 };
 } // namespace Cesium3DTilesSelection

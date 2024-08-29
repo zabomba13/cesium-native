@@ -1,6 +1,6 @@
 #include "CesiumGltf/PropertyView.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace CesiumGltf;
 using namespace CesiumUtility;
@@ -804,7 +804,7 @@ TEST_CASE("MatN PropertyView") {
     classProperty.type = ClassProperty::Type::MAT2;
     classProperty.componentType = ClassProperty::ComponentType::INT8;
     classProperty.required = true;
-    
+
     // clang-format off
     classProperty.defaultProperty = {
       1, 2,
@@ -1426,7 +1426,7 @@ TEST_CASE("Scalar Array PropertyView") {
     REQUIRE(view.noData());
     REQUIRE(view.defaultValue());
 
-    PropertyArrayView<uint8_t> value = view.noData().value();
+    PropertyArrayView<uint8_t> value = *view.noData();
     REQUIRE(value.size() == 2);
     REQUIRE(value[0] == 0);
     REQUIRE(value[1] == 1);
@@ -2405,7 +2405,7 @@ TEST_CASE("MatN Array PropertyView") {
     REQUIRE(value[0] == glm::i8mat2x2(0, 0, 0, 0));
     REQUIRE(value[1] == glm::i8mat2x2(-1, -1, -1, -1));
 
-    value = view.defaultValue().value();
+    value = *view.defaultValue();
     REQUIRE(value.size() == 2);
     REQUIRE(value[0] == glm::i8mat2x2(1, 1, 1, 1));
     REQUIRE(value[1] == glm::i8mat2x2(2, 2, 2, 2));

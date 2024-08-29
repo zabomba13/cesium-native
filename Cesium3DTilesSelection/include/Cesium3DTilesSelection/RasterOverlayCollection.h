@@ -198,13 +198,13 @@ private:
       : public CesiumUtility::ReferenceCountedNonThreadSafe<OverlayList> {
     std::vector<
         CesiumUtility::IntrusivePointer<CesiumRasterOverlays::RasterOverlay>>
-        overlays{};
+        overlays;
     std::vector<CesiumUtility::IntrusivePointer<
         CesiumRasterOverlays::RasterOverlayTileProvider>>
-        tileProviders{};
+        tileProviders;
     std::vector<CesiumUtility::IntrusivePointer<
         CesiumRasterOverlays::RasterOverlayTileProvider>>
-        placeholders{};
+        placeholders;
   };
 
   Tile::LoadedLinkedList* _pLoadedTiles;

@@ -34,7 +34,7 @@ class Tile;
 
 struct TileLoadResultAndRenderResources {
   TileLoadResult result;
-  void* pRenderResources{nullptr};
+  void* pRenderResources = nullptr;
 };
 
 /**

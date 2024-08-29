@@ -179,7 +179,7 @@ void convertB3dmMetadataToGltfStructuralMetadata(
     uint32_t headerLength,
     GltfConverterResult& result) {
   if (result.model && header.featureTableJsonByteLength > 0) {
-    CesiumGltf::Model& gltf = result.model.value();
+    CesiumGltf::Model& gltf = *result.model;
 
     const gsl::span<const std::byte> featureTableJsonData =
         b3dmBinary.subspan(headerLength, header.featureTableJsonByteLength);

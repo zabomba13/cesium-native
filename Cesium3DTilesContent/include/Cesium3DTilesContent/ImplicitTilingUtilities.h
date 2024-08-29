@@ -277,7 +277,7 @@ public:
    */
   static QuadtreeChildren
   getChildren(const CesiumGeometry::QuadtreeTileID& tileID) noexcept {
-    return QuadtreeChildren{tileID};
+    return QuadtreeChildren(tileID);
   }
 
   /**
@@ -289,7 +289,7 @@ public:
    */
   static OctreeChildren
   getChildren(const CesiumGeometry::OctreeTileID& tileID) noexcept {
-    return OctreeChildren{tileID};
+    return OctreeChildren(tileID);
   }
 
   /**

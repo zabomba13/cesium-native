@@ -142,13 +142,14 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
           return;
         }
 
-        std::optional<SkirtMeshMetadata> skirtMeshMetadata =
+        std::optional<SkirtMeshMetadata> maybeSkirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-        int64_t vertexBegin, vertexEnd;
-        if (skirtMeshMetadata.has_value()) {
-          vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
-          vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
-                      skirtMeshMetadata->noSkirtVerticesCount;
+        int64_t vertexBegin{};
+        int64_t vertexEnd{};
+        if (maybeSkirtMeshMetadata) {
+          vertexBegin = maybeSkirtMeshMetadata->noSkirtVerticesBegin;
+          vertexEnd = maybeSkirtMeshMetadata->noSkirtVerticesBegin +
+                      maybeSkirtMeshMetadata->noSkirtVerticesCount;
         } else {
           vertexBegin = 0;
           vertexEnd = positionView.size();
@@ -236,16 +237,16 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
             glm::dvec3 projectedPosition =
                 projectPosition(projection, cartographic.value());
 
-            double longitude = cartographic.value().longitude;
-            const double latitude = cartographic.value().latitude;
-            const double ellipsoidHeight = cartographic.value().height;
+            double longitude = cartographic->longitude;
+            const double latitude = cartographic->latitude;
+            const double ellipsoidHeight = cartographic->height;
 
             // If the position is near the anti-meridian and the projected
             // position is outside the expected range, try using the equivalent
             // longitude on the other side of the anti-meridian to see if that
             // gets us closer.
             if (glm::abs(
-                    glm::abs(cartographic.value().longitude) -
+                    glm::abs(cartographic->longitude) -
                     CesiumUtility::Math::OnePi) <
                     CesiumUtility::Math::Epsilon5 &&
                 (projectedPosition.x < rectangle.minimumX ||

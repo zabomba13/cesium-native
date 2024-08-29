@@ -123,7 +123,7 @@
  * @param name The name of the measured operation.
  */
 #define CESIUM_TRACE_BEGIN_IN_TRACK(name)                                      \
-  if (CesiumUtility::CesiumImpl::TrackReference::current() != nullptr) {       \
+  if (CesiumUtility::CesiumImpl::TrackReference::current()) {                  \
     CESIUM_TRACE_BEGIN(name);                                                  \
   }
 
@@ -138,7 +138,7 @@
  * @param name The name of the measured operation.
  */
 #define CESIUM_TRACE_END_IN_TRACK(name)                                        \
-  if (CesiumUtility::CesiumImpl::TrackReference::current() != nullptr) {       \
+  if (CesiumUtility::CesiumImpl::TrackReference::current()) {                  \
     CESIUM_TRACE_END(name);                                                    \
   }
 

@@ -211,7 +211,8 @@ GlobeRectangle S2CellID::computeBoundingRectangle() const {
   // midpoints of their top and bottom edges.  The two cells covering the
   // poles extend down to +/-35.26 degrees at their vertices.  The maximum
   // error in this calculation is 0.5 * DBL_EPSILON.
-  static const double kPoleMinLat = asin(sqrt(1. / 3)) - 0.5 * DBL_EPSILON;
+  static const double kPoleMinLat =
+      glm::asin(glm::sqrt(1. / 3)) - 0.5 * DBL_EPSILON;
 
   // The face centers are the +X, +Y, +Z, -X, -Y, -Z axes in that order.
   CESIUM_ASSERT(((face_ < 3) ? 1 : -1) == S2::GetNorm(face_)[face_ % 3]);

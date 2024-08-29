@@ -2,15 +2,22 @@
 #include "CesiumGeometry/Plane.h"
 #include "CesiumUtility/Math.h"
 
-#include <catch2/catch.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <CesiumGeometry/CullingResult.h>
+
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <glm/mat3x3.hpp>
 
 using namespace CesiumGeometry;
 using namespace CesiumUtility;
 
 TEST_CASE("BoundingSphere::intersectPlane") {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, hicpp-member-init)
   struct TestCase {
     BoundingSphere sphere;
     Plane plane;
@@ -76,22 +83,28 @@ TEST_CASE("BoundingSphere::transform") {
         glm::identity<glm::dmat4>(),
         glm::dvec3(10.0, 20.0, 30.0));
     BoundingSphere transformed = sphere.transform(transformation);
-    CHECK(transformed.getRadius() == Approx(sphere.getRadius()));
-    CHECK(transformed.getCenter().x == Approx(sphere.getCenter().x + 10.0));
-    CHECK(transformed.getCenter().y == Approx(sphere.getCenter().y + 20.0));
-    CHECK(transformed.getCenter().z == Approx(sphere.getCenter().z + 30.0));
+    CHECK(transformed.getRadius() == Catch::Approx(sphere.getRadius()));
+    CHECK(
+        transformed.getCenter().x ==
+        Catch::Approx(sphere.getCenter().x + 10.0));
+    CHECK(
+        transformed.getCenter().y ==
+        Catch::Approx(sphere.getCenter().y + 20.0));
+    CHECK(
+        transformed.getCenter().z ==
+        Catch::Approx(sphere.getCenter().z + 30.0));
   }
 
   SECTION("rotating moves the center only") {
     double fortyFiveDegrees = Math::OnePi / 4.0;
     glm::dmat4 transformation = glm::eulerAngleY(fortyFiveDegrees);
     BoundingSphere transformed = sphere.transform(transformation);
-    CHECK(transformed.getRadius() == Approx(sphere.getRadius()));
+    CHECK(transformed.getRadius() == Catch::Approx(sphere.getRadius()));
 
     glm::dvec3 rotatedCenter = glm::dmat3(transformation) * sphere.getCenter();
-    CHECK(transformed.getCenter().x == Approx(rotatedCenter.x));
-    CHECK(transformed.getCenter().y == Approx(rotatedCenter.y));
-    CHECK(transformed.getCenter().z == Approx(rotatedCenter.z));
+    CHECK(transformed.getCenter().x == Catch::Approx(rotatedCenter.x));
+    CHECK(transformed.getCenter().y == Catch::Approx(rotatedCenter.y));
+    CHECK(transformed.getCenter().z == Catch::Approx(rotatedCenter.z));
   }
 
   SECTION(
@@ -101,11 +114,11 @@ TEST_CASE("BoundingSphere::transform") {
     BoundingSphere transformed = sphere.transform(transformation);
 
     glm::dvec3 scaledCenter = glm::dmat3(transformation) * sphere.getCenter();
-    CHECK(transformed.getCenter().x == Approx(scaledCenter.x));
-    CHECK(transformed.getCenter().y == Approx(scaledCenter.y));
-    CHECK(transformed.getCenter().z == Approx(scaledCenter.z));
+    CHECK(transformed.getCenter().x == Catch::Approx(scaledCenter.x));
+    CHECK(transformed.getCenter().y == Catch::Approx(scaledCenter.y));
+    CHECK(transformed.getCenter().z == Catch::Approx(scaledCenter.z));
 
-    CHECK(transformed.getRadius() == Approx(45.0 * 4.0));
+    CHECK(transformed.getRadius() == Catch::Approx(45.0 * 4.0));
   }
 }
 

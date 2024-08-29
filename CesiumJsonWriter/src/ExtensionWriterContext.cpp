@@ -52,7 +52,7 @@ ExtensionWriterContext::createExtensionHandler(
     }
   }
 
-  if (std::any_cast<CesiumUtility::JsonValue>(&obj) != nullptr) {
+  if (std::any_cast<CesiumUtility::JsonValue>(&obj)) {
     return objWriter;
   }
 

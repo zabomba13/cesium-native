@@ -10,7 +10,7 @@ TileLoadInput::TileLoadInput(
     const std::shared_ptr<spdlog::logger>& pLogger_,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders_,
     const CesiumGeospatial::Ellipsoid& ellipsoid_)
-    : tile{tile_},
+    : tile(tile_),
       contentOptions{contentOptions_},
       asyncSystem{asyncSystem_},
       pAssetAccessor{pAssetAccessor_},

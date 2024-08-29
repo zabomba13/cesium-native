@@ -13,7 +13,7 @@ namespace CesiumGltf {
 template <typename T> double normalize(T value) {
   constexpr double max = static_cast<double>(std::numeric_limits<T>::max());
   if constexpr (std::is_signed_v<T>) {
-    return std::max(static_cast<double>(value) / max, -1.0);
+    return glm::max(static_cast<double>(value) / max, -1.0);
   } else {
     return static_cast<double>(value) / max;
   }

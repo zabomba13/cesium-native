@@ -132,15 +132,15 @@ std::vector<uint8_t> TextureView::sampleNearestPixel(
 
   const ImageCesium& image = this->_imageCopy.value_or(*this->_pImage);
 
-  // For nearest filtering, std::floor is used instead of std::round.
+  // For nearest filtering, glm::floor is used instead of glm::round.
   // This is because filtering is supposed to consider the pixel centers. But
   // memory access here acts as sampling the beginning of the pixel. Example:
   // 0.4 * 2 = 0.8. In a 2x1 pixel image, that should be closer to the left
   // pixel's center. But it will round to 1.0 which corresponds to the right
   // pixel. So the right pixel has a bigger range than the left one, which is
   // incorrect.
-  double xCoord = std::floor(u * image.width);
-  double yCoord = std::floor(v * image.height);
+  double xCoord = glm::floor(u * image.width);
+  double yCoord = glm::floor(v * image.height);
 
   // Clamp to ensure no out-of-bounds data access
   int64_t x = glm::clamp(

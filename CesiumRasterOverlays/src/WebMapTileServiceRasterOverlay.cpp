@@ -86,7 +86,7 @@ protected:
 
     std::map<std::string, std::string> urlTemplateMap;
     std::string tileMatrix;
-    if (_labels && level < _labels.value().size()) {
+    if (_labels && level < _labels->size()) {
       tileMatrix = _labels.value()[level];
     } else {
       tileMatrix = std::to_string(level);

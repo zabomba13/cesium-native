@@ -217,14 +217,14 @@ CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
     const CesiumGeometry::QuadtreeTileID& tileID,
     const CesiumGeospatial::Ellipsoid& ellipsoid) noexcept {
   double denominator = computeLevelDenominator(tileID.level);
-  return CesiumGeospatial::BoundingRegion{
+  return CesiumGeospatial::BoundingRegion(
       subdivideRectangle(
           rootBoundingVolume.getRectangle(),
           tileID,
           denominator),
       rootBoundingVolume.getMinimumHeight(),
       rootBoundingVolume.getMaximumHeight(),
-      ellipsoid};
+      ellipsoid);
 }
 
 CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
@@ -241,14 +241,14 @@ CesiumGeospatial::BoundingRegion ImplicitTilingUtilities::computeBoundingVolume(
   double childMaxHeight =
       rootBoundingVolume.getMinimumHeight() + heightSize * (tileID.z + 1);
 
-  return CesiumGeospatial::BoundingRegion{
+  return CesiumGeospatial::BoundingRegion(
       subdivideRectangle(
           rootBoundingVolume.getRectangle(),
           QuadtreeTileID(tileID.level, tileID.x, tileID.y),
           denominator),
       childMinHeight,
       childMaxHeight,
-      ellipsoid};
+      ellipsoid);
 }
 
 CesiumGeometry::OrientedBoundingBox
@@ -269,7 +269,7 @@ ImplicitTilingUtilities::computeBoundingVolume(
 
   return CesiumGeometry::OrientedBoundingBox(
       (childMin + childMax) / 2.0,
-      glm::dmat3{xDim / 2.0, yDim / 2.0, halfAxes[2]});
+      glm::dmat3(xDim / 2.0, yDim / 2.0, halfAxes[2]));
 }
 
 CesiumGeometry::OrientedBoundingBox
@@ -293,7 +293,7 @@ ImplicitTilingUtilities::computeBoundingVolume(
 
   return CesiumGeometry::OrientedBoundingBox(
       (childMin + childMax) / 2.0,
-      glm::dmat3{xDim / 2.0, yDim / 2.0, zDim / 2.0});
+      glm::dmat3(xDim / 2.0, yDim / 2.0, zDim / 2.0));
 }
 
 CesiumGeospatial::S2CellBoundingVolume

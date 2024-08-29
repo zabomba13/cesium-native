@@ -173,7 +173,7 @@ Future<std::shared_ptr<IAssetRequest>> CachingAssetAccessor::get(
                       });
             }
 
-            CacheItem& cacheItem = cacheLookup.value();
+            CacheItem& cacheItem = *cacheLookup;
 
             if (shouldRevalidateCache(cacheItem)) {
               // Cache is stale and needs revalidation

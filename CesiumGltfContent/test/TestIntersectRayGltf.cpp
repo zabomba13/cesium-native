@@ -6,7 +6,7 @@
 #include <CesiumNativeTests/readFile.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <glm/glm.hpp>
 
 #include <filesystem>
@@ -34,8 +34,9 @@ void checkIntersection(
 
   if (shouldHit) {
     CHECK(hitResult.hit.has_value());
-    if (!hitResult.hit.has_value())
+    if (!hitResult.hit) {
       return;
+    }
   } else {
     CHECK(!hitResult.hit.has_value());
     return;

@@ -376,13 +376,13 @@ CesiumIonTilesetLoader::CesiumIonTilesetLoader(
     std::unique_ptr<TilesetContentLoader>&& pAggregatedLoader,
     AuthorizationHeaderChangeListener&& headerChangeListener,
     const CesiumGeospatial::Ellipsoid& ellipsoid)
-    : _ellipsoid{ellipsoid},
-      _refreshTokenState{TokenRefreshState::None},
-      _ionAssetID{ionAssetID},
-      _ionAccessToken{std::move(ionAccessToken)},
-      _ionAssetEndpointUrl{std::move(ionAssetEndpointUrl)},
-      _pAggregatedLoader{std::move(pAggregatedLoader)},
-      _headerChangeListener{std::move(headerChangeListener)} {}
+    : _ellipsoid(ellipsoid),
+      _refreshTokenState(TokenRefreshState::None),
+      _ionAssetID(ionAssetID),
+      _ionAccessToken(std::move(ionAccessToken)),
+      _ionAssetEndpointUrl(std::move(ionAssetEndpointUrl)),
+      _pAggregatedLoader(std::move(pAggregatedLoader)),
+      _headerChangeListener(std::move(headerChangeListener)) {}
 
 CesiumAsync::Future<TileLoadResult>
 CesiumIonTilesetLoader::loadTileContent(const TileLoadInput& loadInput) {
@@ -475,7 +475,7 @@ void CesiumIonTilesetLoader::refreshTokenInMainThread(
                 // update cache with new access token
                 auto cacheIt = endpointCache.find(pIonRequest->url());
                 if (cacheIt != endpointCache.end()) {
-                  cacheIt->second.accessToken = accessToken.value();
+                  cacheIt->second.accessToken = *accessToken;
                 }
 
                 this->_refreshTokenState = TokenRefreshState::Done;

@@ -83,7 +83,7 @@ public:
       const AvailabilitySubtree& subtree) noexcept;
 
   bool isBufferView() const noexcept {
-    return pBufferView != nullptr && bufferAccessor;
+    return pBufferView && bufferAccessor;
   }
 
   bool isConstant() const noexcept { return pConstant != nullptr; }
@@ -103,9 +103,7 @@ public:
   /**
    * @brief Unsafe if isBufferView is false.
    */
-  const std::byte& operator[](size_t i) const {
-    return bufferAccessor.value()[i];
-  }
+  const std::byte& operator[](size_t i) const { return (*bufferAccessor)[i]; }
 
   /**
    * @brief Unsafe if isBufferView is false;

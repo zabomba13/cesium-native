@@ -166,30 +166,24 @@ public:
    */
   PropertyTablePropertyView()
       : PropertyView<ElementType, false>(),
-        _values{},
-        _size{0},
-        _arrayOffsets{},
-        _arrayOffsetType{PropertyComponentType::None},
-        _arrayOffsetTypeSize{0},
-        _stringOffsets{},
-        _stringOffsetType{PropertyComponentType::None},
-        _stringOffsetTypeSize{0} {}
+        _size(0),
+        _arrayOffsetType(PropertyComponentType::None),
+        _arrayOffsetTypeSize(0),
+        _stringOffsetType(PropertyComponentType::None),
+        _stringOffsetTypeSize(0) {}
 
   /**
    * @brief Constructs an invalid instance for an erroneous property.
    *
    * @param status The code from {@link PropertyTablePropertyViewStatus} indicating the error with the property.
    */
-  PropertyTablePropertyView(PropertyViewStatusType status)
+  explicit PropertyTablePropertyView(PropertyViewStatusType status)
       : PropertyView<ElementType, false>(status),
-        _values{},
-        _size{0},
-        _arrayOffsets{},
-        _arrayOffsetType{PropertyComponentType::None},
-        _arrayOffsetTypeSize{0},
-        _stringOffsets{},
-        _stringOffsetType{PropertyComponentType::None},
-        _stringOffsetTypeSize{0} {
+        _size(0),
+        _arrayOffsetType(PropertyComponentType::None),
+        _arrayOffsetTypeSize(0),
+        _stringOffsetType(PropertyComponentType::None),
+        _stringOffsetTypeSize(0) {
     CESIUM_ASSERT(
         this->_status != PropertyTablePropertyViewStatus::Valid &&
         "An empty property view should not be constructed with a valid status");
@@ -206,14 +200,11 @@ public:
    */
   PropertyTablePropertyView(const ClassProperty& classProperty, int64_t size)
       : PropertyView<ElementType, false>(classProperty),
-        _values{},
-        _size{0},
-        _arrayOffsets{},
-        _arrayOffsetType{PropertyComponentType::None},
-        _arrayOffsetTypeSize{0},
-        _stringOffsets{},
-        _stringOffsetType{PropertyComponentType::None},
-        _stringOffsetTypeSize{0} {
+        _size(0),
+        _arrayOffsetType(PropertyComponentType::None),
+        _arrayOffsetTypeSize(0),
+        _stringOffsetType(PropertyComponentType::None),
+        _stringOffsetTypeSize(0) {
     if (this->_status != PropertyTablePropertyViewStatus::Valid) {
       // Don't override the status / size if something is wrong with the class
       // property's definition.
@@ -247,15 +238,13 @@ public:
       int64_t size,
       gsl::span<const std::byte> values) noexcept
       : PropertyView<ElementType>(classProperty, property),
-        _values{values},
-        _size{
-            this->_status == PropertyTablePropertyViewStatus::Valid ? size : 0},
-        _arrayOffsets{},
-        _arrayOffsetType{PropertyComponentType::None},
-        _arrayOffsetTypeSize{0},
-        _stringOffsets{},
-        _stringOffsetType{PropertyComponentType::None},
-        _stringOffsetTypeSize{0} {}
+        _values(values),
+        _size(
+            this->_status == PropertyTablePropertyViewStatus::Valid ? size : 0),
+        _arrayOffsetType(PropertyComponentType::None),
+        _arrayOffsetTypeSize(0),
+        _stringOffsetType(PropertyComponentType::None),
+        _stringOffsetTypeSize(0) {}
 
   /**
    * @brief Construct an instance pointing to the data specified by a {@link PropertyTableProperty}.
@@ -279,15 +268,15 @@ public:
       PropertyComponentType arrayOffsetType,
       PropertyComponentType stringOffsetType) noexcept
       : PropertyView<ElementType>(classProperty, property),
-        _values{values},
-        _size{
-            this->_status == PropertyTablePropertyViewStatus::Valid ? size : 0},
-        _arrayOffsets{arrayOffsets},
-        _arrayOffsetType{arrayOffsetType},
-        _arrayOffsetTypeSize{getOffsetTypeSize(arrayOffsetType)},
-        _stringOffsets{stringOffsets},
-        _stringOffsetType{stringOffsetType},
-        _stringOffsetTypeSize{getOffsetTypeSize(stringOffsetType)} {}
+        _values(values),
+        _size(
+            this->_status == PropertyTablePropertyViewStatus::Valid ? size : 0),
+        _arrayOffsets(arrayOffsets),
+        _arrayOffsetType(arrayOffsetType),
+        _arrayOffsetTypeSize(getOffsetTypeSize(arrayOffsetType)),
+        _stringOffsets(stringOffsets),
+        _stringOffsetType(stringOffsetType),
+        _stringOffsetTypeSize(getOffsetTypeSize(stringOffsetType)) {}
 
   /**
    * @brief Get the value of an element in the {@link PropertyTable},

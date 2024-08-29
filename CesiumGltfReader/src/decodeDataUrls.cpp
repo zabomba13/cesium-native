@@ -107,7 +107,7 @@ void decodeDataUrls(
       continue;
     }
 
-    buffer.cesium.data = std::move(decoded.value().data);
+    buffer.cesium.data = std::move(decoded->data);
 
     if (options.clearDecodedDataUrls) {
       buffer.uri.reset();
@@ -135,7 +135,7 @@ void decodeDataUrls(
     }
 
     ImageReaderResult imageResult =
-        reader.readImage(decoded.value().data, options.ktx2TranscodeTargets);
+        reader.readImage(decoded->data, options.ktx2TranscodeTargets);
 
     if (!imageResult.image) {
       continue;

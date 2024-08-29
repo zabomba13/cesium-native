@@ -1,14 +1,18 @@
 #include <Cesium3DTiles/Tile.h>
 #include <Cesium3DTilesContent/TileTransform.h>
 
-#include <glm/mat4x4.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+
+#include <optional>
+#include <vector>
 
 namespace Cesium3DTilesContent {
 
 std::optional<glm::dmat4>
 TileTransform::getTransform(const Cesium3DTiles::Tile& tile) {
-  if (tile.transform.size() < 16)
+  if (tile.transform.size() < 16) {
     return std::nullopt;
+  }
 
   const std::vector<double>& a = tile.transform;
   return glm::dmat4(

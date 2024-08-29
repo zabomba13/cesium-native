@@ -1,7 +1,7 @@
 #include "CesiumGltf/PropertyTablePropertyView.h"
 #include "CesiumGltf/PropertyTableView.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <cstring>
 
@@ -1190,7 +1190,7 @@ TEST_CASE("Test fixed-length scalar array") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -1320,7 +1320,7 @@ TEST_CASE("Test fixed-length scalar array (normalized)") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -1699,7 +1699,7 @@ TEST_CASE("Test fixed-length vecN array") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -1840,7 +1840,7 @@ TEST_CASE("Test fixed-length vecN array (normalized)") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -2243,7 +2243,7 @@ TEST_CASE("Test fixed-length matN array") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -2395,7 +2395,7 @@ TEST_CASE("Test fixed-length matN array (normalized)") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -2837,7 +2837,7 @@ TEST_CASE("Test fixed-length boolean array") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      expected.size() / static_cast<size_t>(testClassProperty.count.value()));
+      expected.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -3125,7 +3125,7 @@ TEST_CASE("Test fixed-length arrays of strings") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      expected.size() / static_cast<size_t>(testClassProperty.count.value()));
+      expected.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -4684,7 +4684,7 @@ TEST_CASE("Test callback for scalar array PropertyTableProperty") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -4760,7 +4760,7 @@ TEST_CASE("Test callback for scalar array PropertyTableProperty (normalized)") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -4841,7 +4841,7 @@ TEST_CASE("Test callback for vecN array PropertyTableProperty") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -4923,7 +4923,7 @@ TEST_CASE("Test callback for vecN array PropertyTableProperty (normalized)") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -5018,7 +5018,7 @@ TEST_CASE("Test callback for matN array PropertyTableProperty") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      values.size() / static_cast<size_t>(testClassProperty.count.value()));
+      values.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -5110,7 +5110,7 @@ TEST_CASE("Test callback for boolean array PropertyTableProperty") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      expected.size() / static_cast<size_t>(testClassProperty.count.value()));
+      expected.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -5209,7 +5209,7 @@ TEST_CASE("Test callback for string array PropertyTableProperty") {
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
   propertyTable.count = static_cast<int64_t>(
-      expected.size() / static_cast<size_t>(testClassProperty.count.value()));
+      expected.size() / static_cast<size_t>(*testClassProperty.count));
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -5255,7 +5255,8 @@ TEST_CASE("Test callback for string array PropertyTableProperty") {
           PropertyArrayView<std::string_view> v1 = propertyValue.getRaw(1);
           REQUIRE(v1.size() == 2);
           REQUIRE(
-              v1[0] == "But they still abduct my cows! Those milk thiefs! 👽 🐮");
+              v1[0] ==
+              "But they still abduct my cows! Those milk thiefs! 👽 🐮");
           REQUIRE(v1[1] == "I'm not crazy. My mother had me tested 🤪");
 
           PropertyArrayView<std::string_view> v2 = propertyValue.getRaw(2);
