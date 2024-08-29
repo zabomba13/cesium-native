@@ -13,7 +13,7 @@
 #include <string>
 
 TEST_CASE("Reads tileset JSON") {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   std::filesystem::path tilesetFile = Cesium3DTilesReader_TEST_DATA_DIR;
   tilesetFile /= "tileset.json";
@@ -294,7 +294,7 @@ TEST_CASE("Reads custom extension") {
 }
 
 TEST_CASE("Reads tileset JSON with unknown properties") {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   std::filesystem::path tilesetFile = Cesium3DTilesReader_TEST_DATA_DIR;
   tilesetFile /= "tileset-with-unsupported-properties.json";
@@ -358,7 +358,7 @@ TEST_CASE("Reads tileset JSON with unknown properties") {
 
 TEST_CASE("Reads tileset JSON with unknown properties and ignores them when "
           "requested") {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   std::filesystem::path tilesetFile = Cesium3DTilesReader_TEST_DATA_DIR;
   tilesetFile /= "tileset-with-unsupported-properties.json";

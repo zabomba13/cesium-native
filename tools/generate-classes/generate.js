@@ -352,7 +352,7 @@ function generate(options, schema, writers) {
         ` : ""}
 
         CesiumJsonReader::IJsonHandler* ${name}JsonHandler::readObjectKey${name}(const std::string& objectType, const std::string_view& str, ${namespace}::${name}& o) {
-          using namespace std::string_literals;
+          using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
           ${properties.length > 0 ? `
           ${indent(

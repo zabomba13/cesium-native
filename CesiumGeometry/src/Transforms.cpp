@@ -1,8 +1,12 @@
 #include "CesiumGeometry/Transforms.h"
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/quaternion_double.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/mat4x4.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace CesiumGeometry {
 
@@ -58,12 +62,14 @@ glm::dmat4 createYupToXup() {
 }
 } // namespace
 
+// NOLINTBEGIN(cert-err58-cpp)
 const glm::dmat4 Transforms::Y_UP_TO_Z_UP = createYupToZup();
 const glm::dmat4 Transforms::Z_UP_TO_Y_UP = createZupToYup();
 const glm::dmat4 Transforms::X_UP_TO_Z_UP = createXupToZup();
 const glm::dmat4 Transforms::Z_UP_TO_X_UP = createZupToXup();
 const glm::dmat4 Transforms::X_UP_TO_Y_UP = createXupToYup();
 const glm::dmat4 Transforms::Y_UP_TO_X_UP = createYupToXup();
+// NOLINTEND(cert-err58-cpp)
 
 glm::dmat4 Transforms::createTranslationRotationScaleMatrix(
     const glm::dvec3& translation,
@@ -87,7 +93,7 @@ void Transforms::computeTranslationRotationScaleFromMatrix(
     glm::dquat* pRotation,
     glm::dvec3* pScale) {
   if (pRotation || pScale) {
-    glm::dmat3 rotationAndScale = glm::dmat3(matrix);
+    glm::dmat3 rotationAndScale(matrix);
     double lengthColumn0 = glm::length(rotationAndScale[0]);
     double lengthColumn1 = glm::length(rotationAndScale[1]);
     double lengthColumn2 = glm::length(rotationAndScale[2]);
@@ -105,14 +111,18 @@ void Transforms::computeTranslationRotationScaleFromMatrix(
       scale *= -1.0;
     }
 
-    if (pRotation)
+    if (pRotation) {
       *pRotation = glm::quat_cast(rotationMatrix);
-    if (pScale)
+    }
+
+    if (pScale) {
       *pScale = scale;
+    }
   }
 
-  if (pTranslation)
+  if (pTranslation) {
     *pTranslation = glm::dvec3(matrix[3]);
+  }
 }
 
 } // namespace CesiumGeometry

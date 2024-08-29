@@ -13,7 +13,7 @@
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
 using namespace CesiumUtility;
-using namespace std::string_literals;
+using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
 namespace Cesium3DTilesSelection {
 Tile::Tile(TilesetContentLoader* pLoader) noexcept

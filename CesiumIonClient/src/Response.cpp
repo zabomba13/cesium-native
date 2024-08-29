@@ -7,16 +7,23 @@
 #include "CesiumIonClient/TokenList.h"
 #include "parseLinkHeader.h"
 
+#include <CesiumAsync/HttpHeaders.h>
 #include <CesiumAsync/IAssetRequest.h>
 #include <CesiumAsync/IAssetResponse.h>
+#include <CesiumIonClient/Token.h>
 #include <CesiumUtility/Uri.h>
+
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumUtility;
 
 namespace CesiumIonClient {
 
-template <typename T> Response<T>::Response() {}
+template <typename T> Response<T>::Response() = default;
 
 template <typename T>
 Response<T>::Response(
@@ -24,12 +31,10 @@ Response<T>::Response(
     uint16_t httpStatusCode_,
     const std::string& errorCode_,
     const std::string& errorMessage_)
-    : value(value_),
+    : value(std::move(value_)),
       httpStatusCode(httpStatusCode_),
       errorCode(errorCode_),
-      errorMessage(errorMessage_),
-      nextPageUrl(),
-      previousPageUrl() {}
+      errorMessage(errorMessage_) {}
 
 template <typename T>
 Response<T>::Response(
@@ -39,20 +44,14 @@ Response<T>::Response(
     : value(),
       httpStatusCode(httpStatusCode_),
       errorCode(errorCode_),
-      errorMessage(errorMessage_),
-      nextPageUrl(),
-      previousPageUrl() {}
+      errorMessage(errorMessage_) {}
 
 template <typename T>
 Response<T>::Response(
     const std::shared_ptr<CesiumAsync::IAssetRequest>& pRequest,
     T&& value_)
-    : value(value_),
-      httpStatusCode(pRequest->response()->statusCode()),
-      errorCode(),
-      errorMessage(),
-      nextPageUrl(),
-      previousPageUrl() {
+    : value(std::move(value_)),
+      httpStatusCode(pRequest->response()->statusCode()) {
   const HttpHeaders& headers = pRequest->response()->headers();
   auto it = headers.find("link");
   if (it == headers.end()) {

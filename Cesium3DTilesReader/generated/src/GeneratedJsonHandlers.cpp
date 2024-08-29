@@ -57,7 +57,7 @@ CesiumJsonReader::IJsonHandler* Extension3dTilesBoundingVolumeS2JsonHandler::
         const std::string& objectType,
         const std::string_view& str,
         Cesium3DTiles::Extension3dTilesBoundingVolumeS2& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("token"s == str)
     return property("token", this->_token, o.token);
@@ -152,7 +152,7 @@ CesiumJsonReader::IJsonHandler* StatisticsJsonHandler::readObjectKeyStatistics(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Statistics& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("classes"s == str)
     return property("classes", this->_classes, o.classes);
@@ -236,7 +236,7 @@ ClassStatisticsJsonHandler::readObjectKeyClassStatistics(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::ClassStatistics& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("count"s == str)
     return property("count", this->_count, o.count);
@@ -330,7 +330,7 @@ PropertyStatisticsJsonHandler::readObjectKeyPropertyStatistics(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::PropertyStatistics& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("min"s == str)
     return property("min", this->_min, o.min);
@@ -437,7 +437,7 @@ CesiumJsonReader::IJsonHandler* SchemaJsonHandler::readObjectKeySchema(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Schema& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("id"s == str)
     return property("id", this->_id, o.id);
@@ -528,7 +528,7 @@ CesiumJsonReader::IJsonHandler* EnumJsonHandler::readObjectKeyEnum(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Enum& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("name"s == str)
     return property("name", this->_name, o.name);
@@ -614,7 +614,7 @@ CesiumJsonReader::IJsonHandler* EnumValueJsonHandler::readObjectKeyEnumValue(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::EnumValue& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("name"s == str)
     return property("name", this->_name, o.name);
@@ -699,7 +699,7 @@ CesiumJsonReader::IJsonHandler* ClassJsonHandler::readObjectKeyClass(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Class& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("name"s == str)
     return property("name", this->_name, o.name);
@@ -797,7 +797,7 @@ ClassPropertyJsonHandler::readObjectKeyClassProperty(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::ClassProperty& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("name"s == str)
     return property("name", this->_name, o.name);
@@ -918,7 +918,7 @@ CesiumJsonReader::IJsonHandler* SubtreeJsonHandler::readObjectKeySubtree(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Subtree& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("buffers"s == str)
     return property("buffers", this->_buffers, o.buffers);
@@ -1029,7 +1029,7 @@ MetadataEntityJsonHandler::readObjectKeyMetadataEntity(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::MetadataEntity& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("class"s == str)
     return property("class", this->_classProperty, o.classProperty);
@@ -1117,7 +1117,7 @@ AvailabilityJsonHandler::readObjectKeyAvailability(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Availability& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("bitstream"s == str)
     return property("bitstream", this->_bitstream, o.bitstream);
@@ -1207,7 +1207,7 @@ PropertyTableJsonHandler::readObjectKeyPropertyTable(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::PropertyTable& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("name"s == str)
     return property("name", this->_name, o.name);
@@ -1305,7 +1305,7 @@ PropertyTablePropertyJsonHandler::readObjectKeyPropertyTableProperty(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::PropertyTableProperty& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("values"s == str)
     return property("values", this->_values, o.values);
@@ -1416,7 +1416,7 @@ CesiumJsonReader::IJsonHandler* BufferViewJsonHandler::readObjectKeyBufferView(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::BufferView& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("buffer"s == str)
     return property("buffer", this->_buffer, o.buffer);
@@ -1506,7 +1506,7 @@ CesiumJsonReader::IJsonHandler* BufferJsonHandler::readObjectKeyBuffer(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Buffer& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("uri"s == str)
     return property("uri", this->_uri, o.uri);
@@ -1598,7 +1598,7 @@ CesiumJsonReader::IJsonHandler* TilesetJsonHandler::readObjectKeyTileset(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Tileset& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("asset"s == str)
     return property("asset", this->_asset, o.asset);
@@ -1708,7 +1708,7 @@ CesiumJsonReader::IJsonHandler* TileJsonHandler::readObjectKeyTile(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Tile& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("boundingVolume"s == str)
     return property("boundingVolume", this->_boundingVolume, o.boundingVolume);
@@ -1811,7 +1811,7 @@ ImplicitTilingJsonHandler::readObjectKeyImplicitTiling(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::ImplicitTiling& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("subdivisionScheme"s == str)
     return property(
@@ -1905,7 +1905,7 @@ CesiumJsonReader::IJsonHandler* SubtreesJsonHandler::readObjectKeySubtrees(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Subtrees& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("uri"s == str)
     return property("uri", this->_uri, o.uri);
@@ -1987,7 +1987,7 @@ CesiumJsonReader::IJsonHandler* ContentJsonHandler::readObjectKeyContent(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Content& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("boundingVolume"s == str)
     return property("boundingVolume", this->_boundingVolume, o.boundingVolume);
@@ -2074,7 +2074,7 @@ BoundingVolumeJsonHandler::readObjectKeyBoundingVolume(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::BoundingVolume& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("box"s == str)
     return property("box", this->_box, o.box);
@@ -2161,7 +2161,7 @@ GroupMetadataJsonHandler::readObjectKeyGroupMetadata(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::GroupMetadata& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   (void)o;
 
@@ -2244,7 +2244,7 @@ CesiumJsonReader::IJsonHandler* PropertiesJsonHandler::readObjectKeyProperties(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Properties& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("maximum"s == str)
     return property("maximum", this->_maximum, o.maximum);
@@ -2329,7 +2329,7 @@ CesiumJsonReader::IJsonHandler* AssetJsonHandler::readObjectKeyAsset(
     const std::string& objectType,
     const std::string_view& str,
     Cesium3DTiles::Asset& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("version"s == str)
     return property("version", this->_version, o.version);

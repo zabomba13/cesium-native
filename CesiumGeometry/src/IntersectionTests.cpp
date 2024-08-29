@@ -8,11 +8,19 @@
 
 #include <CesiumUtility/Math.h>
 
+#include <glm/common.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtx/norm.hpp>
 
+#include <cstdint>
 #include <limits>
 #include <optional>
+#include <utility>
 
 using namespace CesiumUtility;
 
@@ -53,10 +61,15 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
   glm::dvec3 q = inverseRadii * origin;
   glm::dvec3 w = inverseRadii * direction;
 
-  const double q2 = pow(length(q), 2);
-  const double qw = dot(q, w);
+  const double q2 = glm::pow(glm::length(q), 2);
+  const double qw = glm::dot(q, w);
 
-  double difference, w2, product, discriminant, temp;
+  double difference = 0.0;
+  double w2 = 0.0;
+  double product = 0.0;
+  double discriminant = 0.0;
+  double temp = 0.0;
+
   if (q2 > 1.0) {
     // Outside ellipsoid.
     if (qw >= 0.0) {
@@ -67,7 +80,7 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
     // qw < 0.0.
     const double qw2 = qw * qw;
     difference = q2 - 1.0; // Positively valued.
-    w2 = pow(length(w), 2);
+    w2 = glm::pow(glm::length(w), 2);
     product = w2 * difference;
 
     if (qw2 < product) {
@@ -77,7 +90,7 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
     if (qw2 > product) {
       // Distinct roots (2 intersections).
       discriminant = qw * qw - product;
-      temp = -qw + sqrt(discriminant); // Avoid cancellation.
+      temp = -qw + glm::sqrt(discriminant); // Avoid cancellation.
       const double root0 = temp / w2;
       const double root1 = difference / temp;
       if (root0 < root1) {
@@ -87,23 +100,23 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
       return glm::dvec2(root1, root0);
     }
     // qw2 == product.  Repeated roots (2 intersections).
-    const double root = sqrt(difference / w2);
+    const double root = glm::sqrt(difference / w2);
     return glm::dvec2(root, root);
   }
   if (q2 < 1.0) {
     // Inside ellipsoid (2 intersections).
     difference = q2 - 1.0; // Negatively valued.
-    w2 = pow(length(w), 2);
+    w2 = glm::pow(glm::length(w), 2);
     product = w2 * difference; // Negatively valued.
 
     discriminant = qw * qw - product;
-    temp = -qw + sqrt(discriminant); // Positively valued.
+    temp = -qw + glm::sqrt(discriminant); // Positively valued.
     return glm::dvec2(0.0, temp / w2);
   }
   // q2 == 1.0. On ellipsoid.
   if (qw < 0.0) {
     // Looking inward.
-    w2 = pow(length(w), 2);
+    w2 = glm::pow(glm::length(w), 2);
     return glm::dvec2(0.0, -qw / w2);
   }
   // qw >= 0.0.  Looking outward or tangent.
@@ -140,50 +153,55 @@ std::optional<double> IntersectionTests::rayTriangleParametric(
   glm::dvec3 p = glm::cross(direction, edge1);
   double det = glm::dot(edge0, p);
   if (cullBackFaces) {
-    if (det < Math::Epsilon6)
+    if (det < Math::Epsilon6) {
       return std::nullopt;
+    }
 
     glm::dvec3 tvec = origin - p0;
     double u = glm::dot(tvec, p);
-    if (u < 0.0 || u > det)
+    if (u < 0.0 || u > det) {
       return std::nullopt;
+    }
 
     glm::dvec3 q = glm::cross(tvec, edge0);
     double v = glm::dot(direction, q);
-    if (v < 0.0 || u + v > det)
+    if (v < 0.0 || u + v > det) {
       return std::nullopt;
+    }
 
     return glm::dot(edge1, q) / det;
-
-  } else {
-
-    if (glm::abs(det) < Math::Epsilon6)
-      return std::nullopt;
-
-    double invDet = 1.0 / det;
-
-    glm::dvec3 tvec = origin - p0;
-    double u = glm::dot(tvec, p) * invDet;
-    if (u < 0.0 || u > 1.0)
-      return std::nullopt;
-
-    glm::dvec3 q = glm::cross(tvec, edge0);
-    double v = glm::dot(direction, q) * invDet;
-    if (v < 0.0 || u + v > 1.0)
-      return std::nullopt;
-
-    return glm::dot(edge1, q) * invDet;
   }
+
+  if (glm::abs(det) < Math::Epsilon6) {
+    return std::nullopt;
+  }
+
+  double invDet = 1.0 / det;
+
+  glm::dvec3 tvec = origin - p0;
+  double u = glm::dot(tvec, p) * invDet;
+  if (u < 0.0 || u > 1.0) {
+    return std::nullopt;
+  }
+
+  glm::dvec3 q = glm::cross(tvec, edge0);
+  double v = glm::dot(direction, q) * invDet;
+  if (v < 0.0 || u + v > 1.0) {
+    return std::nullopt;
+  }
+
+  return glm::dot(edge1, q) * invDet;
 }
 
 std::optional<glm::dvec3>
 IntersectionTests::rayAABB(const Ray& ray, const AxisAlignedBox& aabb) {
   std::optional<double> t = rayAABBParametric(ray, aabb);
 
-  if (t && t.value() >= 0)
+  if (t && t.value() >= 0) {
     return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
-  else
-    return std::nullopt;
+  }
+
+  return std::nullopt;
 }
 
 std::optional<double> IntersectionTests::rayAABBParametric(
@@ -191,8 +209,8 @@ std::optional<double> IntersectionTests::rayAABBParametric(
     const AxisAlignedBox& aabb) {
   const glm::dvec3& dir = ray.getDirection();
   const glm::dvec3& origin = ray.getOrigin();
-  const glm::dvec3* min = reinterpret_cast<const glm::dvec3*>(&aabb.minimumX);
-  const glm::dvec3* max = reinterpret_cast<const glm::dvec3*>(&aabb.maximumX);
+  const auto* min = reinterpret_cast<const glm::dvec3*>(&aabb.minimumX);
+  const auto* max = reinterpret_cast<const glm::dvec3*>(&aabb.maximumX);
   double greatestMin = -std::numeric_limits<double>::max();
   double smallestMax = std::numeric_limits<double>::max();
   double tmin = greatestMin;
@@ -201,10 +219,11 @@ std::optional<double> IntersectionTests::rayAABBParametric(
   for (uint32_t i = 0; i < 3; ++i) {
     if (glm::abs(dir[i]) < Math::Epsilon6) {
       continue;
-    } else {
-      tmin = ((*min)[i] - origin[i]) / dir[i];
-      tmax = ((*max)[i] - origin[i]) / dir[i];
     }
+
+    tmin = ((*min)[i] - origin[i]) / dir[i];
+    tmax = ((*max)[i] - origin[i]) / dir[i];
+
     if (tmin > tmax) {
       std::swap(tmin, tmax);
     }
@@ -220,10 +239,10 @@ std::optional<double> IntersectionTests::rayAABBParametric(
 std::optional<glm::dvec3>
 IntersectionTests::rayOBB(const Ray& ray, const OrientedBoundingBox& obb) {
   std::optional<double> t = rayOBBParametric(ray, obb);
-  if (t && t.value() >= 0)
+  if (t && t.value() >= 0) {
     return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
-  else
-    return std::nullopt;
+  }
+  return std::nullopt;
 }
 
 std::optional<double> IntersectionTests::rayOBBParametric(
@@ -251,10 +270,10 @@ std::optional<double> IntersectionTests::rayOBBParametric(
 std::optional<glm::dvec3>
 IntersectionTests::raySphere(const Ray& ray, const BoundingSphere& sphere) {
   std::optional<double> t = raySphereParametric(ray, sphere);
-  if (t && t.value() >= 0)
+  if (t && t.value() >= 0) {
     return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
-  else
-    return std::nullopt;
+  }
+  return std::nullopt;
 }
 
 namespace {
@@ -267,7 +286,9 @@ bool solveQuadratic(
   double det = b * b - 4.0 * a * c;
   if (det < 0.0) {
     return false;
-  } else if (det > 0.0) {
+  }
+
+  if (det > 0.0) {
     double denom = 1.0 / (2.0 * a);
     double disc = glm::sqrt(det);
     root0 = (-b + disc) * denom;
@@ -303,7 +324,9 @@ std::optional<double> IntersectionTests::raySphereParametric(
   const double b = 2.0 * glm::dot(direction, diff);
   const double c = glm::dot(diff, diff) - radiusSquared;
 
-  double t0, t1;
+  double t0 = 0.0;
+  double t1 = 0.0;
+
   if (solveQuadratic(1.0, b, c, t0, t1)) {
     return t0 < 0 ? t1 : t0;
   }

@@ -8,6 +8,15 @@
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <memory>
+#include <vector>
+
 namespace CesiumGltfWriter {
 
 namespace {
@@ -39,7 +48,7 @@ void writeGlbBuffer(
   size_t binaryPaddingSize = 0;
   size_t binaryChunkDataSize = 0;
 
-  if (bufferData.size() > 0) {
+  if (!bufferData.empty()) {
     size_t extraJsonPadding =
         getPadding(glbSize + chunkHeaderSize, binaryChunkByteAlignment);
     if (extraJsonPadding > 0) {
@@ -65,8 +74,8 @@ void writeGlbBuffer(
 
   std::vector<std::byte>& glb = result.gltfBytes;
   glb.resize(glbSize);
-  uint8_t* glb8 = reinterpret_cast<uint8_t*>(glb.data());
-  uint32_t* glb32 = reinterpret_cast<uint32_t*>(glb.data());
+  auto* glb8 = reinterpret_cast<uint8_t*>(glb.data());
+  auto* glb32 = reinterpret_cast<uint32_t*>(glb.data());
 
   // GLB header
   size_t byteOffset = 0;
@@ -95,7 +104,7 @@ void writeGlbBuffer(
   memset(glb8 + byteOffset, ' ', jsonPaddingSize);
   byteOffset += jsonPaddingSize;
 
-  if (bufferData.size() > 0) {
+  if (!bufferData.empty()) {
     // Binary chunk header
     glb32[byteOffset / 4] = static_cast<uint32_t>(binaryChunkDataSize);
     byteOffset += 4;

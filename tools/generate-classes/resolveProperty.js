@@ -701,7 +701,7 @@ function createEnumReaderTypeImpl(parentName, enumName, propertyName, enums) {
     }
 
     CesiumJsonReader::IJsonHandler* ${parentName}JsonHandler::${enumName}JsonHandler::readString(const std::string_view& str) {
-      using namespace std::string_literals;
+      using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
       assert(this->_pEnum);
 

@@ -3,6 +3,13 @@
 #include <CesiumUtility/Assert.h>
 
 #include <glm/common.hpp>
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <vector>
 
 using namespace Cesium3DTilesContent::CesiumImpl;
 
@@ -22,9 +29,7 @@ BatchTableHierarchyPropertyValues::BatchTableHierarchyPropertyValues(
     : _batchTableHierarchy(batchTableHierarchy),
       _batchLength(batchLength),
       _pClassIDs(nullptr),
-      _pParentIDs(nullptr),
-      _instanceIndices(),
-      _propertyInClass() {
+      _pParentIDs(nullptr) {
   static const rapidjson::Value emptyArray = createEmptyArray();
 
   auto classIdsIt = this->_batchTableHierarchy.FindMember("classIds");
@@ -101,7 +106,7 @@ void BatchTableHierarchyPropertyValues::setProperty(
       propertyName.data(),
       rapidjson::SizeType(propertyName.size()));
 
-  for (auto it = classes.Begin(); it != classes.End(); ++it) {
+  for (const auto* it = classes.Begin(); it != classes.End(); ++it) {
     auto instancesIt = it->FindMember("instances");
     if (instancesIt == it->MemberEnd()) {
       this->_propertyInClass.emplace_back(nullptr);

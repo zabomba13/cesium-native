@@ -6,7 +6,6 @@
 #include "TilesetJsonWriter.h"
 
 #include <Cesium3DTiles/BoundingVolume.h>
-#include <Cesium3DTiles/Extension3dTilesBoundingVolumeS2.h>
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
 
 namespace Cesium3DTilesWriter {

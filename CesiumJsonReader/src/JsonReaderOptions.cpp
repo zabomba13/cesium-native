@@ -1,16 +1,24 @@
 #include "CesiumJsonReader/JsonReaderOptions.h"
 
 #include "CesiumJsonReader/IExtensionJsonHandler.h"
+#include "CesiumJsonReader/IJsonHandler.h"
 #include "CesiumJsonReader/JsonObjectJsonHandler.h"
-#include "CesiumJsonReader/JsonReader.h"
+
+#include <CesiumUtility/ExtensibleObject.h>
+#include <CesiumUtility/JsonValue.h>
+
+#include <any>
+#include <memory>
+#include <string>
+#include <string_view>
 
 namespace CesiumJsonReader {
 class AnyExtensionJsonHandler : public JsonObjectJsonHandler,
                                 public IExtensionJsonHandler {
 public:
-  AnyExtensionJsonHandler() noexcept : JsonObjectJsonHandler() {}
+  AnyExtensionJsonHandler() noexcept = default;
 
-  virtual void reset(
+  void reset(
       IJsonHandler* pParentHandler,
       CesiumUtility::ExtensibleObject& o,
       const std::string_view& extensionName) override {
@@ -25,7 +33,7 @@ public:
         &std::any_cast<CesiumUtility::JsonValue&>(value));
   }
 
-  virtual IJsonHandler& getHandler() override { return *this; }
+  IJsonHandler& getHandler() override { return *this; }
 };
 
 ExtensionState
@@ -55,7 +63,9 @@ JsonReaderOptions::createExtensionHandler(
   if (stateIt != this->_extensionStates.end()) {
     if (stateIt->second == ExtensionState::Disabled) {
       return nullptr;
-    } else if (stateIt->second == ExtensionState::JsonOnly) {
+    }
+
+    if (stateIt->second == ExtensionState::JsonOnly) {
       return std::make_unique<AnyExtensionJsonHandler>();
     }
   }

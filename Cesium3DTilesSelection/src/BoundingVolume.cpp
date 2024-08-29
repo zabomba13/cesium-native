@@ -3,7 +3,22 @@
 #include "CesiumGeospatial/Cartographic.h"
 #include "CesiumGeospatial/GlobeTransforms.h"
 
-#include <glm/gtc/matrix_inverse.hpp>
+#include <CesiumGeometry/BoundingSphere.h>
+#include <CesiumGeometry/OrientedBoundingBox.h>
+#include <CesiumGeospatial/BoundingRegion.h>
+#include <CesiumGeospatial/BoundingRegionWithLooseFittingHeights.h>
+#include <CesiumGeospatial/Ellipsoid.h>
+#include <CesiumGeospatial/GlobeRectangle.h>
+#include <CesiumGeospatial/S2CellBoundingVolume.h>
+
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+
+#include <cstdint>
+#include <optional>
+#include <variant>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -14,7 +29,10 @@ BoundingVolume transformBoundingVolume(
     const glm::dmat4x4& transform,
     const BoundingVolume& boundingVolume) {
   struct Operation {
-    const glm::dmat4x4& transform;
+
+    const glm::dmat4x4&
+        transform; // NOLINT(misc-non-private-member-variables-in-classes,
+                   // cppcoreguidelines-avoid-const-or-ref-data-members)
 
     BoundingVolume operator()(const OrientedBoundingBox& boundingBox) {
       return boundingBox.transform(transform);
@@ -76,7 +94,9 @@ std::optional<GlobeRectangle> estimateGlobeRectangle(
     const BoundingVolume& boundingVolume,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
   struct Operation {
-    const CesiumGeospatial::Ellipsoid& ellipsoid;
+    const CesiumGeospatial::Ellipsoid&
+        ellipsoid; // NOLINT(misc-non-private-member-variables-in-classes,
+                   // cppcoreguidelines-avoid-const-or-ref-data-members)
 
     std::optional<GlobeRectangle>
     operator()(const BoundingSphere& boundingSphere) {
@@ -212,7 +232,9 @@ OrientedBoundingBox getOrientedBoundingBoxFromBoundingVolume(
     const BoundingVolume& boundingVolume,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
   struct Operation {
-    const CesiumGeospatial::Ellipsoid& ellipsoid;
+    const CesiumGeospatial::Ellipsoid&
+        ellipsoid; // NOLINT(misc-non-private-member-variables-in-classes,
+                   // cppcoreguidelines-avoid-const-or-ref-data-members)
 
     OrientedBoundingBox operator()(const BoundingSphere& sphere) const {
       return OrientedBoundingBox::fromSphere(sphere);

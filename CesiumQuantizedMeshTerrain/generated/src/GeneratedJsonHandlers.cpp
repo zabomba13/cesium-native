@@ -52,7 +52,7 @@ CesiumJsonReader::IJsonHandler* LayerJsonHandler::readObjectKeyLayer(
     const std::string& objectType,
     const std::string_view& str,
     CesiumQuantizedMeshTerrain::Layer& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("attribution"s == str)
     return property("attribution", this->_attribution, o.attribution);
@@ -169,7 +169,7 @@ AvailabilityRectangleJsonHandler::readObjectKeyAvailabilityRectangle(
     const std::string& objectType,
     const std::string_view& str,
     CesiumQuantizedMeshTerrain::AvailabilityRectangle& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("startX"s == str)
     return property("startX", this->_startX, o.startX);
