@@ -4,6 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <glm/exponential.hpp>
 #include <glm/ext/vector_double2.hpp>
 
 using namespace CesiumGeometry;

@@ -8,9 +8,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
-#include <glm/glm.hpp>
+#include <glm/common.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/geometric.hpp>
+#include <glm/vector_relational.hpp>
 
 #include <array>
+#include <optional>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;

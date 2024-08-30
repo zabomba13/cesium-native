@@ -1,3 +1,18 @@
+#include "CesiumGeospatial/Cartographic.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+
+#include <glm/exponential.hpp>
+#include <math.h>
+#include <s2/r2rect.h>
+#include <s2/s2coords.h>
+#include <s2/s2point.h>
+
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <string_view>
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100 4127 4309 4996)
@@ -135,8 +150,9 @@ GlobeRectangle Expanded(
     const S2LatLng& margin) {
   R1Interval lat = lat_.Expanded(margin.lat().radians());
   S1Interval lng = lng_.Expanded(margin.lng().radians());
-  if (lat.is_empty() || lng.is_empty())
+  if (lat.is_empty() || lng.is_empty()) {
     return GlobeRectangle(0.0, 0.0, 0.0, 0.0);
+  }
   return GlobeRectangleFromLatLng(lat.Intersection(FullLat()), lng);
 }
 
@@ -176,8 +192,8 @@ GlobeRectangle S2CellID::computeBoundingRectangle() const {
     // coordinate based on the axis direction and the cell's (u,v) quadrant.
     double u = uv_[0][0] + uv_[0][1];
     double v = uv_[1][0] + uv_[1][1];
-    int i = S2::GetUAxis(face_)[2] == 0 ? (u < 0) : (u > 0);
-    int j = S2::GetVAxis(face_)[2] == 0 ? (v < 0) : (v > 0);
+    int i = static_cast<int>(S2::GetUAxis(face_)[2] == 0 ? (u < 0) : (u > 0));
+    int j = static_cast<int>(S2::GetVAxis(face_)[2] == 0 ? (v < 0) : (v > 0));
     R1Interval lat = R1Interval::FromPointPair(
         GetLatitude(uv_, face_, i, j),
         GetLatitude(uv_, face_, 1 - i, 1 - j));
@@ -211,8 +227,7 @@ GlobeRectangle S2CellID::computeBoundingRectangle() const {
   // midpoints of their top and bottom edges.  The two cells covering the
   // poles extend down to +/-35.26 degrees at their vertices.  The maximum
   // error in this calculation is 0.5 * DBL_EPSILON.
-  static const double kPoleMinLat =
-      glm::asin(glm::sqrt(1. / 3)) - 0.5 * DBL_EPSILON;
+  static const double kPoleMinLat = asin(glm::sqrt(1. / 3)) - 0.5 * DBL_EPSILON;
 
   // The face centers are the +X, +Y, +Z, -X, -Y, -Z axes in that order.
   CESIUM_ASSERT(((face_ < 3) ? 1 : -1) == S2::GetNorm(face_)[face_ % 3]);

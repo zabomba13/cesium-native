@@ -1,6 +1,26 @@
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumRasterOverlays/RasterOverlayLoadFailureDetails.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <Cesium3DTilesSelection/RasterOverlayCollection.h>
 #include <CesiumUtility/Assert.h>
-#include <CesiumUtility/Tracing.h>
+
+#include <fmt/core.h>
+#include <glm/ext/vector_double2.hpp>
+#include <nonstd/expected.hpp>
+#include <spdlog/spdlog.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -42,7 +62,7 @@ RasterOverlayCollection::~RasterOverlayCollection() noexcept {
   if (this->_pOverlays) {
     OverlayList& list = *this->_pOverlays;
     if (!list.overlays.empty()) {
-      for (int64_t i = static_cast<int64_t>(list.overlays.size() - 1); i >= 0;
+      for (auto i = static_cast<int64_t>(list.overlays.size() - 1); i >= 0;
            --i) {
         this->remove(list.overlays[static_cast<size_t>(i)].get());
       }
@@ -54,8 +74,9 @@ void RasterOverlayCollection::add(
     const CesiumUtility::IntrusivePointer<RasterOverlay>& pOverlay) {
   // CESIUM_TRACE_USE_TRACK_SET(this->_loadingSlots);
 
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     this->_pOverlays = new OverlayList();
+  }
 
   IntrusivePointer<OverlayList> pList = this->_pOverlays;
 
@@ -141,20 +162,21 @@ void RasterOverlayCollection::add(
 
 void RasterOverlayCollection::remove(
     const CesiumUtility::IntrusivePointer<RasterOverlay>& pOverlay) noexcept {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return;
+  }
 
   // Remove all mappings of this overlay to geometry tiles.
   auto removeCondition = [pOverlay](
                              const RasterMappedTo3DTile& mapped) noexcept {
     return (
-        (mapped.getLoadingTile() &&
+        ((mapped.getLoadingTile() != nullptr) &&
          pOverlay == &mapped.getLoadingTile()->getTileProvider().getOwner()) ||
-        (mapped.getReadyTile() &&
+        ((mapped.getReadyTile() != nullptr) &&
          pOverlay == &mapped.getReadyTile()->getTileProvider().getOwner()));
   };
 
-  auto pPrepareRenderResources =
+  auto* pPrepareRenderResources =
       this->_externals.pPrepareRendererResources.get();
   forEachTile(
       *this->_pLoadedTiles,
@@ -195,8 +217,9 @@ void RasterOverlayCollection::remove(
 
 const std::vector<CesiumUtility::IntrusivePointer<RasterOverlay>>&
 RasterOverlayCollection::getOverlays() const {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return emptyOverlays;
+  }
 
   return this->_pOverlays->overlays;
 }
@@ -208,16 +231,18 @@ RasterOverlayCollection::getOverlays() const {
  */
 const std::vector<CesiumUtility::IntrusivePointer<RasterOverlayTileProvider>>&
 RasterOverlayCollection::getTileProviders() const {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return emptyTileProviders;
+  }
 
   return this->_pOverlays->tileProviders;
 }
 
 const std::vector<CesiumUtility::IntrusivePointer<RasterOverlayTileProvider>>&
 RasterOverlayCollection::getPlaceholderTileProviders() const {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return emptyTileProviders;
+  }
 
   return this->_pOverlays->placeholders;
 }
@@ -233,8 +258,9 @@ RasterOverlayTileProvider* RasterOverlayCollection::findTileProviderForOverlay(
 const RasterOverlayTileProvider*
 RasterOverlayCollection::findTileProviderForOverlay(
     const RasterOverlay& overlay) const noexcept {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return nullptr;
+  }
 
   const auto& overlays = this->_pOverlays->overlays;
   const auto& tileProviders = this->_pOverlays->tileProviders;
@@ -242,8 +268,9 @@ RasterOverlayCollection::findTileProviderForOverlay(
   CESIUM_ASSERT(overlays.size() == tileProviders.size());
 
   for (size_t i = 0; i < overlays.size() && i < tileProviders.size(); ++i) {
-    if (overlays[i].get() == &overlay)
+    if (overlays[i].get() == &overlay) {
       return tileProviders[i].get();
+    }
   }
 
   return nullptr;
@@ -262,8 +289,9 @@ RasterOverlayCollection::findPlaceholderTileProviderForOverlay(
 const RasterOverlayTileProvider*
 RasterOverlayCollection::findPlaceholderTileProviderForOverlay(
     const RasterOverlay& overlay) const noexcept {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return nullptr;
+  }
 
   const auto& overlays = this->_pOverlays->overlays;
   const auto& placeholders = this->_pOverlays->placeholders;
@@ -271,8 +299,9 @@ RasterOverlayCollection::findPlaceholderTileProviderForOverlay(
   CESIUM_ASSERT(overlays.size() == placeholders.size());
 
   for (size_t i = 0; i < overlays.size() && i < placeholders.size(); ++i) {
-    if (overlays[i].get() == &overlay)
+    if (overlays[i].get() == &overlay) {
       return placeholders[i].get();
+    }
   }
 
   return nullptr;
@@ -280,23 +309,26 @@ RasterOverlayCollection::findPlaceholderTileProviderForOverlay(
 
 RasterOverlayCollection::const_iterator
 RasterOverlayCollection::begin() const noexcept {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return emptyOverlays.begin();
+  }
 
   return this->_pOverlays->overlays.begin();
 }
 
 RasterOverlayCollection::const_iterator
 RasterOverlayCollection::end() const noexcept {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return emptyOverlays.end();
+  }
 
   return this->_pOverlays->overlays.end();
 }
 
 size_t RasterOverlayCollection::size() const noexcept {
-  if (!this->_pOverlays)
+  if (!this->_pOverlays) {
     return 0;
+  }
 
   return this->_pOverlays->overlays.size();
 }

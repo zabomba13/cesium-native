@@ -1,8 +1,38 @@
 #include "TilesetContentManager.h"
 
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "Cesium3DTilesSelection/RasterMappedTo3DTile.h"
+#include "Cesium3DTilesSelection/RasterOverlayCollection.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetLoadFailureDetails.h"
+#include "Cesium3DTilesSelection/TilesetOptions.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/SharedFuture.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/BoundingRegionWithLooseFittingHeights.h"
+#include "CesiumGeospatial/Cartographic.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumGltf/Image.h"
 #include "CesiumIonTilesetLoader.h"
+#include "CesiumRasterOverlays/RasterOverlayDetails.h"
+#include "CesiumUtility/Assert.h"
+#include "CesiumUtility/Math.h"
+#include "CesiumUtility/Tracing.h"
 #include "LayerJsonTerrainLoader.h"
+#include "RasterOverlayUpsampler.h"
 #include "TileContentLoadInfo.h"
+#include "TilesetContentLoaderResult.h"
 #include "TilesetJsonLoader.h"
 
 #include <Cesium3DTilesSelection/IPrepareRendererResources.h>
@@ -15,12 +45,29 @@
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumRasterOverlays/RasterOverlayUtilities.h>
 #include <CesiumUtility/IntrusivePointer.h>
-#include <CesiumUtility/Log.h>
 #include <CesiumUtility/joinToString.h>
 
+#include <fmt/core.h>
+#include <glm/ext/vector_double2.hpp>
+#include <gsl/span>
 #include <rapidjson/document.h>
+#include <spdlog/spdlog.h>
 
-#include <chrono>
+#include <algorithm>
+#include <any>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <functional>
+#include <memory>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumGltfContent;
 using namespace CesiumRasterOverlays;
@@ -69,7 +116,7 @@ struct ContentKindSetter {
 
   TileContent& tileContent;
   std::optional<RasterOverlayDetails> rasterOverlayDetails;
-  void* pRenderResources;
+  void* pRenderResources{};
 };
 
 void unloadTileRecursively(
@@ -388,7 +435,7 @@ void calcRasterOverlayDetailsInWorkerThread(
     TileLoadResult& result,
     std::vector<CesiumGeospatial::Projection>&& projections,
     const TileContentLoadInfo& tileLoadInfo) {
-  CesiumGltf::Model& model = std::get<CesiumGltf::Model>(result.contentKind);
+  auto& model = std::get<CesiumGltf::Model>(result.contentKind);
 
   // we will use the fittest bounding volume to calculate raster overlay details
   // below
@@ -483,7 +530,7 @@ void calcRasterOverlayDetailsInWorkerThread(
 void calcFittestBoundingRegionForLooseTile(
     TileLoadResult& result,
     const TileContentLoadInfo& tileLoadInfo) {
-  CesiumGltf::Model& model = std::get<CesiumGltf::Model>(result.contentKind);
+  auto& model = std::get<CesiumGltf::Model>(result.contentKind);
 
   const BoundingVolume& boundingVolume = getEffectiveBoundingVolume(
       tileLoadInfo.tileBoundingVolume,
@@ -509,7 +556,7 @@ void postProcessGltfInWorkerThread(
     TileLoadResult& result,
     std::vector<CesiumGeospatial::Projection>&& projections,
     const TileContentLoadInfo& tileLoadInfo) {
-  CesiumGltf::Model& model = std::get<CesiumGltf::Model>(result.contentKind);
+  auto& model = std::get<CesiumGltf::Model>(result.contentKind);
 
   if (result.pCompletedRequest) {
     model.extras["Cesium3DTiles_TileUrl"] = result.pCompletedRequest->url();
@@ -545,7 +592,7 @@ postProcessContentInWorkerThread(
       result.state == TileLoadResultState::Success &&
       "This function requires result to be success");
 
-  CesiumGltf::Model& model = std::get<CesiumGltf::Model>(result.contentKind);
+  auto& model = std::get<CesiumGltf::Model>(result.contentKind);
 
   // Download any external image or buffer urls in the gltf if there are any
   CesiumGltfReader::GltfReaderResult gltfResult{std::move(model), {}, {}};
@@ -755,36 +802,35 @@ TilesetContentManager::TilesetContentManager(
                     .thenImmediately(
                         [](TilesetContentLoaderResult<TilesetContentLoader>&&
                                result) { return std::move(result); });
-              } else {
-                const auto formatIt = tilesetJson.FindMember("format");
-                bool isLayerJsonFormat = formatIt != tilesetJson.MemberEnd() &&
-                                         formatIt->value.IsString();
-                isLayerJsonFormat = isLayerJsonFormat &&
-                                    std::string(formatIt->value.GetString()) ==
-                                        "quantized-mesh-1.0";
-                if (isLayerJsonFormat) {
-                  const CesiumAsync::HttpHeaders& completedRequestHeaders =
-                      pCompletedRequest->headers();
-                  std::vector<CesiumAsync::IAssetAccessor::THeader> flatHeaders(
-                      completedRequestHeaders.begin(),
-                      completedRequestHeaders.end());
-                  return LayerJsonTerrainLoader::createLoader(
-                             asyncSystem,
-                             pAssetAccessor,
-                             contentOptions,
-                             url,
-                             flatHeaders,
-                             tilesetJson,
-                             ellipsoid)
-                      .thenImmediately(
-                          [](TilesetContentLoaderResult<TilesetContentLoader>&&
-                                 result) { return std::move(result); });
-                }
-
-                TilesetContentLoaderResult<TilesetContentLoader> result;
-                result.errors.emplaceError("tileset json has unsupport format");
-                return asyncSystem.createResolvedFuture(std::move(result));
               }
+              const auto formatIt = tilesetJson.FindMember("format");
+              bool isLayerJsonFormat = formatIt != tilesetJson.MemberEnd() &&
+                                       formatIt->value.IsString();
+              isLayerJsonFormat = isLayerJsonFormat &&
+                                  std::string(formatIt->value.GetString()) ==
+                                      "quantized-mesh-1.0";
+              if (isLayerJsonFormat) {
+                const CesiumAsync::HttpHeaders& completedRequestHeaders =
+                    pCompletedRequest->headers();
+                std::vector<CesiumAsync::IAssetAccessor::THeader> flatHeaders(
+                    completedRequestHeaders.begin(),
+                    completedRequestHeaders.end());
+                return LayerJsonTerrainLoader::createLoader(
+                           asyncSystem,
+                           pAssetAccessor,
+                           contentOptions,
+                           url,
+                           flatHeaders,
+                           tilesetJson,
+                           ellipsoid)
+                    .thenImmediately(
+                        [](TilesetContentLoaderResult<TilesetContentLoader>&&
+                               result) { return std::move(result); });
+              }
+
+              TilesetContentLoaderResult<TilesetContentLoader> result;
+              result.errors.emplaceError("tileset json has unsupport format");
+              return asyncSystem.createResolvedFuture(std::move(result));
             })
         .thenInMainThread(
             [thiz, errorCallback = tilesetOptions.loadErrorCallback](
@@ -974,7 +1020,7 @@ void TilesetContentManager::loadTileContent(
       tilesetOptions.contentOptions,
       tile};
 
-  TilesetContentLoader* pLoader;
+  TilesetContentLoader* pLoader = nullptr;
   if (tile.getLoader() == &this->_upsampler) {
     pLoader = &this->_upsampler;
   } else {
@@ -1219,7 +1265,7 @@ int64_t TilesetContentManager::getTotalDataUsed() const noexcept {
 }
 
 bool TilesetContentManager::tileNeedsWorkerThreadLoading(
-    const Tile& tile) const noexcept {
+    const Tile& tile) noexcept {
   auto state = tile.getState();
   return state == TileLoadState::Unloaded ||
          state == TileLoadState::FailedTemporarily ||
@@ -1227,7 +1273,7 @@ bool TilesetContentManager::tileNeedsWorkerThreadLoading(
 }
 
 bool TilesetContentManager::tileNeedsMainThreadLoading(
-    const Tile& tile) const noexcept {
+    const Tile& tile) noexcept {
   return tile.getState() == TileLoadState::ContentLoaded &&
          tile.isRenderContent();
 }
@@ -1292,7 +1338,7 @@ void TilesetContentManager::setTileContent(
     }
 
     if (result.updatedContentBoundingVolume) {
-      tile.setContentBoundingVolume(*result.updatedContentBoundingVolume);
+      tile.setContentBoundingVolume(result.updatedContentBoundingVolume);
     }
 
     auto& content = tile.getContent();

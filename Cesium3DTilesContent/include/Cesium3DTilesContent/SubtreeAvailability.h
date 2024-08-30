@@ -420,11 +420,11 @@ private:
       AvailabilityView& availabilityView,
       bool isAvailable) noexcept;
 
-  bool isAvailableUsingBufferView(
+  static bool isAvailableUsingBufferView(
       uint64_t numOfTilesFromRootToParentLevel,
       uint64_t relativeTileMortonId,
-      const AvailabilityView& availabilityView) const noexcept;
-  void setAvailableUsingBufferView(
+      const AvailabilityView& availabilityView) noexcept;
+  static void setAvailableUsingBufferView(
       uint64_t numOfTilesFromRootToParentLevel,
       uint64_t relativeTileMortonId,
       AvailabilityView& availabilityView,

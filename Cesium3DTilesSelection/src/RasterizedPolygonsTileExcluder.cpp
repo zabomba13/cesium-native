@@ -2,6 +2,7 @@
 
 #include "Cesium3DTilesSelection/Tile.h"
 #include "CesiumRasterOverlays/RasterizedPolygonsOverlay.h"
+#include "CesiumUtility/IntrusivePointer.h"
 #include "TileUtilities.h"
 
 using namespace Cesium3DTilesSelection;
@@ -19,10 +20,9 @@ bool RasterizedPolygonsTileExcluder::shouldExclude(
         tile.getBoundingVolume(),
         this->_pOverlay->getPolygons(),
         this->_pOverlay->getEllipsoid());
-  } else {
-    return Cesium3DTilesSelection::CesiumImpl::withinPolygons(
-        tile.getBoundingVolume(),
-        this->_pOverlay->getPolygons(),
-        this->_pOverlay->getEllipsoid());
   }
+  return Cesium3DTilesSelection::CesiumImpl::withinPolygons(
+      tile.getBoundingVolume(),
+      this->_pOverlay->getPolygons(),
+      this->_pOverlay->getEllipsoid());
 }

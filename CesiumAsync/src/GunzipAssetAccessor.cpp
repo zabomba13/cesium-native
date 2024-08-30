@@ -2,17 +2,15 @@
 
 #include "CesiumAsync/AsyncSystem.h"
 #include "CesiumAsync/HttpHeader.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
 #include "CesiumAsync/IAssetResponse.h"
-#include "CesiumUtility/Gunzip.h"
 
-#include <gsl/span>
-
-#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace CesiumAsync {
 
@@ -21,11 +19,9 @@ namespace {
 class GunzippedAssetResponse : public IAssetResponse {
 public:
   explicit GunzippedAssetResponse(const IAssetResponse* pOther) noexcept
-      : _pAssetResponse(pOther) {
-    this->_dataValid = CesiumUtility::gunzip(
-        this->_pAssetResponse->data(),
-        this->_gunzippedData);
-  }
+      : _pAssetResponse(pOther),
+        _dataValid(
+            gunzip(this->_pAssetResponse->data(), this->_gunzippedData)) {}
 
   uint16_t statusCode() const noexcept override {
     return this->_pAssetResponse->statusCode();
@@ -46,7 +42,7 @@ public:
 
 private:
   const IAssetResponse* _pAssetResponse;
-  std::vector<std::byte> _gunzippedData;
+  std::vector<std::byte> _gunzippedData{};
   bool _dataValid;
 };
 
@@ -54,7 +50,7 @@ class GunzippedAssetRequest : public IAssetRequest {
 public:
   explicit GunzippedAssetRequest(std::shared_ptr<IAssetRequest>&& pOther)
       : _pAssetRequest(std::move(pOther)),
-        _assetResponse(_pAssetRequest->response()) {};
+        _assetResponse(_pAssetRequest->response()){};
   const std::string& method() const noexcept override {
     return this->_pAssetRequest->method();
   }
@@ -79,7 +75,7 @@ private:
 Future<std::shared_ptr<IAssetRequest>> gunzipIfNeeded(
     const AsyncSystem& asyncSystem,
     std::shared_ptr<IAssetRequest>&& pCompletedRequest) {
-  const IAssetResponse* pResponse = pCompletedRequest->response();
+  const IAssetResponse* pResponse = nullptr = pCompletedRequest->response();
   if (pResponse && CesiumUtility::isGzip(pResponse->data())) {
     return asyncSystem.runInWorkerThread(
         [pCompletedRequest = std::move(

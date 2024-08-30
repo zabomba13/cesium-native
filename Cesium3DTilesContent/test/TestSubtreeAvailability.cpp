@@ -1,3 +1,6 @@
+#include "CesiumNativeTests/SimpleAssetRequest.h"
+#include "CesiumNativeTests/SimpleAssetResponse.h"
+
 #include <Cesium3DTiles/Subtree.h>
 #include <Cesium3DTilesContent/SubtreeAvailability.h>
 #include <CesiumAsync/AsyncSystem.h>
@@ -8,12 +11,24 @@
 #include <CesiumNativeTests/waitForFuture.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <glm/common.hpp>
+#include <gsl/span>
 #include <libmorton/morton.h>
 #include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <spdlog/spdlog.h>
 
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 using namespace Cesium3DTiles;
@@ -38,7 +53,7 @@ struct SubtreeBuffers {
 
 uint64_t calculateTotalNumberOfTilesForQuadtree(uint64_t subtreeLevels) {
   return static_cast<uint64_t>(
-      (glm::pow(4.0, static_cast<double>(subtreeLevels)) - 1) /
+      (pow(4.0, static_cast<double>(subtreeLevels)) - 1) /
       (static_cast<double>(subtreeLevels) - 1));
 }
 
@@ -47,7 +62,7 @@ void markTileAvailableForQuadtree(
     gsl::span<std::byte> available) {
   // This function assumes that subtree tile ID is (0, 0, 0).
   // TileID must be within the subtree
-  uint64_t numOfTilesFromRootToParentLevel =
+  auto numOfTilesFromRootToParentLevel =
       static_cast<uint64_t>(((1 << (2 * tileID.level)) - 1) / 3);
   uint64_t availabilityBitIndex =
       numOfTilesFromRootToParentLevel +
@@ -73,9 +88,9 @@ SubtreeBuffers createSubtreeBuffers(
     const std::vector<CesiumGeometry::QuadtreeTileID>& subtreeAvailabilities) {
   uint64_t numTiles = calculateTotalNumberOfTilesForQuadtree(maxSubtreeLevels);
   uint64_t maxSubtreeTiles = uint64_t(1) << (2 * (maxSubtreeLevels));
-  uint64_t bufferSize =
+  auto bufferSize =
       static_cast<uint64_t>(glm::ceil(static_cast<double>(numTiles) / 8.0));
-  uint64_t subtreeBufferSize = static_cast<uint64_t>(
+  auto subtreeBufferSize = static_cast<uint64_t>(
       glm::ceil(static_cast<double>(maxSubtreeTiles) / 8.0));
   std::vector<std::byte> availabilityBuffer(
       bufferSize + bufferSize + subtreeBufferSize);
@@ -376,9 +391,9 @@ TEST_CASE("Test SubtreeAvailability methods") {
         calculateTotalNumberOfTilesForQuadtree(maxSubtreeLevels);
 
     uint64_t maxSubtreeTiles = uint64_t(1) << (2 * (maxSubtreeLevels));
-    uint64_t bufferSize =
+    auto bufferSize =
         static_cast<uint64_t>(glm::ceil(static_cast<double>(numTiles) / 8.0));
-    uint64_t subtreeBufferSize = static_cast<uint64_t>(
+    auto subtreeBufferSize = static_cast<uint64_t>(
         glm::ceil(static_cast<double>(maxSubtreeTiles) / 8.0));
 
     Subtree subtree;
@@ -524,7 +539,7 @@ TEST_CASE("Test parsing subtree format") {
     rapidjson::Writer<rapidjson::StringBuffer> writer(subtreeJsonBuffer);
     subtreeJson.Accept(writer);
 
-    SubtreeHeader subtreeHeader;
+    SubtreeHeader subtreeHeader{};
     subtreeHeader.magic[0] = 's';
     subtreeHeader.magic[1] = 'u';
     subtreeHeader.magic[2] = 'b';
@@ -677,7 +692,7 @@ TEST_CASE("Test parsing subtree format") {
 
     SECTION("Buffer does not have byteLength field") {
       auto bufferIt = subtreeJson.FindMember("buffers");
-      auto bufferObj = bufferIt->value.GetArray().Begin();
+      auto* bufferObj = bufferIt->value.GetArray().Begin();
       bufferObj->RemoveMember("byteLength");
       CHECK(
           mockLoadSubtreeJson(
@@ -688,7 +703,7 @@ TEST_CASE("Test parsing subtree format") {
 
     SECTION("Buffer does not have string uri field") {
       auto bufferIt = subtreeJson.FindMember("buffers");
-      auto bufferObj = bufferIt->value.GetArray().Begin();
+      auto* bufferObj = bufferIt->value.GetArray().Begin();
       bufferObj->RemoveMember("uri");
       bufferObj->AddMember("uri", 12, subtreeJson.GetAllocator());
       CHECK(

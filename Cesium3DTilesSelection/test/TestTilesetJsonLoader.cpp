@@ -1,5 +1,21 @@
+#include "Cesium3DTiles/Schema.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetMetadata.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeometry/BoundingSphere.h"
+#include "CesiumGeometry/OrientedBoundingBox.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumUtility/CreditSystem.h"
 #include "ImplicitQuadtreeLoader.h"
 #include "SimplePrepareRendererResource.h"
+#include "TilesetContentLoaderResult.h"
 #include "TilesetJsonLoader.h"
 
 #include <Cesium3DTilesContent/registerAllTileContentTypes.h>
@@ -11,10 +27,21 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <spdlog/spdlog.h>
 
+#include <array>
 #include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <map>
 #include <memory>
+#include <optional>
 #include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace Cesium3DTilesSelection;
@@ -158,7 +185,7 @@ TEST_CASE("Test creating tileset json loader") {
         children[0].getBoundingVolume()));
 
     CHECK(children[1].getParent() == pRootTile);
-    CHECK(children[1].getChildren().size() == 0);
+    CHECK(children[1].getChildren().empty());
     CHECK(children[1].getGeometricError() == 0.0);
     CHECK(children[1].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[1].getTileID()) == "lr.b3dm");
@@ -166,7 +193,7 @@ TEST_CASE("Test creating tileset json loader") {
         children[1].getBoundingVolume()));
 
     CHECK(children[2].getParent() == pRootTile);
-    CHECK(children[2].getChildren().size() == 0);
+    CHECK(children[2].getChildren().empty());
     CHECK(children[2].getGeometricError() == 0.0);
     CHECK(children[2].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[2].getTileID()) == "ur.b3dm");
@@ -174,7 +201,7 @@ TEST_CASE("Test creating tileset json loader") {
         children[2].getBoundingVolume()));
 
     CHECK(children[3].getParent() == pRootTile);
-    CHECK(children[3].getChildren().size() == 0);
+    CHECK(children[3].getChildren().empty());
     CHECK(children[3].getGeometricError() == 0.0);
     CHECK(children[3].getRefine() == TileRefine::Replace);
     CHECK(std::get<std::string>(children[3].getTileID()) == "ul.b3dm");
@@ -192,11 +219,11 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(!loaderResult.errors.hasErrors());
 
     // check root tile
-    auto pTilesetJson = loaderResult.pRootTile.get();
+    auto* pTilesetJson = loaderResult.pRootTile.get();
     REQUIRE(pTilesetJson != nullptr);
     CHECK(!pTilesetJson->getParent());
     REQUIRE(pTilesetJson->getChildren().size() == 1);
-    auto pRootTile = &pTilesetJson->getChildren()[0];
+    auto* pRootTile = pTilesetJson->getChildren().data();
     CHECK(pRootTile->getParent() == pTilesetJson);
     CHECK(pRootTile->getChildren().size() == 4);
     CHECK(pRootTile->getGeometricError() == 70.0);
@@ -221,10 +248,10 @@ TEST_CASE("Test creating tileset json loader") {
     // check children
     std::array<std::string, 4> expectedUrl{
         {"tileset3/tileset3.json", "lr.b3dm", "ur.b3dm", "ul.b3dm"}};
-    auto expectedUrlIt = expectedUrl.begin();
+    auto* expectedUrlIt = expectedUrl.begin();
     for (const Tile& child : pRootTile->getChildren()) {
       CHECK(child.getParent() == pRootTile);
-      CHECK(child.getChildren().size() == 0);
+      CHECK(child.getChildren().empty());
       CHECK(child.getGeometricError() == 0.0);
       CHECK(child.getRefine() == TileRefine::Add);
       CHECK(std::get<std::string>(child.getTileID()) == *expectedUrlIt);
@@ -246,7 +273,7 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
 
     const Tile& rootTile = loaderResult.pRootTile->getChildren()[0];
-    const CesiumGeometry::BoundingSphere& sphere =
+    const auto& sphere =
         std::get<CesiumGeometry::BoundingSphere>(rootTile.getBoundingVolume());
     CHECK(sphere.getCenter() == glm::dvec3(0.0, 0.0, 10.0));
     CHECK(sphere.getRadius() == 141.4214);
@@ -264,9 +291,8 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
 
     const Tile& rootTile = loaderResult.pRootTile->getChildren()[0];
-    const CesiumGeometry::OrientedBoundingBox& box =
-        std::get<CesiumGeometry::OrientedBoundingBox>(
-            rootTile.getBoundingVolume());
+    const auto& box = std::get<CesiumGeometry::OrientedBoundingBox>(
+        rootTile.getBoundingVolume());
     const glm::dmat3& halfAxis = box.getHalfAxes();
     CHECK(halfAxis[0] == glm::dvec3(100.0, 0.0, 0.0));
     CHECK(halfAxis[1] == glm::dvec3(0.0, 100.0, 0.0));
@@ -282,7 +308,7 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->getChildren().empty());
 
     // check loader up axis
@@ -297,7 +323,7 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->getGeometricError() == Catch::Approx(70.0));
     CHECK(pRootTile->getChildren().size() == 4);
     for (const Tile& child : pRootTile->getChildren()) {
@@ -316,7 +342,7 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->getGeometricError() == Catch::Approx(70.0));
     CHECK(pRootTile->getRefine() == TileRefine::Add);
     CHECK(pRootTile->getChildren().size() == 4);
@@ -337,7 +363,7 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->getGeometricError() == Catch::Approx(210.0));
     CHECK(pRootTile->getChildren().size() == 4);
     for (const Tile& child : pRootTile->getChildren()) {
@@ -354,7 +380,7 @@ TEST_CASE("Test creating tileset json loader") {
     CHECK(!loaderResult.errors.hasErrors());
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->getGeometricError() == Catch::Approx(70.0));
     CHECK(pRootTile->getChildren().size() == 1);
 
@@ -373,7 +399,7 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile);
     CHECK(loaderResult.pRootTile->isExternalContent());
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->isExternalContent());
     REQUIRE(pRootTile->getChildren().size() == 1);
     CHECK(pRootTile->getTransform() == glm::dmat4(glm::dmat3(2.0)));
@@ -396,7 +422,7 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile);
     CHECK(loaderResult.pRootTile->isExternalContent());
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     CHECK(pRootTile->isExternalContent());
     REQUIRE(pRootTile->getChildren().size() == 1);
     CHECK(pRootTile->getTransform() == glm::dmat4(glm::dmat3(2.0)));
@@ -439,7 +465,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
 
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
 
     const auto& tileID = std::get<std::string>(pRootTile->getTileID());
     CHECK(tileID == "parent.b3dm");
@@ -464,7 +490,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
 
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
 
     const auto& tileID = std::get<std::string>(pRootTile->getTileID());
     CHECK(tileID == "tileset2.json");
@@ -517,7 +543,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
     CHECK(loaderResult.pRootTile->isExternalContent());
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
 
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     REQUIRE(pRootTile->getChildren().size() == 1);
 
     auto& implicitTile = pRootTile->getChildren().front();
@@ -616,7 +642,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
     CHECK(loaderResult.pRootTile->isExternalContent());
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
 
-    auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
+    auto* pRootTile = loaderResult.pRootTile->getChildren().data();
     REQUIRE(pRootTile->getChildren().size() == 1);
 
     auto& implicitTile = pRootTile->getChildren().front();
@@ -624,7 +650,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
         std::get<CesiumGeometry::QuadtreeTileID>(implicitTile.getTileID());
     CHECK(tileID == CesiumGeometry::QuadtreeTileID(0, 0, 0));
 
-    const auto pLoader =
+    const auto* const pLoader =
         dynamic_cast<const ImplicitQuadtreeLoader*>(implicitTile.getLoader());
     CHECK(pLoader);
     CHECK(pLoader->getSubtreeLevels() == 2);

@@ -1,8 +1,19 @@
+#include "CesiumAsync/Future.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/QuadtreeTilingScheme.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumRasterOverlays/IPrepareRasterOverlayRendererResources.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/IntrusivePointer.h"
+#include "CesiumUtility/Math.h"
+
 #include <CesiumAsync/IAssetAccessor.h>
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
 #include <CesiumGeospatial/Projection.h>
-#include <CesiumGeospatial/WebMercatorProjection.h>
 #include <CesiumRasterOverlays/QuadtreeRasterOverlayTileProvider.h>
 #include <CesiumRasterOverlays/RasterOverlayLoadFailureDetails.h>
 #include <CesiumRasterOverlays/RasterOverlayTile.h>
@@ -10,10 +21,23 @@
 #include <CesiumUtility/CreditSystem.h>
 #include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
+#include <gsl/span>
+#include <nonstd/expected.hpp>
+#include <spdlog/logger.h>
 #include <tinyxml2.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <map>
+#include <memory>
+#include <optional>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGeometry;
@@ -65,10 +89,10 @@ public:
         _layers(layers),
         _format(format) {}
 
-  virtual ~WebMapServiceTileProvider() {}
+  ~WebMapServiceTileProvider() override = default;
 
 protected:
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
+  CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
       const CesiumGeometry::QuadtreeTileID& tileID) const override {
 
     LoadTileImageFromUrlOptions options;
@@ -82,8 +106,9 @@ protected:
 
     std::string queryString = "?";
 
-    if (this->_url.find(queryString) != std::string::npos)
+    if (this->_url.find(queryString) != std::string::npos) {
       queryString = "&";
+    }
 
     const std::string urlTemplate =
         this->_url + queryString +
@@ -139,7 +164,7 @@ WebMapServiceRasterOverlay::WebMapServiceRasterOverlay(
       _headers(headers),
       _options(wmsOptions) {}
 
-WebMapServiceRasterOverlay::~WebMapServiceRasterOverlay() {}
+WebMapServiceRasterOverlay::~WebMapServiceRasterOverlay() = default;
 
 static bool validateCapabilities(
     tinyxml2::XMLElement* pRoot,
@@ -208,7 +233,7 @@ static bool validateCapabilities(
   std::string layer;
   const char delimiter = ',';
   while (std::getline(sstream, layer, delimiter)) {
-    if (layer.size() > 0) {
+    if (!layer.empty()) {
       configLayers.push_back(layer);
     }
   }
@@ -256,7 +281,8 @@ WebMapServiceRasterOverlay::createTileProvider(
           [this](const std::string& placeholder) {
             if (placeholder == "baseUrl") {
               return this->_baseUrl;
-            } else if (placeholder == "version") {
+            }
+            if (placeholder == "version") {
               return Uri::escape(this->_options.version);
             } else if (placeholder == "queryString") {
               std::string queryString = "?";
@@ -292,7 +318,7 @@ WebMapServiceRasterOverlay::createTileProvider(
             if (!pResponse) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                   RasterOverlayLoadType::TileProvider,
-                  std::move(pRequest),
+                  pRequest,
                   "No response received from web map service."});
             }
 
@@ -305,7 +331,7 @@ WebMapServiceRasterOverlay::createTileProvider(
             if (error != tinyxml2::XMLError::XML_SUCCESS) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                   RasterOverlayLoadType::TileProvider,
-                  std::move(pRequest),
+                  pRequest,
                   "Could not parse web map service XML."});
             }
 
@@ -313,7 +339,7 @@ WebMapServiceRasterOverlay::createTileProvider(
             if (!pRoot) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                   RasterOverlayLoadType::TileProvider,
-                  std::move(pRequest),
+                  pRequest,
                   "Web map service XML document does not have a root "
                   "element."});
             }
@@ -322,7 +348,7 @@ WebMapServiceRasterOverlay::createTileProvider(
             if (!validateCapabilities(pRoot, options, validationError)) {
               return nonstd::make_unexpected(RasterOverlayLoadFailureDetails{
                   RasterOverlayLoadType::TileProvider,
-                  std::move(pRequest),
+                  pRequest,
                   validationError});
             }
 

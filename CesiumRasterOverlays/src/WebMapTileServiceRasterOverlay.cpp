@@ -1,5 +1,16 @@
+#include "CesiumAsync/Future.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/QuadtreeTilingScheme.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumGeospatial/WebMercatorProjection.h"
+#include "CesiumRasterOverlays/IPrepareRasterOverlayRendererResources.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumAsync/IAssetAccessor.h>
-#include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
 #include <CesiumGeospatial/Projection.h>
 #include <CesiumRasterOverlays/QuadtreeRasterOverlayTileProvider.h>
@@ -9,8 +20,18 @@
 #include <CesiumUtility/CreditSystem.h>
 #include <CesiumUtility/Uri.h>
 
-#include <cstddef>
+#include <nonstd/expected.hpp>
+#include <spdlog/logger.h>
+
+#include <algorithm>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 #include <variant>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumUtility;
@@ -42,8 +63,8 @@ public:
       std::string layer,
       std::string style,
       std::string _tileMatrixSetID,
-      const std::optional<std::vector<std::string>> tileMatrixLabels,
-      const std::optional<std::map<std::string, std::string>> dimensions,
+      const std::optional<std::vector<std::string>>& tileMatrixLabels,
+      const std::optional<std::map<std::string, std::string>>& dimensions,
       const std::vector<std::string>& subdomains)
       : QuadtreeRasterOverlayTileProvider(
             pOwner,
@@ -63,17 +84,17 @@ public:
         _headers(headers),
         _useKVP(useKVP),
         _format(format),
-        _layer(layer),
-        _style(style),
-        _tileMatrixSetID(_tileMatrixSetID),
+        _layer(std::move(layer)),
+        _style(std::move(style)),
+        _tileMatrixSetID(std::move(_tileMatrixSetID)),
         _labels(tileMatrixLabels),
         _staticDimensions(dimensions),
         _subdomains(subdomains) {}
 
-  virtual ~WebMapTileServiceTileProvider() {}
+  ~WebMapTileServiceTileProvider() override = default;
 
 protected:
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
+  CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
       const CesiumGeometry::QuadtreeTileID& tileID) const override {
 
     LoadTileImageFromUrlOptions options;
@@ -106,7 +127,7 @@ protected:
            {"TileRow", std::to_string(row)},
            {"TileCol", std::to_string(col)},
            {"TileMatrixSet", _tileMatrixSetID}});
-      if (_subdomains.size() > 0) {
+      if (!_subdomains.empty()) {
         urlTemplateMap.emplace(
             "s",
             _subdomains[(col + row + level) % _subdomains.size()]);
@@ -130,7 +151,7 @@ protected:
             _staticDimensions->begin(),
             _staticDimensions->end());
       }
-      if (_subdomains.size() > 0) {
+      if (!_subdomains.empty()) {
         urlTemplateMap.emplace(
             "s",
             _subdomains[(col + row + level) % _subdomains.size()]);
@@ -179,7 +200,7 @@ WebMapTileServiceRasterOverlay::WebMapTileServiceRasterOverlay(
       _headers(headers),
       _options(wmtsOptions) {}
 
-WebMapTileServiceRasterOverlay::~WebMapTileServiceRasterOverlay() {}
+WebMapTileServiceRasterOverlay::~WebMapTileServiceRasterOverlay() = default;
 
 Future<RasterOverlay::CreateTileProviderResult>
 WebMapTileServiceRasterOverlay::createTileProvider(
@@ -212,15 +233,11 @@ WebMapTileServiceRasterOverlay::createTileProvider(
   std::optional<std::map<std::string, std::string>> dimensions =
       _options.dimensions;
 
-  bool useKVP;
+  bool useKVP = false;
 
   auto countBracket = std::count(_url.begin(), _url.end(), '{');
-  if (countBracket < 1 ||
-      (countBracket == 1 && _url.find("{s}") != std::string::npos)) {
-    useKVP = true;
-  } else {
-    useKVP = false;
-  }
+  useKVP = countBracket < 1 ||
+           (countBracket == 1 && _url.find("{s}") != std::string::npos);
 
   CesiumGeospatial::Projection projection =
       _options.projection.value_or(CesiumGeospatial::WebMercatorProjection(

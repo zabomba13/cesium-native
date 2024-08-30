@@ -1,18 +1,31 @@
 #include "CesiumAsync/SqliteCache.h"
 
-#include "CesiumAsync/IAssetResponse.h"
+#include "CesiumAsync/CacheItem.h"
+#include "CesiumAsync/HttpHeaders.h"
 
 #include <CesiumAsync/cesium-sqlite3.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <gsl/span>
 #include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 #include <sqlite3.h>
+#include <stdio.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <mutex>
+#include <optional>
 #include <stdexcept>
+#include <string>
 #include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 
@@ -149,7 +162,7 @@ using SqliteStatementPtr =
 SqliteStatementPtr prepareStatement(
     const SqliteConnectionPtr& pConnection,
     const std::string& sql) {
-  CESIUM_SQLITE(sqlite3_stmt*) pStmt;
+  CESIUM_SQLITE(sqlite3_stmt*) pStmt = nullptr;
   const int status = CESIUM_SQLITE(sqlite3_prepare_v2)(
       pConnection.get(),
       sql.c_str(),
@@ -175,14 +188,7 @@ struct SqliteCache::Impl {
       : _pLogger(pLogger),
         _pConnection(nullptr),
         _databaseName(databaseName),
-        _maxItems(maxItems),
-        _getEntryStmtWrapper(),
-        _updateLastAccessedTimeStmtWrapper(),
-        _storeResponseStmtWrapper(),
-        _totalItemsQueryStmtWrapper(),
-        _deleteExpiredStmtWrapper(),
-        _deleteLRUStmtWrapper(),
-        _clearAllStmtWrapper() {}
+        _maxItems(maxItems) {}
 
   std::shared_ptr<spdlog::logger> _pLogger;
   SqliteConnectionPtr _pConnection;
@@ -207,7 +213,7 @@ SqliteCache::SqliteCache(
 }
 
 void SqliteCache::createConnection() const {
-  CESIUM_SQLITE(sqlite3*) pConnection;
+  CESIUM_SQLITE(sqlite3*) pConnection = nullptr;
   int status = CESIUM_SQLITE(
       sqlite3_open)(this->_pImpl->_databaseName.c_str(), &pConnection);
   if (status != SQLITE_OK) {
@@ -375,10 +381,10 @@ std::optional<CacheItem> SqliteCache::getEntry(const std::string& key) const {
   if (!responseHeaders) {
     return std::nullopt;
   }
-  const uint16_t statusCode = static_cast<uint16_t>(CESIUM_SQLITE(
+  const auto statusCode = static_cast<uint16_t>(CESIUM_SQLITE(
       sqlite3_column_int)(this->_pImpl->_getEntryStmtWrapper.get(), 3));
 
-  const std::byte* rawResponseData =
+  const auto* rawResponseData =
       reinterpret_cast<const std::byte*>(CESIUM_SQLITE(
           sqlite3_column_blob)(this->_pImpl->_getEntryStmtWrapper.get(), 4));
   const int responseDataSize = CESIUM_SQLITE(

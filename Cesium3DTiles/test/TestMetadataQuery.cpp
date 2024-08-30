@@ -1,6 +1,14 @@
+#include "Cesium3DTiles/Class.h"
+#include "Cesium3DTiles/ClassProperty.h"
+#include "Cesium3DTiles/MetadataEntity.h"
+#include "Cesium3DTiles/Schema.h"
+#include "CesiumUtility/JsonValue.h"
+
 #include <Cesium3DTiles/MetadataQuery.h>
 
 #include <catch2/catch_test_macros.hpp>
+
+#include <optional>
 
 using namespace Cesium3DTiles;
 using namespace CesiumUtility;
@@ -50,6 +58,6 @@ TEST_CASE("MetadataQuery") {
     CHECK(&foundProperty2->classDefinition == &classDefinition);
     CHECK(foundProperty2->propertyIdentifier == "somePropertyWithSemantic");
     CHECK(&foundProperty2->propertyDefinition == &classProperty2);
-    CHECK(foundProperty2->propertyValue.getStringOrDefault("") == "the value");
+    CHECK(foundProperty2->propertyValue->getStringOrDefault("") == "the value");
   }
 }

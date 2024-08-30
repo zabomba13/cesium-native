@@ -1,3 +1,7 @@
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/S2CellID.h"
+
 #include <Cesium3DTiles/BoundingVolume.h>
 #include <Cesium3DTilesContent/ImplicitTilingUtilities.h>
 #include <Cesium3DTilesContent/TileBoundingVolumes.h>
@@ -8,7 +12,13 @@
 #include <CesiumGeospatial/S2CellBoundingVolume.h>
 #include <CesiumUtility/Uri.h>
 
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/fwd.hpp>
 #include <libmorton/morton.h>
+
+#include <cstdint>
+#include <optional>
+#include <string>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -375,7 +385,7 @@ QuadtreeChildren::iterator& QuadtreeChildren::iterator::operator++() {
   return *this;
 }
 
-QuadtreeChildren::iterator QuadtreeChildren::iterator::operator++(int) {
+const QuadtreeChildren::iterator QuadtreeChildren::iterator::operator++(int) {
   iterator copy = *this;
   ++copy;
   return copy;
@@ -432,7 +442,7 @@ OctreeChildren::iterator& OctreeChildren::iterator::operator++() {
   return *this;
 }
 
-OctreeChildren::iterator OctreeChildren::iterator::operator++(int) {
+const OctreeChildren::iterator OctreeChildren::iterator::operator++(int) {
   iterator copy = *this;
   ++copy;
   return copy;

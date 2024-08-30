@@ -1,8 +1,18 @@
 #include "BatchTableToGltfStructuralMetadata.h"
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/FeatureId.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/Schema.h"
+#include "CesiumGltfReader/GltfReader.h"
 #include "ConvertTileToGltf.h"
 
-#include <CesiumAsync/AsyncSystem.h>
-#include <CesiumAsync/HttpHeaders.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
@@ -12,12 +22,26 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <gsl/span>
 #include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 #include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/spdlog.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <limits>
+#include <memory>
+#include <optional>
 #include <set>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace Cesium3DTilesContent;
@@ -361,13 +385,13 @@ std::set<int32_t> getUniqueBufferViewIds(
     const std::vector<Accessor>& accessors,
     const PropertyTable& propertyTable) {
   std::set<int32_t> result;
-  for (auto it = accessors.begin(); it != accessors.end(); it++) {
-    result.insert(it->bufferView);
+  for (const auto& accessor : accessors) {
+    result.insert(accessor.bufferView);
   }
 
-  auto& properties = propertyTable.properties;
-  for (auto it = properties.begin(); it != properties.end(); it++) {
-    auto& property = it->second;
+  const auto& properties = propertyTable.properties;
+  for (const auto& propertie : properties) {
+    const auto& property = propertie.second;
     result.insert(property.values);
     if (property.arrayOffsets >= 0) {
       result.insert(property.arrayOffsets);
@@ -390,8 +414,7 @@ TEST_CASE("Converts JSON B3DM batch table to EXT_structural_metadata") {
 
   Model& gltf = *result.model;
 
-  ExtensionModelExtStructuralMetadata* pExtension =
-      gltf.getExtension<ExtensionModelExtStructuralMetadata>();
+  auto* pExtension = gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
       gltf.isExtensionUsed(ExtensionModelExtStructuralMetadata::ExtensionName));
@@ -482,7 +505,7 @@ TEST_CASE("Converts JSON B3DM batch table to EXT_structural_metadata") {
       CHECK(
           primitive.attributes.find("_BATCH_ID") == primitive.attributes.end());
 
-      ExtensionExtMeshFeatures* pPrimitiveExtension =
+      auto* pPrimitiveExtension =
           primitive.getExtension<ExtensionExtMeshFeatures>();
       REQUIRE(pPrimitiveExtension);
       CHECK(gltf.isExtensionUsed(ExtensionExtMeshFeatures::ExtensionName));
@@ -590,7 +613,7 @@ TEST_CASE("Convert binary B3DM batch table to EXT_structural_metadata") {
 
   const Model& model = *result.model;
 
-  const ExtensionModelExtStructuralMetadata* metadata =
+  const auto* metadata =
       model.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(metadata);
 
@@ -623,7 +646,7 @@ TEST_CASE("Convert binary B3DM batch table to EXT_structural_metadata") {
       CHECK(
           primitive.attributes.find("_BATCH_ID") == primitive.attributes.end());
 
-      const ExtensionExtMeshFeatures* pPrimitiveExtension =
+      const auto* pPrimitiveExtension =
           primitive.getExtension<ExtensionExtMeshFeatures>();
       REQUIRE(pPrimitiveExtension);
       CHECK(model.isExtensionUsed(ExtensionExtMeshFeatures::ExtensionName));
@@ -766,7 +789,7 @@ TEST_CASE("Converts batched PNTS batch table to EXT_structural_metadata") {
   REQUIRE(result.model);
   const Model& gltf = *result.model;
 
-  const ExtensionModelExtStructuralMetadata* pExtension =
+  const auto* pExtension =
       gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
@@ -838,7 +861,7 @@ TEST_CASE("Converts batched PNTS batch table to EXT_structural_metadata") {
   CHECK(
       primitive.attributes.find("_FEATURE_ID_0") != primitive.attributes.end());
 
-  const ExtensionExtMeshFeatures* pPrimitiveExtension =
+  const auto* pPrimitiveExtension =
       primitive.getExtension<ExtensionExtMeshFeatures>();
   REQUIRE(pPrimitiveExtension);
   CHECK(gltf.isExtensionUsed(ExtensionExtMeshFeatures::ExtensionName));
@@ -872,14 +895,14 @@ TEST_CASE("Converts batched PNTS batch table to EXT_structural_metadata") {
 
   {
     std::vector<glm::vec3> expected = {
-        {0.1182744f, 0.7206326f, 0.6399210f},
-        {0.5820198f, 0.1433532f, 0.5373732f},
-        {0.9446688f, 0.7586156f, 0.5218483f},
-        {0.1059076f, 0.4146619f, 0.4736004f},
-        {0.2645556f, 0.1863323f, 0.7742336f},
-        {0.7369181f, 0.4561503f, 0.2165503f},
-        {0.5684339f, 0.1352181f, 0.0187897f},
-        {0.3241409f, 0.6176354f, 0.1496748f}};
+        {0.1182744F, 0.7206326F, 0.6399210F},
+        {0.5820198F, 0.1433532F, 0.5373732F},
+        {0.9446688F, 0.7586156F, 0.5218483F},
+        {0.1059076F, 0.4146619F, 0.4736004F},
+        {0.2645556F, 0.1863323F, 0.7742336F},
+        {0.7369181F, 0.4561503F, 0.2165503F},
+        {0.5684339F, 0.1352181F, 0.0187897F},
+        {0.3241409F, 0.6176354F, 0.1496748F}};
     checkNonArrayProperty<glm::vec3>(
         gltf,
         propertyTable,
@@ -915,7 +938,7 @@ TEST_CASE("Converts per-point PNTS batch table to EXT_structural_metadata") {
   REQUIRE(result.model);
   const Model& gltf = *result.model;
 
-  const ExtensionModelExtStructuralMetadata* pExtension =
+  const auto* pExtension =
       gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
@@ -992,7 +1015,7 @@ TEST_CASE("Converts per-point PNTS batch table to EXT_structural_metadata") {
   CHECK(
       primitive.attributes.find("_FEATURE_ID_0") == primitive.attributes.end());
 
-  const ExtensionExtMeshFeatures* pPrimitiveExtension =
+  const auto* pPrimitiveExtension =
       primitive.getExtension<ExtensionExtMeshFeatures>();
   REQUIRE(pPrimitiveExtension);
   CHECK(gltf.isExtensionUsed(ExtensionExtMeshFeatures::ExtensionName));
@@ -1005,14 +1028,14 @@ TEST_CASE("Converts per-point PNTS batch table to EXT_structural_metadata") {
   // Check metadata values
   {
     std::vector<float> expected = {
-        0.2883332f,
-        0.4338732f,
-        0.1750928f,
-        0.1430827f,
-        0.1156976f,
-        0.3274261f,
-        0.1337213f,
-        0.0207673f};
+        0.2883332F,
+        0.4338732F,
+        0.1750928F,
+        0.1430827F,
+        0.1156976F,
+        0.3274261F,
+        0.1337213F,
+        0.0207673F};
     checkNonArrayProperty<float>(
         gltf,
         propertyTable,
@@ -1026,14 +1049,14 @@ TEST_CASE("Converts per-point PNTS batch table to EXT_structural_metadata") {
 
   {
     std::vector<glm::vec3> expected = {
-        {0.0202183f, 0, 0},
-        {0.3682415f, 0, 0},
-        {0.8326198f, 0, 0},
-        {0.9571551f, 0, 0},
-        {0.7781567f, 0, 0},
-        {0.1403507f, 0, 0},
-        {0.8700121f, 0, 0},
-        {0.8700872f, 0, 0}};
+        {0.0202183F, 0, 0},
+        {0.3682415F, 0, 0},
+        {0.8326198F, 0, 0},
+        {0.9571551F, 0, 0},
+        {0.7781567F, 0, 0},
+        {0.1403507F, 0, 0},
+        {0.8700121F, 0, 0},
+        {0.8700872F, 0, 0}};
     checkNonArrayProperty<glm::vec3>(
         gltf,
         propertyTable,
@@ -1083,7 +1106,7 @@ TEST_CASE("Draco-compressed b3dm uses _FEATURE_ID_0 attribute name in glTF") {
           primitive.attributes.find("_FEATURE_ID_0") !=
           primitive.attributes.end());
 
-      const ExtensionKhrDracoMeshCompression* pDraco =
+      const auto* pDraco =
           primitive.getExtension<ExtensionKhrDracoMeshCompression>();
       REQUIRE(pDraco);
       CHECK(
@@ -1102,7 +1125,7 @@ TEST_CASE("Converts Draco per-point PNTS batch table to "
   REQUIRE(result.model);
   const Model& gltf = *result.model;
 
-  const ExtensionModelExtStructuralMetadata* pExtension =
+  const auto* pExtension =
       gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
@@ -1179,7 +1202,7 @@ TEST_CASE("Converts Draco per-point PNTS batch table to "
   CHECK(
       primitive.attributes.find("_FEATURE_ID_0") == primitive.attributes.end());
 
-  const ExtensionExtMeshFeatures* pPrimitiveExtension =
+  const auto* pPrimitiveExtension =
       primitive.getExtension<ExtensionExtMeshFeatures>();
   REQUIRE(pPrimitiveExtension);
   CHECK(gltf.isExtensionUsed(ExtensionExtMeshFeatures::ExtensionName));
@@ -1192,14 +1215,14 @@ TEST_CASE("Converts Draco per-point PNTS batch table to "
   // Check metadata values
   {
     std::vector<float> expected = {
-        0.2883025f,
-        0.4338731f,
-        0.1751145f,
-        0.1430345f,
-        0.1156959f,
-        0.3274441f,
-        0.1337535f,
-        0.0207673f};
+        0.2883025F,
+        0.4338731F,
+        0.1751145F,
+        0.1430345F,
+        0.1156959F,
+        0.3274441F,
+        0.1337535F,
+        0.0207673F};
     checkNonArrayProperty<float>(
         gltf,
         propertyTable,
@@ -1213,14 +1236,14 @@ TEST_CASE("Converts Draco per-point PNTS batch table to "
 
   {
     std::vector<glm::vec3> expected = {
-        {0.1182744f, 0, 0},
-        {0.7206645f, 0, 0},
-        {0.6399421f, 0, 0},
-        {0.5820239f, 0, 0},
-        {0.1432983f, 0, 0},
-        {0.5374249f, 0, 0},
-        {0.9446688f, 0, 0},
-        {0.7586040f, 0, 0}};
+        {0.1182744F, 0, 0},
+        {0.7206645F, 0, 0},
+        {0.6399421F, 0, 0},
+        {0.5820239F, 0, 0},
+        {0.1432983F, 0, 0},
+        {0.5374249F, 0, 0},
+        {0.9446688F, 0, 0},
+        {0.7586040F, 0, 0}};
     checkNonArrayProperty<glm::vec3>(
         gltf,
         propertyTable,
@@ -1279,8 +1302,8 @@ TEST_CASE("Upgrade nested JSON metadata to string") {
   {
     std::vector<std::string> expected;
     for (int64_t i = 0; i < propertyTable.count; ++i) {
-      std::string v = std::string("{\"name\":\"building") + std::to_string(i) +
-                      "\",\"year\":" + std::to_string(i) + "}";
+      std::string v = std::string(R"({"name":"building)") + std::to_string(i) +
+                      R"(","year":)" + std::to_string(i) + "}";
       expected.push_back(v);
     }
     checkNonArrayProperty<std::string, std::string_view>(
@@ -1333,9 +1356,9 @@ TEST_CASE("Upgrade JSON booleans to binary") {
   rapidjson::Document batchTableJson;
   batchTableJson.SetObject();
   rapidjson::Value boolProperties(rapidjson::kArrayType);
-  for (size_t i = 0; i < expected.size(); ++i) {
+  for (auto&& i : expected) {
     boolProperties.PushBack(
-        rapidjson::Value(static_cast<bool>(expected[i])),
+        rapidjson::Value(static_cast<bool>(i)),
         batchTableJson.GetAllocator());
   }
   batchTableJson.AddMember(
@@ -1513,10 +1536,10 @@ TEST_CASE("Upgrade fixed-length JSON arrays") {
     // clang-format off
      std::vector<std::vector<uint64_t>> expected {
       {0, 1, 4, 1},
-      {1244, 13223302036854775807u, 1222, 544662},
+      {1244, 13223302036854775807U, 1222, 544662},
       {123, 10, 122, 334},
       {13, 45, 122, 94},
-      {11, 22, 3, 13223302036854775807u}};
+      {11, 22, 3, 13223302036854775807U}};
     // clang-format on
 
     createTestForArrayJson(
@@ -1530,11 +1553,11 @@ TEST_CASE("Upgrade fixed-length JSON arrays") {
   SECTION("float") {
     // clang-format off
      std::vector<std::vector<float>> expected {
-      {0.122f, 1.1233f, 4.113f, 1.11f},
-      {1.244f, 122.3f, 1.222f, 544.66f},
-      {12.003f, 1.21f, 2.123f, 33.12f},
-      {1.333f, 4.232f, 1.422f, 9.4f},
-      {1.1221f, 2.2f, 3.0f, 122.31f}};
+      {0.122F, 1.1233F, 4.113F, 1.11F},
+      {1.244F, 122.3F, 1.222F, 544.66F},
+      {12.003F, 1.21F, 2.123F, 33.12F},
+      {1.333F, 4.232F, 1.422F, 9.4F},
+      {1.1221F, 2.2F, 3.0F, 122.31F}};
     // clang-format on
 
     createTestForArrayJson(
@@ -1731,10 +1754,10 @@ TEST_CASE("Upgrade variable-length JSON arrays") {
     // clang-format off
     std::vector<std::vector<uint64_t>> expected {
       {1},
-      {1244, 13223302036854775807u, 1222, 544662},
+      {1244, 13223302036854775807U, 1222, 544662},
       {123, 10, 2},
       {13, 94},
-      {11, 22, 3, 13223302036854775807u, 32323}};
+      {11, 22, 3, 13223302036854775807U, 32323}};
     // clang-format on
 
     createTestForArrayJson(
@@ -1748,11 +1771,11 @@ TEST_CASE("Upgrade variable-length JSON arrays") {
   SECTION("float") {
     // clang-format off
     std::vector<std::vector<float>> expected {
-      {0.122f, 1.1233f},
-      {1.244f, 122.3f, 1.222f, 544.66f, 323.122f},
-      {12.003f, 1.21f, 2.123f, 33.12f, 122.2f},
-      {1.333f},
-      {1.1221f, 2.2f}};
+      {0.122F, 1.1233F},
+      {1.244F, 122.3F, 1.222F, 544.66F, 323.122F},
+      {12.003F, 1.21F, 2.123F, 33.12F, 122.2F},
+      {1.333F},
+      {1.1221F, 2.2F}};
     // clang-format on
 
     createTestForArrayJson(
@@ -1929,15 +1952,15 @@ TEST_CASE("Defaults to string if no sentinel values are available") {
     rapidjson::Document batchTableJson;
     batchTableJson.SetObject();
     rapidjson::Value scalarProperty(rapidjson::kArrayType);
-    for (size_t i = 0; i < expected.size(); ++i) {
-      if (!expected[i]) {
+    for (auto& i : expected) {
+      if (!i) {
         rapidjson::Value nullValue;
         nullValue.SetNull();
         scalarProperty.PushBack(nullValue, batchTableJson.GetAllocator());
         continue;
       }
 
-      scalarProperty.PushBack(*expected[i], batchTableJson.GetAllocator());
+      scalarProperty.PushBack(*i, batchTableJson.GetAllocator());
     }
 
     batchTableJson.AddMember(
@@ -2015,15 +2038,15 @@ TEST_CASE("Defaults to string if no sentinel values are available") {
     rapidjson::Document batchTableJson;
     batchTableJson.SetObject();
     rapidjson::Value scalarProperty(rapidjson::kArrayType);
-    for (size_t i = 0; i < expected.size(); ++i) {
-      if (!expected[i]) {
+    for (auto& i : expected) {
+      if (!i) {
         rapidjson::Value nullValue;
         nullValue.SetNull();
         scalarProperty.PushBack(nullValue, batchTableJson.GetAllocator());
         continue;
       }
 
-      scalarProperty.PushBack(*expected[i], batchTableJson.GetAllocator());
+      scalarProperty.PushBack(*i, batchTableJson.GetAllocator());
     }
 
     batchTableJson.AddMember(
@@ -2118,10 +2141,10 @@ TEST_CASE("Cannot write past batch table length") {
     // clang-format off
     std::vector<std::vector<uint64_t>> expected {
       {0, 1, 4, 1},
-      {1244, 13223302036854775807u, 1222, 544662},
+      {1244, 13223302036854775807U, 1222, 544662},
       {123, 10, 122, 334},
       {13, 45, 122, 94},
-      {11, 22, 3, 13223302036854775807u}};
+      {11, 22, 3, 13223302036854775807U}};
     // clang-format on
 
     createTestForArrayJson(
@@ -2285,8 +2308,7 @@ TEST_CASE("Converts \"Feature Classes\" 3DTILES_batch_table_hierarchy example "
       gsl::span<const std::byte>(),
       gltf);
 
-  ExtensionModelExtStructuralMetadata* pExtension =
-      gltf.getExtension<ExtensionModelExtStructuralMetadata>();
+  auto* pExtension = gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
       gltf.isExtensionUsed(ExtensionModelExtStructuralMetadata::ExtensionName));
@@ -2433,8 +2455,7 @@ TEST_CASE("Omits value-less properties when converting "
       gsl::span<const std::byte>(),
       gltf);
 
-  ExtensionModelExtStructuralMetadata* pExtension =
-      gltf.getExtension<ExtensionModelExtStructuralMetadata>();
+  auto* pExtension = gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
       gltf.isExtensionUsed(ExtensionModelExtStructuralMetadata::ExtensionName));
@@ -2530,8 +2551,7 @@ TEST_CASE(
       gsl::span<const std::byte>(),
       gltf);
 
-  ExtensionModelExtStructuralMetadata* pExtension =
-      gltf.getExtension<ExtensionModelExtStructuralMetadata>();
+  auto* pExtension = gltf.getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pExtension);
   CHECK(
       gltf.isExtensionUsed(ExtensionModelExtStructuralMetadata::ExtensionName));
@@ -2555,8 +2575,8 @@ TEST_CASE(
   struct ExpectedString {
     std::string name;
     std::vector<std::string> values;
-    std::string type() const { return ClassProperty::Type::STRING; }
-    std::optional<std::string> componentType() const { return std::nullopt; }
+    static std::string type() { return ClassProperty::Type::STRING; }
+    static std::optional<std::string> componentType() { return std::nullopt; }
   };
 
   std::vector<ExpectedString> expectedStringProperties{
@@ -2598,8 +2618,8 @@ TEST_CASE(
   struct ExpectedInt8Properties {
     std::string name;
     std::vector<int8_t> values;
-    std::string type() const { return ClassProperty::Type::SCALAR; }
-    std::optional<std::string> componentType() const {
+    static std::string type() { return ClassProperty::Type::SCALAR; }
+    static std::optional<std::string> componentType() {
       return ClassProperty::ComponentType::INT8;
     }
   };
@@ -2630,8 +2650,8 @@ TEST_CASE(
     std::string name;
     int64_t count;
     std::vector<std::vector<double>> values;
-    std::string type() const { return ClassProperty::Type::SCALAR; }
-    std::optional<std::string> componentType() const {
+    static std::string type() { return ClassProperty::Type::SCALAR; }
+    static std::optional<std::string> componentType() {
       return ClassProperty::ComponentType::FLOAT64;
     }
   };
@@ -2733,7 +2753,7 @@ TEST_CASE("3DTILES_batch_table_hierarchy with parentCounts is okay if all "
   // There should not be any log messages about parentCounts, since they're
   // all 1.
   std::vector<std::string> logMessages = pLog->last_formatted();
-  REQUIRE(logMessages.size() == 0);
+  REQUIRE(logMessages.empty());
 
   // There should actually be metadata properties as normal.
   const ExtensionModelExtStructuralMetadata* pExtension =
@@ -2841,12 +2861,12 @@ TEST_CASE("3DTILES_batch_table_hierarchy with parentCounts values != 1 is "
   CHECK(firstClassIt->first == "default");
 
   const Class& defaultClass = firstClassIt->second;
-  REQUIRE(defaultClass.properties.size() == 0);
+  REQUIRE(defaultClass.properties.empty());
 
   // Check the property table
   REQUIRE(pExtension->propertyTables.size() == 1);
   const PropertyTable& propertyTable = pExtension->propertyTables[0];
 
   CHECK(propertyTable.classProperty == "default");
-  REQUIRE(propertyTable.properties.size() == 0);
+  REQUIRE(propertyTable.properties.empty());
 }

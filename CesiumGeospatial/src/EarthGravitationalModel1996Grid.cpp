@@ -2,9 +2,9 @@
 #include <CesiumGeospatial/EarthGravitationalModel1996Grid.h>
 #include <CesiumUtility/Math.h>
 
+#include <glm/common.hpp>
 #include <gsl/span>
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>

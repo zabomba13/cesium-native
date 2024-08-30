@@ -1,3 +1,30 @@
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetOptions.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
+#include "CesiumGltf/Scene.h"
+#include "CesiumRasterOverlays/IPrepareRasterOverlayRendererResources.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumRasterOverlays/RasterOverlayDetails.h"
+#include "CesiumRasterOverlays/RasterOverlayTile.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/CreditSystem.h"
 #include "SimplePrepareRendererResource.h"
 #include "TilesetContentManager.h"
 
@@ -21,9 +48,25 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <glm/glm.hpp>
+#include <glm/common.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/trigonometric.hpp>
+#include <gsl/span>
+#include <spdlog/logger.h>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <filesystem>
+#include <map>
+#include <memory>
+#include <optional>
+#include <type_traits>
+#include <utility>
+#include <variant>
 #include <vector>
 
 using namespace Cesium3DTilesSelection;
@@ -82,8 +125,8 @@ CesiumGltf::Model createGlobeGrid(
   glm::dvec3 max = min;
 
   std::vector<glm::dvec3> positions;
-  indices.reserve(6 * (width - 1) * (height - 1));
-  positions.reserve(width * height);
+  indices.reserve(static_cast<size_type>(6 * (width - 1) * (height - 1)));
+  positions.reserve(static_cast<size_type>(width * height));
   for (uint32_t y = 0; y < height; ++y) {
     for (uint32_t x = 0; x < width; ++x) {
       double longitude = beginPoint.longitude + x * dimension;
@@ -340,7 +383,7 @@ TEST_CASE("Test the manager can be initialized with correct loaders") {
     const Tile* pTilesetJson = manager.getRootTile();
     REQUIRE(pTilesetJson);
     REQUIRE(pTilesetJson->getChildren().size() == 1);
-    const Tile* pRootTile = &pTilesetJson->getChildren()[0];
+    const Tile* pRootTile = pTilesetJson->getChildren().data();
     CHECK(std::get<std::string>(pRootTile->getTileID()) == "parent.b3dm");
     CHECK(pRootTile->getGeometricError() == 70.0);
     CHECK(pRootTile->getRefine() == TileRefine::Add);
@@ -704,7 +747,7 @@ TEST_CASE("Test tile state machine") {
     // create mock loader
     bool initializerCall = false;
     auto pMockedLoader = std::make_unique<SimpleTilesetContentLoader>();
-    auto pMockedLoaderRaw = pMockedLoader.get();
+    auto* pMockedLoaderRaw = pMockedLoader.get();
 
     pMockedLoader->mockLoadTileContent = {
         CesiumGltf::Model(),
@@ -865,7 +908,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       const auto& buffer = buffers.front();
       CHECK(buffer.uri == "Box0.bin");
       CHECK(buffer.byteLength == 648);
-      CHECK(buffer.cesium.data.size() == 0);
+      CHECK(buffer.cesium.data.empty());
     }
 
     auto pMockedLoader = std::make_unique<SimpleTilesetContentLoader>();
@@ -1191,7 +1234,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
           Catch::Approx(CesiumUtility::Math::PiOverTwo));
 
       // check the tile whole region which will be more fitted
-      const BoundingRegion& tileRegion =
+      const auto& tileRegion =
           std::get<BoundingRegion>(tile.getBoundingVolume());
       CHECK(
           tileRegion.getRectangle().getWest() ==
@@ -1243,7 +1286,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
 
     SECTION("Automatically calculate fit bounding region when tile has loose "
             "region") {
-      auto pRemovedOverlay =
+      auto* pRemovedOverlay =
           pManager->getRasterOverlayCollection().begin()->get();
       pManager->getRasterOverlayCollection().remove(pRemovedOverlay);
       CHECK(pManager->getRasterOverlayCollection().size() == 0);
@@ -1263,7 +1306,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       CHECK(tile.getState() == TileLoadState::ContentLoaded);
 
       // check the tile whole region which will be more fitted
-      const BoundingRegion& tileRegion =
+      const auto& tileRegion =
           std::get<BoundingRegion>(tile.getBoundingVolume());
       CHECK(
           tileRegion.getRectangle().getWest() ==

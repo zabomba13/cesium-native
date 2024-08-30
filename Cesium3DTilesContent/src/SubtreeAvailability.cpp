@@ -1,21 +1,33 @@
-#include <Cesium3DTiles/ImplicitTiling.h>
+#include "Cesium3DTiles/Availability.h"
+#include "Cesium3DTiles/Buffer.h"
+#include "Cesium3DTiles/BufferView.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumJsonReader/JsonReader.h"
+#include "CesiumUtility/joinToString.h"
+
 #include <Cesium3DTiles/Subtree.h>
 #include <Cesium3DTilesContent/ImplicitTilingUtilities.h>
 #include <Cesium3DTilesContent/SubtreeAvailability.h>
 #include <Cesium3DTilesReader/SubtreeFileReader.h>
-#include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGeometry/OctreeTileID.h>
 #include <CesiumGeometry/QuadtreeTileID.h>
 #include <CesiumUtility/Assert.h>
-#include <CesiumUtility/ErrorList.h>
-#include <CesiumUtility/Uri.h>
 
+#include <glm/common.hpp>
 #include <gsl/span>
-#include <rapidjson/document.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace Cesium3DTiles;
 using namespace Cesium3DTilesReader;
@@ -84,20 +96,23 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
           subtree.tileAvailability,
           subtree.buffers,
           subtree.bufferViews);
-  if (!maybeTileAvailability)
+  if (!maybeTileAvailability) {
     return std::nullopt;
+  }
 
   std::optional<SubtreeAvailability::AvailabilityView>
       maybeChildSubtreeAvailability = parseAvailabilityView(
           subtree.childSubtreeAvailability,
           subtree.buffers,
           subtree.bufferViews);
-  if (!maybeChildSubtreeAvailability)
+  if (!maybeChildSubtreeAvailability) {
     return std::nullopt;
+  }
 
   // At least one element is required in contentAvailability.
-  if (subtree.contentAvailability.empty())
+  if (subtree.contentAvailability.empty()) {
     return std::nullopt;
+  }
 
   std::vector<SubtreeAvailability::AvailabilityView> contentAvailability;
   contentAvailability.reserve(subtree.contentAvailability.size());
@@ -108,7 +123,7 @@ std::optional<SubtreeAvailability::AvailabilityView> parseAvailabilityView(
         subtree.buffers,
         subtree.bufferViews);
     if (maybeAvailability) {
-      contentAvailability.emplace_back(std::move(*maybeAvailability));
+      contentAvailability.emplace_back(*maybeAvailability);
     }
   }
 
@@ -294,8 +309,9 @@ bool SubtreeAvailability::isContentAvailable(
     uint32_t relativeTileLevel,
     uint64_t relativeTileMortonId,
     uint64_t contentId) const noexcept {
-  if (contentId >= this->_contentAvailability.size())
+  if (contentId >= this->_contentAvailability.size()) {
     return false;
+  }
   return isAvailable(
       relativeTileLevel,
       relativeTileMortonId,
@@ -384,14 +400,16 @@ void convertConstantAvailabilityToBitstream(
       pConstantAvailability =
           std::get_if<SubtreeAvailability::SubtreeConstantAvailability>(
               &availabilityView);
-  if (!pConstantAvailability)
+  if (!pConstantAvailability) {
     return;
+  }
 
   bool oldValue = pConstantAvailability->constant;
 
   uint64_t numberOfBytes = numberOfTiles / 8;
-  if (numberOfBytes * 8 < numberOfTiles)
+  if (numberOfBytes * 8 < numberOfTiles) {
     ++numberOfBytes;
+  }
 
   BufferView& bufferView = subtree.bufferViews.emplace_back();
   bufferView.buffer = 0;
@@ -434,15 +452,14 @@ void SubtreeAvailability::setSubtreeAvailable(
     if (pConstantAvailability->constant == isAvailable) {
       // New state matches the constant, so there is nothing to do.
       return;
-    } else {
-      uint64_t numberOfTilesInNextLevel =
-          uint64_t(1) << (this->_powerOf2 * this->_levelsInSubtree);
-
-      convertConstantAvailabilityToBitstream(
-          this->_subtree,
-          numberOfTilesInNextLevel,
-          this->_subtreeAvailability);
     }
+    uint64_t numberOfTilesInNextLevel =
+        uint64_t(1) << (this->_powerOf2 * this->_levelsInSubtree);
+
+    convertConstantAvailabilityToBitstream(
+        this->_subtree,
+        numberOfTilesInNextLevel,
+        this->_subtreeAvailability);
   }
 
   setAvailableUsingBufferView(
@@ -510,17 +527,16 @@ void SubtreeAvailability::setAvailable(
     if (pConstantAvailability->constant == isAvailable) {
       // New state matches the constant, so there is nothing to do.
       return;
-    } else {
-      uint64_t numberOfTilesInNextLevel =
-          uint64_t(1) << (this->_powerOf2 * this->_levelsInSubtree);
-      uint64_t numberOfTilesInSubtree =
-          (numberOfTilesInNextLevel - 1U) / (this->_childCount - 1U);
-
-      convertConstantAvailabilityToBitstream(
-          this->_subtree,
-          numberOfTilesInSubtree,
-          availabilityView);
     }
+    uint64_t numberOfTilesInNextLevel =
+        uint64_t(1) << (this->_powerOf2 * this->_levelsInSubtree);
+    uint64_t numberOfTilesInSubtree =
+        (numberOfTilesInNextLevel - 1U) / (this->_childCount - 1U);
+
+    convertConstantAvailabilityToBitstream(
+        this->_subtree,
+        numberOfTilesInSubtree,
+        availabilityView);
   }
 
   // At this point we're definitely working with a bitstream (not a constant).
@@ -545,7 +561,7 @@ void SubtreeAvailability::setAvailable(
 bool SubtreeAvailability::isAvailableUsingBufferView(
     uint64_t numOfTilesFromRootToParentLevel,
     uint64_t relativeTileMortonId,
-    const AvailabilityView& availabilityView) const noexcept {
+    const AvailabilityView& availabilityView) noexcept {
 
   uint64_t availabilityBitIndex =
       numOfTilesFromRootToParentLevel + relativeTileMortonId;

@@ -6,7 +6,10 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <cstddef>
 #include <filesystem>
+#include <optional>
+#include <vector>
 
 using namespace CesiumGeospatial;
 using namespace CesiumUtility;

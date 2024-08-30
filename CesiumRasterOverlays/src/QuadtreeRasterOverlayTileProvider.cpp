@@ -1,10 +1,36 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/SharedFuture.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/Assert.h"
+#include "CesiumUtility/IntrusivePointer.h"
+#include "CesiumUtility/Tracing.h"
+
 #include <CesiumGeometry/QuadtreeTilingScheme.h>
 #include <CesiumGltfContent/ImageManipulation.h>
 #include <CesiumRasterOverlays/QuadtreeRasterOverlayTileProvider.h>
 #include <CesiumRasterOverlays/RasterOverlay.h>
 #include <CesiumRasterOverlays/RasterOverlayTile.h>
 #include <CesiumUtility/Math.h>
-#include <CesiumUtility/SpanHelper.h>
+
+#include <glm/common.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <spdlog/logger.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGeometry;
@@ -53,8 +79,7 @@ QuadtreeRasterOverlayTileProvider::QuadtreeRasterOverlayTileProvider(
       _imageWidth(imageWidth),
       _imageHeight(imageHeight),
       _tilingScheme(tilingScheme),
-      _tilesOldToRecent(),
-      _tileLookup(),
+
       _cachedBytes(0) {}
 
 uint32_t QuadtreeRasterOverlayTileProvider::computeLevelFromTargetScreenPixels(
@@ -81,7 +106,7 @@ uint32_t QuadtreeRasterOverlayTileProvider::computeLevelFromTargetScreenPixels(
   const glm::dvec2 level = glm::log2(twoToTheLevelPower);
   const glm::dvec2 rounded = glm::max(glm::round(level), 0.0);
 
-  uint32_t imageryLevel = uint32_t(glm::max(rounded.x, rounded.y));
+  auto imageryLevel = uint32_t(glm::max(rounded.x, rounded.y));
 
   const uint32_t maximumLevel = this->getMaximumLevel();
   if (imageryLevel > maximumLevel) {
@@ -224,7 +249,7 @@ QuadtreeRasterOverlayTileProvider::mapRasterTilesToGeometryTile(
   }
 
   // If we're mapping too many tiles, reduce the level until it's sane.
-  uint32_t maxTextureSize =
+  auto maxTextureSize =
       uint32_t(this->getOwner().getOptions().maximumTextureSize);
 
   uint32_t tilesX = northeastTileCoordinates.x - southwestTileCoordinates.x + 1;
@@ -358,12 +383,10 @@ QuadtreeRasterOverlayTileProvider::getQuadtreeTile(
             // though.
             if (currentLevel > minimumLevel) {
               return asyncSystem.runInMainThread(loadParentTile);
-            } else {
-              // No parent available, so return the original failed result.
-              return asyncSystem.createResolvedFuture(LoadedQuadtreeImage{
-                  std::make_shared<LoadedRasterOverlayImage>(std::move(loaded)),
-                  std::nullopt});
-            }
+            } // No parent available, so return the original failed result.
+            return asyncSystem.createResolvedFuture(LoadedQuadtreeImage{
+                std::make_shared<LoadedRasterOverlayImage>(std::move(loaded)),
+                std::nullopt});
           });
 
   auto newIt = this->_tilesOldToRecent.emplace(
@@ -387,23 +410,23 @@ PixelRectangle computePixelRectangle(
   // Pixel coordinates are measured from the top left.
   // Projected rectangles are measured from the bottom left.
 
-  int32_t x = static_cast<int32_t>(Math::roundDown(
+  auto x = static_cast<int32_t>(Math::roundDown(
       image.width * (partRectangle.minimumX - totalRectangle.minimumX) /
           totalRectangle.computeWidth(),
       pixelTolerance));
   x = glm::max(0, x);
-  int32_t y = static_cast<int32_t>(Math::roundDown(
+  auto y = static_cast<int32_t>(Math::roundDown(
       image.height * (totalRectangle.maximumY - partRectangle.maximumY) /
           totalRectangle.computeHeight(),
       pixelTolerance));
   y = glm::max(0, y);
 
-  int32_t maxX = static_cast<int32_t>(Math::roundUp(
+  auto maxX = static_cast<int32_t>(Math::roundUp(
       image.width * (partRectangle.maximumX - totalRectangle.minimumX) /
           totalRectangle.computeWidth(),
       pixelTolerance));
   maxX = glm::min(maxX, image.width);
-  int32_t maxY = static_cast<int32_t>(Math::roundUp(
+  auto maxY = static_cast<int32_t>(Math::roundUp(
       image.height * (totalRectangle.maximumY - partRectangle.minimumY) /
           totalRectangle.computeHeight(),
       pixelTolerance));
@@ -624,10 +647,10 @@ QuadtreeRasterOverlayTileProvider::measureCombinedImage(
   }
 
   // Compute the pixel dimensions needed for the combined image.
-  const int32_t combinedWidthPixels = static_cast<int32_t>(Math::roundUp(
+  const auto combinedWidthPixels = static_cast<int32_t>(Math::roundUp(
       combinedRectangle->computeWidth() / projectedWidthPerPixel,
       pixelTolerance));
-  const int32_t combinedHeightPixels = static_cast<int32_t>(Math::roundUp(
+  const auto combinedHeightPixels = static_cast<int32_t>(Math::roundUp(
       combinedRectangle->computeHeight() / projectedHeightPerPixel,
       pixelTolerance));
 
@@ -677,8 +700,8 @@ QuadtreeRasterOverlayTileProvider::combineImages(
   target.pixelData.resize(size_t(
       target.width * target.height * target.channels * target.bytesPerChannel));
 
-  for (auto it = images.begin(); it != images.end(); ++it) {
-    const LoadedRasterOverlayImage& loaded = *it->pLoaded;
+  for (auto& image : images) {
+    const LoadedRasterOverlayImage& loaded = *image.pLoaded;
     if (!loaded.image) {
       continue;
     }
@@ -690,12 +713,12 @@ QuadtreeRasterOverlayTileProvider::combineImages(
         result.rectangle,
         *loaded.image,
         loaded.rectangle,
-        it->subset);
+        image.subset);
   }
 
   size_t combinedCreditsCount = 0;
-  for (auto it = images.begin(); it != images.end(); ++it) {
-    const LoadedRasterOverlayImage& loaded = *it->pLoaded;
+  for (auto& image : images) {
+    const LoadedRasterOverlayImage& loaded = *image.pLoaded;
     if (!loaded.image) {
       continue;
     }
@@ -704,8 +727,8 @@ QuadtreeRasterOverlayTileProvider::combineImages(
   }
 
   result.credits.reserve(combinedCreditsCount);
-  for (auto it = images.begin(); it != images.end(); ++it) {
-    const LoadedRasterOverlayImage& loaded = *it->pLoaded;
+  for (auto& image : images) {
+    const LoadedRasterOverlayImage& loaded = *image.pLoaded;
     if (!loaded.image) {
       continue;
     }

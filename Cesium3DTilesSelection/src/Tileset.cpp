@@ -1,12 +1,22 @@
-#include "TileUtilities.h"
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "Cesium3DTilesSelection/RasterMappedTo3DTile.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "Cesium3DTilesSelection/TileSelectionState.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetOptions.h"
+#include "Cesium3DTilesSelection/ViewState.h"
+#include "Cesium3DTilesSelection/ViewUpdateResult.h"
+#include "CesiumAsync/SharedFuture.h"
+#include "CesiumGeospatial/Ellipsoid.h"
 #include "TilesetContentManager.h"
 
 #include <Cesium3DTilesSelection/ITileExcluder.h>
-#include <Cesium3DTilesSelection/TileID.h>
 #include <Cesium3DTilesSelection/TileOcclusionRendererProxy.h>
 #include <Cesium3DTilesSelection/Tileset.h>
 #include <Cesium3DTilesSelection/TilesetMetadata.h>
-#include <Cesium3DTilesSelection/spdlog-cesium.h>
 #include <CesiumAsync/AsyncSystem.h>
 #include <CesiumGeospatial/Cartographic.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
@@ -14,17 +24,26 @@
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/CreditSystem.h>
 #include <CesiumUtility/Math.h>
-#include <CesiumUtility/ScopeGuard.h>
 #include <CesiumUtility/Tracing.h>
-#include <CesiumUtility/joinToString.h>
 
 #include <glm/common.hpp>
-#include <rapidjson/document.h>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/geometric.hpp>
+#include <gsl/span>
 
 #include <algorithm>
+#include <chrono>
 #include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <limits>
+#include <memory>
+#include <optional>
+#include <string>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGeometry;
@@ -43,8 +62,7 @@ Tileset::Tileset(
       _asyncSystem(externals.asyncSystem),
       _options(options),
       _previousFrameNumber(0),
-      _distances(),
-      _childOcclusionProxies(),
+
       _pTilesetContentManager{new TilesetContentManager(
           _externals,
           _options,
@@ -61,8 +79,7 @@ Tileset::Tileset(
       _asyncSystem(externals.asyncSystem),
       _options(options),
       _previousFrameNumber(0),
-      _distances(),
-      _childOcclusionProxies(),
+
       _pTilesetContentManager{new TilesetContentManager(
           _externals,
           _options,
@@ -79,8 +96,7 @@ Tileset::Tileset(
       _asyncSystem(externals.asyncSystem),
       _options(options),
       _previousFrameNumber(0),
-      _distances(),
-      _childOcclusionProxies(),
+
       _pTilesetContentManager{new TilesetContentManager(
           _externals,
           _options,
@@ -113,8 +129,8 @@ void Tileset::setShowCreditsOnScreen(bool showCreditsOnScreen) noexcept {
 
   const std::vector<Credit>& credits = this->getTilesetCredits();
   auto pCreditSystem = this->_externals.pCreditSystem;
-  for (size_t i = 0, size = credits.size(); i < size; i++) {
-    pCreditSystem->setShowOnScreen(credits[i], showCreditsOnScreen);
+  for (auto credit : credits) {
+    pCreditSystem->setShowOnScreen(credit, showCreditsOnScreen);
   }
 }
 
@@ -213,24 +229,24 @@ void Tileset::_updateLodTransitions(
               frameState.currentFrameNumber);
       if (selectionResult == TileSelectionState::Result::Rendered) {
         // This tile will already be on the render list.
-        pRenderContent->setLodTransitionFadePercentage(0.0f);
+        pRenderContent->setLodTransitionFadePercentage(0.0F);
         tileIt = result.tilesFadingOut.erase(tileIt);
         continue;
       }
 
       float currentPercentage =
           pRenderContent->getLodTransitionFadePercentage();
-      if (currentPercentage >= 1.0f) {
+      if (currentPercentage >= 1.0F) {
         // Remove this tile from the fading out list if it is already done.
         // The client will already have had a chance to stop rendering the tile
         // last frame.
-        pRenderContent->setLodTransitionFadePercentage(0.0f);
+        pRenderContent->setLodTransitionFadePercentage(0.0F);
         tileIt = result.tilesFadingOut.erase(tileIt);
         continue;
       }
 
       float newPercentage =
-          glm::min(currentPercentage + deltaTransitionPercentage, 1.0f);
+          glm::min(currentPercentage + deltaTransitionPercentage, 1.0F);
       pRenderContent->setLodTransitionFadePercentage(newPercentage);
       ++tileIt;
     }
@@ -243,7 +259,7 @@ void Tileset::_updateLodTransitions(
         float transitionPercentage =
             pRenderContent->getLodTransitionFadePercentage();
         float newTransitionPercentage =
-            glm::min(transitionPercentage + deltaTransitionPercentage, 1.0f);
+            glm::min(transitionPercentage + deltaTransitionPercentage, 1.0F);
         pRenderContent->setLodTransitionFadePercentage(newTransitionPercentage);
       }
     }
@@ -254,7 +270,7 @@ void Tileset::_updateLodTransitions(
       TileRenderContent* pRenderContent =
           pTile->getContent().getRenderContent();
       if (pRenderContent) {
-        pRenderContent->setLodTransitionFadePercentage(1.0f);
+        pRenderContent->setLodTransitionFadePercentage(1.0F);
       }
     }
   }
@@ -267,12 +283,12 @@ Tileset::updateViewOffline(const std::vector<ViewState>& frustums) {
 
   // TODO: fix the fading for offline case
   // (https://github.com/CesiumGS/cesium-native/issues/549)
-  this->updateView(frustums, 0.0f);
+  this->updateView(frustums, 0.0F);
   while (this->_pTilesetContentManager->getNumberOfTilesLoading() > 0 ||
          this->_updateResult.mainThreadTileLoadQueueLength > 0 ||
          this->_updateResult.workerThreadTileLoadQueueLength > 0) {
     this->_externals.pAssetAccessor->tick();
-    this->updateView(frustums, 0.0f);
+    this->updateView(frustums, 0.0F);
   }
 
   this->_updateResult.tilesFadingOut.clear();
@@ -285,7 +301,7 @@ Tileset::updateViewOffline(const std::vector<ViewState>& frustums) {
         uniqueTilesToRenderThisFrame.end()) {
       TileRenderContent* pRenderContent = tile->getContent().getRenderContent();
       if (pRenderContent) {
-        pRenderContent->setLodTransitionFadePercentage(1.0f);
+        pRenderContent->setLodTransitionFadePercentage(1.0F);
         this->_updateResult.tilesFadingOut.insert(tile);
       }
     }
@@ -435,15 +451,14 @@ int32_t Tileset::getNumberOfTilesLoaded() const {
 }
 
 float Tileset::computeLoadProgress() noexcept {
-  int32_t queueSizeSum = static_cast<int32_t>(
-      this->_updateResult.workerThreadTileLoadQueueLength +
-      this->_updateResult.mainThreadTileLoadQueueLength);
+  auto queueSizeSum =
+      (this->_updateResult.workerThreadTileLoadQueueLength +
+       this->_updateResult.mainThreadTileLoadQueueLength);
   int32_t numOfTilesLoading =
       this->_pTilesetContentManager->getNumberOfTilesLoading();
   int32_t numOfTilesLoaded =
       this->_pTilesetContentManager->getNumberOfTilesLoaded();
-  int32_t numOfTilesKicked =
-      static_cast<int32_t>(this->_updateResult.tilesKicked);
+  auto numOfTilesKicked = static_cast<int32_t>(this->_updateResult.tilesKicked);
 
   // Amount of work actively being done
   int32_t inProgressSum = numOfTilesLoading + queueSizeSum;
@@ -454,7 +469,7 @@ float Tileset::computeLoadProgress() noexcept {
   int32_t totalNum = inProgressSum + numOfTilesLoaded + numOfTilesKicked;
   float percentage =
       static_cast<float>(numOfTilesLoaded) / static_cast<float>(totalNum);
-  return (percentage * 100.f);
+  return (percentage * 100.F);
 }
 
 void Tileset::forEachLoadedTile(
@@ -537,7 +552,7 @@ static void markTileNonRendered(
     result.tilesFadingOut.insert(&tile);
     TileRenderContent* pRenderContent = tile.getContent().getRenderContent();
     if (pRenderContent) {
-      pRenderContent->setLodTransitionFadePercentage(0.0f);
+      pRenderContent->setLodTransitionFadePercentage(0.0F);
     }
   }
 }
@@ -707,7 +722,7 @@ void Tileset::_frustumCull(
 void Tileset::_fogCull(
     const FrameState& frameState,
     const std::vector<double>& distances,
-    CullResult& cullResult) {
+    CullResult& cullResult) const {
 
   if (!cullResult.shouldVisit || cullResult.culled) {
     return;
@@ -1005,8 +1020,9 @@ bool Tileset::_loadAndRenderAdditiveRefinedTile(
   // addition to its children.
   if (tile.getRefine() == TileRefine::Add) {
     result.tilesToRenderThisFrame.push_back(&tile);
-    if (!queuedForLoad)
+    if (!queuedForLoad) {
       addTileToLoadQueue(tile, TileLoadPriorityGroup::Normal, tilePriority);
+    }
     return true;
   }
 
@@ -1125,23 +1141,22 @@ Tileset::_checkOcclusion(const Tile& tile, const FrameState& frameState) {
       // on occlusion info here since it might not ever arrive, so treat this
       // tile as if it is _known_ to be unoccluded.
       return TileOcclusionState::NotOccluded;
-    } else
-      switch (
-          static_cast<TileOcclusionState>(pOcclusion->getOcclusionState())) {
-      case TileOcclusionState::OcclusionUnavailable:
-        // We have an occlusion proxy, but it does not have valid occlusion
-        // info yet, wait for it.
-        return TileOcclusionState::OcclusionUnavailable;
-        break;
-      case TileOcclusionState::Occluded:
-        return TileOcclusionState::Occluded;
-        break;
-      case TileOcclusionState::NotOccluded:
-        if (tile.getChildren().size() == 0) {
-          // This is a leaf tile, so we can't use children bounding volumes.
-          return TileOcclusionState::NotOccluded;
-        }
+    }
+    switch (static_cast<TileOcclusionState>(pOcclusion->getOcclusionState())) {
+    case TileOcclusionState::OcclusionUnavailable:
+      // We have an occlusion proxy, but it does not have valid occlusion
+      // info yet, wait for it.
+      return TileOcclusionState::OcclusionUnavailable;
+      break;
+    case TileOcclusionState::Occluded:
+      return TileOcclusionState::Occluded;
+      break;
+    case TileOcclusionState::NotOccluded:
+      if (tile.getChildren().size() == 0) {
+        // This is a leaf tile, so we can't use children bounding volumes.
+        return TileOcclusionState::NotOccluded;
       }
+    }
 
     // The tile's bounding volume is known to be unoccluded, but check the
     // union of the children bounding volumes since it is tighter fitting.
@@ -1359,7 +1374,8 @@ Tileset::TraversalDetails Tileset::_visitTile(
       _options.enableLodTransitionPeriod &&
       _options.kickDescendantsWhileFadingIn &&
       lastFrameSelectionResult == TileSelectionState::Result::Rendered &&
-      pRenderContent && pRenderContent->getLodTransitionFadePercentage() < 1.0f;
+      (pRenderContent != nullptr) &&
+      pRenderContent->getLodTransitionFadePercentage() < 1.0F;
 
   if (kickDueToNonReadyDescendant || kickDueToTileFadingIn) {
     // Kick all descendants out of the render list and render this tile instead
@@ -1421,7 +1437,7 @@ Tileset::TraversalDetails Tileset::_visitVisibleChildrenNearToFar(
 void Tileset::_processWorkerThreadLoadQueue() {
   CESIUM_TRACE("Tileset::_processWorkerThreadLoadQueue");
 
-  int32_t maximumSimultaneousTileLoads =
+  auto maximumSimultaneousTileLoads =
       static_cast<int32_t>(this->_options.maximumSimultaneousTileLoads);
 
   if (this->_pTilesetContentManager->getNumberOfTilesLoading() >=

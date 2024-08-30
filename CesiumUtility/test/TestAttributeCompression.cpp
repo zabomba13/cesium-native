@@ -2,6 +2,12 @@
 #include "CesiumUtility/Math.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <glm/fwd.hpp>
+#include <glm/geometric.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 using namespace CesiumUtility;
 

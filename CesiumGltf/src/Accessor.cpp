@@ -1,6 +1,11 @@
 #include "CesiumGltf/Accessor.h"
 
+#include "CesiumGltf/BufferView.h"
 #include "CesiumGltf/Model.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
 
 namespace CesiumGltf {
 /*static*/ int8_t
@@ -72,7 +77,7 @@ Accessor::computeByteStride(const CesiumGltf::Model& model) const noexcept {
   if (pBufferView->byteStride && *pBufferView->byteStride != 0) {
     return *pBufferView->byteStride;
   }
-  return computeNumberOfComponents(this->type) *
-         computeByteSizeOfComponent(this->componentType);
+  return int64_t(computeNumberOfComponents(this->type)) *
+         int64_t(computeByteSizeOfComponent(this->componentType));
 }
 } // namespace CesiumGltf

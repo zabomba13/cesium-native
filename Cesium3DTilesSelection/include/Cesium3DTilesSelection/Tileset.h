@@ -340,7 +340,7 @@ private:
       Tile& tile,
       double tilePriority,
       ViewUpdateResult& result);
-  TraversalDetails _renderInnerTile(
+  static TraversalDetails _renderInnerTile(
       const FrameState& frameState,
       Tile& tile,
       ViewUpdateResult& result);
@@ -382,7 +382,7 @@ private:
   void _fogCull(
       const FrameState& frameState,
       const std::vector<double>& distances,
-      CullResult& cullResult);
+      CullResult& cullResult) const;
   bool _meetsSse(
       const std::vector<ViewState>& frustums,
       const Tile& tile,

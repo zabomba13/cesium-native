@@ -1,4 +1,17 @@
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
 #include "CesiumGltfReader/GltfReader.h"
+#include "CesiumJsonReader/JsonReaderOptions.h"
+#include "CesiumNativeTests/SimpleAssetRequest.h"
+#include "CesiumNativeTests/SimpleAssetResponse.h"
+#include "CesiumUtility/JsonValue.h"
+#include "absl/strings/match.h"
 
 #include <CesiumAsync/AsyncSystem.h>
 #include <CesiumGltf/AccessorView.h>
@@ -12,14 +25,23 @@
 #include <CesiumUtility/Math.h>
 
 #include <catch2/catch_test_macros.hpp>
-#include <glm/vec3.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
 #include <gsl/span>
-#include <rapidjson/reader.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <limits>
+#include <map>
+#include <memory>
 #include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGltf;
@@ -131,7 +153,7 @@ template <typename T> T getRange(const Model& model, int32_t accessor) {
 }
 
 VertexAttributeRange getVertexAttributeRange(const Model& model) {
-  VertexAttributeRange var;
+  VertexAttributeRange var{};
   model.forEachPrimitiveInScene(
       -1,
       [&var](
@@ -140,7 +162,7 @@ VertexAttributeRange getVertexAttributeRange(const Model& model) {
           const Mesh&,
           const MeshPrimitive& primitive,
           const glm::dmat4& transform) {
-        for (std::pair<const std::string, int32_t> attribute :
+        for (const std::pair<const std::string, int32_t>& attribute :
              primitive.attributes) {
           const std::string& attributeName = attribute.first;
           if (attributeName == "POSITION") {
@@ -150,7 +172,7 @@ VertexAttributeRange getVertexAttributeRange(const Model& model) {
           } else if (attributeName == "NORMAL") {
             var.normalRange =
                 glm::normalize(getRange<glm::vec3>(model, attribute.second));
-          } else if (attributeName.find("TEXCOORD") == 0) {
+          } else if (absl::StartsWith(attributeName, "TEXCOORD")) {
             var.texCoordRange = getRange<glm::vec2>(model, attribute.second);
           }
         }
@@ -171,7 +193,7 @@ bool epsilonCompare(const T& v1, const T& v2, double epsilon) {
 
 TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
 
-  VertexAttributeRange originalVar;
+  VertexAttributeRange originalVar{};
   {
     GltfReader reader;
     GltfReaderResult result = reader.readGltf(readFile(
@@ -203,7 +225,7 @@ TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
       REQUIRE(result.warnings.empty());
       const Model& model = result.model.value();
       VertexAttributeRange compressedVar = getVertexAttributeRange(model);
-      double error = 1.0f / (glm::pow(2, n - 1));
+      double error = 1.0F / (glm::pow(2, n - 1));
       REQUIRE(epsilonCompare(
           originalVar.positionRange,
           compressedVar.positionRange,
@@ -284,7 +306,7 @@ TEST_CASE("Nested extras deserializes properly") {
   REQUIRE(pC2 != nullptr);
 
   CHECK(pC2->isArray());
-  std::vector<JsonValue>& array = std::get<std::vector<JsonValue>>(pC2->value);
+  auto& array = std::get<std::vector<JsonValue>>(pC2->value);
   CHECK(array.size() == 5);
   CHECK(array[0].getSafeNumber<double>() == 1.0);
   CHECK(array[1].getSafeNumber<uint64_t>() == 2);
@@ -334,8 +356,7 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
   REQUIRE(model.meshes[0].primitives.size() == 1);
 
   MeshPrimitive& primitive = model.meshes[0].primitives[0];
-  ExtensionKhrDracoMeshCompression* pDraco =
-      primitive.getExtension<ExtensionKhrDracoMeshCompression>();
+  auto* pDraco = primitive.getExtension<ExtensionKhrDracoMeshCompression>();
   REQUIRE(pDraco);
 
   CHECK(pDraco->bufferView == 1);
@@ -595,8 +616,8 @@ TEST_CASE("Can correctly interpret mipmaps in KTX2 files") {
     REQUIRE(imageResult.image.has_value());
 
     const ImageCesium& image = *imageResult.image;
-    REQUIRE(image.mipPositions.size() == 0);
-    CHECK(image.pixelData.size() > 0);
+    REQUIRE(image.mipPositions.empty());
+    CHECK(!image.pixelData.empty());
   }
 
   {
@@ -743,8 +764,9 @@ TEST_CASE("GltfReader::loadGltf") {
 
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
            dataDir / "DracoCompressed")) {
-    if (!entry.is_regular_file())
+    if (!entry.is_regular_file()) {
       continue;
+    }
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
@@ -784,7 +806,7 @@ TEST_CASE("GltfReader::loadGltf") {
     const CesiumGltf::Image& image = result.model->images[0];
     CHECK(image.cesium.width == 2048);
     CHECK(image.cesium.height == 2048);
-    CHECK(image.cesium.pixelData.size() == 2048 * 2048 * 4);
+    CHECK(image.cesium.pixelData.size() == static_cast<size_type>(2048 * 2048 * 4);
 
     CHECK(!result.model->buffers.empty());
     for (const CesiumGltf::Buffer& buffer : result.model->buffers) {

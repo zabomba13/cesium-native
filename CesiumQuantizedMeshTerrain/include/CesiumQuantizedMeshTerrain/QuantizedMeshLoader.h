@@ -110,7 +110,7 @@ public:
    * @return The availability.
    */
   static QuantizedMeshMetadataResult loadAvailabilityRectangles(
-      const rapidjson::Document& layerJson,
+      const rapidjson::Document& metadata,
       uint32_t startingLevel);
 };
 

@@ -1,4 +1,12 @@
+#include "CesiumGltf/Model.h"
+#include "CesiumUtility/CreditSystem.h"
+
 #include <Cesium3DTilesSelection/TileContent.h>
+
+#include <memory>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumRasterOverlays;
 using namespace CesiumUtility;
@@ -7,9 +15,8 @@ namespace Cesium3DTilesSelection {
 TileRenderContent::TileRenderContent(CesiumGltf::Model&& model)
     : _model{std::move(model)},
       _pRenderResources{nullptr},
-      _rasterOverlayDetails{},
-      _credits{},
-      _lodTransitionFadePercentage{0.0f} {}
+
+      _lodTransitionFadePercentage{0.0F} {}
 
 const CesiumGltf::Model& TileRenderContent::getModel() const noexcept {
   return _model;
@@ -130,7 +137,7 @@ const TileRenderContent* TileContent::getRenderContent() const noexcept {
 }
 
 TileRenderContent* TileContent::getRenderContent() noexcept {
-  std::unique_ptr<TileRenderContent>* pRenderContent =
+  auto* pRenderContent =
       std::get_if<std::unique_ptr<TileRenderContent>>(&this->_contentKind);
   if (pRenderContent) {
     return pRenderContent->get();
@@ -150,7 +157,7 @@ const TileExternalContent* TileContent::getExternalContent() const noexcept {
 }
 
 TileExternalContent* TileContent::getExternalContent() noexcept {
-  std::unique_ptr<TileExternalContent>* pExternalContent =
+  auto* pExternalContent =
       std::get_if<std::unique_ptr<TileExternalContent>>(&this->_contentKind);
   if (pExternalContent) {
     return pExternalContent->get();

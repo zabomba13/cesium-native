@@ -1,3 +1,11 @@
+#include "Cesium3DTilesContent/SubtreeAvailability.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/S2CellID.h"
+#include "CesiumGltf/Model.h"
 #include "ImplicitQuadtreeLoader.h"
 
 #include <Cesium3DTilesContent/registerAllTileContentTypes.h>
@@ -14,8 +22,21 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <gsl/span>
+#include <spdlog/spdlog.h>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace Cesium3DTilesContent;
 using namespace Cesium3DTilesSelection;
@@ -26,7 +47,7 @@ using namespace CesiumNativeTests;
 
 namespace {
 std::filesystem::path testDataPath = Cesium3DTilesSelection_TEST_DATA_DIR;
-}
+} // namespace
 
 TEST_CASE("Test implicit quadtree loader") {
   Cesium3DTilesContent::registerAllTileContentTypes();
@@ -212,8 +233,9 @@ findTile(const gsl::span<const Tile>& children, const QuadtreeTileID& tileID) {
       [tileID](const Tile& tile) {
         const QuadtreeTileID* pID =
             std::get_if<QuadtreeTileID>(&tile.getTileID());
-        if (!pID)
+        if (!pID) {
           return false;
+        }
         return *pID == tileID;
       });
   REQUIRE(it != children.end());

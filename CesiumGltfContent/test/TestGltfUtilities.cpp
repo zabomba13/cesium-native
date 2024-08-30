@@ -1,3 +1,5 @@
+#include "CesiumGltf/BufferView.h"
+
 #include <CesiumGltf/ExtensionBufferExtMeshoptCompression.h>
 #include <CesiumGltf/ExtensionBufferViewExtMeshoptCompression.h>
 #include <CesiumGltf/Model.h>
@@ -6,7 +8,13 @@
 #include <CesiumUtility/Math.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/quaternion_trigonometric.hpp>
+#include <glm/fwd.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+#include <cstddef>
+#include <optional>
 
 using namespace CesiumGltf;
 using namespace CesiumGltfContent;
@@ -489,7 +497,7 @@ TEST_CASE("GltfUtilities::compactBuffers") {
     REQUIRE(buffer.cesium.data.size() == 123 - 8);
     CHECK(bv.byteOffset == 2);
 
-    for (size_t i = size_t(bv.byteOffset); i < buffer.cesium.data.size(); ++i) {
+    for (auto i = size_t(bv.byteOffset); i < buffer.cesium.data.size(); ++i) {
       CHECK(buffer.cesium.data[i] == std::byte(i + 8));
     }
   }
@@ -557,7 +565,7 @@ TEST_CASE("GltfUtilities::compactBuffers") {
     bv.byteOffset = 0;
     bv.byteLength = 100;
 
-    ExtensionBufferViewExtMeshoptCompression& extension =
+    auto& extension =
         bv.addExtension<ExtensionBufferViewExtMeshoptCompression>();
     extension.buffer = 0;
     extension.byteOffset = 100;
@@ -671,7 +679,7 @@ TEST_CASE("GltfUtilities::collapseToSingleBuffer") {
 
     Buffer& buffer2 = m.buffers[1];
     buffer2.byteLength = 100;
-    ExtensionBufferExtMeshoptCompression& extension =
+    auto& extension =
         buffer2.addExtension<ExtensionBufferExtMeshoptCompression>();
     extension.fallback = true;
 

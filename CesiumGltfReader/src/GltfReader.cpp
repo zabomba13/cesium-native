@@ -1,5 +1,14 @@
 #include "CesiumGltfReader/GltfReader.h"
 
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Ktx2TranscodeTargets.h"
+#include "CesiumGltf/Texture.h"
 #include "ModelJsonHandler.h"
 #include "applyKhrTextureTransform.h"
 #include "decodeDataUrls.h"
@@ -12,22 +21,29 @@
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGltf/ExtensionKhrTextureBasisu.h>
 #include <CesiumGltf/ExtensionTextureWebp.h>
-#include <CesiumJsonReader/JsonHandler.h>
 #include <CesiumJsonReader/JsonReader.h>
 #include <CesiumJsonReader/JsonReaderOptions.h>
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/Tracing.h>
 #include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
+#include <gsl/span>
 #include <ktx.h>
-#include <rapidjson/reader.h>
 #include <webp/decode.h>
 
 #include <algorithm>
 #include <cstddef>
-#include <iomanip>
+#include <cstdint>
+#include <cstring>
+#include <ios>
+#include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #define STBI_FAILURE_USERMSG
 
@@ -100,10 +116,10 @@ GltfReaderResult readJsonGltf(
  * @return The string
  */
 std::string toMagicString(uint32_t i) {
-  const unsigned char c0 = static_cast<unsigned char>(i & 0xFF);
-  const unsigned char c1 = static_cast<unsigned char>((i >> 8) & 0xFF);
-  const unsigned char c2 = static_cast<unsigned char>((i >> 16) & 0xFF);
-  const unsigned char c3 = static_cast<unsigned char>((i >> 24) & 0xFF);
+  const auto c0 = static_cast<unsigned char>(i & 0xFF);
+  const auto c1 = static_cast<unsigned char>((i >> 8) & 0xFF);
+  const auto c2 = static_cast<unsigned char>((i >> 16) & 0xFF);
+  const auto c3 = static_cast<unsigned char>((i >> 24) & 0xFF);
   std::stringstream stream;
   stream << c0 << c1 << c2 << c3 << " (0x" << std::hex << i << ")";
   return stream.str();
@@ -118,7 +134,7 @@ GltfReaderResult readBinaryGltf(
     return {std::nullopt, {"Too short to be a valid GLB."}, {}};
   }
 
-  const GlbHeader* pHeader = reinterpret_cast<const GlbHeader*>(data.data());
+  const auto* pHeader = reinterpret_cast<const GlbHeader*>(data.data());
   if (pHeader->magic != 0x46546C67) {
     return {
         std::nullopt,
@@ -146,7 +162,7 @@ GltfReaderResult readBinaryGltf(
 
   const gsl::span<const std::byte> glbData = data.subspan(0, pHeader->length);
 
-  const ChunkHeader* pJsonChunkHeader =
+  const auto* pJsonChunkHeader =
       reinterpret_cast<const ChunkHeader*>(glbData.data() + sizeof(GlbHeader));
   if (pJsonChunkHeader->chunkType != 0x4E4F534A) {
     return {
@@ -173,7 +189,7 @@ GltfReaderResult readBinaryGltf(
   gsl::span<const std::byte> binaryChunk;
 
   if (jsonEnd + sizeof(ChunkHeader) <= data.size()) {
-    const ChunkHeader* pBinaryChunkHeader =
+    const auto* pBinaryChunkHeader =
         reinterpret_cast<const ChunkHeader*>(glbData.data() + jsonEnd);
     if (pBinaryChunkHeader->chunkType != 0x004E4942) {
       return {
@@ -217,7 +233,7 @@ GltfReaderResult readBinaryGltf(
       return result;
     }
 
-    const int64_t binaryChunkSize = static_cast<int64_t>(binaryChunk.size());
+    const auto binaryChunkSize = static_cast<int64_t>(binaryChunk.size());
     if (buffer.byteLength > binaryChunkSize) {
       result.errors.emplace_back(
           "The size of the first buffer in the JSON chunk is " +
@@ -327,14 +343,12 @@ void postprocess(
     // image has already been decoded as necessary, so it's more convenient for
     // clients to not need to worry about the extension.
     for (Texture& texture : model.textures) {
-      ExtensionTextureWebp* pWebP =
-          texture.getExtension<ExtensionTextureWebp>();
+      auto* pWebP = texture.getExtension<ExtensionTextureWebp>();
       if (pWebP) {
         texture.source = pWebP->source;
       }
 
-      ExtensionKhrTextureBasisu* pKtx =
-          texture.getExtension<ExtensionKhrTextureBasisu>();
+      auto* pKtx = texture.getExtension<ExtensionKhrTextureBasisu>();
       if (pKtx) {
         texture.source = pKtx->source;
       }
@@ -456,17 +470,17 @@ CesiumAsync::Future<GltfReaderResult> GltfReader::loadGltf(
 
 void CesiumGltfReader::GltfReader::postprocessGltf(
     GltfReaderResult& readGltf,
-    const GltfReaderOptions& options) {
+    const GltfReaderOptions& options) const {
   if (readGltf.model) {
     postprocess(*this, readGltf, options);
   }
 }
 
 /*static*/ Future<GltfReaderResult> GltfReader::resolveExternalData(
-    AsyncSystem asyncSystem,
+    const AsyncSystem& asyncSystem,
     const std::string& baseUrl,
     const HttpHeaders& headers,
-    std::shared_ptr<IAssetAccessor> pAssetAccessor,
+    const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const GltfReaderOptions& options,
     GltfReaderResult&& result) {
 
@@ -765,7 +779,7 @@ ImageReaderResult GltfReader::readImage(
             // Copy over the positions of each mip within the buffer.
             image.mipPositions.resize(pTexture->numLevels);
             for (ktx_uint32_t level = 0; level < pTexture->numLevels; ++level) {
-              ktx_size_t imageOffset;
+              ktx_size_t imageOffset = 0;
               ktxTexture_GetImageOffset(
                   ktxTexture(pTexture),
                   level,
@@ -803,7 +817,8 @@ ImageReaderResult GltfReader::readImage(
         std::string(ktxErrorString(errorCode)));
 
     return result;
-  } else if (isWebP(data)) {
+  }
+  if (isWebP(data)) {
     if (WebPGetInfo(
             reinterpret_cast<const uint8_t*>(data.data()),
             data.size(),
@@ -830,15 +845,16 @@ ImageReaderResult GltfReader::readImage(
 
   {
     tjhandle tjInstance = tjInitDecompress();
-    int inSubsamp, inColorspace;
-    if (!tjDecompressHeader3(
+    int inSubsamp;
+    int inColorspace;
+    if (tjDecompressHeader3(
             tjInstance,
             reinterpret_cast<const unsigned char*>(data.data()),
             static_cast<unsigned long>(data.size()),
             &image.width,
             &image.height,
             &inSubsamp,
-            &inColorspace)) {
+            &inColorspace) == 0) {
       CESIUM_TRACE("Decode JPG");
       image.bytesPerChannel = 1;
       image.channels = 4;
@@ -854,7 +870,7 @@ ImageReaderResult GltfReader::readImage(
               0,
               image.height,
               TJPF_RGBA,
-              0)) {
+              0) != 0) {
         result.errors.emplace_back("Unable to decode JPEG");
         result.image.reset();
       }
@@ -863,7 +879,7 @@ ImageReaderResult GltfReader::readImage(
       image.bytesPerChannel = 1;
       image.channels = 4;
 
-      int channelsInFile;
+      int channelsInFile = 0;
       stbi_uc* pImage = stbi_load_from_memory(
           reinterpret_cast<const stbi_uc*>(data.data()),
           static_cast<int>(data.size()),
@@ -932,7 +948,7 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
   }
 
   // Byte size of the base image.
-  const size_t imageByteSize = static_cast<size_t>(
+  const auto imageByteSize = static_cast<size_t>(
       image.width * image.height * image.channels * image.bytesPerChannel);
 
   image.mipPositions.resize(mipCount);
@@ -968,7 +984,7 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
     image.mipPositions[mipIndex].byteOffset = byteOffset;
     image.mipPositions[mipIndex].byteSize = byteSize;
 
-    if (!stbir_resize_uint8(
+    if (stbir_resize_uint8(
             reinterpret_cast<const unsigned char*>(
                 &image.pixelData[lastByteOffset]),
             lastWidth,
@@ -978,7 +994,7 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
             mipWidth,
             mipHeight,
             0,
-            image.channels)) {
+            image.channels) == 0) {
       // Remove any added mipmaps.
       image.mipPositions.clear();
       image.pixelData.resize(imageByteSize);

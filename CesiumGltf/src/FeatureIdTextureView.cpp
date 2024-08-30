@@ -1,22 +1,23 @@
 #include "CesiumGltf/FeatureIdTextureView.h"
 
-#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/FeatureIdTexture.h"
 #include "CesiumGltf/Model.h"
-#include "CesiumGltf/SamplerUtility.h"
+#include "CesiumGltf/TextureView.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 namespace CesiumGltf {
 FeatureIdTextureView::FeatureIdTextureView() noexcept
-    : TextureView(),
-      _status(FeatureIdTextureViewStatus::ErrorUninitialized),
-      _channels() {}
+    : _status(FeatureIdTextureViewStatus::ErrorUninitialized) {}
 
 FeatureIdTextureView::FeatureIdTextureView(
     const Model& model,
     const FeatureIdTexture& featureIdTexture,
     const TextureViewOptions& options) noexcept
     : TextureView(model, featureIdTexture, options),
-      _status(FeatureIdTextureViewStatus::ErrorUninitialized),
-      _channels() {
+      _status(FeatureIdTextureViewStatus::ErrorUninitialized) {
   switch (this->getTextureViewStatus()) {
   case TextureViewStatus::Valid:
     break;
@@ -41,15 +42,15 @@ FeatureIdTextureView::FeatureIdTextureView(
   }
 
   const std::vector<int64_t>& channels = featureIdTexture.channels;
-  if (channels.size() == 0 || channels.size() > 4 ||
+  if (channels.empty() || channels.size() > 4 ||
       channels.size() > static_cast<size_t>(this->getImage()->channels)) {
     this->_status = FeatureIdTextureViewStatus::ErrorInvalidChannels;
     return;
   }
 
   // Only channel values 0-3 are supported.
-  for (size_t i = 0; i < channels.size(); i++) {
-    if (channels[i] < 0 || channels[i] > 3) {
+  for (long channel : channels) {
+    if (channel < 0 || channel > 3) {
       this->_status = FeatureIdTextureViewStatus::ErrorInvalidChannels;
       return;
     }
@@ -72,7 +73,7 @@ int64_t FeatureIdTextureView::getFeatureID(double u, double v) const noexcept {
   // unsigned 8 bit integers, and represent the bytes of the actual feature ID,
   // in little-endian order.
   for (size_t i = 0; i < this->_channels.size(); i++) {
-    int64_t channelValue = static_cast<int64_t>(sample[i]);
+    auto channelValue = static_cast<int64_t>(sample[i]);
     value |= channelValue << bitOffset;
     bitOffset += 8;
   }

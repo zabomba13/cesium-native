@@ -2,28 +2,39 @@
 
 #include "CesiumAsync/AsyncSystem.h"
 #include "CesiumAsync/CacheItem.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
 #include "CesiumAsync/IAssetResponse.h"
+#include "CesiumAsync/ICacheDatabase.h"
+#include "CesiumUtility/Tracing.h"
 #include "InternalTimegm.h"
 #include "ResponseCacheControl.h"
 
-#include <spdlog/spdlog.h>
+#include <gsl/span>
+#include <spdlog/logger.h>
 
-#include <algorithm>
 #include <cstddef>
+#include <cstdint>
+#include <ctime>
 #include <iomanip>
+#include <memory>
+#include <optional>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumAsync {
 class CacheAssetResponse : public IAssetResponse {
 public:
-  CacheAssetResponse(const CacheItem* pCacheItem) noexcept
+  explicit CacheAssetResponse(const CacheItem* pCacheItem) noexcept
       : _pCacheItem{pCacheItem} {}
 
-  virtual uint16_t statusCode() const noexcept override {
+  uint16_t statusCode() const noexcept override {
     return this->_pCacheItem->cacheResponse.statusCode;
   }
 
-  virtual std::string contentType() const override {
+  std::string contentType() const override {
     auto it = this->_pCacheItem->cacheResponse.headers.find("Content-Type");
     if (it == this->_pCacheItem->cacheResponse.headers.end()) {
       return std::string();
@@ -31,11 +42,11 @@ public:
     return it->second;
   }
 
-  virtual const HttpHeaders& headers() const noexcept override {
+  const HttpHeaders& headers() const noexcept override {
     return this->_pCacheItem->cacheResponse.headers;
   }
 
-  virtual gsl::span<const std::byte> data() const noexcept override {
+  gsl::span<const std::byte> data() const noexcept override {
     return gsl::span<const std::byte>(
         this->_pCacheItem->cacheResponse.data.data(),
         this->_pCacheItem->cacheResponse.data.size());
@@ -47,22 +58,22 @@ private:
 
 class CacheAssetRequest : public IAssetRequest {
 public:
-  CacheAssetRequest(CacheItem&& cacheItem)
+  explicit CacheAssetRequest(CacheItem&& cacheItem)
       : _cacheItem(std::move(cacheItem)), _response(&this->_cacheItem) {}
 
-  virtual const std::string& method() const noexcept override {
+  const std::string& method() const noexcept override {
     return this->_cacheItem.cacheRequest.method;
   }
 
-  virtual const std::string& url() const noexcept override {
+  const std::string& url() const noexcept override {
     return this->_cacheItem.cacheRequest.url;
   }
 
-  virtual const HttpHeaders& headers() const noexcept override {
+  const HttpHeaders& headers() const noexcept override {
     return this->_cacheItem.cacheRequest.headers;
   }
 
-  virtual const IAssetResponse* response() const noexcept override {
+  const IAssetResponse* response() const noexcept override {
     return &this->_response;
   }
 
@@ -102,7 +113,7 @@ CachingAssetAccessor::CachingAssetAccessor(
       _pCacheDatabase(pCacheDatabase),
       _cacheThreadPool(1) {}
 
-CachingAssetAccessor::~CachingAssetAccessor() noexcept {}
+CachingAssetAccessor::~CachingAssetAccessor() noexcept = default;
 
 Future<std::shared_ptr<IAssetRequest>> CachingAssetAccessor::get(
     const AsyncSystem& asyncSystem,
@@ -180,17 +191,16 @@ Future<std::shared_ptr<IAssetRequest>> CachingAssetAccessor::get(
               std::vector<THeader> newHeaders = headers;
               const CacheResponse& cacheResponse = cacheItem.cacheResponse;
               const HttpHeaders& responseHeaders = cacheResponse.headers;
-              HttpHeaders::const_iterator etagHeader =
-                  responseHeaders.find("Etag");
+              auto etagHeader = responseHeaders.find("Etag");
               if (etagHeader != responseHeaders.end()) {
                 newHeaders.emplace_back("If-None-Match", etagHeader->second);
               } else {
-                HttpHeaders::const_iterator lastModifiedHeader =
-                    responseHeaders.find("Last-Modified");
-                if (lastModifiedHeader != responseHeaders.end())
+                auto lastModifiedHeader = responseHeaders.find("Last-Modified");
+                if (lastModifiedHeader != responseHeaders.end()) {
                   newHeaders.emplace_back(
                       "If-Modified-Since",
                       lastModifiedHeader->second);
+                }
               }
 
               return pAssetAccessor->get(asyncSystem, url, newHeaders)
@@ -269,8 +279,9 @@ bool shouldRevalidateCache(const CacheItem& cacheItem) {
   std::optional<ResponseCacheControl> cacheControl =
       ResponseCacheControl::parseFromResponseHeaders(
           cacheItem.cacheResponse.headers);
-  if (cacheControl && cacheControl->noCache())
+  if (cacheControl && cacheControl->noCache()) {
     return true;
+  }
 
   // Always revalidate if cache is stale. We always assume online scenarios.
   // A must-revalidate directive doesn't change this logic.
@@ -310,7 +321,7 @@ bool shouldCacheRequest(
   }
 
   const HttpHeaders& headers = pResponse->headers();
-  HttpHeaders::const_iterator expiresHeader = headers.find("Expires");
+  auto expiresHeader = headers.find("Expires");
   bool expiresExists = expiresHeader != headers.end();
 
   //
@@ -318,8 +329,9 @@ bool shouldCacheRequest(
   //
   // The no-store response directive indicates that any caches of any kind
   // (private or shared) should not store this response.
-  if (cacheControl && cacheControl->noStore())
+  if (cacheControl && cacheControl->noStore()) {
     return false;
+  }
 
   //
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires
@@ -333,12 +345,14 @@ bool shouldCacheRequest(
   if (cacheControl) {
     if (cacheControl->maxAgeExists()) {
       preferCacheControl = true;
-      if (cacheControl->maxAgeValue() > 0)
+      if (cacheControl->maxAgeValue() > 0) {
         return true;
+      }
     } else if (cacheControl->sharedMaxAgeExists()) {
       preferCacheControl = true;
-      if (cacheControl->sharedMaxAgeValue() > 0)
+      if (cacheControl->sharedMaxAgeValue() > 0) {
         return true;
+      }
     }
   }
 
@@ -348,15 +362,17 @@ bool shouldCacheRequest(
     bool alreadyExpired = std::difftime(
                               convertHttpDateToTime(expiresHeader->second),
                               std::time(nullptr)) <= 0.0;
-    if (!alreadyExpired)
+    if (!alreadyExpired) {
       return true;
+    }
   }
 
   // If we have a way to revalidate, we can store
   bool hasEtag = headers.find("ETag") != headers.end();
   bool hasLastModifiedEtag = headers.find("Last-Modified") != headers.end();
-  if (hasEtag || hasLastModifiedEtag)
+  if (hasEtag || hasLastModifiedEtag) {
     return true;
+  }
 
   // Else don't store it
   return false;
@@ -384,15 +400,14 @@ std::time_t calculateExpiryTime(
     int maxAgeValue =
         cacheControl->maxAgeExists() ? cacheControl->maxAgeValue() : 0;
     return std::time(nullptr) + maxAgeValue;
-  } else {
-    const IAssetResponse* pResponse = request.response();
-    const HttpHeaders& responseHeaders = pResponse->headers();
-    HttpHeaders::const_iterator expiresHeader = responseHeaders.find("Expires");
-    if (expiresHeader != responseHeaders.end())
-      return convertHttpDateToTime(expiresHeader->second);
-
-    return std::time(nullptr);
   }
+  const IAssetResponse* pResponse = request.response();
+  const HttpHeaders& responseHeaders = pResponse->headers();
+  HttpHeaders::const_iterator expiresHeader = responseHeaders.find("Expires");
+  if (expiresHeader != responseHeaders.end())
+    return convertHttpDateToTime(expiresHeader->second);
+
+  return std::time(nullptr);
 }
 
 std::unique_ptr<IAssetRequest>

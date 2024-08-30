@@ -1,4 +1,20 @@
-#include <CesiumAsync/IAssetResponse.h>
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
+#include "CesiumGltf/Sampler.h"
+#include "CesiumGltf/Scene.h"
+#include "CesiumGltf/Texture.h"
+
 #include <CesiumGeometry/QuadtreeTileRectangularRange.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
 #include <CesiumGeospatial/calcQuadtreeMaxGeometricError.h>
@@ -6,18 +22,27 @@
 #include <CesiumQuantizedMeshTerrain/QuantizedMeshLoader.h>
 #include <CesiumUtility/AttributeCompression.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Log.h>
 #include <CesiumUtility/Math.h>
 #include <CesiumUtility/Tracing.h>
-#include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
 #include <glm/common.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
+#include <glm/fwd.hpp>
+#include <glm/geometric.hpp>
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <optional>
 #include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -62,48 +87,40 @@ enum class QuantizedMeshIndexType { UnsignedShort, UnsignedInt };
 
 struct QuantizedMeshView {
   QuantizedMeshView() noexcept
-      : header{nullptr},
-        indexType{QuantizedMeshIndexType::UnsignedShort},
-        triangleCount{0},
-        westEdgeIndicesCount{0},
-        southEdgeIndicesCount{0},
-        eastEdgeIndicesCount{0},
-        northEdgeIndicesCount{0},
-        onlyWater{false},
-        onlyLand{true},
-        metadataJsonLength{0} {}
 
-  const QuantizedMeshHeader* header;
+  {}
+
+  const QuantizedMeshHeader* header{nullptr};
 
   gsl::span<const uint16_t> uBuffer;
   gsl::span<const uint16_t> vBuffer;
   gsl::span<const uint16_t> heightBuffer;
 
-  QuantizedMeshIndexType indexType;
-  uint32_t triangleCount;
+  QuantizedMeshIndexType indexType{QuantizedMeshIndexType::UnsignedShort};
+  uint32_t triangleCount{0};
   gsl::span<const std::byte> indicesBuffer;
 
-  uint32_t westEdgeIndicesCount;
+  uint32_t westEdgeIndicesCount{0};
   gsl::span<const std::byte> westEdgeIndicesBuffer;
 
-  uint32_t southEdgeIndicesCount;
+  uint32_t southEdgeIndicesCount{0};
   gsl::span<const std::byte> southEdgeIndicesBuffer;
 
-  uint32_t eastEdgeIndicesCount;
+  uint32_t eastEdgeIndicesCount{0};
   gsl::span<const std::byte> eastEdgeIndicesBuffer;
 
-  uint32_t northEdgeIndicesCount;
+  uint32_t northEdgeIndicesCount{0};
   gsl::span<const std::byte> northEdgeIndicesBuffer;
 
   gsl::span<const std::byte> octEncodedNormalBuffer;
 
-  bool onlyWater;
-  bool onlyLand;
+  bool onlyWater{false};
+  bool onlyLand{true};
 
   // water mask will always be a 256*256 map where 0 is land and 255 is water.
   gsl::span<const std::byte> waterMaskBuffer;
 
-  uint32_t metadataJsonLength;
+  uint32_t metadataJsonLength{0};
   gsl::span<const char> metadataJsonBuffer;
 };
 
@@ -145,8 +162,9 @@ static T readValue(
   return defaultValue;
 }
 
-static QuantizedMeshMetadataResult
-processMetadata(const QuadtreeTileID& tileID, gsl::span<const char> json);
+static QuantizedMeshMetadataResult processMetadata(
+    const QuadtreeTileID& tileID,
+    gsl::span<const char> metadataString);
 
 static std::optional<QuantizedMeshView> parseQuantizedMesh(
     const gsl::span<const std::byte>& data,
@@ -190,7 +208,7 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   }
 
   // parse the indices buffer
-  uint32_t indexSizeBytes;
+  uint32_t indexSizeBytes = 0;
   if (vertexCount > 65536) {
     // 32-bit indices
     if ((readIndex % 4) != 0) {
@@ -244,7 +262,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the west edge indices
   meshView.westEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.westEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes =
+      static_cast<size_t>(meshView.westEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -256,7 +275,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the south edge
   meshView.southEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.southEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes =
+      static_cast<size_t>(meshView.southEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -268,7 +288,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the east edge
   meshView.eastEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.eastEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes =
+      static_cast<size_t>(meshView.eastEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -280,7 +301,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the north edge
   meshView.northEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.northEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes =
+      static_cast<size_t>(meshView.northEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -304,12 +326,13 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
     if (extensionID == 1) {
       // Oct-encoded per-vertex normals
-      if (readIndex + vertexCount * 2 > data.size()) {
+      if (readIndex + static_cast<size_t>(vertexCount * 2) > data.size()) {
         break;
       }
 
-      meshView.octEncodedNormalBuffer =
-          gsl::span<const std::byte>(data.data() + readIndex, vertexCount * 2);
+      meshView.octEncodedNormalBuffer = gsl::span<const std::byte>(
+          data.data() + readIndex,
+          static_cast<size_type>(vertexCount * 2));
     } else if (enableWaterMask && extensionID == 2) {
       // Water Mask
       if (extensionLength == 1) {
@@ -384,7 +407,7 @@ static void addSkirt(
   const double north = rectangle.getNorth();
 
   size_t newEdgeIndex = currentVertexCount;
-  size_t positionIdx = currentVertexCount * 3;
+  size_t positionIdx = static_cast<size_t>(currentVertexCount * 3);
   size_t indexIdx = currentIndicesCount;
   for (size_t i = 0; i < edgeIndices.size(); ++i) {
     E edgeIdx = edgeIndices[i];
@@ -408,7 +431,7 @@ static void addSkirt(
     positionMaximums = glm::max(positionMaximums, position);
 
     if (!normals.empty()) {
-      const size_t componentIndex = static_cast<size_t>(3 * edgeIdx);
+      const auto componentIndex = static_cast<size_t>(3 * edgeIdx);
       normals[positionIdx] = normals[componentIndex];
       normals[positionIdx + 1] = normals[componentIndex + 1];
       normals[positionIdx + 2] = normals[componentIndex + 2];
@@ -452,13 +475,13 @@ static void addSkirts(
     const gsl::span<I>& outputIndices,
     glm::dvec3& positionMinimums,
     glm::dvec3& positionMaximums) {
-  const uint32_t westVertexCount =
+  const auto westVertexCount =
       static_cast<uint32_t>(westEdgeIndicesBuffer.size() / sizeof(E));
-  const uint32_t southVertexCount =
+  const auto southVertexCount =
       static_cast<uint32_t>(southEdgeIndicesBuffer.size() / sizeof(E));
-  const uint32_t eastVertexCount =
+  const auto eastVertexCount =
       static_cast<uint32_t>(eastEdgeIndicesBuffer.size() / sizeof(E));
-  const uint32_t northVertexCount =
+  const auto northVertexCount =
       static_cast<uint32_t>(northEdgeIndicesBuffer.size() / sizeof(E));
 
   // allocate edge indices to be sort later
@@ -700,10 +723,11 @@ static std::vector<std::byte> generateNormals(
   // decode position without skirt, but preallocate position buffer to include
   // skirt as well
   std::vector<std::byte> outputPositionsBuffer(
-      (vertexCount + skirtVertexCount) * 3 * sizeof(float));
+      static_cast<unsigned long>((vertexCount + skirtVertexCount) * 3) *
+      sizeof(float));
   gsl::span<float> outputPositions(
       reinterpret_cast<float*>(outputPositionsBuffer.data()),
-      (vertexCount + skirtVertexCount) * 3);
+      static_cast<size_type>((vertexCount + skirtVertexCount) * 3));
   size_t positionOutputIndex = 0;
 
   const glm::dvec3 center(

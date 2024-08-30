@@ -75,7 +75,7 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayUtilities {
    */
   static std::optional<RasterOverlayDetails>
   createRasterOverlayTextureCoordinates(
-      CesiumGltf::Model& gltf,
+      CesiumGltf::Model& model,
       const glm::dmat4& modelToEcefTransform,
       const std::optional<CesiumGeospatial::GlobeRectangle>& globeRectangle,
       std::vector<CesiumGeospatial::Projection>&& projections,

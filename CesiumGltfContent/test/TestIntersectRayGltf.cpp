@@ -1,5 +1,8 @@
 #include "CesiumGeometry/IntersectionTests.h"
 #include "CesiumGeometry/Ray.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
 #include "CesiumGltfContent/GltfUtilities.h"
 #include "CesiumGltfReader/GltfReader.h"
 
@@ -7,10 +10,14 @@
 #include <CesiumUtility/Math.h>
 
 #include <catch2/catch_test_macros.hpp>
-#include <glm/glm.hpp>
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/vector_relational.hpp>
 
+#include <cstddef>
 #include <filesystem>
-#include <fstream>
+#include <string>
 
 using namespace CesiumUtility;
 using namespace CesiumGltf;
@@ -95,7 +102,7 @@ void checkBadUnitCube(const std::string& testModelName, bool shouldHitAnyway) {
 
   // We're expecting a bad model, so it shouldn't crash or assert
   // and we should get some warnings about that
-  CHECK(hitResult.warnings.size() > 0);
+  CHECK(!hitResult.warnings.empty());
 
   // Check for a bad model that is mostly good, and should produce good results
   if (shouldHitAnyway) {

@@ -1282,7 +1282,7 @@ private:
   PropertyViewStatusType getArrayOffsetsBufferSafe(
       int32_t arrayOffsetsBufferView,
       PropertyComponentType arrayOffsetType,
-      size_t valuesBufferSize,
+      size_t valueBufferSize,
       size_t propertyTableCount,
       bool checkBitsSize,
       gsl::span<const std::byte>& arrayOffsetsBuffer) const noexcept;
@@ -1290,7 +1290,7 @@ private:
   PropertyViewStatusType getStringOffsetsBufferSafe(
       int32_t stringOffsetsBufferView,
       PropertyComponentType stringOffsetType,
-      size_t valuesBufferSize,
+      size_t valueBufferSize,
       size_t propertyTableCount,
       gsl::span<const std::byte>& stringOffsetsBuffer) const noexcept;
 

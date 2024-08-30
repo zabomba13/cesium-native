@@ -274,7 +274,7 @@ public:
    * @param numberOfThreads The number of threads in the pool.
    * @return The thread pool.
    */
-  ThreadPool createThreadPool(int32_t numberOfThreads) const;
+  static ThreadPool createThreadPool(int32_t numberOfThreads);
 
   /**
    * Returns true if this instance and the right-hand side can be used

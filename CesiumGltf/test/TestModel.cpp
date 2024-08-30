@@ -1,5 +1,20 @@
+#include "CesiumGltf/Accessor.h"
 #include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
 #include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
+#include "CesiumGltf/PropertyAttribute.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumGltf/PropertyTexture.h"
+#include "CesiumGltf/PropertyTextureProperty.h"
+#include "CesiumGltf/Scene.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumUtility/ErrorList.h"
 
 #include <CesiumGltf/ExtensionBufferViewExtMeshoptCompression.h>
 #include <CesiumGltf/ExtensionCesiumPrimitiveOutline.h>
@@ -12,22 +27,22 @@
 #include <CesiumGltf/ExtensionTextureWebp.h>
 
 #include <catch2/catch_test_macros.hpp>
-#include <glm/common.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
+#include <glm/vector_relational.hpp>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 #include <utility>
 #include <vector>
 
 using namespace CesiumGltf;
 using namespace CesiumUtility;
 
-#define DEFAULT_EPSILON 1e-6f
+#define DEFAULT_EPSILON 1e-6F
 
 TEST_CASE("Test forEachPrimitive") {
   Model model;
@@ -207,15 +222,15 @@ static Model createCubeGltf() {
   Model model;
 
   std::vector<glm::vec3> cubeVertices = {
-      glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(1.0f, 0.0f, 0.0f),
-      glm::vec3(1.0f, 0.0f, 1.0f),
-      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0F, 0.0F, 0.0F),
+      glm::vec3(1.0F, 0.0F, 0.0F),
+      glm::vec3(1.0F, 0.0F, 1.0F),
+      glm::vec3(0.0F, 0.0F, 1.0F),
 
-      glm::vec3(0.0f, 1.0f, 0.0f),
-      glm::vec3(1.0f, 1.0f, 0.0f),
-      glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(0.0f, 1.0f, 1.0f)};
+      glm::vec3(0.0F, 1.0F, 0.0F),
+      glm::vec3(1.0F, 1.0F, 0.0F),
+      glm::vec3(1.0F, 1.0F, 1.0F),
+      glm::vec3(0.0F, 1.0F, 1.0F)};
 
   // TODO: generalize type so each index type can be tested?
   std::vector<uint8_t> cubeIndices = {0, 1, 2, 0, 2, 3,
@@ -238,7 +253,7 @@ static Model createCubeGltf() {
   vertexBuffer.cesium.data.resize(vertexByteLength);
   std::memcpy(
       vertexBuffer.cesium.data.data(),
-      &cubeVertices[0],
+      cubeVertices.data(),
       vertexByteLength);
 
   BufferView& vertexBufferView = model.bufferViews.emplace_back();
@@ -258,7 +273,7 @@ static Model createCubeGltf() {
   Buffer& indexBuffer = model.buffers.emplace_back();
   indexBuffer.byteLength = 36;
   indexBuffer.cesium.data.resize(36);
-  std::memcpy(indexBuffer.cesium.data.data(), &cubeIndices[0], 36);
+  std::memcpy(indexBuffer.cesium.data.data(), cubeIndices.data(), 36);
 
   BufferView& indexBufferView = model.bufferViews.emplace_back();
   indexBufferView.buffer = 1;
@@ -294,10 +309,10 @@ static Model createTriangleStrip() {
   Model model;
 
   std::vector<glm::vec3> vertices = {
-      glm::vec3(0.0f, 1.0f, 0.0f),
-      glm::vec3(1.0f, 0.0f, 0.0f),
-      glm::vec3(0.0f, 0.0f, -1.0f),
-      glm::vec3(1.0f, 1.0f, -1.0f)};
+      glm::vec3(0.0F, 1.0F, 0.0F),
+      glm::vec3(1.0F, 0.0F, 0.0F),
+      glm::vec3(0.0F, 0.0F, -1.0F),
+      glm::vec3(1.0F, 1.0F, -1.0F)};
 
   size_t byteStride = sizeof(glm::vec3);
   size_t byteLength = 4 * byteStride;
@@ -305,7 +320,7 @@ static Model createTriangleStrip() {
   Buffer& vertexBuffer = model.buffers.emplace_back();
   vertexBuffer.byteLength = static_cast<int64_t>(byteLength);
   vertexBuffer.cesium.data.resize(byteLength);
-  std::memcpy(vertexBuffer.cesium.data.data(), &vertices[0], byteLength);
+  std::memcpy(vertexBuffer.cesium.data.data(), vertices.data(), byteLength);
 
   BufferView& vertexBufferView = model.bufferViews.emplace_back();
   vertexBufferView.buffer = 0;
@@ -340,12 +355,12 @@ static Model createTriangleFan() {
   Model model;
 
   std::vector<glm::vec3> vertices = {
-      glm::vec3(0.5f, 1.0f, -0.5f),
-      glm::vec3(0.0f, 0.0f, 0.0f),
-      glm::vec3(1.0f, 0.0f, 0.0f),
-      glm::vec3(1.0f, 0.0f, -1.0f),
-      glm::vec3(0.0f, 0.0f, -1.0f),
-      glm::vec3(0.0f, 0.0f, 0.0f)};
+      glm::vec3(0.5F, 1.0F, -0.5F),
+      glm::vec3(0.0F, 0.0F, 0.0F),
+      glm::vec3(1.0F, 0.0F, 0.0F),
+      glm::vec3(1.0F, 0.0F, -1.0F),
+      glm::vec3(0.0F, 0.0F, -1.0F),
+      glm::vec3(0.0F, 0.0F, 0.0F)};
 
   size_t byteStride = sizeof(glm::vec3);
   size_t byteLength = 6 * byteStride;
@@ -353,7 +368,7 @@ static Model createTriangleFan() {
   Buffer& vertexBuffer = model.buffers.emplace_back();
   vertexBuffer.byteLength = static_cast<int64_t>(byteLength);
   vertexBuffer.cesium.data.resize(byteLength);
-  std::memcpy(vertexBuffer.cesium.data.data(), &vertices[0], byteLength);
+  std::memcpy(vertexBuffer.cesium.data.data(), vertices.data(), byteLength);
 
   BufferView& vertexBufferView = model.bufferViews.emplace_back();
   vertexBufferView.buffer = 0;
@@ -408,14 +423,14 @@ TEST_CASE("Test smooth normal generation") {
     REQUIRE(normalView.size() == 8);
 
     const glm::vec3& vertex0Normal = normalView[0];
-    glm::vec3 expectedNormal(-1.0f, -1.0f, -1.0f);
+    glm::vec3 expectedNormal(-1.0F, -1.0F, -1.0F);
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
         glm::epsilonEqual(vertex0Normal, expectedNormal, DEFAULT_EPSILON)));
 
     const glm::vec3& vertex6Normal = normalView[6];
-    expectedNormal = glm::vec3(1.0f, 1.0f, 1.0f);
+    expectedNormal = glm::vec3(1.0F, 1.0F, 1.0F);
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
@@ -447,7 +462,7 @@ TEST_CASE("Test smooth normal generation") {
     const glm::vec3& vertex1Normal = normalView[1];
     const glm::vec3& vertex2Normal = normalView[2];
 
-    glm::vec3 expectedNormal(0.0f, 1.0f, 0.0f);
+    glm::vec3 expectedNormal(0.0F, 1.0F, 0.0F);
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
@@ -480,7 +495,7 @@ TEST_CASE("Test smooth normal generation") {
 
     const glm::vec3& vertex0Normal = normalView[0];
 
-    glm::vec3 expectedNormal(0.0f, 1.0f, 0.0f);
+    glm::vec3 expectedNormal(0.0F, 1.0F, 0.0F);
     expectedNormal = glm::normalize(expectedNormal);
 
     REQUIRE(glm::all(
@@ -766,43 +781,37 @@ TEST_CASE("Model::merge") {
     Model m2;
 
     SECTION("when only this has the extension") {
-      ExtensionModelExtStructuralMetadata& metadata1 =
-          m1.addExtension<ExtensionModelExtStructuralMetadata>();
+      auto& metadata1 = m1.addExtension<ExtensionModelExtStructuralMetadata>();
       metadata1.schema.emplace().name = "test";
 
       ErrorList errors = m1.merge(std::move(m2));
       CHECK(errors.errors.empty());
       CHECK(errors.warnings.empty());
 
-      ExtensionModelExtStructuralMetadata* pExtension =
-          m1.getExtension<ExtensionModelExtStructuralMetadata>();
+      auto* pExtension = m1.getExtension<ExtensionModelExtStructuralMetadata>();
       REQUIRE(pExtension);
       REQUIRE(pExtension->schema);
       CHECK(pExtension->schema->name == "test");
     }
 
     SECTION("when only rhs has the extension") {
-      ExtensionModelExtStructuralMetadata& metadata2 =
-          m2.addExtension<ExtensionModelExtStructuralMetadata>();
+      auto& metadata2 = m2.addExtension<ExtensionModelExtStructuralMetadata>();
       metadata2.schema.emplace().name = "test";
 
       ErrorList errors = m1.merge(std::move(m2));
       CHECK(errors.errors.empty());
       CHECK(errors.warnings.empty());
 
-      ExtensionModelExtStructuralMetadata* pExtension =
-          m1.getExtension<ExtensionModelExtStructuralMetadata>();
+      auto* pExtension = m1.getExtension<ExtensionModelExtStructuralMetadata>();
       REQUIRE(pExtension);
       REQUIRE(pExtension->schema);
       CHECK(pExtension->schema->name == "test");
     }
 
     SECTION("when both have the extension") {
-      ExtensionModelExtStructuralMetadata& metadata1 =
-          m1.addExtension<ExtensionModelExtStructuralMetadata>();
+      auto& metadata1 = m1.addExtension<ExtensionModelExtStructuralMetadata>();
 
-      ExtensionModelExtStructuralMetadata& metadata2 =
-          m2.addExtension<ExtensionModelExtStructuralMetadata>();
+      auto& metadata2 = m2.addExtension<ExtensionModelExtStructuralMetadata>();
 
       SECTION("and only this has a schema") {
         metadata1.schema.emplace().name = "test";
@@ -811,7 +820,7 @@ TEST_CASE("Model::merge") {
         CHECK(errors.errors.empty());
         CHECK(errors.warnings.empty());
 
-        ExtensionModelExtStructuralMetadata* pExtension =
+        auto* pExtension =
             m1.getExtension<ExtensionModelExtStructuralMetadata>();
         REQUIRE(pExtension);
         REQUIRE(pExtension->schema);
@@ -825,7 +834,7 @@ TEST_CASE("Model::merge") {
         CHECK(errors.errors.empty());
         CHECK(errors.warnings.empty());
 
-        ExtensionModelExtStructuralMetadata* pExtension =
+        auto* pExtension =
             m1.getExtension<ExtensionModelExtStructuralMetadata>();
         REQUIRE(pExtension);
         REQUIRE(pExtension->schema);
@@ -846,7 +855,7 @@ TEST_CASE("Model::merge") {
         CHECK(errors.warnings.empty());
 
         // Check that both classes are included in the merged schema.
-        ExtensionModelExtStructuralMetadata* pExtension =
+        auto* pExtension =
             m1.getExtension<ExtensionModelExtStructuralMetadata>();
         REQUIRE(pExtension);
         REQUIRE(pExtension->schema);
@@ -873,7 +882,7 @@ TEST_CASE("Model::merge") {
           CHECK(errors.errors.empty());
           CHECK(errors.warnings.empty());
 
-          ExtensionModelExtStructuralMetadata* pExtension =
+          auto* pExtension =
               m1.getExtension<ExtensionModelExtStructuralMetadata>();
           REQUIRE(pExtension);
           REQUIRE(pExtension->schema);
@@ -901,7 +910,7 @@ TEST_CASE("Model::merge") {
           CHECK(errors.errors.empty());
           CHECK(errors.warnings.empty());
 
-          ExtensionModelExtStructuralMetadata* pExtension =
+          auto* pExtension =
               m1.getExtension<ExtensionModelExtStructuralMetadata>();
           REQUIRE(pExtension);
           REQUIRE(pExtension->schema);
@@ -925,7 +934,7 @@ TEST_CASE("Model::merge") {
           CHECK(errors.errors.empty());
           CHECK(errors.warnings.empty());
 
-          ExtensionModelExtStructuralMetadata* pExtension =
+          auto* pExtension =
               m1.getExtension<ExtensionModelExtStructuralMetadata>();
           REQUIRE(pExtension);
           REQUIRE(pExtension->schema);
@@ -948,7 +957,7 @@ TEST_CASE("Model::merge") {
           CHECK(errors.errors.empty());
           CHECK(errors.warnings.empty());
 
-          ExtensionModelExtStructuralMetadata* pExtension =
+          auto* pExtension =
               m1.getExtension<ExtensionModelExtStructuralMetadata>();
           REQUIRE(pExtension);
           REQUIRE(pExtension->schema);
@@ -979,7 +988,7 @@ TEST_CASE("Model::merge") {
         CHECK(errors.errors.empty());
         CHECK(errors.warnings.empty());
 
-        ExtensionModelExtStructuralMetadata* pExtension =
+        auto* pExtension =
             m1.getExtension<ExtensionModelExtStructuralMetadata>();
         REQUIRE(pExtension);
         REQUIRE(pExtension->propertyTables.size() == 2);
@@ -1020,7 +1029,7 @@ TEST_CASE("Model::merge") {
         CHECK(errors.errors.empty());
         CHECK(errors.warnings.empty());
 
-        ExtensionModelExtStructuralMetadata* pExtension =
+        auto* pExtension =
             m1.getExtension<ExtensionModelExtStructuralMetadata>();
         REQUIRE(pExtension);
         REQUIRE(pExtension->propertyTextures.size() == 2);
@@ -1045,14 +1054,14 @@ TEST_CASE("Model::merge") {
 
         Mesh& mesh1 = m1.meshes.emplace_back();
         MeshPrimitive& primitive1 = mesh1.primitives.emplace_back();
-        ExtensionMeshPrimitiveExtStructuralMetadata& primitiveMetadata1 =
+        auto& primitiveMetadata1 =
             primitive1
                 .addExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
         primitiveMetadata1.propertyTextures.push_back(0);
 
         Mesh& mesh2 = m2.meshes.emplace_back();
         MeshPrimitive& primitive2 = mesh2.primitives.emplace_back();
-        ExtensionMeshPrimitiveExtStructuralMetadata& primitiveMetadata2 =
+        auto& primitiveMetadata2 =
             primitive2
                 .addExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
         primitiveMetadata2.propertyTextures.push_back(0);
@@ -1065,7 +1074,7 @@ TEST_CASE("Model::merge") {
         REQUIRE(m1.meshes[0].primitives.size() == 1);
         REQUIRE(m1.meshes[1].primitives.size() == 1);
 
-        ExtensionMeshPrimitiveExtStructuralMetadata* pPrimitiveMetadata1 =
+        auto* pPrimitiveMetadata1 =
             m1.meshes[0]
                 .primitives[0]
                 .getExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
@@ -1073,7 +1082,7 @@ TEST_CASE("Model::merge") {
         REQUIRE(pPrimitiveMetadata1->propertyTextures.size() == 1);
         CHECK(pPrimitiveMetadata1->propertyTextures[0] == 0);
 
-        ExtensionMeshPrimitiveExtStructuralMetadata* pPrimitiveMetadata2 =
+        auto* pPrimitiveMetadata2 =
             m1.meshes[1]
                 .primitives[0]
                 .getExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
@@ -1088,14 +1097,14 @@ TEST_CASE("Model::merge") {
 
         Mesh& mesh1 = m1.meshes.emplace_back();
         MeshPrimitive& primitive1 = mesh1.primitives.emplace_back();
-        ExtensionMeshPrimitiveExtStructuralMetadata& primitiveMetadata1 =
+        auto& primitiveMetadata1 =
             primitive1
                 .addExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
         primitiveMetadata1.propertyAttributes.push_back(0);
 
         Mesh& mesh2 = m2.meshes.emplace_back();
         MeshPrimitive& primitive2 = mesh2.primitives.emplace_back();
-        ExtensionMeshPrimitiveExtStructuralMetadata& primitiveMetadata2 =
+        auto& primitiveMetadata2 =
             primitive2
                 .addExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
         primitiveMetadata2.propertyAttributes.push_back(0);
@@ -1108,7 +1117,7 @@ TEST_CASE("Model::merge") {
         REQUIRE(m1.meshes[0].primitives.size() == 1);
         REQUIRE(m1.meshes[1].primitives.size() == 1);
 
-        ExtensionMeshPrimitiveExtStructuralMetadata* pPrimitiveMetadata1 =
+        auto* pPrimitiveMetadata1 =
             m1.meshes[0]
                 .primitives[0]
                 .getExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
@@ -1116,7 +1125,7 @@ TEST_CASE("Model::merge") {
         REQUIRE(pPrimitiveMetadata1->propertyAttributes.size() == 1);
         CHECK(pPrimitiveMetadata1->propertyAttributes[0] == 0);
 
-        ExtensionMeshPrimitiveExtStructuralMetadata* pPrimitiveMetadata2 =
+        auto* pPrimitiveMetadata2 =
             m1.meshes[1]
                 .primitives[0]
                 .getExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
@@ -1132,13 +1141,13 @@ TEST_CASE("Model::merge") {
 
         Mesh& mesh1 = m1.meshes.emplace_back();
         MeshPrimitive& primitive1 = mesh1.primitives.emplace_back();
-        ExtensionExtMeshFeatures& meshFeatures1 =
+        auto& meshFeatures1 =
             primitive1.addExtension<ExtensionExtMeshFeatures>();
         meshFeatures1.featureIds.emplace_back().propertyTable = 0;
 
         Mesh& mesh2 = m2.meshes.emplace_back();
         MeshPrimitive& primitive2 = mesh2.primitives.emplace_back();
-        ExtensionExtMeshFeatures& meshFeatures2 =
+        auto& meshFeatures2 =
             primitive2.addExtension<ExtensionExtMeshFeatures>();
         meshFeatures2.featureIds.emplace_back().propertyTable = 0;
 
@@ -1150,13 +1159,13 @@ TEST_CASE("Model::merge") {
         REQUIRE(m1.meshes[0].primitives.size() == 1);
         REQUIRE(m1.meshes[1].primitives.size() == 1);
 
-        ExtensionExtMeshFeatures* pMeshFeatures1 =
+        auto* pMeshFeatures1 =
             m1.meshes[0].primitives[0].getExtension<ExtensionExtMeshFeatures>();
         REQUIRE(pMeshFeatures1);
         REQUIRE(pMeshFeatures1->featureIds.size() == 1);
         CHECK(pMeshFeatures1->featureIds[0].propertyTable == 0);
 
-        ExtensionExtMeshFeatures* pMeshFeatures2 =
+        auto* pMeshFeatures2 =
             m1.meshes[1].primitives[0].getExtension<ExtensionExtMeshFeatures>();
         REQUIRE(pMeshFeatures2);
         REQUIRE(pMeshFeatures2->featureIds.size() == 1);
@@ -1170,13 +1179,13 @@ TEST_CASE("Model::merge") {
 
         Mesh& mesh1 = m1.meshes.emplace_back();
         MeshPrimitive& primitive1 = mesh1.primitives.emplace_back();
-        ExtensionExtMeshFeatures& meshFeatures1 =
+        auto& meshFeatures1 =
             primitive1.addExtension<ExtensionExtMeshFeatures>();
         meshFeatures1.featureIds.emplace_back().texture.emplace().index = 0;
 
         Mesh& mesh2 = m2.meshes.emplace_back();
         MeshPrimitive& primitive2 = mesh2.primitives.emplace_back();
-        ExtensionExtMeshFeatures& meshFeatures2 =
+        auto& meshFeatures2 =
             primitive2.addExtension<ExtensionExtMeshFeatures>();
         meshFeatures2.featureIds.emplace_back().texture.emplace().index = 0;
 
@@ -1188,14 +1197,14 @@ TEST_CASE("Model::merge") {
         REQUIRE(m1.meshes[0].primitives.size() == 1);
         REQUIRE(m1.meshes[1].primitives.size() == 1);
 
-        ExtensionExtMeshFeatures* pMeshFeatures1 =
+        auto* pMeshFeatures1 =
             m1.meshes[0].primitives[0].getExtension<ExtensionExtMeshFeatures>();
         REQUIRE(pMeshFeatures1);
         REQUIRE(pMeshFeatures1->featureIds.size() == 1);
         REQUIRE(pMeshFeatures1->featureIds[0].texture);
         CHECK(pMeshFeatures1->featureIds[0].texture->index == 0);
 
-        ExtensionExtMeshFeatures* pMeshFeatures2 =
+        auto* pMeshFeatures2 =
             m1.meshes[1].primitives[0].getExtension<ExtensionExtMeshFeatures>();
         REQUIRE(pMeshFeatures2);
         REQUIRE(pMeshFeatures2->featureIds.size() == 1);
@@ -1212,8 +1221,7 @@ TEST_CASE("Model::merge") {
     Model m2;
     m2.images.emplace_back();
     Texture& texture = m2.textures.emplace_back();
-    ExtensionKhrTextureBasisu& extension =
-        texture.addExtension<ExtensionKhrTextureBasisu>();
+    auto& extension = texture.addExtension<ExtensionKhrTextureBasisu>();
     extension.source = 0;
 
     m1.merge(std::move(m2));
@@ -1221,8 +1229,7 @@ TEST_CASE("Model::merge") {
     REQUIRE(m1.images.size() == 2);
     REQUIRE(m1.textures.size() == 1);
 
-    ExtensionKhrTextureBasisu* pMerged =
-        m1.textures[0].getExtension<ExtensionKhrTextureBasisu>();
+    auto* pMerged = m1.textures[0].getExtension<ExtensionKhrTextureBasisu>();
     REQUIRE(pMerged);
     CHECK(pMerged->source == 1);
   }
@@ -1234,8 +1241,7 @@ TEST_CASE("Model::merge") {
     Model m2;
     m2.images.emplace_back();
     Texture& texture = m2.textures.emplace_back();
-    ExtensionTextureWebp& extension =
-        texture.addExtension<ExtensionTextureWebp>();
+    auto& extension = texture.addExtension<ExtensionTextureWebp>();
     extension.source = 0;
 
     m1.merge(std::move(m2));
@@ -1243,8 +1249,7 @@ TEST_CASE("Model::merge") {
     REQUIRE(m1.images.size() == 2);
     REQUIRE(m1.textures.size() == 1);
 
-    ExtensionTextureWebp* pMerged =
-        m1.textures[0].getExtension<ExtensionTextureWebp>();
+    auto* pMerged = m1.textures[0].getExtension<ExtensionTextureWebp>();
     REQUIRE(pMerged);
     CHECK(pMerged->source == 1);
   }
@@ -1257,8 +1262,7 @@ TEST_CASE("Model::merge") {
     m2.accessors.emplace_back();
     MeshPrimitive& primitive =
         m2.meshes.emplace_back().primitives.emplace_back();
-    ExtensionCesiumPrimitiveOutline& extension =
-        primitive.addExtension<ExtensionCesiumPrimitiveOutline>();
+    auto& extension = primitive.addExtension<ExtensionCesiumPrimitiveOutline>();
     extension.indices = 0;
 
     m1.merge(std::move(m2));
@@ -1267,10 +1271,9 @@ TEST_CASE("Model::merge") {
     REQUIRE(m1.meshes.size() == 1);
     REQUIRE(m1.meshes[0].primitives.size() == 1);
 
-    ExtensionCesiumPrimitiveOutline* pMerged =
-        m1.meshes[0]
-            .primitives[0]
-            .getExtension<ExtensionCesiumPrimitiveOutline>();
+    auto* pMerged = m1.meshes[0]
+                        .primitives[0]
+                        .getExtension<ExtensionCesiumPrimitiveOutline>();
     REQUIRE(pMerged);
     CHECK(pMerged->indices == 1);
   }
@@ -1283,8 +1286,7 @@ TEST_CASE("Model::merge") {
     m2.accessors.emplace_back();
     MeshPrimitive& primitive =
         m2.meshes.emplace_back().primitives.emplace_back();
-    ExtensionCesiumTileEdges& extension =
-        primitive.addExtension<ExtensionCesiumTileEdges>();
+    auto& extension = primitive.addExtension<ExtensionCesiumTileEdges>();
     extension.left = 0;
     extension.bottom = 0;
     extension.right = 0;
@@ -1296,7 +1298,7 @@ TEST_CASE("Model::merge") {
     REQUIRE(m1.meshes.size() == 1);
     REQUIRE(m1.meshes[0].primitives.size() == 1);
 
-    ExtensionCesiumTileEdges* pMerged =
+    auto* pMerged =
         m1.meshes[0].primitives[0].getExtension<ExtensionCesiumTileEdges>();
     REQUIRE(pMerged);
     CHECK(pMerged->left == 1);
@@ -1313,8 +1315,7 @@ TEST_CASE("Model::merge") {
     m2.accessors.emplace_back();
     Node& node = m2.nodes.emplace_back();
 
-    ExtensionExtMeshGpuInstancing& extension =
-        node.addExtension<ExtensionExtMeshGpuInstancing>();
+    auto& extension = node.addExtension<ExtensionExtMeshGpuInstancing>();
     extension.attributes["foo"] = 0;
 
     m1.merge(std::move(m2));
@@ -1322,8 +1323,7 @@ TEST_CASE("Model::merge") {
     REQUIRE(m1.accessors.size() == 2);
     REQUIRE(m1.nodes.size() == 1);
 
-    ExtensionExtMeshGpuInstancing* pMerged =
-        m1.nodes[0].getExtension<ExtensionExtMeshGpuInstancing>();
+    auto* pMerged = m1.nodes[0].getExtension<ExtensionExtMeshGpuInstancing>();
     REQUIRE(pMerged);
 
     auto it = pMerged->attributes.find("foo");
@@ -1339,7 +1339,7 @@ TEST_CASE("Model::merge") {
     m2.buffers.emplace_back();
     BufferView& bufferView = m2.bufferViews.emplace_back();
 
-    ExtensionBufferViewExtMeshoptCompression& extension =
+    auto& extension =
         bufferView.addExtension<ExtensionBufferViewExtMeshoptCompression>();
     extension.buffer = 0;
 
@@ -1348,7 +1348,7 @@ TEST_CASE("Model::merge") {
     REQUIRE(m1.buffers.size() == 2);
     REQUIRE(m1.bufferViews.size() == 1);
 
-    ExtensionBufferViewExtMeshoptCompression* pMerged =
+    auto* pMerged =
         m1.bufferViews[0]
             .getExtension<ExtensionBufferViewExtMeshoptCompression>();
     REQUIRE(pMerged);
@@ -1394,7 +1394,7 @@ TEST_CASE("Model::forEachRootNodeInScene") {
       });
 
       REQUIRE(visited.size() == 2);
-      CHECK(visited[0] == &m.nodes[0]);
+      CHECK(visited[0] == m.nodes.data());
       CHECK(visited[1] == &m.nodes[2]);
     }
 
@@ -1408,7 +1408,7 @@ TEST_CASE("Model::forEachRootNodeInScene") {
       });
 
       REQUIRE(visited.size() == 2);
-      CHECK(visited[0] == &m.nodes[0]);
+      CHECK(visited[0] == m.nodes.data());
       CHECK(visited[1] == &m.nodes[2]);
     }
   }
@@ -1426,7 +1426,7 @@ TEST_CASE("Model::forEachRootNodeInScene") {
     });
 
     REQUIRE(visited.size() == 1);
-    CHECK(visited[0] == &m.nodes[0]);
+    CHECK(visited[0] == m.nodes.data());
   }
 
   SECTION("with no scenes or nodes") {
@@ -1527,7 +1527,7 @@ TEST_CASE("Model::forEachNodeInScene") {
           });
 
       REQUIRE(visited.size() == 2);
-      CHECK(visited[0] == &m.nodes[0]);
+      CHECK(visited[0] == m.nodes.data());
       CHECK(visited[1] == &m.nodes[1]);
     }
 
@@ -1544,7 +1544,7 @@ TEST_CASE("Model::forEachNodeInScene") {
           });
 
       REQUIRE(visited.size() == 2);
-      CHECK(visited[0] == &m.nodes[0]);
+      CHECK(visited[0] == m.nodes.data());
       CHECK(visited[1] == &m.nodes[1]);
     }
 
@@ -1581,7 +1581,7 @@ TEST_CASE("Model::forEachNodeInScene") {
         });
 
     REQUIRE(visited.size() == 1);
-    CHECK(visited[0] == &m.nodes[0]);
+    CHECK(visited[0] == m.nodes.data());
   }
 
   SECTION("with no scenes or nodes") {

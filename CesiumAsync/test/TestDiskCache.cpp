@@ -1,3 +1,5 @@
+#include "CesiumAsync/CacheItem.h"
+#include "CesiumAsync/HttpHeaders.h"
 #include "CesiumAsync/SqliteCache.h"
 #include "MockAssetRequest.h"
 #include "MockAssetResponse.h"
@@ -7,6 +9,13 @@
 #include <spdlog/spdlog.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 

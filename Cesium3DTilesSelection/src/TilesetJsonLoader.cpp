@@ -1,7 +1,24 @@
 #include "TilesetJsonLoader.h"
 
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/S2CellID.h"
+#include "CesiumGltfReader/GltfReader.h"
+#include "CesiumUtility/ErrorList.h"
 #include "ImplicitOctreeLoader.h"
 #include "ImplicitQuadtreeLoader.h"
+#include "TilesetContentLoaderResult.h"
 #include "logTileLoadResult.h"
 
 #include <Cesium3DTilesContent/GltfConverters.h>
@@ -17,13 +34,29 @@
 #include <CesiumGeospatial/S2CellBoundingVolume.h>
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Log.h>
 #include <CesiumUtility/Uri.h>
-#include <CesiumUtility/joinToString.h>
 
+#include <fmt/core.h>
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/geometric.hpp>
+#include <gsl/span>
 #include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumUtility;
 using namespace Cesium3DTilesContent;
@@ -586,19 +619,18 @@ std::optional<Tile> parseTileJsonRecursively(
     tile.createChildTiles(std::move(childTiles));
 
     return tile;
-  } else {
-    Tile tile{&currentLoader, TileEmptyContent{}};
-    tile.setTileID("");
-    tile.setTransform(tileTransform);
-    tile.setBoundingVolume(tileBoundingVolume);
-    tile.setViewerRequestVolume(tileViewerRequestVolume);
-    tile.setGeometricError(tileGeometricError);
-    tile.setRefine(tileRefine);
-    tile.setContentBoundingVolume(tileContentBoundingVolume);
-    tile.createChildTiles(std::move(childTiles));
-
-    return tile;
   }
+  Tile tile{&currentLoader, TileEmptyContent{}};
+  tile.setTileID("");
+  tile.setTransform(tileTransform);
+  tile.setBoundingVolume(tileBoundingVolume);
+  tile.setViewerRequestVolume(tileViewerRequestVolume);
+  tile.setGeometricError(tileGeometricError);
+  tile.setRefine(tileRefine);
+  tile.setContentBoundingVolume(tileContentBoundingVolume);
+  tile.createChildTiles(std::move(childTiles));
+
+  return tile;
 }
 
 TilesetContentLoaderResult<TilesetJsonLoader> parseTilesetJson(
@@ -751,7 +783,7 @@ TilesetJsonLoader::TilesetJsonLoader(
     const std::string& baseUrl,
     CesiumGeometry::Axis upAxis,
     const CesiumGeospatial::Ellipsoid& ellipsoid)
-    : _baseUrl{baseUrl}, _ellipsoid{ellipsoid}, _upAxis{upAxis}, _children{} {}
+    : _baseUrl{baseUrl}, _ellipsoid{ellipsoid}, _upAxis{upAxis} {}
 
 CesiumAsync::Future<TilesetContentLoaderResult<TilesetJsonLoader>>
 TilesetJsonLoader::createLoader(
@@ -864,7 +896,7 @@ CesiumAsync::Future<TileLoadResult>
 TilesetJsonLoader::loadTileContent(const TileLoadInput& loadInput) {
   const Tile& tile = loadInput.tile;
   // check if this tile belongs to a child loader
-  auto currentLoader = tile.getLoader();
+  auto* currentLoader = tile.getLoader();
   if (currentLoader != this) {
     return currentLoader->loadTileContent(loadInput);
   }
@@ -903,7 +935,7 @@ TilesetJsonLoader::loadTileContent(const TileLoadInput& loadInput) {
                            requestHeaders](
                               std::shared_ptr<CesiumAsync::IAssetRequest>&&
                                   pCompletedRequest) mutable {
-        auto pResponse = pCompletedRequest->response();
+        const auto* pResponse = pCompletedRequest->response();
         const std::string& tileUrl = pCompletedRequest->url();
         if (!pResponse) {
           SPDLOG_LOGGER_ERROR(
@@ -953,7 +985,7 @@ TilesetJsonLoader::loadTileContent(const TileLoadInput& loadInput) {
                     logTileLoadResult(pLogger, tileUrl, result.errors);
                     if (result.errors) {
                       return TileLoadResult::createFailedResult(
-                          std::move(pCompletedRequest));
+                          pCompletedRequest);
                     }
                     return TileLoadResult{
                         std::move(*result.model),
@@ -961,30 +993,28 @@ TilesetJsonLoader::loadTileContent(const TileLoadInput& loadInput) {
                         std::nullopt,
                         std::nullopt,
                         std::nullopt,
-                        std::move(pCompletedRequest),
+                        pCompletedRequest,
                         {},
                         TileLoadResultState::Success,
                         ellipsoid};
                   });
-        } else {
-          // not a renderable content, then it must be external tileset
-          return asyncSystem.createResolvedFuture(
-              parseExternalTilesetInWorkerThread(
-                  tileTransform,
-                  upAxis,
-                  tileRefine,
-                  pLogger,
-                  std::move(pCompletedRequest),
-                  std::move(externalContentInitializer),
-                  ellipsoid));
-        }
+        } // not a renderable content, then it must be external tileset
+        return asyncSystem.createResolvedFuture(
+            parseExternalTilesetInWorkerThread(
+                tileTransform,
+                upAxis,
+                tileRefine,
+                pLogger,
+                std::move(pCompletedRequest),
+                std::move(externalContentInitializer),
+                ellipsoid));
       });
 }
 
 TileChildrenResult TilesetJsonLoader::createTileChildren(
     const Tile& tile,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
-  auto pLoader = tile.getLoader();
+  auto* pLoader = tile.getLoader();
   if (pLoader != this) {
     return pLoader->createTileChildren(tile, ellipsoid);
   }

@@ -1,6 +1,15 @@
 #include "CesiumGltf/Model.h"
 
+#include "CesiumGltf/Accessor.h"
 #include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/Animation.h"
+#include "CesiumGltf/AnimationChannel.h"
+#include "CesiumGltf/AnimationSampler.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/Enum.h"
 #include "CesiumGltf/ExtensionBufferViewExtMeshoptCompression.h"
 #include "CesiumGltf/ExtensionCesiumPrimitiveOutline.h"
 #include "CesiumGltf/ExtensionCesiumTileEdges.h"
@@ -11,16 +20,46 @@
 #include "CesiumGltf/ExtensionMeshPrimitiveExtStructuralMetadata.h"
 #include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
 #include "CesiumGltf/ExtensionTextureWebp.h"
+#include "CesiumGltf/FeatureId.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Node.h"
+#include "CesiumGltf/PropertyAttribute.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumGltf/PropertyTexture.h"
+#include "CesiumGltf/PropertyTextureProperty.h"
+#include "CesiumGltf/Scene.h"
+#include "CesiumGltf/Schema.h"
+#include "CesiumGltf/Skin.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumUtility/ErrorList.h"
 
 #include <CesiumUtility/Assert.h>
 
-#include <glm/gtc/quaternion.hpp>
+#include <fmt/core.h>
+#include <glm/exponential.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/quaternion_double.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtx/norm.hpp>
-#include <glm/vec3.hpp>
 #include <gsl/span>
 
 #include <algorithm>
-#include <charconv>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <map>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumUtility;
 
@@ -93,11 +132,9 @@ ErrorList Model::merge(Model&& rhs) {
   size_t firstPropertyTexture = 0;
   size_t firstPropertyAttribute = 0;
 
-  ExtensionModelExtStructuralMetadata* pRhsMetadata =
-      rhs.getExtension<ExtensionModelExtStructuralMetadata>();
+  auto* pRhsMetadata = rhs.getExtension<ExtensionModelExtStructuralMetadata>();
   if (pRhsMetadata) {
-    ExtensionModelExtStructuralMetadata& metadata =
-        this->addExtension<ExtensionModelExtStructuralMetadata>();
+    auto& metadata = this->addExtension<ExtensionModelExtStructuralMetadata>();
 
     if (metadata.schemaUri && pRhsMetadata->schemaUri &&
         *metadata.schemaUri != *pRhsMetadata->schemaUri) {
@@ -195,7 +232,7 @@ ErrorList Model::merge(Model&& rhs) {
     BufferView& bufferView = this->bufferViews[i];
     updateIndex(bufferView.buffer, firstBuffer);
 
-    ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
+    auto* pMeshOpt =
         bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
     if (pMeshOpt) {
       updateIndex(pMeshOpt->buffer, firstBuffer);
@@ -224,13 +261,12 @@ ErrorList Model::merge(Model&& rhs) {
         }
       }
 
-      ExtensionKhrDracoMeshCompression* pDraco =
-          primitive.getExtension<ExtensionKhrDracoMeshCompression>();
+      auto* pDraco = primitive.getExtension<ExtensionKhrDracoMeshCompression>();
       if (pDraco) {
         updateIndex(pDraco->bufferView, firstBufferView);
       }
 
-      ExtensionMeshPrimitiveExtStructuralMetadata* pMetadata =
+      auto* pMetadata =
           primitive.getExtension<ExtensionMeshPrimitiveExtStructuralMetadata>();
       if (pMetadata) {
         for (int32_t& propertyTextureID : pMetadata->propertyTextures) {
@@ -242,8 +278,7 @@ ErrorList Model::merge(Model&& rhs) {
         }
       }
 
-      ExtensionExtMeshFeatures* pMeshFeatures =
-          primitive.getExtension<ExtensionExtMeshFeatures>();
+      auto* pMeshFeatures = primitive.getExtension<ExtensionExtMeshFeatures>();
       if (pMeshFeatures) {
         for (FeatureId& featureId : pMeshFeatures->featureIds) {
           updateIndex(featureId.propertyTable, firstPropertyTable);
@@ -254,8 +289,7 @@ ErrorList Model::merge(Model&& rhs) {
         }
       }
 
-      ExtensionCesiumTileEdges* pTileEdges =
-          primitive.getExtension<ExtensionCesiumTileEdges>();
+      auto* pTileEdges = primitive.getExtension<ExtensionCesiumTileEdges>();
       if (pTileEdges) {
         updateIndex(pTileEdges->left, firstAccessor);
         updateIndex(pTileEdges->bottom, firstAccessor);
@@ -263,7 +297,7 @@ ErrorList Model::merge(Model&& rhs) {
         updateIndex(pTileEdges->top, firstAccessor);
       }
 
-      ExtensionCesiumPrimitiveOutline* pPrimitiveOutline =
+      auto* pPrimitiveOutline =
           primitive.getExtension<ExtensionCesiumPrimitiveOutline>();
       if (pPrimitiveOutline) {
         updateIndex(pPrimitiveOutline->indices, firstAccessor);
@@ -282,8 +316,7 @@ ErrorList Model::merge(Model&& rhs) {
       updateIndex(nodeIndex, firstNode);
     }
 
-    ExtensionExtMeshGpuInstancing* pInstancing =
-        node.getExtension<ExtensionExtMeshGpuInstancing>();
+    auto* pInstancing = node.getExtension<ExtensionExtMeshGpuInstancing>();
     if (pInstancing) {
       for (auto& pair : pInstancing->attributes) {
         updateIndex(pair.second, firstAccessor);
@@ -315,14 +348,15 @@ ErrorList Model::merge(Model&& rhs) {
     updateIndex(texture.sampler, firstSampler);
     updateIndex(texture.source, firstImage);
 
-    ExtensionKhrTextureBasisu* pKtx =
-        texture.getExtension<ExtensionKhrTextureBasisu>();
-    if (pKtx)
+    auto* pKtx = texture.getExtension<ExtensionKhrTextureBasisu>();
+    if (pKtx) {
       updateIndex(pKtx->source, firstImage);
+    }
 
-    ExtensionTextureWebp* pWebP = texture.getExtension<ExtensionTextureWebp>();
-    if (pWebP)
+    auto* pWebP = texture.getExtension<ExtensionTextureWebp>();
+    if (pWebP) {
       updateIndex(pWebP->source, firstImage);
+    }
   }
 
   for (size_t i = firstMaterial; i < this->materials.size(); ++i) {
@@ -519,9 +553,10 @@ void forEachNodeInSceneObject(
     const Scene& scene,
     TCallback& callback) {
   for (int32_t node : scene.nodes) {
-    const Node* pNode = model.getSafe(&model.nodes, node);
-    if (!pNode)
+    const Node* pNode = CesiumGltf::Model::getSafe(&model.nodes, node);
+    if (!pNode) {
       continue;
+    }
 
     callback(model, *pNode);
   }
@@ -642,9 +677,9 @@ void addTriangleNormalToVertexNormals(
 
   // Add the triangle's normal to each vertex's accumulated normal.
 
-  const uint32_t index0 = static_cast<uint32_t>(tIndex0);
-  const uint32_t index1 = static_cast<uint32_t>(tIndex1);
-  const uint32_t index2 = static_cast<uint32_t>(tIndex2);
+  const auto index0 = static_cast<uint32_t>(tIndex0);
+  const auto index1 = static_cast<uint32_t>(tIndex1);
+  const auto index2 = static_cast<uint32_t>(tIndex2);
 
   const glm::vec3& vertex0 = positionView[index0];
   const glm::vec3& vertex1 = positionView[index1];
@@ -744,7 +779,7 @@ void generateSmoothNormals(
     const AccessorView<glm::vec3>& positionView,
     const std::optional<Accessor>& indexAccessor) {
 
-  const size_t count = static_cast<size_t>(positionView.size());
+  const auto count = static_cast<size_t>(positionView.size());
   const size_t normalBufferStride = sizeof(glm::vec3);
   const size_t normalBufferSize = count * normalBufferStride;
 
@@ -786,8 +821,8 @@ void generateSmoothNormals(
   // normalizes the accumulated vertex normals
   for (size_t i = 0; i < count; ++i) {
     const float lengthSquared = glm::length2(normals[i]);
-    if (lengthSquared < 1e-8f) {
-      normals[i] = glm::vec3(0.0f);
+    if (lengthSquared < 1e-8F) {
+      normals[i] = glm::vec3(0.0F);
     } else {
       normals[i] /= glm::sqrt(lengthSquared);
     }
@@ -950,8 +985,9 @@ std::string findAvailableName(
     const std::unordered_map<std::string, T>& map,
     const std::string& name) {
   auto it = map.find(name);
-  if (it == map.end())
+  if (it == map.end()) {
     return name;
+  }
 
   // Name already exists in the map, so find a numbered name that doesn't.
 
@@ -976,29 +1012,33 @@ void mergeSchemas(
     Schema& lhs,
     Schema& rhs,
     std::map<std::string, std::string>& classNameMap) {
-  if (!lhs.name)
+  if (!lhs.name) {
     lhs.name = rhs.name;
-  else if (rhs.name && *lhs.name != *rhs.name)
+  } else if (rhs.name && *lhs.name != *rhs.name) {
     lhs.name.emplace("Merged");
+  }
 
-  if (!lhs.description)
+  if (!lhs.description) {
     lhs.description = rhs.description;
-  else if (rhs.description && *lhs.description != *rhs.description)
+  } else if (rhs.description && *lhs.description != *rhs.description) {
     lhs.description.emplace("This is a merged schema created by combining "
                             "together the schemas from multiple glTFs.");
+  }
 
-  if (!lhs.version)
+  if (!lhs.version) {
     lhs.version = rhs.version;
-  else if (rhs.version && *lhs.version != *rhs.version)
+  } else if (rhs.version && *lhs.version != *rhs.version) {
     lhs.version.reset();
+  }
 
   std::map<std::string, std::string> enumNameMap;
 
   for (std::pair<const std::string, Enum>& pair : rhs.enums) {
     std::string availableName = findAvailableName(lhs.enums, pair.first);
     lhs.enums[availableName] = std::move(pair.second);
-    if (availableName != pair.first)
+    if (availableName != pair.first) {
       enumNameMap.emplace(pair.first, availableName);
+    }
   }
 
   for (std::pair<const std::string, Class>& pair : rhs.classes) {
@@ -1006,8 +1046,9 @@ void mergeSchemas(
     Class& klass = lhs.classes[availableName];
     klass = std::move(pair.second);
 
-    if (availableName != pair.first)
+    if (availableName != pair.first) {
       classNameMap.emplace(pair.first, availableName);
+    }
 
     // Remap enum names in class properties.
     for (std::pair<const std::string, ClassProperty>& propertyPair :

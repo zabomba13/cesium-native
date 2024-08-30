@@ -1,10 +1,16 @@
+#include "Cesium3DTilesContent/SubtreeAvailability.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGltf/Model.h"
 #include "ImplicitOctreeLoader.h"
 
 #include <Cesium3DTilesContent/registerAllTileContentTypes.h>
 #include <Cesium3DTilesSelection/Tile.h>
 #include <CesiumGeometry/OrientedBoundingBox.h>
 #include <CesiumGeospatial/BoundingRegion.h>
-#include <CesiumGeospatial/S2CellBoundingVolume.h>
 #include <CesiumNativeTests/SimpleAssetAccessor.h>
 #include <CesiumNativeTests/SimpleAssetRequest.h>
 #include <CesiumNativeTests/SimpleAssetResponse.h>
@@ -14,8 +20,21 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <gsl/span>
+#include <spdlog/spdlog.h>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace Cesium3DTilesContent;
 using namespace Cesium3DTilesSelection;
@@ -26,7 +45,7 @@ using namespace CesiumNativeTests;
 
 namespace {
 std::filesystem::path testDataPath = Cesium3DTilesSelection_TEST_DATA_DIR;
-}
+} // namespace
 
 TEST_CASE("Test implicit octree loader") {
   Cesium3DTilesContent::registerAllTileContentTypes();
@@ -211,8 +230,9 @@ findTile(const gsl::span<const Tile>& children, const OctreeTileID& tileID) {
       children.end(),
       [tileID](const Tile& tile) {
         const OctreeTileID* pID = std::get_if<OctreeTileID>(&tile.getTileID());
-        if (!pID)
+        if (!pID) {
           return false;
+        }
         return *pID == tileID;
       });
   REQUIRE(it != children.end());
@@ -594,7 +614,7 @@ TEST_CASE("Test tile subdivision for implicit octree loader") {
 
     // check subdivide one of the root children
     {
-      auto& tile_1_1_0_0 =
+      const auto& tile_1_1_0_0 =
           findTile(tile.getChildren(), OctreeTileID(1, 1, 0, 0));
       auto tileChildrenResult = loader.createTileChildren(tile_1_1_0_0);
       CHECK(tileChildrenResult.state == TileLoadResultState::Success);

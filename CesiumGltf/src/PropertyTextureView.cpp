@@ -1,5 +1,19 @@
 #include "CesiumGltf/PropertyTextureView.h"
 
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyTexture.h"
+#include "CesiumGltf/PropertyTexturePropertyView.h"
+#include "CesiumGltf/PropertyView.h"
+#include "CesiumGltf/Texture.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <vector>
+
 namespace CesiumGltf {
 PropertyTextureView::PropertyTextureView(
     const Model& model,
@@ -8,7 +22,7 @@ PropertyTextureView::PropertyTextureView(
       _pPropertyTexture(&propertyTexture),
       _pClass(nullptr),
       _status() {
-  const ExtensionModelExtStructuralMetadata* pMetadata =
+  const auto* pMetadata =
       model.getExtension<ExtensionModelExtStructuralMetadata>();
 
   if (!pMetadata) {
@@ -96,14 +110,14 @@ PropertyTextureView::checkImage(const int32_t imageIndex) const noexcept {
 
 PropertyViewStatusType PropertyTextureView::checkChannels(
     const std::vector<int64_t>& channels,
-    const ImageCesium& image) const noexcept {
-  if (channels.size() <= 0 || channels.size() > 4) {
+    const ImageCesium& image) noexcept {
+  if (channels.empty() || channels.size() > 4) {
     return PropertyTexturePropertyViewStatus::ErrorInvalidChannels;
   }
 
-  int64_t imageChannelCount = static_cast<int64_t>(image.channels);
-  for (size_t i = 0; i < channels.size(); i++) {
-    if (channels[i] < 0 || channels[i] >= imageChannelCount) {
+  auto imageChannelCount = static_cast<int64_t>(image.channels);
+  for (long channel : channels) {
+    if (channel < 0 || channel >= imageChannelCount) {
       return PropertyTexturePropertyViewStatus::ErrorInvalidChannels;
     }
   }

@@ -1,6 +1,27 @@
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/PropertyArrayView.h"
 #include "CesiumGltf/PropertyView.h"
+#include "CesiumUtility/JsonValue.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_int2.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_int4_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/fwd.hpp>
+
+#include <cstdint>
+#include <string_view>
 
 using namespace CesiumGltf;
 using namespace CesiumUtility;
@@ -126,17 +147,17 @@ TEST_CASE("Scalar PropertyView") {
     ClassProperty classProperty;
     classProperty.type = ClassProperty::Type::SCALAR;
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
-    classProperty.offset = 5.04f;
-    classProperty.scale = 2.2f;
-    classProperty.max = 10.5f;
-    classProperty.min = -10.5f;
+    classProperty.offset = 5.04F;
+    classProperty.scale = 2.2F;
+    classProperty.max = 10.5F;
+    classProperty.min = -10.5F;
 
     PropertyView<float> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::Valid);
-    REQUIRE(view.offset() == 5.04f);
-    REQUIRE(view.scale() == 2.2f);
-    REQUIRE(view.max() == 10.5f);
-    REQUIRE(view.min() == -10.5f);
+    REQUIRE(view.offset() == 5.04F);
+    REQUIRE(view.scale() == 2.2F);
+    REQUIRE(view.max() == 10.5F);
+    REQUIRE(view.min() == -10.5F);
   }
 
   SECTION("Constructs with noData and defaultProperty") {
@@ -279,17 +300,17 @@ TEST_CASE("Scalar PropertyView (normalized)") {
     classProperty.type = ClassProperty::Type::SCALAR;
     classProperty.componentType = ClassProperty::ComponentType::INT32;
     classProperty.normalized = true;
-    classProperty.offset = 5.04f;
-    classProperty.scale = 2.2f;
-    classProperty.max = 10.5f;
-    classProperty.min = -10.5f;
+    classProperty.offset = 5.04F;
+    classProperty.scale = 2.2F;
+    classProperty.max = 10.5F;
+    classProperty.min = -10.5F;
 
     PropertyView<int32_t, true> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::Valid);
-    REQUIRE(view.offset() == 5.04f);
-    REQUIRE(view.scale() == 2.2f);
-    REQUIRE(view.max() == 10.5f);
-    REQUIRE(view.min() == -10.5f);
+    REQUIRE(view.offset() == 5.04F);
+    REQUIRE(view.scale() == 2.2F);
+    REQUIRE(view.max() == 10.5F);
+    REQUIRE(view.min() == -10.5F);
   }
 
   SECTION("Constructs with noData and defaultProperty") {
@@ -433,13 +454,13 @@ TEST_CASE("VecN PropertyView") {
     classProperty.type = ClassProperty::Type::VEC4;
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
     classProperty.required = false;
-    classProperty.noData = {0.0f, 0.0f, 0.0f, 0.0f};
-    classProperty.defaultProperty = {1.0f, 2.0f, 3.0f, 4.0f};
+    classProperty.noData = {0.0F, 0.0F, 0.0F, 0.0F};
+    classProperty.defaultProperty = {1.0F, 2.0F, 3.0F, 4.0F};
 
     PropertyView<glm::vec4> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::Valid);
-    REQUIRE(view.noData() == glm::vec4(0.0f));
-    REQUIRE(view.defaultValue() == glm::vec4(1.0f, 2.0f, 3.0f, 4.0f));
+    REQUIRE(view.noData() == glm::vec4(0.0F));
+    REQUIRE(view.defaultValue() == glm::vec4(1.0F, 2.0F, 3.0F, 4.0F));
   }
 
   SECTION("Reports errors for incorrectly defined properties") {
@@ -776,11 +797,11 @@ TEST_CASE("MatN PropertyView") {
     classProperty.required = false;
     // clang-format off
     classProperty.noData = {
-      0.0f, 0.0f,
-      0.0f, 0.0f};
+      0.0F, 0.0F,
+      0.0F, 0.0F};
     classProperty.defaultProperty = {
-      1.0f, 2.0f,
-      3.0f, 4.5f};
+      1.0F, 2.0F,
+      3.0F, 4.5F};
     // clang-format on
 
     PropertyView<glm::mat2> view(classProperty);
@@ -789,13 +810,13 @@ TEST_CASE("MatN PropertyView") {
 
     // clang-format off
     glm::mat2 expectedNoData(
-      0.0f, 0.0f,
-      0.0f, 0.0f);
+      0.0F, 0.0F,
+      0.0F, 0.0F);
     REQUIRE(view.noData() == expectedNoData);
 
     glm::mat2 expectedDefaultValue(
-      1.0f, 2.0f,
-      3.0f, 4.5f);
+      1.0F, 2.0F,
+      3.0F, 4.5F);
     REQUIRE(view.defaultValue() == expectedDefaultValue);
   }
 
@@ -1377,10 +1398,10 @@ TEST_CASE("Scalar Array PropertyView") {
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
     classProperty.array = true;
     classProperty.count = 2;
-    classProperty.offset = JsonValue::Array{5.0f, 10.0f};
-    classProperty.scale = JsonValue::Array{2.0f, 1.0f};
-    classProperty.max = JsonValue::Array{10.0f, 20.0f};
-    classProperty.min = JsonValue::Array{-10.0f, -1.0f};
+    classProperty.offset = JsonValue::Array{5.0F, 10.0F};
+    classProperty.scale = JsonValue::Array{2.0F, 1.0F};
+    classProperty.max = JsonValue::Array{10.0F, 20.0F};
+    classProperty.min = JsonValue::Array{-10.0F, -1.0F};
 
     PropertyView<PropertyArrayView<float>> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::Valid);
@@ -1391,23 +1412,23 @@ TEST_CASE("Scalar Array PropertyView") {
 
     PropertyArrayView<float> value = *view.offset();
     REQUIRE(value.size() == 2);
-    REQUIRE(value[0] == 5.0f);
-    REQUIRE(value[1] == 10.0f);
+    REQUIRE(value[0] == 5.0F);
+    REQUIRE(value[1] == 10.0F);
 
     value = *view.scale();
     REQUIRE(value.size() == 2);
-    REQUIRE(value[0] == 2.0f);
-    REQUIRE(value[1] == 1.0f);
+    REQUIRE(value[0] == 2.0F);
+    REQUIRE(value[1] == 1.0F);
 
     value = *view.max();
     REQUIRE(value.size() == 2);
-    REQUIRE(value[0] == 10.0f);
-    REQUIRE(value[1] == 20.0f);
+    REQUIRE(value[0] == 10.0F);
+    REQUIRE(value[1] == 20.0F);
 
     value = *view.min();
     REQUIRE(value.size() == 2);
-    REQUIRE(value[0] == -10.0f);
-    REQUIRE(value[1] == -1.0f);
+    REQUIRE(value[0] == -10.0F);
+    REQUIRE(value[1] == -1.0F);
   }
 
   SECTION("Constructs with noData and defaultProperty") {
@@ -1890,8 +1911,8 @@ TEST_CASE("VecN Array PropertyView") {
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
     classProperty.array = true;
     classProperty.required = false;
-    classProperty.noData = {{0.0f, 0.0f}, {1.0f, 2.0f}};
-    classProperty.defaultProperty = {{3.0f, 4.0f}, {5.0f, 6.0f}};
+    classProperty.noData = {{0.0F, 0.0F}, {1.0F, 2.0F}};
+    classProperty.defaultProperty = {{3.0F, 4.0F}, {5.0F, 6.0F}};
 
     PropertyView<PropertyArrayView<glm::vec2>> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::Valid);
@@ -1901,13 +1922,13 @@ TEST_CASE("VecN Array PropertyView") {
 
     PropertyArrayView<glm::vec2> value = *view.noData();
     REQUIRE(value.size() == 2);
-    REQUIRE(value[0] == glm::vec2(0.0f, 0.0f));
-    REQUIRE(value[1] == glm::vec2(1.0f, 2.0f));
+    REQUIRE(value[0] == glm::vec2(0.0F, 0.0F));
+    REQUIRE(value[1] == glm::vec2(1.0F, 2.0F));
 
     value = *view.defaultValue();
     REQUIRE(value.size() == 2);
-    REQUIRE(value[0] == glm::vec2(3.0f, 4.0f));
-    REQUIRE(value[1] == glm::vec2(5.0f, 6.0f));
+    REQUIRE(value[0] == glm::vec2(3.0F, 4.0F));
+    REQUIRE(value[1] == glm::vec2(5.0F, 6.0F));
   }
 
   SECTION("Reports errors for defined properties on variable-length arrays") {
@@ -1999,7 +2020,7 @@ TEST_CASE("VecN Array PropertyView") {
     PropertyView<PropertyArrayView<glm::i8vec2>> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::ErrorInvalidDefaultValue);
 
-    classProperty.noData = JsonValue::Array{{2.0f, 5.4f}};
+    classProperty.noData = JsonValue::Array{{2.0F, 5.4F}};
     view = PropertyView<PropertyArrayView<glm::i8vec2>>(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::ErrorInvalidNoDataValue);
 
@@ -2222,7 +2243,7 @@ TEST_CASE("VecN Array PropertyView (normalized)") {
     PropertyView<PropertyArrayView<glm::i8vec2>, true> view(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::ErrorInvalidDefaultValue);
 
-    classProperty.noData = JsonValue::Array{{2.0f, 5.4f}, "not a vec2"};
+    classProperty.noData = JsonValue::Array{{2.0F, 5.4F}, "not a vec2"};
     view = PropertyView<PropertyArrayView<glm::i8vec2>, true>(classProperty);
     REQUIRE(view.status() == PropertyViewStatus::ErrorInvalidNoDataValue);
 

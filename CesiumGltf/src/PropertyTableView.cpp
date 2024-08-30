@@ -1,5 +1,27 @@
 #include "CesiumGltf/PropertyTableView.h"
 
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumGltf/PropertyTablePropertyView.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyView.h"
+#include "CesiumGltf/Schema.h"
+
+#include <glm/common.hpp>
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <string_view>
+
 namespace CesiumGltf {
 template <typename T>
 static PropertyViewStatusType checkOffsetsBuffer(
@@ -111,7 +133,7 @@ PropertyTableView::PropertyTableView(
       _pPropertyTable{&propertyTable},
       _pClass{nullptr},
       _status() {
-  const ExtensionModelExtStructuralMetadata* pMetadata =
+  const auto* pMetadata =
       model.getExtension<ExtensionModelExtStructuralMetadata>();
   if (!pMetadata) {
     _status = PropertyTableViewStatus::ErrorMissingMetadataExtension;
@@ -153,13 +175,13 @@ PropertyViewStatusType PropertyTableView::getBufferSafe(
   buffer = {};
 
   const BufferView* pBufferView =
-      _pModel->getSafe(&_pModel->bufferViews, bufferViewIdx);
+      CesiumGltf::Model::getSafe(&_pModel->bufferViews, bufferViewIdx);
   if (!pBufferView) {
     return PropertyTablePropertyViewStatus::ErrorInvalidValueBufferView;
   }
 
   const Buffer* pBuffer =
-      _pModel->getSafe(&_pModel->buffers, pBufferView->buffer);
+      CesiumGltf::Model::getSafe(&_pModel->buffers, pBufferView->buffer);
   if (!pBuffer) {
     return PropertyTablePropertyViewStatus::ErrorInvalidValueBuffer;
   }
@@ -360,7 +382,7 @@ PropertyTableView::getBooleanArrayPropertyValues(
 
   // Handle fixed-length arrays
   if (fixedLengthArrayCount > 0) {
-    size_t maxRequiredBytes = static_cast<size_t>(glm::ceil(
+    auto maxRequiredBytes = static_cast<size_t>(glm::ceil(
         static_cast<double>(_pPropertyTable->count * fixedLengthArrayCount) /
         8.0));
 

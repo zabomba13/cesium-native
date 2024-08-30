@@ -13,6 +13,8 @@
 #include <glm/ext/vector_double3.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
+#include <vector>
+
 using namespace CesiumGeometry;
 using namespace CesiumUtility;
 

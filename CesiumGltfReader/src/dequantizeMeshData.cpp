@@ -1,6 +1,20 @@
 #include "dequantizeMeshData.h"
 
-#include <CesiumGltfReader/GltfReader.h>
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/AccessorSpec.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "absl/strings/match.h"
+
+#include <glm/common.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGltf;
 
@@ -10,15 +24,15 @@ namespace {
 
 template <typename T> float intToFloat(T t) = delete;
 
-template <> float intToFloat(int8_t c) { return glm::max(c / 127.0f, -1.0f); }
+template <> float intToFloat(int8_t c) { return glm::max(c / 127.0F, -1.0F); }
 
-template <> float intToFloat(uint8_t c) { return c / 127.0f; }
+template <> float intToFloat(uint8_t c) { return c / 127.0F; }
 
 template <> float intToFloat(int16_t c) {
-  return glm::max(c / 65535.0f, -1.0f);
+  return glm::max(c / 65535.0F, -1.0F);
 }
 
-template <> float intToFloat(uint16_t c) { return c / 65535.0f; }
+template <> float intToFloat(uint16_t c) { return c / 65535.0F; }
 
 template <typename T, size_t N>
 void normalizeQuantized(
@@ -61,7 +75,7 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
     return;
   }
 
-  int64_t byteStride;
+  int64_t byteStride = 0;
   if (pBufferView->byteStride) {
     byteStride = *pBufferView->byteStride;
   } else {
@@ -157,7 +171,7 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
 void dequantizeMeshData(Model& model) {
   for (Mesh& mesh : model.meshes) {
     for (MeshPrimitive& primitive : mesh.primitives) {
-      for (std::pair<const std::string, int32_t> attribute :
+      for (const std::pair<const std::string, int32_t>& attribute :
            primitive.attributes) {
         Accessor* pAccessor =
             Model::getSafe(&model.accessors, attribute.second);
@@ -169,7 +183,8 @@ void dequantizeMeshData(Model& model) {
         }
         const std::string& attributeName = attribute.first;
         if (attributeName == "POSITION" || attributeName == "NORMAL" ||
-            attributeName == "TANGENT" || attributeName.find("TEXCOORD") == 0) {
+            attributeName == "TANGENT" ||
+            absl::StartsWith(attributeName, "TEXCOORD")) {
           dequantizeAccessor(model, *pAccessor);
         }
       }

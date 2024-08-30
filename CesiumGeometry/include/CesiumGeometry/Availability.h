@@ -82,9 +82,7 @@ public:
       const AvailabilityView& view,
       const AvailabilitySubtree& subtree) noexcept;
 
-  bool isBufferView() const noexcept {
-    return pBufferView && bufferAccessor;
-  }
+  bool isBufferView() const noexcept { return pBufferView && bufferAccessor; }
 
   bool isConstant() const noexcept { return pConstant != nullptr; }
 

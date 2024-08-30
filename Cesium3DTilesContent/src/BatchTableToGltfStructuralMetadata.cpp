@@ -1,6 +1,18 @@
 #include "BatchTableToGltfStructuralMetadata.h"
 
 #include "BatchTableHierarchyPropertyValues.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/FeatureId.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumGltf/Schema.h"
+#include "CesiumUtility/ErrorList.h"
+#include "CesiumUtility/JsonValue.h"
 
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
@@ -9,15 +21,27 @@
 #include <CesiumGltf/PropertyType.h>
 #include <CesiumGltf/PropertyTypeTraits.h>
 #include <CesiumUtility/Assert.h>
-#include <CesiumUtility/Log.h>
 
-#include <glm/glm.hpp>
+#include <fmt/core.h>
+#include <glm/common.hpp>
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <limits>
 #include <map>
+#include <optional>
+#include <string>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace Cesium3DTilesContent::CesiumImpl;
@@ -45,7 +69,7 @@ struct MaskedType {
   bool isBool;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  MaskedType() : MaskedType(true) {};
+  MaskedType() : MaskedType(true){};
 
   explicit MaskedType(bool defaultValue)
       : isInt8(defaultValue),
@@ -103,12 +127,12 @@ struct MaskedArrayType {
   uint32_t maxArrayCount;
   // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-  MaskedArrayType() : MaskedArrayType(true) {};
+  MaskedArrayType() : MaskedArrayType(true){};
 
   explicit MaskedArrayType(bool defaultValue)
       : elementType(defaultValue),
         minArrayCount(std::numeric_limits<uint32_t>::max()),
-        maxArrayCount(std::numeric_limits<uint32_t>::min()) {};
+        maxArrayCount(std::numeric_limits<uint32_t>::min()){};
 
   MaskedArrayType(
       MaskedType inElementType,
@@ -178,9 +202,9 @@ private:
 
 public:
   explicit CompatibleTypes() = default;
-  explicit CompatibleTypes(const MaskedType& maskedType) : _type(maskedType) {};
+  explicit CompatibleTypes(const MaskedType& maskedType) : _type(maskedType){};
   explicit CompatibleTypes(const MaskedArrayType& maskedArrayType)
-      : _type(maskedArrayType) {};
+      : _type(maskedArrayType){};
 
   /**
    * Whether this is exclusively compatible with array types. This indicates an
@@ -1624,7 +1648,7 @@ void updateExtensionWithBinaryProperty(
 
   binaryProperty.batchTableByteOffset = byteOffset;
   binaryProperty.gltfByteOffset = gltfBufferOffset;
-  binaryProperty.byteLength = static_cast<int64_t>(bufferView.byteLength);
+  binaryProperty.byteLength = bufferView.byteLength;
 }
 
 void updateExtensionWithBatchTableHierarchy(

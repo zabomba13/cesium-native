@@ -1,12 +1,35 @@
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/ImageCesium.h"
 #include "CesiumGltf/KhrTextureTransform.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTextureProperty.h"
 #include "CesiumGltf/PropertyTexturePropertyView.h"
+#include "CesiumGltf/PropertyTransformations.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyTypeTraits.h"
+#include "CesiumGltf/Sampler.h"
+#include "CesiumGltf/TextureView.h"
+#include "CesiumUtility/JsonValue.h"
 #include "CesiumUtility/Math.h"
 
 #include <catch2/catch_test_macros.hpp>
-#include <gsl/span>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_double4.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_int4_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
 
 #include <climits>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <optional>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -594,8 +617,8 @@ TEST_CASE("Check scalar PropertyTexturePropertyView") {
     std::vector<float> expectedRaw(expectedUint.size());
     std::vector<std::optional<float>> expectedTransformed(expectedUint.size());
 
-    const float offset = 1.0f;
-    const float scale = 2.0f;
+    const float offset = 1.0F;
+    const float scale = 2.0F;
 
     for (size_t i = 0; i < expectedUint.size(); i++) {
       float value = *reinterpret_cast<float*>(&expectedUint[i]);
@@ -1391,10 +1414,10 @@ TEST_CASE("Check that PropertyTextureProperty values override class property "
   classProperty.type = ClassProperty::Type::SCALAR;
   classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
 
-  classProperty.offset = 0.0f;
-  classProperty.scale = 1.0f;
-  classProperty.min = -10.0f;
-  classProperty.max = 10.0f;
+  classProperty.offset = 0.0F;
+  classProperty.scale = 1.0F;
+  classProperty.min = -10.0F;
+  classProperty.max = 10.0F;
 
   Sampler sampler;
   ImageCesium image;
@@ -1411,8 +1434,8 @@ TEST_CASE("Check that PropertyTextureProperty values override class property "
       8, 1, 0, 1};
   // clang-format on
 
-  const float offset = 1.0f;
-  const float scale = 2.0f;
+  const float offset = 1.0F;
+  const float scale = 2.0F;
   std::vector<uint32_t> expectedUint{16777216, 65545, 131604, 16777480};
   std::vector<float> expectedRaw(expectedUint.size());
   std::vector<std::optional<float>> expectedTransformed(expectedUint.size());
@@ -1778,7 +1801,7 @@ TEST_CASE("Test PropertyTextureProperty constructs with "
   PropertyTextureProperty property;
   property.texCoord = 0;
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       property.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {0.5, -0.5};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -1850,7 +1873,7 @@ TEST_CASE("Test normalized PropertyTextureProperty constructs with "
   PropertyTextureProperty property;
   property.texCoord = 0;
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       property.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {0.5, -0.5};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -1925,7 +1948,7 @@ TEST_CASE("Test PropertyTextureProperty constructs with "
   PropertyTextureProperty property;
   property.texCoord = 0;
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       property.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {0.5, -0.5};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -1991,7 +2014,7 @@ TEST_CASE("Test normalized PropertyTextureProperty constructs with "
   PropertyTextureProperty property;
   property.texCoord = 0;
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       property.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {0.5, -0.5};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;

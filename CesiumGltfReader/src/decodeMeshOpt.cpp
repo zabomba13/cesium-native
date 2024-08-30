@@ -1,7 +1,17 @@
 #include "decodeMeshOpt.h"
 
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+
 #include <CesiumGltf/ExtensionBufferViewExtMeshoptCompression.h>
 #include <CesiumGltfReader/GltfReader.h>
+
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
+#include <vector>
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -60,8 +70,8 @@ int decodeIndices(
         static_cast<size_t>(meshOpt.count),
         reinterpret_cast<const unsigned char*>(buffer.data()),
         buffer.size());
-  } else if (
-      meshOpt.mode == ExtensionBufferViewExtMeshoptCompression::Mode::INDICES) {
+  }
+  if (meshOpt.mode == ExtensionBufferViewExtMeshoptCompression::Mode::INDICES) {
     return meshopt_decodeIndexSequence<T>(
         data,
         static_cast<size_t>(meshOpt.count),
@@ -83,14 +93,13 @@ int decodeBufferView(
         static_cast<size_t>(meshOpt.byteStride),
         reinterpret_cast<const unsigned char*>(buffer.data()),
         buffer.size());
+  }
+  if (meshOpt.byteStride == sizeof(uint16_t)) {
+    return decodeIndices(reinterpret_cast<uint16_t*>(data), buffer, meshOpt);
+  } else if (meshOpt.byteStride == sizeof(uint32_t)) {
+    return decodeIndices(reinterpret_cast<uint32_t*>(data), buffer, meshOpt);
   } else {
-    if (meshOpt.byteStride == sizeof(uint16_t)) {
-      return decodeIndices(reinterpret_cast<uint16_t*>(data), buffer, meshOpt);
-    } else if (meshOpt.byteStride == sizeof(uint32_t)) {
-      return decodeIndices(reinterpret_cast<uint32_t*>(data), buffer, meshOpt);
-    } else {
-      return -1;
-    }
+    return -1;
   }
 }
 } // namespace
@@ -100,7 +109,8 @@ void decodeMeshOpt(Model& model, CesiumGltfReader::GltfReaderResult& readGltf) {
     const ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
         bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
     if (pMeshOpt) {
-      const Buffer* pBuffer = model.getSafe(&model.buffers, pMeshOpt->buffer);
+      const Buffer* pBuffer =
+          CesiumGltf::Model::getSafe(&model.buffers, pMeshOpt->buffer);
       if (!pBuffer) {
         readGltf.warnings.emplace_back(
             "The EXT_meshopt_compression extension has an invalid buffer "

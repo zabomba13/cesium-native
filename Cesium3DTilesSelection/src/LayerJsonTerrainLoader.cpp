@@ -1,16 +1,57 @@
 #include "LayerJsonTerrainLoader.h"
 
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetOptions.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/QuadtreeTileRectangularRange.h"
+#include "CesiumGeometry/QuadtreeTilingScheme.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/BoundingRegionWithLooseFittingHeights.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumGeospatial/WebMercatorProjection.h"
+#include "CesiumUtility/Assert.h"
+#include "CesiumUtility/ErrorList.h"
+#include "TilesetContentLoaderResult.h"
+
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGeospatial/calcQuadtreeMaxGeometricError.h>
 #include <CesiumGltfContent/GltfUtilities.h>
 #include <CesiumQuantizedMeshTerrain/QuantizedMeshLoader.h>
 #include <CesiumRasterOverlays/RasterOverlayUtilities.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Log.h>
 #include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <gsl/span>
 #include <libmorton/morton.h>
 #include <rapidjson/document.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace Cesium3DTilesSelection;
@@ -161,8 +202,8 @@ bool isSubtreeLoadedInLayer(
       layer.availabilityLevels > 0 &&
       "Layer needs to support availabilityLevels");
 
-  uint32_t subtreeLevelIdx;
-  uint64_t subtreeMortonIdx;
+  uint32_t subtreeLevelIdx{};
+  uint64_t subtreeMortonIdx{};
   subtreeHash(subtreeID, layer, subtreeLevelIdx, subtreeMortonIdx);
 
   // it doesn't have the subtree exceeds max zooms, so just treat it
@@ -184,8 +225,8 @@ void addRectangleAvailabilityToLayer(
     layer.contentAvailability.addAvailableTileRange(range);
   }
 
-  uint32_t subtreeLevelIdx;
-  uint64_t subtreeMortonIdx;
+  uint32_t subtreeLevelIdx{};
+  uint64_t subtreeMortonIdx{};
   subtreeHash(subtreeID, layer, subtreeLevelIdx, subtreeMortonIdx);
 
   // it doesn't have the subtree exceeds max zooms, so just treat it
@@ -430,7 +471,7 @@ Future<LoadLayersResult> loadLayerJson(
   CesiumGeospatial::Projection projection = WebMercatorProjection(ellipsoid);
   CesiumGeospatial::GlobeRectangle quadtreeRectangleGlobe(0.0, 0.0, 0.0, 0.0);
   CesiumGeometry::Rectangle quadtreeRectangleProjected(0.0, 0.0, 0.0, 0.0);
-  uint32_t quadtreeXTiles;
+  uint32_t quadtreeXTiles = 0;
 
   // Consistent with CesiumJS behavior, we ignore the "bounds" property.
   // Some non-Cesium terrain tilers seem to provide incorrect bounds.
@@ -604,12 +645,12 @@ LayerJsonTerrainLoader::Layer::Layer(
     CesiumGeometry::QuadtreeRectangleAvailability&& contentAvailability_,
     uint32_t maxZooms_,
     int32_t availabilityLevels_)
-    : baseUrl{baseUrl_},
-      version{std::move(version_)},
-      tileTemplateUrls{std::move(tileTemplateUrls_)},
-      contentAvailability{std::move(contentAvailability_)},
+    : baseUrl(baseUrl_),
+      version(std::move(version_)),
+      tileTemplateUrls(std::move(tileTemplateUrls_)),
+      contentAvailability(std::move(contentAvailability_)),
       loadedSubtrees(maxSubtreeInLayer(maxZooms_, availabilityLevels_)),
-      availabilityLevels{availabilityLevels_} {}
+      availabilityLevels(availabilityLevels_) {}
 
 LayerJsonTerrainLoader::LayerJsonTerrainLoader(
     const CesiumGeometry::QuadtreeTilingScheme& tilingScheme,
@@ -715,7 +756,7 @@ Future<int> loadTileAvailability(
         if (pResponse) {
           uint16_t statusCode = pResponse->statusCode();
 
-          if (!(statusCode != 0 && (statusCode < 200 || statusCode >= 300))) {
+          if (statusCode == 0 || (statusCode >= 200 && statusCode < 300)) {
             return QuantizedMeshLoader::loadMetadata(pResponse->data(), tileID);
           }
         }
@@ -767,8 +808,8 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
   // available.
   auto firstAvailableIt = this->_layers.begin();
   while (firstAvailableIt != this->_layers.end() &&
-         !firstAvailableIt->contentAvailability.isTileAvailable(
-             *pQuadtreeTileID)) {
+         (firstAvailableIt->contentAvailability.isTileAvailable(
+              *pQuadtreeTileID) == 0)) {
     ++firstAvailableIt;
   }
 
@@ -858,8 +899,7 @@ LayerJsonTerrainLoader::loadTileContent(const TileLoadInput& loadInput) {
                            shouldCurrLayerLoadAvailability](
                               QuantizedMeshLoadResult&& loadResult) {
           if (shouldCurrLayerLoadAvailability) {
-            const QuadtreeTileID& tileID =
-                std::get<QuadtreeTileID>(tile.getTileID());
+            const auto& tileID = std::get<QuadtreeTileID>(tile.getTileID());
             addRectangleAvailabilityToLayer(
                 currentLayer,
                 tileID,
@@ -980,20 +1020,24 @@ bool LayerJsonTerrainLoader::tileHasUpsampledChild(const Tile& tile) const {
     const QuadtreeTileID neID(swID.level, swID.x + 1, swID.y + 1);
 
     uint32_t totalChildren = 0;
-    totalChildren += this->tileIsAvailableInAnyLayer(swID);
-    totalChildren += this->tileIsAvailableInAnyLayer(seID);
-    totalChildren += this->tileIsAvailableInAnyLayer(nwID);
-    totalChildren += this->tileIsAvailableInAnyLayer(neID);
+    totalChildren +=
+        static_cast<uint32_t>(this->tileIsAvailableInAnyLayer(swID));
+    totalChildren +=
+        static_cast<uint32_t>(this->tileIsAvailableInAnyLayer(seID));
+    totalChildren +=
+        static_cast<uint32_t>(this->tileIsAvailableInAnyLayer(nwID));
+    totalChildren +=
+        static_cast<uint32_t>(this->tileIsAvailableInAnyLayer(neID));
     return totalChildren > 0 && totalChildren < 4;
-  } else {
-    for (const auto& child : tileChildren) {
-      if (std::holds_alternative<UpsampledQuadtreeNode>(child.getTileID())) {
-        return true;
-      }
-    }
-
-    return false;
   }
+
+  for (const auto& child : tileChildren) {
+    if (std::holds_alternative<UpsampledQuadtreeNode>(child.getTileID())) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 std::vector<Tile>
@@ -1044,39 +1088,38 @@ bool LayerJsonTerrainLoader::tileIsAvailableInAnyLayer(
 }
 
 LayerJsonTerrainLoader::AvailableState
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 LayerJsonTerrainLoader::tileIsAvailableInLayer(
     const CesiumGeometry::QuadtreeTileID& tileID,
     const Layer& layer) const {
-  if (layer.contentAvailability.isTileAvailable(tileID)) {
+  if (layer.contentAvailability.isTileAvailable(tileID) != 0) {
     return AvailableState::Available;
-  } else {
-    // this layer doesn't use subtree at all and list
-    // all availability rectanges in the layer.json. So
-    // this tile is not available
-    if (layer.availabilityLevels <= 0) {
+  }
+
+  // this layer doesn't use subtree at all and list
+  // all availability rectanges in the layer.json. So
+  // this tile is not available
+  if (layer.availabilityLevels <= 0) {
+    return AvailableState::NotAvailable;
+  }
+
+  // this tile ID is also a subtree ID. So no need to calc
+  // subtree ID
+  if (int32_t(tileID.level) % layer.availabilityLevels == 0) {
+    if (isSubtreeLoadedInLayer(tileID, layer)) {
       return AvailableState::NotAvailable;
     }
+  }
 
-    // this tile ID is also a subtree ID. So no need to calc
-    // subtree ID
-    if (int32_t(tileID.level) % layer.availabilityLevels == 0) {
-      if (isSubtreeLoadedInLayer(tileID, layer)) {
-        return AvailableState::NotAvailable;
-      }
-    }
-
-    // calc the subtree ID this tile belongs to and determine it's loaded
-    uint32_t subtreeLevelIdx =
-        tileID.level / uint32_t(layer.availabilityLevels);
-    uint64_t levelLeft = tileID.level % uint32_t(layer.availabilityLevels);
-    uint32_t subtreeLevel =
-        subtreeLevelIdx * uint32_t(layer.availabilityLevels);
-    uint32_t subtreeX = tileID.x >> levelLeft;
-    uint32_t subtreeY = tileID.y >> levelLeft;
-    CesiumGeometry::QuadtreeTileID subtreeID{subtreeLevel, subtreeX, subtreeY};
-    if (isSubtreeLoadedInLayer(subtreeID, layer)) {
-      return AvailableState::NotAvailable;
-    }
+  // calc the subtree ID this tile belongs to and determine it's loaded
+  uint32_t subtreeLevelIdx = tileID.level / uint32_t(layer.availabilityLevels);
+  uint64_t levelLeft = tileID.level % uint32_t(layer.availabilityLevels);
+  uint32_t subtreeLevel = subtreeLevelIdx * uint32_t(layer.availabilityLevels);
+  uint32_t subtreeX = tileID.x >> levelLeft;
+  uint32_t subtreeY = tileID.y >> levelLeft;
+  CesiumGeometry::QuadtreeTileID subtreeID{subtreeLevel, subtreeX, subtreeY};
+  if (isSubtreeLoadedInLayer(subtreeID, layer)) {
+    return AvailableState::NotAvailable;
   }
 
   return AvailableState::Unknown;

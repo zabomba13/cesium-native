@@ -1,3 +1,4 @@
+#include "CesiumGltf/ExtensionKhrTextureTransform.h"
 #include "CesiumGltf/KhrTextureTransform.h"
 #include "CesiumUtility/Math.h"
 

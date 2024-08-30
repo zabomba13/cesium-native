@@ -1,3 +1,11 @@
+#include "CesiumGeospatial/CartographicPolygon.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumRasterOverlays/Library.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumUtility/CreditSystem.h"
+
 #include <CesiumAsync/AsyncSystem.h>
 #include <CesiumAsync/IAssetAccessor.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
@@ -6,10 +14,17 @@
 #include <CesiumRasterOverlays/RasterizedPolygonsOverlay.h>
 #include <CesiumUtility/IntrusivePointer.h>
 
+#include <glm/common.hpp>
+#include <glm/fwd.hpp>
+#include <glm/geometric.hpp>
 #include <spdlog/fwd.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -120,8 +135,8 @@ void rasterizePolygons(
       const glm::dvec2 ca = a - c;
       const glm::dvec2 ca_perp(-ca.y, ca.x);
 
-      size_t width = size_t(image.width);
-      size_t height = size_t(image.height);
+      auto width = size_t(image.width);
+      auto height = size_t(image.height);
 
       for (size_t j = 0; j < height; ++j) {
         const double pixelY =
@@ -187,7 +202,7 @@ public:
         _polygons(polygons),
         _invertSelection(invertSelection) {}
 
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage>
+  CesiumAsync::Future<LoadedRasterOverlayImage>
   loadTileImage(RasterOverlayTile& overlayTile) override {
     // Choose the texture size according to the geometry screen size and raster
     // SSE, but no larger than the maximum texture size.
@@ -233,7 +248,7 @@ RasterizedPolygonsOverlay::RasterizedPolygonsOverlay(
       _ellipsoid(ellipsoid),
       _projection(projection) {}
 
-RasterizedPolygonsOverlay::~RasterizedPolygonsOverlay() {}
+RasterizedPolygonsOverlay::~RasterizedPolygonsOverlay() = default;
 
 CesiumAsync::Future<RasterOverlay::CreateTileProviderResult>
 RasterizedPolygonsOverlay::createTileProvider(

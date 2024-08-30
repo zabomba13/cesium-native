@@ -1,5 +1,15 @@
 // Heavily inspired by PntsToGltfConverter.cpp
 
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "Cesium3DTilesContent/GltfConverters.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltfReader/GltfReader.h"
+#include "CesiumUtility/Assert.h"
+
 #include <Cesium3DTilesContent/BinaryToGltfConverter.h>
 #include <Cesium3DTilesContent/GltfConverterUtility.h>
 #include <Cesium3DTilesContent/I3dmToGltfConverter.h>
@@ -8,22 +18,36 @@
 #include <CesiumGltf/AccessorView.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
 #include <CesiumGltf/Model.h>
-#include <CesiumGltf/PropertyTransformations.h>
 #include <CesiumGltfContent/GltfUtilities.h>
 #include <CesiumUtility/AttributeCompression.h>
 #include <CesiumUtility/Math.h>
 #include <CesiumUtility/Uri.h>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <fmt/core.h>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/quaternion_common.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_double4.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/fwd.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/matrix.hpp>
+#include <gsl/span>
+#include <rapidjson/document.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <numeric>
+#include <limits>
 #include <optional>
 #include <set>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumGltf;
 
@@ -92,7 +116,7 @@ void parseI3dmHeader(
     return;
   }
 
-  const I3dmHeader* pHeader =
+  const auto* pHeader =
       reinterpret_cast<const I3dmHeader*>(instancesBinary.data());
 
   header = *pHeader;
@@ -157,14 +181,14 @@ glm::vec3 decodeOct32P(const uint16_t rawOct[2]) {
 
 glm::quat rotationFromUpRight(const glm::vec3& up, const glm::vec3& right) {
   // First rotation: up
-  auto upRot = CesiumUtility::Math::rotation(glm::vec3(0.0f, 1.0f, 0.0f), up);
+  auto upRot = CesiumUtility::Math::rotation(glm::vec3(0.0F, 1.0F, 0.0F), up);
   // We can rotate a point vector by a quaternion using q * (0, v) *
   // conj(q). But here we are doing an inverse rotation of the right vector into
   // the "up frame."
-  glm::quat temp = glm::conjugate(upRot) * glm::quat(0.0f, right) * upRot;
+  glm::quat temp = glm::conjugate(upRot) * glm::quat(0.0F, right) * upRot;
   glm::vec3 innerRight(temp.x, temp.y, temp.z);
   glm::quat rightRot =
-      CesiumUtility::Math::rotation(glm::vec3(1.0f, 0.0f, 0.0f), innerRight);
+      CesiumUtility::Math::rotation(glm::vec3(1.0F, 0.0F, 0.0F), innerRight);
   return upRot * rightRot;
 }
 
@@ -334,7 +358,7 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
       header.featureTableBinaryByteLength);
   const std::byte* const pBinaryData = featureTableBinaryData.data();
   const uint32_t numInstances = parsedContent.instancesLength;
-  decodedInstances.positions.resize(numInstances, glm::vec3(0.0f, 0.0f, 0.0f));
+  decodedInstances.positions.resize(numInstances, glm::vec3(0.0F, 0.0F, 0.0F));
   if (parsedContent.position) {
     gsl::span<const glm::vec3> rawPositions(
         reinterpret_cast<const glm::vec3*>(
@@ -363,7 +387,7 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
   }
   decodedInstances.rotations.resize(
       numInstances,
-      glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+      glm::quat(1.0F, 0.0F, 0.0F, 0.0F));
   if (parsedContent.normalUp && parsedContent.normalRight) {
     gsl::span<const glm::vec3> rawUp(
         reinterpret_cast<const glm::vec3*>(
@@ -484,9 +508,8 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
                 options,
                 assetFetcher);
           });
-    } else {
-      return BinaryToGltfConverter::convert(gltfData, options, assetFetcher);
     }
+    return BinaryToGltfConverter::convert(gltfData, options, assetFetcher);
   };
 
   return getGltf()
@@ -494,7 +517,7 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
                            GltfConverterResult&& converterResult) {
         if (converterResult.model) {
           CesiumGltfReader::GltfReaderResult readerResult{
-              std::move(*converterResult.model),
+              std::move(converterResult.model),
               {},
               {}};
           CesiumAsync::HttpHeaders externalRequestHeaders(
@@ -517,8 +540,9 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
       .thenImmediately(
           [convertedI3dm = std::move(convertedI3dm)](
               CesiumGltfReader::GltfReaderResult&& readerResult) mutable {
-            if (readerResult.model)
+            if (readerResult.model) {
               convertedI3dm.gltfResult.model = std::move(readerResult.model);
+            }
             CesiumUtility::ErrorList resolvedExternalErrors{
                 std::move(readerResult.errors),
                 {}};
@@ -665,7 +689,9 @@ bool copyInstanceToBuffer(
     std::vector<std::byte>& bufferData,
     size_t i) {
   bool result = true;
-  glm::dvec3 position, scale, skew;
+  glm::dvec3 position;
+  glm::dvec3 scale;
+  glm::dvec3 skew;
   glm::dquat rotation;
   glm::dvec4 perspective;
   if (!decompose(
@@ -737,7 +763,7 @@ void instantiateGltfInstances(
         if (result.errors.hasErrors()) {
           return;
         }
-        const uint32_t numNewInstances = static_cast<uint32_t>(
+        const auto numNewInstances = static_cast<uint32_t>(
             numInstances * modelInstanceTransforms.size());
         const size_t instanceDataSize = totalStride * numNewInstances;
         auto dataBaseOffset =
