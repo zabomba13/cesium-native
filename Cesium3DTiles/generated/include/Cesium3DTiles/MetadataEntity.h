@@ -17,7 +17,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API MetadataEntity
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "MetadataEntity";
+  static constexpr const char* TypeName = "MetadataEntity";
 
   /**
    * @brief The class that property values conform to. The value shall be a

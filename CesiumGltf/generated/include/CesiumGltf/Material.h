@@ -18,7 +18,7 @@ namespace CesiumGltf {
  * @brief The material appearance of a primitive.
  */
 struct CESIUMGLTF_API Material final : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "Material";
+  static constexpr const char* TypeName = "Material";
 
   /**
    * @brief Known values for The alpha rendering mode of the material.

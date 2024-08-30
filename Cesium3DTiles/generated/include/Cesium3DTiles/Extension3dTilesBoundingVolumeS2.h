@@ -14,10 +14,8 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Extension3dTilesBoundingVolumeS2 final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
-      "Extension3dTilesBoundingVolumeS2";
-  static inline constexpr const char* ExtensionName =
-      "3DTILES_bounding_volume_S2";
+  static constexpr const char* TypeName = "Extension3dTilesBoundingVolumeS2";
+  static constexpr const char* ExtensionName = "3DTILES_bounding_volume_S2";
 
   /**
    * @brief A hexadecimal representation of the S2CellId. Tokens shall be

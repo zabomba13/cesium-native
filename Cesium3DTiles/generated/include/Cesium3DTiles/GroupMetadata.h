@@ -10,6 +10,6 @@ namespace Cesium3DTiles {
  * @brief An object containing metadata about a group.
  */
 struct CESIUM3DTILES_API GroupMetadata final : public MetadataEntity {
-  static inline constexpr const char* TypeName = "GroupMetadata";
+  static constexpr const char* TypeName = "GroupMetadata";
 };
 } // namespace Cesium3DTiles

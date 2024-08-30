@@ -14,7 +14,7 @@ namespace CesiumGltf {
  * by a node that references it.
  */
 struct CESIUMGLTF_API Mesh final : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "Mesh";
+  static constexpr const char* TypeName = "Mesh";
 
   /**
    * @brief An array of primitives, each defining geometry to be rendered.

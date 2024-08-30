@@ -18,7 +18,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Content final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Content";
+  static constexpr const char* TypeName = "Content";
 
   /**
    * @brief An optional bounding volume that tightly encloses tile content.

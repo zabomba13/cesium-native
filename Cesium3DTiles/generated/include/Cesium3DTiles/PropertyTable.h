@@ -19,7 +19,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API PropertyTable final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "PropertyTable";
+  static constexpr const char* TypeName = "PropertyTable";
 
   /**
    * @brief The name of the property table, e.g. for display purposes.

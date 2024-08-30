@@ -16,7 +16,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API PropertyAttributeProperty final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "PropertyAttributeProperty";
+  static constexpr const char* TypeName = "PropertyAttributeProperty";
 
   /**
    * @brief The name of the attribute containing property values.

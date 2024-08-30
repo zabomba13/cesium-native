@@ -18,7 +18,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API ClassStatistics final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ClassStatistics";
+  static constexpr const char* TypeName = "ClassStatistics";
 
   /**
    * @brief The number of entities that conform to the class.

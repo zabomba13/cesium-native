@@ -13,7 +13,7 @@ namespace CesiumGltf {
  * @brief A view into a buffer generally representing a subset of the buffer.
  */
 struct CESIUMGLTF_API BufferView final : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "BufferView";
+  static constexpr const char* TypeName = "BufferView";
 
   /**
    * @brief Known values for The hint representing the intended GPU buffer type

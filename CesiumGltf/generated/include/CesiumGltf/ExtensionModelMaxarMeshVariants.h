@@ -16,9 +16,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionModelMaxarMeshVariants final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
-      "ExtensionModelMaxarMeshVariants";
-  static inline constexpr const char* ExtensionName = "MAXAR_mesh_variants";
+  static constexpr const char* TypeName = "ExtensionModelMaxarMeshVariants";
+  static constexpr const char* ExtensionName = "MAXAR_mesh_variants";
 
   /**
    * @brief The index of the variant to load by default. The meshes that are

@@ -16,7 +16,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API MeshPrimitive final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "MeshPrimitive";
+  static constexpr const char* TypeName = "MeshPrimitive";
 
   /**
    * @brief Known values for The topology type of primitives to render.

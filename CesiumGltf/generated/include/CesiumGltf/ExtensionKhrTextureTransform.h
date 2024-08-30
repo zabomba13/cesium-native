@@ -17,8 +17,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionKhrTextureTransform final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ExtensionKhrTextureTransform";
-  static inline constexpr const char* ExtensionName = "KHR_texture_transform";
+  static constexpr const char* TypeName = "ExtensionKhrTextureTransform";
+  static constexpr const char* ExtensionName = "KHR_texture_transform";
 
   /**
    * @brief The offset of the UV coordinate origin as a factor of the texture

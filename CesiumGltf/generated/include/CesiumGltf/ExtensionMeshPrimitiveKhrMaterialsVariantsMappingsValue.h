@@ -17,7 +17,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue
     final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
+  static constexpr const char* TypeName =
       "ExtensionMeshPrimitiveKhrMaterialsVariantsMappingsValue";
 
   /**

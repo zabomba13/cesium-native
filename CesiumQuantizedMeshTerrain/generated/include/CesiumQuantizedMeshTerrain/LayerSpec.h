@@ -18,12 +18,12 @@ namespace CesiumQuantizedMeshTerrain {
  */
 struct CESIUMQUANTIZEDMESHTERRAIN_API LayerSpec
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Layer";
+  static constexpr const char* TypeName = "Layer";
 
   /**
    * @brief The attribution (credit) string for the terrain.
    */
-  std::string attribution = "";
+  std::string attribution;
 
   /**
    * @brief The tile availability information. The outer array is indexed by
@@ -43,7 +43,7 @@ struct CESIUMQUANTIZEDMESHTERRAIN_API LayerSpec
   /**
    * @brief The description of this terrain tileset.
    */
-  std::string description = "";
+  std::string description;
 
   /**
    * @brief The extensions available for this tileset.

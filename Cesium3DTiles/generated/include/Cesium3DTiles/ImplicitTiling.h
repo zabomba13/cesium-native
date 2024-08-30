@@ -18,7 +18,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API ImplicitTiling final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ImplicitTiling";
+  static constexpr const char* TypeName = "ImplicitTiling";
 
   /**
    * @brief Known values for A string describing the subdivision scheme used

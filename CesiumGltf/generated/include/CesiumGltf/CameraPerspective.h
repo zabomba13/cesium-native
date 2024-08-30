@@ -15,7 +15,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API CameraPerspective final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "CameraPerspective";
+  static constexpr const char* TypeName = "CameraPerspective";
 
   /**
    * @brief The floating-point aspect ratio of the field of view.

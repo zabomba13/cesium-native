@@ -16,7 +16,7 @@ namespace CesiumGltf {
  * @brief An object defining the values of an enum.
  */
 struct CESIUMGLTF_API Enum final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Enum";
+  static constexpr const char* TypeName = "Enum";
 
   /**
    * @brief Known values for The type of the integer enum value.

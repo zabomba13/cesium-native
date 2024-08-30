@@ -15,7 +15,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Statistics final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Statistics";
+  static constexpr const char* TypeName = "Statistics";
 
   /**
    * @brief A dictionary, where each key corresponds to a class ID in the

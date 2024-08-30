@@ -16,7 +16,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API EnumValue final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "EnumValue";
+  static constexpr const char* TypeName = "EnumValue";
 
   /**
    * @brief The name of the enum value.

@@ -23,7 +23,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Subtree final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Subtree";
+  static constexpr const char* TypeName = "Subtree";
 
   /**
    * @brief An array of buffers.

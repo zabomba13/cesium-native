@@ -17,7 +17,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API PropertyTableProperty final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "PropertyTableProperty";
+  static constexpr const char* TypeName = "PropertyTableProperty";
 
   /**
    * @brief Known values for The type of values in `arrayOffsets`.

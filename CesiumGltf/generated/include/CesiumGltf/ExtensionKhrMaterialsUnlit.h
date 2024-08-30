@@ -12,7 +12,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionKhrMaterialsUnlit final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ExtensionKhrMaterialsUnlit";
-  static inline constexpr const char* ExtensionName = "KHR_materials_unlit";
+  static constexpr const char* TypeName = "ExtensionKhrMaterialsUnlit";
+  static constexpr const char* ExtensionName = "KHR_materials_unlit";
 };
 } // namespace CesiumGltf

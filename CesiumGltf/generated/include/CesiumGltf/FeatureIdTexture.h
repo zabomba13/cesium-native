@@ -13,7 +13,7 @@ namespace CesiumGltf {
  * @brief A texture containing feature IDs
  */
 struct CESIUMGLTF_API FeatureIdTexture final : public TextureInfo {
-  static inline constexpr const char* TypeName = "FeatureIdTexture";
+  static constexpr const char* TypeName = "FeatureIdTexture";
 
   /**
    * @brief Texture channels containing feature IDs, identified by index.

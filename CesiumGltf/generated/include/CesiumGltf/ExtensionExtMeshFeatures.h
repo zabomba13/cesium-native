@@ -15,8 +15,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionExtMeshFeatures final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ExtensionExtMeshFeatures";
-  static inline constexpr const char* ExtensionName = "EXT_mesh_features";
+  static constexpr const char* TypeName = "ExtensionExtMeshFeatures";
+  static constexpr const char* ExtensionName = "EXT_mesh_features";
 
   /**
    * @brief An array of feature ID sets.

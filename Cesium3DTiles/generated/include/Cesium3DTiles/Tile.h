@@ -19,7 +19,7 @@ namespace Cesium3DTiles {
  * @brief A tile in a 3D Tiles tileset.
  */
 struct CESIUM3DTILES_API Tile final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Tile";
+  static constexpr const char* TypeName = "Tile";
 
   /**
    * @brief Known values for Specifies if additive or replacement refinement is

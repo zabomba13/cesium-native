@@ -14,8 +14,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionCesiumRTC final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ExtensionCesiumRTC";
-  static inline constexpr const char* ExtensionName = "CESIUM_RTC";
+  static constexpr const char* TypeName = "ExtensionCesiumRTC";
+  static constexpr const char* ExtensionName = "CESIUM_RTC";
 
   /**
    * @brief Center that vertex positions are relative to.

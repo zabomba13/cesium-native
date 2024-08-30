@@ -18,7 +18,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API AccessorSparseValues final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "AccessorSparseValues";
+  static constexpr const char* TypeName = "AccessorSparseValues";
 
   /**
    * @brief The index of the bufferView with sparse values. The referenced

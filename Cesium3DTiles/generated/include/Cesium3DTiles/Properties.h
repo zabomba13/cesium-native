@@ -12,7 +12,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Properties final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Properties";
+  static constexpr const char* TypeName = "Properties";
 
   /**
    * @brief The maximum value of this property of all the features in the

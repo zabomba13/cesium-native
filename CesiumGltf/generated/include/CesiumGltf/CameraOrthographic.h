@@ -13,7 +13,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API CameraOrthographic final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "CameraOrthographic";
+  static constexpr const char* TypeName = "CameraOrthographic";
 
   /**
    * @brief The floating-point horizontal magnification of the view. This value

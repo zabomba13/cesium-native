@@ -16,7 +16,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API AnimationSampler final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "AnimationSampler";
+  static constexpr const char* TypeName = "AnimationSampler";
 
   /**
    * @brief Known values for Interpolation algorithm.

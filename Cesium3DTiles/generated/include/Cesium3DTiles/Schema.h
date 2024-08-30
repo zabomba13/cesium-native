@@ -17,7 +17,7 @@ namespace Cesium3DTiles {
  * @brief An object defining classes and enums.
  */
 struct CESIUM3DTILES_API Schema final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Schema";
+  static constexpr const char* TypeName = "Schema";
 
   /**
    * @brief Unique identifier for the schema. Schema IDs shall be alphanumeric

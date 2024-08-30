@@ -14,7 +14,7 @@ namespace CesiumQuantizedMeshTerrain {
  */
 struct CESIUMQUANTIZEDMESHTERRAIN_API AvailabilityRectangle final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "AvailabilityRectangle";
+  static constexpr const char* TypeName = "AvailabilityRectangle";
 
   /**
    * @brief The index of the start tile in the X direction.

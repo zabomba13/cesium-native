@@ -15,7 +15,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Availability final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Availability";
+  static constexpr const char* TypeName = "Availability";
 
   /**
    * @brief Known values for Integer indicating whether all of the elements are

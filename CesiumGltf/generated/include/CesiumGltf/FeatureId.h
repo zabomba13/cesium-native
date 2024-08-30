@@ -16,7 +16,7 @@ namespace CesiumGltf {
  * @brief Feature IDs stored in an attribute or texture.
  */
 struct CESIUMGLTF_API FeatureId final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "FeatureId";
+  static constexpr const char* TypeName = "FeatureId";
 
   /**
    * @brief The number of unique features in the attribute or texture.

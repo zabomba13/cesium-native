@@ -16,7 +16,7 @@ namespace CesiumGltf {
  * @brief A typed view into a buffer view that contains raw binary data.
  */
 struct CESIUMGLTF_API AccessorSpec : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "Accessor";
+  static constexpr const char* TypeName = "Accessor";
 
   /**
    * @brief Known values for The datatype of the accessor's components.

@@ -16,7 +16,7 @@ namespace Cesium3DTiles {
  * subtree file, or an external buffer referenced by a URI.
  */
 struct CESIUM3DTILES_API BufferSpec : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Buffer";
+  static constexpr const char* TypeName = "Buffer";
 
   /**
    * @brief The URI (or IRI) of the file that contains the binary buffer data.

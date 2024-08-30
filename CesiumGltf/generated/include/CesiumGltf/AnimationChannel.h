@@ -16,7 +16,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API AnimationChannel final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "AnimationChannel";
+  static constexpr const char* TypeName = "AnimationChannel";
 
   /**
    * @brief The index of a sampler in this animation used to compute the value

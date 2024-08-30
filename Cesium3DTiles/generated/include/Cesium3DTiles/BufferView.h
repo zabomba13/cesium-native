@@ -16,7 +16,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API BufferView final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "BufferView";
+  static constexpr const char* TypeName = "BufferView";
 
   /**
    * @brief The index of the buffer.

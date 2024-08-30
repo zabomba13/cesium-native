@@ -16,7 +16,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API PropertyStatistics final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "PropertyStatistics";
+  static constexpr const char* TypeName = "PropertyStatistics";
 
   /**
    * @brief The minimum property value occurring in the tileset. Only applicable

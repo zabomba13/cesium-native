@@ -21,9 +21,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionModelExtStructuralMetadata final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
-      "ExtensionModelExtStructuralMetadata";
-  static inline constexpr const char* ExtensionName = "EXT_structural_metadata";
+  static constexpr const char* TypeName = "ExtensionModelExtStructuralMetadata";
+  static constexpr const char* ExtensionName = "EXT_structural_metadata";
 
   /**
    * @brief An object defining classes and enums.

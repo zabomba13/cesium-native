@@ -12,9 +12,9 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionBufferExtMeshoptCompression final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
+  static constexpr const char* TypeName =
       "ExtensionBufferExtMeshoptCompression";
-  static inline constexpr const char* ExtensionName = "EXT_meshopt_compression";
+  static constexpr const char* ExtensionName = "EXT_meshopt_compression";
 
   /**
    * @brief Set to true to indicate that the buffer is only referenced by

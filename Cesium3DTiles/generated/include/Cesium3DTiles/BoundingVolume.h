@@ -16,7 +16,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API BoundingVolume final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "BoundingVolume";
+  static constexpr const char* TypeName = "BoundingVolume";
 
   /**
    * @brief An array of 12 numbers that define an oriented bounding box. The

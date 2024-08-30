@@ -14,7 +14,7 @@ namespace CesiumGltf {
  * @brief A keyframe animation.
  */
 struct CESIUMGLTF_API Animation final : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "Animation";
+  static constexpr const char* TypeName = "Animation";
 
   /**
    * @brief An array of animation channels. An animation channel combines an

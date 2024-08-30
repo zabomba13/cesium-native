@@ -21,7 +21,7 @@ namespace CesiumGltf {
  * animation.channel.target), `matrix` **MUST NOT** be present.
  */
 struct CESIUMGLTF_API Node final : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "Node";
+  static constexpr const char* TypeName = "Node";
 
   /**
    * @brief The index of the camera referenced by this node.

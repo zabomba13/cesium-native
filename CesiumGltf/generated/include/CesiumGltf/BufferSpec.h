@@ -14,7 +14,7 @@ namespace CesiumGltf {
  * @brief A buffer points to binary geometry, animation, or skins.
  */
 struct CESIUMGLTF_API BufferSpec : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName = "Buffer";
+  static constexpr const char* TypeName = "Buffer";
 
   /**
    * @brief The URI (or IRI) of the buffer.

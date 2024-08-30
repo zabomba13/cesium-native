@@ -15,9 +15,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionExtMeshGpuInstancing final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
-      "ExtensionExtMeshGpuInstancing";
-  static inline constexpr const char* ExtensionName = "EXT_mesh_gpu_instancing";
+  static constexpr const char* TypeName = "ExtensionExtMeshGpuInstancing";
+  static constexpr const char* ExtensionName = "EXT_mesh_gpu_instancing";
 
   /**
    * @brief A dictionary object, where each key corresponds to instance

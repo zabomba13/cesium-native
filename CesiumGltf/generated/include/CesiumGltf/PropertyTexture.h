@@ -18,7 +18,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API PropertyTexture final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "PropertyTexture";
+  static constexpr const char* TypeName = "PropertyTexture";
 
   /**
    * @brief The name of the property texture, e.g. for display purposes.

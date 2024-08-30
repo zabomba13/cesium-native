@@ -19,7 +19,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API PropertyTableProperty final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "PropertyTableProperty";
+  static constexpr const char* TypeName = "PropertyTableProperty";
 
   /**
    * @brief Known values for The type of values in `arrayOffsets`.

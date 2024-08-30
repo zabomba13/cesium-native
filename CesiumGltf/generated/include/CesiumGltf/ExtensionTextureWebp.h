@@ -14,8 +14,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionTextureWebp final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ExtensionTextureWebp";
-  static inline constexpr const char* ExtensionName = "EXT_texture_webp";
+  static constexpr const char* TypeName = "ExtensionTextureWebp";
+  static constexpr const char* ExtensionName = "EXT_texture_webp";
 
   /**
    * @brief The index of the images node which points to a WebP image.

@@ -15,10 +15,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionCesiumPrimitiveOutline final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
-      "ExtensionCesiumPrimitiveOutline";
-  static inline constexpr const char* ExtensionName =
-      "CESIUM_primitive_outline";
+  static constexpr const char* TypeName = "ExtensionCesiumPrimitiveOutline";
+  static constexpr const char* ExtensionName = "CESIUM_primitive_outline";
 
   /**
    * @brief The index of the accessor providing the list of highlighted lines at

@@ -16,7 +16,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API AccessorSparseIndices final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "AccessorSparseIndices";
+  static constexpr const char* TypeName = "AccessorSparseIndices";
 
   /**
    * @brief Known values for The indices data type.

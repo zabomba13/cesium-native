@@ -15,9 +15,9 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionBufferViewExtMeshoptCompression final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName =
+  static constexpr const char* TypeName =
       "ExtensionBufferViewExtMeshoptCompression";
-  static inline constexpr const char* ExtensionName = "EXT_meshopt_compression";
+  static constexpr const char* ExtensionName = "EXT_meshopt_compression";
 
   /**
    * @brief Known values for The compression mode.

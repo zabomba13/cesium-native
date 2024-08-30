@@ -10,7 +10,7 @@ namespace CesiumGltf {
  * @brief Material Occlusion Texture Info
  */
 struct CESIUMGLTF_API MaterialOcclusionTextureInfo final : public TextureInfo {
-  static inline constexpr const char* TypeName = "MaterialOcclusionTextureInfo";
+  static constexpr const char* TypeName = "MaterialOcclusionTextureInfo";
 
   /**
    * @brief A scalar multiplier controlling the amount of occlusion applied.

@@ -14,8 +14,8 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionCesiumTileEdges final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "ExtensionCesiumTileEdges";
-  static inline constexpr const char* ExtensionName = "CESIUM_tile_edges";
+  static constexpr const char* TypeName = "ExtensionCesiumTileEdges";
+  static constexpr const char* ExtensionName = "CESIUM_tile_edges";
 
   /**
    * @brief The index of the accessor containing indices that make up the left

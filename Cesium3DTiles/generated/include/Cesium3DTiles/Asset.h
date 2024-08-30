@@ -14,7 +14,7 @@ namespace Cesium3DTiles {
  * @brief Metadata about the entire tileset.
  */
 struct CESIUM3DTILES_API Asset final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Asset";
+  static constexpr const char* TypeName = "Asset";
 
   /**
    * @brief The 3D Tiles version. The version defines the JSON schema for the

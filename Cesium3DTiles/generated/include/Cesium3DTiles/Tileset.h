@@ -24,7 +24,7 @@ namespace Cesium3DTiles {
  */
 struct CESIUM3DTILES_API Tileset final
     : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* TypeName = "Tileset";
+  static constexpr const char* TypeName = "Tileset";
 
   /**
    * @brief Metadata about the entire tileset.

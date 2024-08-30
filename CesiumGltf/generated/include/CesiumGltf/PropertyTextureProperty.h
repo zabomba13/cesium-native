@@ -16,7 +16,7 @@ namespace CesiumGltf {
  * @brief A texture containing property values.
  */
 struct CESIUMGLTF_API PropertyTextureProperty final : public TextureInfo {
-  static inline constexpr const char* TypeName = "PropertyTextureProperty";
+  static constexpr const char* TypeName = "PropertyTextureProperty";
 
   /**
    * @brief Texture channels containing property values, identified by index.

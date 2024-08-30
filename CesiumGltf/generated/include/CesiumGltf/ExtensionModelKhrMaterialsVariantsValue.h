@@ -13,7 +13,7 @@ namespace CesiumGltf {
  */
 struct CESIUMGLTF_API ExtensionModelKhrMaterialsVariantsValue final
     : public CesiumGltf::NamedObject {
-  static inline constexpr const char* TypeName =
+  static constexpr const char* TypeName =
       "ExtensionModelKhrMaterialsVariantsValue";
 
   /**
