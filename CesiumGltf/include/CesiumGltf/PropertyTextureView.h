@@ -706,7 +706,7 @@ private:
             PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty);
       }
 
-      if (count * sizeof(T) > 4) {
+      if (size_t(count) * sizeof(T) > 4) {
         return PropertyTexturePropertyView<PropertyArrayView<T>, Normalized>(
             PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty);
       }
@@ -714,7 +714,7 @@ private:
       return createPropertyViewImpl<PropertyArrayView<T>, Normalized>(
           classProperty,
           propertyTextureProperty,
-          count * sizeof(T),
+          size_t(count) * sizeof(T),
           propertyOptions);
     } else {
       return PropertyTexturePropertyView<PropertyArrayView<T>, Normalized>(
@@ -748,7 +748,7 @@ private:
       return PropertyTexturePropertyView<T, Normalized>(status);
     }
 
-    const ImageCesium& image = _pModel->images[imageIndex].cesium;
+    const ImageCesium& image = _pModel->images[size_t(imageIndex)].cesium;
     const std::vector<int64_t>& channels = propertyTextureProperty.channels;
 
     status = checkChannels(channels, image);
@@ -756,14 +756,14 @@ private:
       return PropertyTexturePropertyView<T, Normalized>(status);
     }
 
-    if (channels.size() * image.bytesPerChannel != elementSize) {
+    if (channels.size() * size_t(image.bytesPerChannel) != elementSize) {
       return PropertyTexturePropertyViewStatus::ErrorChannelsAndTypeMismatch;
     }
 
     return PropertyTexturePropertyView<T, Normalized>(
         propertyTextureProperty,
         classProperty,
-        _pModel->samplers[samplerIndex],
+        _pModel->samplers[size_t(samplerIndex)],
         image,
         propertyOptions);
   }

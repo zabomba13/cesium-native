@@ -20,7 +20,7 @@ struct CESIUMGEOMETRY_API OctreeTileID {
   /**
    * @brief Creates a new instance.
    */
-  constexpr OctreeTileID() : level(0), x(0), y(0), z(0){};
+  constexpr OctreeTileID() : level(0), x(0), y(0), z(0) {};
 
   /**
    * @brief Creates a new instance.
@@ -31,11 +31,11 @@ struct CESIUMGEOMETRY_API OctreeTileID {
    * @param z The z-coordinate of the tile.
    */
   constexpr OctreeTileID(
-      uint32_t level,
-      uint32_t x,
-      uint32_t y,
-      uint32_t z) noexcept
-      : level(level), x(x), y(y), z(z) {}
+      uint32_t level_,
+      uint32_t x_,
+      uint32_t y_,
+      uint32_t z_) noexcept
+      : level(level_), x(x_), y(y_), z(z_) {}
 
   /**
    * @brief Returns `true` if two identifiers are equal.

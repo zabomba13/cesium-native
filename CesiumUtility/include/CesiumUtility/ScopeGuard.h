@@ -26,9 +26,9 @@ public:
               std::remove_reference_t<std::remove_const_t<ExitFunctionArg>>,
               ScopeGuard<ExitFunction>>,
           int> = 0>
-  explicit ScopeGuard(ExitFunctionArg&& _exitFunc)
+  explicit ScopeGuard(ExitFunctionArg&& exitFunc_)
       : _callExitFuncOnDestruct{true},
-        _exitFunc{std::forward<ExitFunctionArg>(_exitFunc)} {}
+        _exitFunc{std::forward<ExitFunctionArg>(exitFunc_)} {}
 
   ScopeGuard(const ScopeGuard& rhs) = delete;
 
