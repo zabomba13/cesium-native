@@ -676,7 +676,7 @@ function createEnumReaderType(parentName, enumName, propertyName, enums) {
     public:
       ${enumName}JsonHandler() noexcept : CesiumJsonReader::JsonHandler() {}
       void reset(CesiumJsonReader::IJsonHandler* pParent, ${parentName}::${enumName}* pEnum);
-      virtual CesiumJsonReader::IJsonHandler* readString(const std::string_view& str) override;
+      CesiumJsonReader::IJsonHandler* readString(const std::string_view& str) override;
 
     private:
       ${parentName}::${enumName}* _pEnum = nullptr;
@@ -701,7 +701,7 @@ function createEnumReaderTypeImpl(parentName, enumName, propertyName, enums) {
     }
 
     CesiumJsonReader::IJsonHandler* ${parentName}JsonHandler::${enumName}JsonHandler::readString(const std::string_view& str) {
-      using namespace std::string_literals;
+      using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
       assert(this->_pEnum);
 
