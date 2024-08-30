@@ -102,7 +102,9 @@ ElementType assembleScalarValue(const gsl::span<uint8_t> bytes) noexcept {
     using UintType = std::make_unsigned_t<ElementType>;
     UintType resultAsUint = 0;
     for (size_t i = 0; i < bytes.size(); i++) {
-      resultAsUint |= static_cast<UintType>(bytes[i]) << i * 8;
+      resultAsUint = static_cast<UintType>(
+          resultAsUint | static_cast<UintType>(bytes[i])
+                             << static_cast<UintType>(i * 8));
     }
 
     // Reinterpret the bits with the correct signedness.
@@ -124,10 +126,12 @@ ElementType assembleVecNValue(const gsl::span<uint8_t> bytes) noexcept {
   if constexpr (std::is_same_v<T, int16_t>) {
     CESIUM_ASSERT(
         N == 2 && "Only vec2s can contain two-byte integer components.");
-    uint16_t x = static_cast<uint16_t>(bytes[0]) |
-                 (static_cast<uint16_t>(bytes[1]) << 8);
-    uint16_t y = static_cast<uint16_t>(bytes[2]) |
-                 (static_cast<uint16_t>(bytes[3]) << 8);
+    uint16_t x = static_cast<uint16_t>(
+        static_cast<uint16_t>(bytes[0]) |
+        (static_cast<uint16_t>(bytes[1]) << uint16_t(8)));
+    uint16_t y = static_cast<uint16_t>(
+        static_cast<uint16_t>(bytes[2]) |
+        (static_cast<uint16_t>(bytes[3]) << uint16_t(8)));
 
     result[0] = *reinterpret_cast<int16_t*>(&x);
     result[1] = *reinterpret_cast<int16_t*>(&y);
@@ -163,11 +167,12 @@ assembleArrayValue(const gsl::span<uint8_t> bytes) noexcept {
   std::vector<T> result(bytes.size() / sizeof(T));
 
   if constexpr (sizeof(T) == 2) {
-    for (int i = 0, b = 0; i < result.size(); i++, b += 2) {
+    for (int i = 0, b = 0; i < int(result.size()); i++, b += 2) {
       using UintType = std::make_unsigned_t<T>;
-      UintType resultAsUint = static_cast<UintType>(bytes[b]) |
-                              (static_cast<UintType>(bytes[b + 1]) << 8);
-      result[i] = *reinterpret_cast<T*>(&resultAsUint);
+      UintType resultAsUint =
+          static_cast<UintType>(bytes[size_t(b)]) |
+          (static_cast<UintType>(bytes[size_t(b + 1)]) << 8);
+      result[size_t(i)] = *reinterpret_cast<T*>(&resultAsUint);
     }
   } else {
     for (size_t i = 0; i < bytes.size(); i++) {

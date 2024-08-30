@@ -1128,7 +1128,7 @@ private:
       maxRequiredBytes = static_cast<size_t>(
           glm::ceil(static_cast<double>(_pPropertyTable->count) / 8.0));
     } else {
-      maxRequiredBytes = _pPropertyTable->count * sizeof(T);
+      maxRequiredBytes = size_t(_pPropertyTable->count) * sizeof(T);
     }
 
     if (values.size() < maxRequiredBytes) {
@@ -1210,8 +1210,8 @@ private:
 
     // Handle fixed-length arrays
     if (fixedLengthArrayCount > 0) {
-      size_t maxRequiredBytes = maxRequiredBytes = static_cast<size_t>(
-          _pPropertyTable->count * fixedLengthArrayCount * sizeof(T));
+      size_t maxRequiredBytes = size_t(_pPropertyTable->count) *
+                                size_t(fixedLengthArrayCount) * sizeof(T);
 
       if (values.size() < maxRequiredBytes) {
         return PropertyTablePropertyView<PropertyArrayView<T>, Normalized>(
