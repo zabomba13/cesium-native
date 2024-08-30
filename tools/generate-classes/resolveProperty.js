@@ -383,7 +383,7 @@ function resolveDictionary(
   return {
     ...propertyDefaults(propertyName, cppSafeName, propertyDetails),
     name: propertyName,
-    headers: ["<unordered_map>", ...additional.headers],
+    headers: ["<unordered_map>", "<string>", ...additional.headers],
     schemas: additional.schemas,
     localTypes: additional.localTypes,
     type: `std::unordered_map<std::string, ${additional.type}>`,
@@ -676,7 +676,7 @@ function createEnumReaderType(parentName, enumName, propertyName, enums) {
     public:
       ${enumName}JsonHandler() noexcept : CesiumJsonReader::JsonHandler() {}
       void reset(CesiumJsonReader::IJsonHandler* pParent, ${parentName}::${enumName}* pEnum);
-      virtual CesiumJsonReader::IJsonHandler* readString(const std::string_view& str) override;
+      CesiumJsonReader::IJsonHandler* readString(const std::string_view& str) override;
 
     private:
       ${parentName}::${enumName}* _pEnum = nullptr;
@@ -701,7 +701,8 @@ function createEnumReaderTypeImpl(parentName, enumName, propertyName, enums) {
     }
 
     CesiumJsonReader::IJsonHandler* ${parentName}JsonHandler::${enumName}JsonHandler::readString(const std::string_view& str) {
-      using namespace std::string_literals;
+      // NOLINTNEXTLINE(misc-include-cleaner)
+      using std::string_literals::operator""s;
 
       assert(this->_pEnum);
 
