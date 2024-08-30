@@ -367,8 +367,8 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
   UriPathSegmentA* pCurrent = parsedUri.pathHead;
   while (pCurrent) {
     UriPathSegmentA* pNext = pCurrent->next;
-    free(pCurrent); // NOLINT(cppcoreguidelines-no-malloc, hicpp-no-malloc,
-                    // cppcoreguidelines-owning-memory)
+    std::free(pCurrent); // NOLINT(cppcoreguidelines-no-malloc, hicpp-no-malloc,
+                         // cppcoreguidelines-owning-memory)
     pCurrent = pNext;
   }
 
@@ -390,8 +390,8 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
       // NOLINTBEGIN(cppcoreguidelines-owning-memory,
       // cppcoreguidelines-no-malloc)
       auto* pSegment =
-          static_cast<UriPathSegmentA*>(malloc(sizeof(UriPathSegmentA)));
-      memset(pSegment, 0, sizeof(UriPathSegmentA));
+          static_cast<UriPathSegmentA*>(std::malloc(sizeof(UriPathSegmentA)));
+      std::memset(pSegment, 0, sizeof(UriPathSegmentA));
       // NOLINTEND(cppcoreguidelines-owning-memory,
       // cppcoreguidelines-no-malloc)
 

@@ -26,7 +26,7 @@ TEST_CASE("B3dmToGltfConverter") {
     REQUIRE(result.model);
 
     Model& gltf = *result.model;
-    REQUIRE(gltf.getExtension<ExtensionCesiumRTC>() != nullptr);
+    REQUIRE(gltf.getExtension<ExtensionCesiumRTC>());
     CHECK(gltf.isExtensionUsed(ExtensionCesiumRTC::ExtensionName));
     CHECK(gltf.isExtensionRequired(ExtensionCesiumRTC::ExtensionName));
   }

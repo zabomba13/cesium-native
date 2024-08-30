@@ -361,7 +361,7 @@ size_t moveBufferContentWithoutRenumbering(
     // Also leave intact meshopt fallback buffers without any data.
     auto* pMeshOpt =
         sourceBuffer.getExtension<ExtensionBufferExtMeshoptCompression>();
-    bool isMeshOptFallback = (pMeshOpt != nullptr) && pMeshOpt->fallback;
+    bool isMeshOptFallback = pMeshOpt && pMeshOpt->fallback;
     if (sourceBuffer.cesium.data.empty() &&
         (sourceBuffer.uri || isMeshOptFallback)) {
       keepBuffer[i] = true;

@@ -162,7 +162,7 @@ TEST_CASE("Test creating tileset json loader") {
     const auto& boundingVolume = pRootTile->getBoundingVolume();
     const auto* pRegion =
         std::get_if<CesiumGeospatial::BoundingRegion>(&boundingVolume);
-    CHECK(pRegion != nullptr);
+    CHECK(pRegion);
     CHECK(pRegion->getMinimumHeight() == Catch::Approx(0.0));
     CHECK(pRegion->getMaximumHeight() == Catch::Approx(88.0));
     CHECK(
@@ -220,7 +220,7 @@ TEST_CASE("Test creating tileset json loader") {
 
     // check root tile
     auto* pTilesetJson = loaderResult.pRootTile.get();
-    REQUIRE(pTilesetJson != nullptr);
+    REQUIRE(pTilesetJson);
     CHECK(!pTilesetJson->getParent());
     REQUIRE(pTilesetJson->getChildren().size() == 1);
     auto* pRootTile = pTilesetJson->getChildren().data();
@@ -233,7 +233,7 @@ TEST_CASE("Test creating tileset json loader") {
     const auto& boundingVolume = pRootTile->getBoundingVolume();
     const auto* pRegion =
         std::get_if<CesiumGeospatial::BoundingRegion>(&boundingVolume);
-    CHECK(pRegion != nullptr);
+    CHECK(pRegion);
     CHECK(pRegion->getMinimumHeight() == Catch::Approx(0.0));
     CHECK(pRegion->getMaximumHeight() == Catch::Approx(88.0));
     CHECK(

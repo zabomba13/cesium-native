@@ -832,8 +832,7 @@ bool validateDracoAttribute(
     const draco::PointAttribute* const pAttribute,
     const draco::DataType expectedDataType,
     const int32_t expectedNumComponents) {
-  return (pAttribute != nullptr) &&
-         pAttribute->data_type() == expectedDataType &&
+  return pAttribute && pAttribute->data_type() == expectedDataType &&
          pAttribute->num_components() == expectedNumComponents;
 }
 

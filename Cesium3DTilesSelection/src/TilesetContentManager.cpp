@@ -1287,7 +1287,7 @@ void TilesetContentManager::finishLoading(
   TileContent& content = tile.getContent();
   TileRenderContent* pRenderContent = content.getRenderContent();
 
-  CESIUM_ASSERT(pRenderContent != nullptr);
+  CESIUM_ASSERT(pRenderContent);
 
   // add copyright
   CreditSystem* pCreditSystem = this->_externals.pCreditSystem.get();

@@ -155,12 +155,12 @@ TEST_CASE("Reads extras") {
   REQUIRE(cit != tileset.extras.end());
 
   CesiumUtility::JsonValue* pC1 = cit->second.getValuePtrForKey("C1");
-  REQUIRE(pC1 != nullptr);
+  REQUIRE(pC1);
   CHECK(pC1->isObject());
   CHECK(pC1->getObject().empty());
 
   CesiumUtility::JsonValue* pC2 = cit->second.getValuePtrForKey("C2");
-  REQUIRE(pC2 != nullptr);
+  REQUIRE(pC2);
 
   CHECK(pC2->isArray());
   CesiumUtility::JsonValue::Array array = pC2->getArray();
@@ -172,7 +172,7 @@ TEST_CASE("Reads extras") {
   CHECK(array[4].getSafeNumber<int32_t>() == 5);
 
   CesiumUtility::JsonValue* pC3 = cit->second.getValuePtrForKey("C3");
-  REQUIRE(pC3 != nullptr);
+  REQUIRE(pC3);
   CHECK(pC3->isBool());
   CHECK(pC3->getBool());
 
@@ -270,8 +270,8 @@ TEST_CASE("Reads custom extension") {
 
   CesiumUtility::JsonValue* pA = withCustomExt.value->getGenericExtension("A");
   CesiumUtility::JsonValue* pB = withCustomExt.value->getGenericExtension("B");
-  REQUIRE(pA != nullptr);
-  REQUIRE(pB != nullptr);
+  REQUIRE(pA);
+  REQUIRE(pB);
 
   REQUIRE(pA->getValuePtrForKey("test"));
   REQUIRE(pA->getValuePtrForKey("test")->getStringOrDefault("") == "Hello");

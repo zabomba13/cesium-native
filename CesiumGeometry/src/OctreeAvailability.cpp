@@ -316,7 +316,7 @@ uint8_t OctreeAvailability::computeAvailability(
 
   // If this is root of the subtree and the subtree isn't loaded yet, we can
   // atleast assume this tile and its subtree are available.
-  bool subtreeLoaded = (pNode != nullptr) && pNode->subtree;
+  bool subtreeLoaded = pNode && pNode->subtree;
   uint32_t relativeLevel = tileID.level % this->_subtreeLevels;
   if (!subtreeLoaded) {
     if (relativeLevel == 0) {

@@ -626,7 +626,7 @@ TEST_CASE("Test serving cache item") {
         ->get(asyncSystem, "test.com", std::vector<IAssetAccessor::THeader>{})
         .thenImmediately(
             [](const std::shared_ptr<IAssetRequest>& completedRequest) {
-              REQUIRE(completedRequest != nullptr);
+              REQUIRE(completedRequest);
               REQUIRE(completedRequest->url() == "test.com");
               REQUIRE(
                   completedRequest->headers() ==
@@ -634,7 +634,7 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(completedRequest->method() == "GET");
 
               const IAssetResponse* response = completedRequest->response();
-              REQUIRE(response != nullptr);
+              REQUIRE(response);
               REQUIRE(
                   response->headers().at("Response-Header") ==
                   "Response-Value");
@@ -703,7 +703,7 @@ TEST_CASE("Test serving cache item") {
         ->get(asyncSystem, "test.com", std::vector<IAssetAccessor::THeader>{})
         .thenImmediately(
             [](const std::shared_ptr<IAssetRequest>& completedRequest) {
-              REQUIRE(completedRequest != nullptr);
+              REQUIRE(completedRequest);
               REQUIRE(completedRequest->url() == "cache.com");
               REQUIRE(
                   completedRequest->headers() ==
@@ -711,7 +711,7 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(completedRequest->method() == "GET");
 
               const IAssetResponse* response = completedRequest->response();
-              REQUIRE(response != nullptr);
+              REQUIRE(response);
               REQUIRE(
                   response->headers().at("Cache-Response-Header") ==
                   "Cache-Response-Value");
@@ -794,7 +794,7 @@ TEST_CASE("Test serving cache item") {
         ->get(asyncSystem, "test.com", std::vector<IAssetAccessor::THeader>{})
         .thenImmediately(
             [](const std::shared_ptr<IAssetRequest>& completedRequest) {
-              REQUIRE(completedRequest != nullptr);
+              REQUIRE(completedRequest);
               REQUIRE(completedRequest->url() == "cache.com");
               REQUIRE(
                   completedRequest->headers() ==
@@ -803,7 +803,7 @@ TEST_CASE("Test serving cache item") {
 
               // check response header is updated
               const IAssetResponse* response = completedRequest->response();
-              REQUIRE(response != nullptr);
+              REQUIRE(response);
               REQUIRE(
                   response->headers().at("Revalidation-Response-Header") ==
                   "Revalidation-Response-Value");
@@ -888,13 +888,13 @@ TEST_CASE("Test serving cache item") {
         ->get(asyncSystem, "test.com", std::vector<IAssetAccessor::THeader>{})
         .thenImmediately(
             [](const std::shared_ptr<IAssetRequest>& completedRequest) {
-              REQUIRE(completedRequest != nullptr);
+              REQUIRE(completedRequest);
               REQUIRE(completedRequest->url() == "test.com");
               REQUIRE(completedRequest->headers().empty());
               REQUIRE(completedRequest->method() == "GET");
 
               const IAssetResponse* response = completedRequest->response();
-              REQUIRE(response != nullptr);
+              REQUIRE(response);
 
               REQUIRE(
                   response->headers().at("Revalidation-Response-Header") ==

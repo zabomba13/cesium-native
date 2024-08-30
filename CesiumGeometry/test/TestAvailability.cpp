@@ -266,7 +266,7 @@ TEST_CASE("Test OctreeAvailability") {
         AvailabilityNode* pNode =
             octreeAvailability.addNode(mockChildrenSubtreeId, pParentNode);
 
-        REQUIRE(pNode != nullptr);
+        REQUIRE(pNode);
         octreeAvailability.addLoadedSubtree(pNode, std::move(childSubtree));
       }
     }
@@ -297,7 +297,7 @@ TEST_CASE("Test OctreeAvailability") {
               (bool)(availability & TileAvailabilityFlags::SUBTREE_LOADED) ==
               subtreeShouldBeLoaded);
 
-          REQUIRE((pChildNode != nullptr) == subtreeShouldBeLoaded);
+          REQUIRE((pChildNode == subtreeShouldBeLoaded);
         }
       }
     }
@@ -457,7 +457,7 @@ TEST_CASE("Test QuadtreeAvailability") {
         AvailabilityNode* pNode =
             quadtreeAvailability.addNode(mockChildrenSubtreeId, pParentNode);
 
-        REQUIRE(pNode != nullptr);
+        REQUIRE(pNode);
         quadtreeAvailability.addLoadedSubtree(pNode, std::move(childSubtree));
       }
     }

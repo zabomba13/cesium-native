@@ -97,11 +97,11 @@ void writeGlbBuffer(
   glb8[byteOffset++] = 'N';
 
   // JSON chunk
-  memcpy(glb8 + byteOffset, jsonData.data(), jsonData.size());
+  std::memcpy(glb8 + byteOffset, jsonData.data(), jsonData.size());
   byteOffset += jsonData.size();
 
   // JSON chunk padding
-  memset(glb8 + byteOffset, ' ', jsonPaddingSize);
+  std::memset(glb8 + byteOffset, ' ', jsonPaddingSize);
   byteOffset += jsonPaddingSize;
 
   if (!bufferData.empty()) {
@@ -114,11 +114,11 @@ void writeGlbBuffer(
     glb8[byteOffset++] = 0;
 
     // Binary chunk
-    memcpy(glb8 + byteOffset, bufferData.data(), bufferData.size());
+    std::memcpy(glb8 + byteOffset, bufferData.data(), bufferData.size());
     byteOffset += bufferData.size();
 
     // Binary chunk padding
-    memset(glb8 + byteOffset, 0, binaryPaddingSize);
+    std::memset(glb8 + byteOffset, 0, binaryPaddingSize);
   }
 }
 } // namespace

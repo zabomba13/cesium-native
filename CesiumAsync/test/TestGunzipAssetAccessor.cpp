@@ -58,7 +58,7 @@ TEST_CASE("GunzipAssetAccessor") {
         HttpHeaders{std::make_pair("Foo", "Bar")});
 
     const IAssetResponse* pResponse = pCompletedRequest->response();
-    REQUIRE(pResponse != nullptr);
+    REQUIRE(pResponse);
     CHECK(pResponse->statusCode() == 200);
     CHECK(pResponse->contentType() == "Application/Whatever");
     CHECK(
@@ -100,7 +100,7 @@ TEST_CASE("GunzipAssetAccessor") {
         HttpHeaders{std::make_pair("Foo", "Bar")});
 
     const IAssetResponse* pResponse = pCompletedRequest->response();
-    REQUIRE(pResponse != nullptr);
+    REQUIRE(pResponse);
     CHECK(pResponse->statusCode() == 200);
     CHECK(pResponse->contentType() == "Application/Whatever");
     CHECK(
@@ -139,7 +139,7 @@ TEST_CASE("GunzipAssetAccessor") {
         HttpHeaders{std::make_pair("Foo", "Bar")});
 
     const IAssetResponse* pResponse = pCompletedRequest->response();
-    REQUIRE(pResponse != nullptr);
+    REQUIRE(pResponse);
     CHECK(pResponse->statusCode() == 200);
     CHECK(pResponse->contentType() == "Application/Whatever");
     CHECK(
@@ -187,7 +187,7 @@ TEST_CASE("GunzipAssetAccessor") {
         HttpHeaders{std::make_pair("Foo", "Bar")});
 
     const IAssetResponse* pResponse = pCompletedRequest->response();
-    REQUIRE(pResponse != nullptr);
+    REQUIRE(pResponse);
     CHECK(pResponse->statusCode() == 200);
     CHECK(pResponse->contentType() == "Application/Whatever");
     CHECK(

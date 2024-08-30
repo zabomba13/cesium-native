@@ -1483,7 +1483,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       // Load the southeast child
       REQUIRE(tile.getChildren().size() == 4);
       Tile& se = tile.getChildren()[1];
-      REQUIRE(std::get_if<UpsampledQuadtreeNode>(&se.getTileID()) != nullptr);
+      REQUIRE(std::get_if<UpsampledQuadtreeNode>(&se.getTileID()));
       REQUIRE(
           std::get<UpsampledQuadtreeNode>(se.getTileID()).tileID ==
           QuadtreeTileID(1, 1, 0));
@@ -1493,7 +1493,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       // Verify the bounding volume is sensible
       const BoundingRegion* pRegion =
           std::get_if<BoundingRegion>(&se.getBoundingVolume());
-      REQUIRE(pRegion != nullptr);
+      REQUIRE(pRegion);
       CHECK(
           pRegion->getRectangle().getEast() >
           pRegion->getRectangle().getWest());
@@ -1504,7 +1504,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       // The tight-fitting bounding region from the raster overlay process
       // should be sensible and smaller than the _original_ tile rectangle.
       TileRenderContent* pRenderContent = se.getContent().getRenderContent();
-      REQUIRE(pRenderContent != nullptr);
+      REQUIRE(pRenderContent);
       const GlobeRectangle& tightRectangle =
           pRenderContent->getRasterOverlayDetails()
               .boundingRegion.getRectangle();
@@ -1543,7 +1543,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       // Load the southeast child's southwest child
       REQUIRE(se.getChildren().size() == 4);
       Tile& sw = se.getChildren()[0];
-      REQUIRE(std::get_if<UpsampledQuadtreeNode>(&sw.getTileID()) != nullptr);
+      REQUIRE(std::get_if<UpsampledQuadtreeNode>(&sw.getTileID()));
       REQUIRE(
           std::get<UpsampledQuadtreeNode>(sw.getTileID()).tileID ==
           QuadtreeTileID(2, 2, 0));
@@ -1552,7 +1552,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
 
       // Verify the bounding volume is sensible
       pRegion = std::get_if<BoundingRegion>(&sw.getBoundingVolume());
-      REQUIRE(pRegion != nullptr);
+      REQUIRE(pRegion);
       CHECK(
           pRegion->getRectangle().getEast() >
           pRegion->getRectangle().getWest());
@@ -1563,7 +1563,7 @@ TEST_CASE("Test the tileset content manager's post processing for gltf") {
       // The tight-fitting bounding region from the raster overlay process
       // should be sensible and smaller than the _original_ tile rectangle.
       pRenderContent = sw.getContent().getRenderContent();
-      REQUIRE(pRenderContent != nullptr);
+      REQUIRE(pRenderContent);
       const GlobeRectangle& swTightRectangle =
           pRenderContent->getRasterOverlayDetails()
               .boundingRegion.getRectangle();

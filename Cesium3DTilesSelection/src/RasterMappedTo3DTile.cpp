@@ -72,7 +72,7 @@ RasterMappedTo3DTile::RasterMappedTo3DTile(
       _scale(1.0, 1.0),
       _state(AttachmentState::Unattached),
       _originalFailed(false) {
-  CESIUM_ASSERT(this->_pLoadingTile != nullptr);
+  CESIUM_ASSERT(this->_pLoadingTile);
 }
 
 RasterOverlayTile::MoreDetailAvailable RasterMappedTo3DTile::update(

@@ -99,7 +99,7 @@ static void initializeTileset(Tileset& tileset) {
 static ViewState zoomToTile(const Tile& tile) {
   const BoundingRegion* region =
       std::get_if<BoundingRegion>(&tile.getBoundingVolume());
-  REQUIRE(region != nullptr);
+  REQUIRE(region);
 
   const GlobeRectangle& rectangle = region->getRectangle();
   double maxHeight = region->getMaximumHeight();
@@ -128,7 +128,7 @@ static ViewState zoomToTile(const Tile& tile) {
 
 static ViewState zoomToTileset(const Tileset& tileset) {
   const Tile* root = tileset.getRootTile();
-  REQUIRE(root != nullptr);
+  REQUIRE(root);
 
   return zoomToTile(*root);
 }

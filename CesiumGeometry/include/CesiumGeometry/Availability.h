@@ -84,7 +84,7 @@ public:
 
   bool isBufferView() const noexcept { return pBufferView && bufferAccessor; }
 
-  bool isConstant() const noexcept { return pConstant != nullptr; }
+  bool isConstant() const noexcept { return pConstant; }
 
   /**
    * @brief Unsafe if isConstant is false.

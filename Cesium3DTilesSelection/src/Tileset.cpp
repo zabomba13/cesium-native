@@ -1374,8 +1374,7 @@ Tileset::TraversalDetails Tileset::_visitTile(
       _options.enableLodTransitionPeriod &&
       _options.kickDescendantsWhileFadingIn &&
       lastFrameSelectionResult == TileSelectionState::Result::Rendered &&
-      (pRenderContent != nullptr) &&
-      pRenderContent->getLodTransitionFadePercentage() < 1.0F;
+      pRenderContent && pRenderContent->getLodTransitionFadePercentage() < 1.0F;
 
   if (kickDueToNonReadyDescendant || kickDueToTileFadingIn) {
     // Kick all descendants out of the render list and render this tile instead

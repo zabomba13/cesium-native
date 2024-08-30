@@ -303,7 +303,7 @@ TEST_CASE("Nested extras deserializes properly") {
   REQUIRE(cit != model.extras.end());
 
   JsonValue* pC2 = cit->second.getValuePtrForKey("C2");
-  REQUIRE(pC2 != nullptr);
+  REQUIRE(pC2);
 
   CHECK(pC2->isArray());
   auto& array = std::get<std::vector<JsonValue>>(pC2->value);
@@ -454,8 +454,8 @@ TEST_CASE("Extensions deserialize to JsonVaue iff "
 
   JsonValue* pA = withCustomExtModel.model->getGenericExtension("A");
   JsonValue* pB = withCustomExtModel.model->getGenericExtension("B");
-  REQUIRE(pA != nullptr);
-  REQUIRE(pB != nullptr);
+  REQUIRE(pA);
+  REQUIRE(pB);
 
   REQUIRE(pA->getValuePtrForKey("test"));
   REQUIRE(

@@ -58,6 +58,6 @@ TEST_CASE("MetadataQuery") {
     CHECK(&foundProperty2->classDefinition == &classDefinition);
     CHECK(foundProperty2->propertyIdentifier == "somePropertyWithSemantic");
     CHECK(&foundProperty2->propertyDefinition == &classProperty2);
-    CHECK(foundProperty2->propertyValue->getStringOrDefault("") == "the value");
+    CHECK(foundProperty2->propertyValue.getStringOrDefault("") == "the value");
   }
 }

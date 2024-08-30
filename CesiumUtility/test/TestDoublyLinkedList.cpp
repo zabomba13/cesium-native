@@ -25,8 +25,8 @@ void assertOrder(
     const std::vector<uint32_t>& expectedOrder) {
   CHECK(linkedList.size() == expectedOrder.size());
   if (!expectedOrder.empty()) {
-    REQUIRE(linkedList.head() != nullptr);
-    REQUIRE(linkedList.tail() != nullptr);
+    REQUIRE(linkedList.head());
+    REQUIRE(linkedList.tail());
 
     CHECK(linkedList.head()->value == expectedOrder.front());
     CHECK(linkedList.tail()->value == expectedOrder.back());
@@ -34,7 +34,7 @@ void assertOrder(
     TestNode* pCurrent = linkedList.head();
 
     for (size_t i = 0; i < expectedOrder.size(); ++i) {
-      REQUIRE(pCurrent != nullptr);
+      REQUIRE(pCurrent);
       CHECK(pCurrent->value == expectedOrder[i]);
 
       if (i == 0) {
@@ -54,10 +54,10 @@ void assertOrder(
       pCurrent = linkedList.next(*pCurrent);
     }
 
-    CHECK(linkedList.next(nullptr) != nullptr);
+    CHECK(linkedList.next(nullptr));
     CHECK(linkedList.next(nullptr)->value == expectedOrder.front());
 
-    CHECK(linkedList.previous(nullptr) != nullptr);
+    CHECK(linkedList.previous(nullptr));
     CHECK(linkedList.previous(nullptr)->value == expectedOrder.back());
   } else {
     CHECK(!linkedList.head());

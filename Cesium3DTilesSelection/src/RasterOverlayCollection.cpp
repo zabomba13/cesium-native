@@ -170,9 +170,9 @@ void RasterOverlayCollection::remove(
   auto removeCondition = [pOverlay](
                              const RasterMappedTo3DTile& mapped) noexcept {
     return (
-        ((mapped.getLoadingTile() != nullptr) &&
+        (mapped.getLoadingTile() &&
          pOverlay == &mapped.getLoadingTile()->getTileProvider().getOwner()) ||
-        ((mapped.getReadyTile() != nullptr) &&
+        (mapped.getReadyTile() &&
          pOverlay == &mapped.getReadyTile()->getTileProvider().getOwner()));
   };
 
