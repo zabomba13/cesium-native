@@ -1,6 +1,7 @@
 #include "CesiumAsync/Impl/QueuedScheduler.h"
 
 #include <condition_variable>
+#include <memory>
 #include <mutex>
 
 namespace {
@@ -11,6 +12,8 @@ namespace {
 // directory rather than the include directory. When we use Async++ via vcpkg,
 // we have no way to access files in the src directory. So, we copy it here
 // instead.
+
+// NOLINTBEGIN
 class fifo_queue {
   async::detail::aligned_array<void*, LIBASYNC_CACHELINE_SIZE> items;
   std::size_t head, tail;
@@ -53,6 +56,7 @@ public:
     }
   }
 };
+// NOLINTEND
 
 } // namespace
 
@@ -99,9 +103,8 @@ bool QueuedScheduler::dispatchInternal(bool blockIfNoTasks) {
     auto scope = this->immediate.scope();
     t.run();
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 void QueuedScheduler::unblock() {

@@ -1,9 +1,16 @@
 #include "CesiumJsonWriter/JsonWriter.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <algorithm>
-#include <iterator>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace CesiumJsonWriter {
 JsonWriter::JsonWriter()
@@ -141,7 +148,7 @@ std::string_view JsonWriter::toStringView() {
 std::vector<std::byte> JsonWriter::toBytes() {
   const auto view = this->toStringView();
   std::vector<std::byte> result(view.size(), std::byte(0));
-  std::uint8_t* u8Pointer = reinterpret_cast<std::uint8_t*>(result.data());
+  auto* u8Pointer = reinterpret_cast<std::uint8_t*>(result.data());
   std::copy(view.begin(), view.end(), u8Pointer);
   return result;
 }

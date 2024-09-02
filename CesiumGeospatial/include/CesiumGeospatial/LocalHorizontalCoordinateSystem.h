@@ -193,8 +193,8 @@ public:
       const LocalHorizontalCoordinateSystem& target) const noexcept;
 
 private:
-  glm::dmat4 _ecefToLocal;
-  glm::dmat4 _localToEcef;
+  glm::dmat4 _ecefToLocal{};
+  glm::dmat4 _localToEcef{};
 };
 
 } // namespace CesiumGeospatial

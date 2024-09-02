@@ -1,8 +1,15 @@
+#include "CesiumGltf/Accessor.h"
 #include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
 #include "CesiumGltf/Model.h"
 
-#include <catch2/catch.hpp>
-#include <glm/vec3.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_float3.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
 
 TEST_CASE("AccessorView construct and read example") {
   auto anyOldFunctionToGetAModel = []() {
@@ -22,10 +29,10 @@ TEST_CASE("AccessorView construct and read example") {
     buffer.byteLength = bufferView.byteLength;
     buffer.cesium.data.resize(size_t(buffer.byteLength));
 
-    float* p = reinterpret_cast<float*>(buffer.cesium.data.data());
-    p[0] = 1.0f;
-    p[1] = 2.0f;
-    p[2] = 3.0f;
+    auto* p = reinterpret_cast<float*>(buffer.cesium.data.data());
+    p[0] = 1.0F;
+    p[1] = 2.0F;
+    p[2] = 3.0F;
 
     return model;
   };
@@ -36,7 +43,7 @@ TEST_CASE("AccessorView construct and read example") {
   glm::vec3 firstPosition = positions[0];
   //! [createFromAccessorAndRead]
 
-  CHECK(firstPosition == glm::vec3(1.0f, 2.0f, 3.0f));
+  CHECK(firstPosition == glm::vec3(1.0F, 2.0F, 3.0F));
 }
 
 TEST_CASE("Create AccessorView of unknown type with lambda") {

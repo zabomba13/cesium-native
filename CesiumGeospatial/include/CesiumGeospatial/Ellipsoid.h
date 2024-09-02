@@ -99,8 +99,8 @@ public:
    * determine the surface normal.
    * @return The normal.
    */
-  glm::dvec3
-  geodeticSurfaceNormal(const Cartographic& cartographic) const noexcept;
+  static glm::dvec3
+  geodeticSurfaceNormal(const Cartographic& cartographic) noexcept;
 
   /**
    * @brief Converts the provided {@link Cartographic} to cartesian

@@ -1,8 +1,8 @@
 #include <CesiumGltfContent/SkirtMeshMetadata.h>
 #include <CesiumUtility/JsonValue.h>
 
+#include <cstdint>
 #include <optional>
-#include <stdexcept>
 
 using namespace CesiumUtility;
 
@@ -28,13 +28,13 @@ SkirtMeshMetadata::parseFromGltfExtras(const JsonValue::Object& extras) {
     return std::nullopt;
   }
 
-  const double noSkirtIndicesBegin =
+  const auto noSkirtIndicesBegin =
       (*pNoSkirtRange)[0].getSafeNumberOrDefault<double>(-1.0);
-  const double noSkirtIndicesCount =
+  const auto noSkirtIndicesCount =
       (*pNoSkirtRange)[1].getSafeNumberOrDefault<double>(-1.0);
-  const double noSkirtVerticesBegin =
+  const auto noSkirtVerticesBegin =
       (*pNoSkirtRange)[2].getSafeNumberOrDefault<double>(-1.0);
-  const double noSkirtVerticesCount =
+  const auto noSkirtVerticesCount =
       (*pNoSkirtRange)[3].getSafeNumberOrDefault<double>(-1.0);
 
   if (noSkirtIndicesBegin < 0.0 || noSkirtIndicesCount < 0.0 ||
@@ -67,7 +67,10 @@ SkirtMeshMetadata::parseFromGltfExtras(const JsonValue::Object& extras) {
       (*pMeshCenter)[1].getSafeNumberOrDefault<double>(0.0),
       (*pMeshCenter)[2].getSafeNumberOrDefault<double>(0.0));
 
-  double westHeight, southHeight, eastHeight, northHeight;
+  double westHeight{};
+  double southHeight{};
+  double eastHeight{};
+  double northHeight{};
   try {
     westHeight = gltfSkirtMeshMetadata.getSafeNumericalValueForKey<double>(
         "skirtWestHeight");

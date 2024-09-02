@@ -1,9 +1,23 @@
+#include "CesiumGltf/Accessor.h"
 #include "CesiumGltf/AccessorUtility.h"
+#include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
 #include "CesiumGltf/ExtensionExtMeshGpuInstancing.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
 
+#include <cstdint>
 #include <cstring>
+#include <variant>
+#include <vector>
 
 using namespace CesiumGltf;
 
@@ -310,7 +324,7 @@ TEST_CASE("Test getFeatureIdAccessorView for instances") {
   accessor.count = bufferView.byteLength;
 
   Node& node = model.nodes.emplace_back();
-  ExtensionExtMeshGpuInstancing& instancingExtension =
+  auto& instancingExtension =
       node.addExtension<ExtensionExtMeshGpuInstancing>();
   instancingExtension.attributes["_FEATURE_ID_0"] = 0;
 
@@ -549,7 +563,7 @@ TEST_CASE("Test IndicesForFaceFromAccessor") {
   }
 
   SECTION("Handles invalid accessor") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     // Wrong component type
     IndexAccessorType indexAccessor =
         AccessorView<uint8_t>(model, model.accessors[0]);
@@ -565,7 +579,7 @@ TEST_CASE("Test IndicesForFaceFromAccessor") {
   }
 
   SECTION("Handles invalid face index") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     IndexAccessorType indexAccessor =
         AccessorView<uint32_t>(model, model.accessors[0]);
     auto indicesForFace = std::visit(
@@ -590,7 +604,7 @@ TEST_CASE("Test IndicesForFaceFromAccessor") {
   }
 
   SECTION("Handles invalid primitive modes") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     IndexAccessorType indexAccessor =
         AccessorView<uint32_t>(model, model.accessors[0]);
     auto indicesForFace = std::visit(
@@ -622,7 +636,7 @@ TEST_CASE("Test IndicesForFaceFromAccessor") {
   }
 
   SECTION("Retrieves from valid accessor and face index; triangles mode") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     IndexAccessorType indexAccessor =
         AccessorView<uint32_t>(model, model.accessors[0]);
     const size_t numFaces =
@@ -637,7 +651,7 @@ TEST_CASE("Test IndicesForFaceFromAccessor") {
           indexAccessor);
 
       for (size_t j = 0; j < indicesForFace.size(); j++) {
-        int64_t expected = static_cast<int64_t>(triangleIndices[i * 3 + j]);
+        auto expected = static_cast<int64_t>(triangleIndices[i * 3 + j]);
         REQUIRE(indicesForFace[j] == expected);
       }
     }
@@ -658,7 +672,7 @@ TEST_CASE("Test IndicesForFaceFromAccessor") {
           indexAccessor);
 
       for (size_t j = 0; j < indicesForFace.size(); j++) {
-        int64_t expected = static_cast<int64_t>(specialIndices[i + j]);
+        auto expected = static_cast<int64_t>(specialIndices[i + j]);
         REQUIRE(indicesForFace[j] == expected);
       }
     }
@@ -793,7 +807,7 @@ TEST_CASE("Test IndexFromAccessor") {
   }
 
   SECTION("Handles invalid accessor") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     // Wrong component type
     IndexAccessorType indexAccessor =
         AccessorView<uint8_t>(model, model.accessors[0]);
@@ -802,7 +816,7 @@ TEST_CASE("Test IndexFromAccessor") {
   }
 
   SECTION("Handles invalid index") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     IndexAccessorType indexAccessor =
         AccessorView<uint32_t>(model, model.accessors[0]);
     auto index = std::visit(IndexFromAccessor{-1}, indexAccessor);
@@ -815,7 +829,7 @@ TEST_CASE("Test IndexFromAccessor") {
   }
 
   SECTION("Retrieves from valid accessor and index") {
-    REQUIRE(model.accessors.size() > 0);
+    REQUIRE(!model.accessors.empty());
     IndexAccessorType indexAccessor =
         AccessorView<uint32_t>(model, model.accessors[0]);
 

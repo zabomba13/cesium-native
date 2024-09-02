@@ -1,10 +1,11 @@
 #include "CesiumJsonReader/BoolJsonHandler.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
 #include "CesiumJsonReader/JsonHandler.h"
 #include "CesiumUtility/Assert.h"
 
 namespace CesiumJsonReader {
-BoolJsonHandler::BoolJsonHandler() noexcept : JsonHandler() {}
+BoolJsonHandler::BoolJsonHandler() noexcept = default;
 
 void BoolJsonHandler::reset(IJsonHandler* pParent, bool* pBool) {
   JsonHandler::reset(pParent);

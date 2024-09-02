@@ -1,13 +1,15 @@
 #include "CesiumGeometry/OrientedBoundingBox.h"
 
+#include "CesiumGeometry/AxisAlignedBox.h"
+#include "CesiumGeometry/BoundingSphere.h"
+#include "CesiumGeometry/CullingResult.h"
 #include "CesiumGeometry/Plane.h"
 
-#include <CesiumUtility/Math.h>
-
-#include <glm/ext/matrix_transform.hpp>
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
-
-#include <stdexcept>
 
 namespace CesiumGeometry {
 CullingResult
@@ -71,7 +73,7 @@ double OrientedBoundingBox::computeDistanceSquaredToPosition(
       glm::dot(offset, w));
 
   double distanceSquared = 0.0;
-  double d;
+  double d{};
 
   if (pPrime.x < -uHalf) {
     d = pPrime.x + uHalf;
@@ -144,7 +146,7 @@ BoundingSphere OrientedBoundingBox::toSphere() const noexcept {
 /*static*/ OrientedBoundingBox
 OrientedBoundingBox::fromSphere(const BoundingSphere& sphere) noexcept {
   glm::dvec3 center = sphere.getCenter();
-  glm::dmat3 halfAxes = glm::dmat3(sphere.getRadius());
+  glm::dmat3 halfAxes(sphere.getRadius());
   return OrientedBoundingBox(center, halfAxes);
 }
 

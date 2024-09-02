@@ -1,6 +1,25 @@
+#include "Cesium3DTiles/Buffer.h"
+#include "Cesium3DTiles/Subtree.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumJsonReader/JsonReader.h"
+#include "CesiumJsonReader/JsonReaderOptions.h"
+
 #include <Cesium3DTilesReader/SubtreeFileReader.h>
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumUtility/Uri.h>
+
+#include <fmt/core.h>
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace Cesium3DTiles;
 using namespace CesiumAsync;
@@ -8,7 +27,7 @@ using namespace CesiumJsonReader;
 
 namespace Cesium3DTilesReader {
 
-SubtreeFileReader::SubtreeFileReader() : _reader() {}
+SubtreeFileReader::SubtreeFileReader() = default;
 
 CesiumJsonReader::JsonReaderOptions& SubtreeFileReader::getOptions() {
   return this->_reader.getOptions();
@@ -63,7 +82,7 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
 
 namespace {
 constexpr const char SUBTREE_MAGIC[] = "subt";
-}
+} // namespace
 
 Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
     const AsyncSystem& asyncSystem,
@@ -91,10 +110,8 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
   if (isBinarySubtree) {
     return this
         ->loadBinary(asyncSystem, pAssetAccessor, url, requestHeaders, data);
-  } else {
-    return this
-        ->loadJson(asyncSystem, pAssetAccessor, url, requestHeaders, data);
   }
+  return this->loadJson(asyncSystem, pAssetAccessor, url, requestHeaders, data);
 }
 
 namespace {
@@ -123,8 +140,7 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
     return asyncSystem.createResolvedFuture(std::move(result));
   }
 
-  const SubtreeHeader* header =
-      reinterpret_cast<const SubtreeHeader*>(data.data());
+  const auto* header = reinterpret_cast<const SubtreeHeader*>(data.data());
   if (header->jsonByteLength > data.size() - sizeof(SubtreeHeader)) {
     CesiumJsonReader::ReadJsonResult<Subtree> result;
     result.errors.emplace_back(fmt::format(
@@ -166,7 +182,7 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::loadBinary(
       return asyncSystem.createResolvedFuture(std::move(result));
     }
 
-    const int64_t binaryChunkSize = static_cast<int64_t>(binaryChunk.size());
+    const auto binaryChunkSize = static_cast<int64_t>(binaryChunk.size());
 
     // We allow - but don't require - 8-byte padding.
     int64_t maxPaddingBytes = 0;
@@ -247,12 +263,12 @@ CesiumAsync::Future<RequestedSubtreeBuffer> requestBuffer(
 
 } // namespace
 
-Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
+/*static*/ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
     const AsyncSystem& asyncSystem,
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor,
     const std::string& url,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-    ReadJsonResult<Subtree>&& loaded) const noexcept {
+    ReadJsonResult<Subtree>&& loaded) noexcept {
   if (!loaded.value) {
     return asyncSystem.createResolvedFuture(std::move(loaded));
   }

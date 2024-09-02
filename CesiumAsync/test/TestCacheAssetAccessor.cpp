@@ -1,18 +1,30 @@
 #include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/CacheItem.h"
 #include "CesiumAsync/CachingAssetAccessor.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumAsync/IAssetResponse.h"
 #include "CesiumAsync/ICacheDatabase.h"
-#include "CesiumAsync/ITaskProcessor.h"
 #include "MockAssetAccessor.h"
 #include "MockAssetRequest.h"
 #include "MockAssetResponse.h"
 #include "MockTaskProcessor.h"
 #include "ResponseCacheControl.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <gsl/span>
 #include <spdlog/spdlog.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <ctime>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 
@@ -31,19 +43,14 @@ public:
     std::vector<std::byte> responseData;
   };
 
-  MockStoreCacheDatabase()
-      : getEntryCall{false},
-        storeResponseCall{false},
-        pruneCall{false},
-        clearAllCall{false} {}
+  MockStoreCacheDatabase() = default;
 
-  virtual std::optional<CacheItem>
-  getEntry(const std::string& /*key*/) const override {
+  std::optional<CacheItem> getEntry(const std::string& /*key*/) const override {
     this->getEntryCall = true;
     return this->cacheItem;
   }
 
-  virtual bool storeEntry(
+  bool storeEntry(
       const std::string& key,
       std::time_t expiryTime,
       const std::string& url,
@@ -65,20 +72,20 @@ public:
     return true;
   }
 
-  virtual bool prune() override {
+  bool prune() override {
     this->pruneCall = true;
     return true;
   }
 
-  virtual bool clearAll() override {
+  bool clearAll() override {
     this->clearAllCall = true;
     return true;
   }
 
-  mutable bool getEntryCall;
-  bool storeResponseCall;
-  bool pruneCall;
-  bool clearAllCall;
+  mutable bool getEntryCall{false};
+  bool storeResponseCall{false};
+  bool pruneCall{false};
+  bool clearAllCall{false};
 
   std::optional<StoreRequestParameters> storeRequestParam;
   std::optional<CacheItem> cacheItem;

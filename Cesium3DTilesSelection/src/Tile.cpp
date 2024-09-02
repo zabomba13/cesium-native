@@ -1,14 +1,23 @@
 #include "Cesium3DTilesSelection/Tile.h"
 
-#include <CesiumGeometry/Axis.h>
-#include <CesiumGeometry/Rectangle.h>
-#include <CesiumGeometry/Transforms.h>
-#include <CesiumGeospatial/GlobeTransforms.h>
-#include <CesiumGltf/Model.h>
-#include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Tracing.h>
+#include "Cesium3DTilesSelection/RasterMappedTo3DTile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumUtility/Math.h"
 
+#include <CesiumGltf/Model.h>
+
+#include <algorithm>
 #include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -39,21 +48,16 @@ Tile::Tile(
 
 template <typename... TileContentArgs, typename TileContentEnable>
 Tile::Tile(
-    TileConstructorImpl,
+    TileConstructorImpl /* tag */,
     TileLoadState loadState,
     TilesetContentLoader* pLoader,
     TileContentArgs&&... args)
     : _pParent(nullptr),
-      _children(),
       _id(""s),
       _boundingVolume(OrientedBoundingBox(glm::dvec3(), glm::dmat3())),
-      _viewerRequestVolume(),
-      _contentBoundingVolume(),
       _geometricError(0.0),
       _refine(TileRefine::Replace),
       _transform(1.0),
-      _lastSelectionState(),
-      _loadedTilesLinks(),
       _content{std::forward<TileContentArgs>(args)...},
       _pLoader{pLoader},
       _loadState{loadState},
@@ -70,7 +74,6 @@ Tile::Tile(Tile&& rhs) noexcept
       _refine(rhs._refine),
       _transform(rhs._transform),
       _lastSelectionState(rhs._lastSelectionState),
-      _loadedTilesLinks(),
       _content(std::move(rhs._content)),
       _pLoader{rhs._pLoader},
       _loadState{rhs._loadState},

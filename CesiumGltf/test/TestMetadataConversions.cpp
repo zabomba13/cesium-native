@@ -1,6 +1,37 @@
 #include "CesiumGltf/MetadataConversions.h"
+#include "CesiumGltf/PropertyArrayView.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/matrix_float3x3.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_double4.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_int2.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_int4.hpp>
+#include <glm/ext/vector_int4_sized.hpp>
+#include <glm/ext/vector_uint2.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/ext/vector_uint4.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
+
+#include <cstdint>
+#include <limits>
+#include <optional>
+#include <string>
+#include <string_view>
 
 #ifdef _MSC_VER
 // Some tests intentionally use a double value that overflows a float.
@@ -80,8 +111,8 @@ TEST_CASE("Test MetadataConversions for integer") {
   }
 
   SECTION("converts from in-range floating point number") {
-    REQUIRE(MetadataConversions<int32_t, float>::convert(50.125f) == 50);
-    REQUIRE(MetadataConversions<int32_t, double>::convert(1234.05678f) == 1234);
+    REQUIRE(MetadataConversions<int32_t, float>::convert(50.125F) == 50);
+    REQUIRE(MetadataConversions<int32_t, double>::convert(1234.05678F) == 1234);
   }
 
   SECTION("converts from boolean") {
@@ -104,7 +135,7 @@ TEST_CASE("Test MetadataConversions for integer") {
     REQUIRE(!MetadataConversions<int32_t, int64_t>::convert(
         std::numeric_limits<int64_t>::min()));
     // out-of-range float
-    REQUIRE(!MetadataConversions<uint8_t, float>::convert(1234.56f));
+    REQUIRE(!MetadataConversions<uint8_t, float>::convert(1234.56F));
     // out-of-range double
     REQUIRE(!MetadataConversions<int32_t, double>::convert(
         std::numeric_limits<double>::max()));
@@ -149,7 +180,7 @@ TEST_CASE("Test MetadataConversions for integer") {
 
 TEST_CASE("Test MetadataConversions for float") {
   SECTION("converts from in-range floating point number") {
-    REQUIRE(MetadataConversions<float, float>::convert(123.45f) == 123.45f);
+    REQUIRE(MetadataConversions<float, float>::convert(123.45F) == 123.45F);
     REQUIRE(
         MetadataConversions<float, double>::convert(123.45) ==
         static_cast<float>(123.45));
@@ -167,8 +198,8 @@ TEST_CASE("Test MetadataConversions for float") {
   }
 
   SECTION("converts from boolean") {
-    REQUIRE(MetadataConversions<float, bool>::convert(true) == 1.0f);
-    REQUIRE(MetadataConversions<float, bool>::convert(false) == 0.0f);
+    REQUIRE(MetadataConversions<float, bool>::convert(true) == 1.0F);
+    REQUIRE(MetadataConversions<float, bool>::convert(false) == 0.0F);
   }
 
   SECTION("converts from string") {
@@ -205,8 +236,8 @@ TEST_CASE("Test MetadataConversions for float") {
 TEST_CASE("Test MetadataConversions for double") {
   SECTION("converts from floating point number") {
     REQUIRE(
-        MetadataConversions<double, float>::convert(123.45f) ==
-        static_cast<double>(123.45f));
+        MetadataConversions<double, float>::convert(123.45F) ==
+        static_cast<double>(123.45F));
     REQUIRE(MetadataConversions<double, double>::convert(123.45) == 123.45);
   }
 
@@ -259,7 +290,7 @@ TEST_CASE("Test MetadataConversions for vec2") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::vec2, glm::vec2>::convert(
-            glm::vec2(-3.5f, 1.234f)) == glm::vec2(-3.5f, 1.234f));
+            glm::vec2(-3.5F, 1.234F)) == glm::vec2(-3.5F, 1.234F));
   }
 
   SECTION("converts from other vec2 types") {
@@ -278,7 +309,7 @@ TEST_CASE("Test MetadataConversions for vec2") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::dvec2, glm::vec2>::convert(
-            glm::vec2(-3.5f, 1.234f)) == glm::dvec2(-3.5f, 1.234f));
+            glm::vec2(-3.5F, 1.234F)) == glm::dvec2(-3.5F, 1.234F));
   }
 
   SECTION("converts from vec3 types") {
@@ -293,7 +324,7 @@ TEST_CASE("Test MetadataConversions for vec2") {
     // float-to-int
     REQUIRE(
         MetadataConversions<glm::uvec2, glm::vec3>::convert(
-            glm::vec3(4.5f, 2.345f, 81.0f)) == glm::uvec2(4, 2));
+            glm::vec3(4.5F, 2.345F, 81.0F)) == glm::uvec2(4, 2));
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::vec2, glm::dvec3>::convert(
@@ -346,15 +377,15 @@ TEST_CASE("Test MetadataConversions for vec2") {
   SECTION("converts from float") {
     // float to int
     REQUIRE(
-        MetadataConversions<glm::u8vec2, float>::convert(45.4f) ==
+        MetadataConversions<glm::u8vec2, float>::convert(45.4F) ==
         glm::u8vec2(45));
     REQUIRE(
         MetadataConversions<glm::i16vec2, double>::convert(-1.0111) ==
         glm::i16vec2(-1));
     // float to float
     REQUIRE(
-        MetadataConversions<glm::dvec2, float>::convert(-1234.5f) ==
-        glm::dvec2(-1234.5f));
+        MetadataConversions<glm::dvec2, float>::convert(-1234.5F) ==
+        glm::dvec2(-1234.5F));
     REQUIRE(
         MetadataConversions<glm::vec2, double>::convert(12.0) ==
         glm::vec2(12.0));
@@ -370,7 +401,7 @@ TEST_CASE("Test MetadataConversions for vec2") {
         glm::u8vec4(0, 255, 2, 1)));
     // float
     REQUIRE(!MetadataConversions<glm::i8vec2, glm::vec2>::convert(
-        glm::vec2(129.0f, -129.0f)));
+        glm::vec2(129.0F, -129.0F)));
     REQUIRE(!MetadataConversions<glm::vec2, glm::dvec3>::convert(
         glm::dvec3(std::numeric_limits<double>::max())));
   };
@@ -395,7 +426,7 @@ TEST_CASE("Test MetadataConversions for vec3") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::vec3, glm::vec3>::convert(
-            glm::vec3(-3.5f, 1.234f, 1.0f)) == glm::vec3(-3.5f, 1.234f, 1.0f));
+            glm::vec3(-3.5F, 1.234F, 1.0F)) == glm::vec3(-3.5F, 1.234F, 1.0F));
   }
 
   SECTION("converts from other vec3 types") {
@@ -414,7 +445,7 @@ TEST_CASE("Test MetadataConversions for vec3") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::dvec3, glm::vec3>::convert(
-            glm::vec3(-3.5f, 1.234f, 2.4f)) == glm::dvec3(-3.5f, 1.234f, 2.4f));
+            glm::vec3(-3.5F, 1.234F, 2.4F)) == glm::dvec3(-3.5F, 1.234F, 2.4F));
   }
 
   SECTION("converts from vec2 types") {
@@ -429,7 +460,7 @@ TEST_CASE("Test MetadataConversions for vec3") {
     // float-to-int
     REQUIRE(
         MetadataConversions<glm::uvec3, glm::vec2>::convert(
-            glm::vec2(4.5f, 2.345f)) == glm::uvec3(4, 2, 0));
+            glm::vec2(4.5F, 2.345F)) == glm::uvec3(4, 2, 0));
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::vec3, glm::dvec2>::convert(
@@ -481,15 +512,15 @@ TEST_CASE("Test MetadataConversions for vec3") {
   SECTION("converts from float") {
     // float to int
     REQUIRE(
-        MetadataConversions<glm::u8vec3, float>::convert(45.4f) ==
+        MetadataConversions<glm::u8vec3, float>::convert(45.4F) ==
         glm::u8vec3(45));
     REQUIRE(
         MetadataConversions<glm::i16vec3, double>::convert(-1.0111) ==
         glm::i16vec3(-1));
     // float to float
     REQUIRE(
-        MetadataConversions<glm::dvec3, float>::convert(-1234.5f) ==
-        glm::dvec3(-1234.5f));
+        MetadataConversions<glm::dvec3, float>::convert(-1234.5F) ==
+        glm::dvec3(-1234.5F));
     REQUIRE(
         MetadataConversions<glm::vec3, double>::convert(12.0) ==
         glm::vec3(12.0));
@@ -505,7 +536,7 @@ TEST_CASE("Test MetadataConversions for vec3") {
         glm::u8vec4(0, 255, 2, 1)));
     // float
     REQUIRE(!MetadataConversions<glm::i8vec3, glm::vec2>::convert(
-        glm::vec2(129.0f, -129.0f)));
+        glm::vec2(129.0F, -129.0F)));
     REQUIRE(!MetadataConversions<glm::vec3, glm::dvec4>::convert(
         glm::dvec4(std::numeric_limits<double>::max())));
   };
@@ -530,8 +561,8 @@ TEST_CASE("Test MetadataConversions for vec4") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::vec4, glm::vec4>::convert(
-            glm::vec4(-3.5f, 1.234f, 1.0f, 1.0f)) ==
-        glm::vec4(-3.5f, 1.234f, 1.0f, 1.0f));
+            glm::vec4(-3.5F, 1.234F, 1.0F, 1.0F)) ==
+        glm::vec4(-3.5F, 1.234F, 1.0F, 1.0F));
   }
 
   SECTION("converts from other vec4 types") {
@@ -551,8 +582,8 @@ TEST_CASE("Test MetadataConversions for vec4") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::dvec4, glm::vec4>::convert(
-            glm::vec4(-3.5f, 1.234f, 2.4f, 1.0f)) ==
-        glm::dvec4(-3.5f, 1.234f, 2.4f, 1.0f));
+            glm::vec4(-3.5F, 1.234F, 2.4F, 1.0F)) ==
+        glm::dvec4(-3.5F, 1.234F, 2.4F, 1.0F));
   }
 
   SECTION("converts from vec2 types") {
@@ -567,7 +598,7 @@ TEST_CASE("Test MetadataConversions for vec4") {
     // float-to-int
     REQUIRE(
         MetadataConversions<glm::uvec4, glm::vec2>::convert(
-            glm::vec2(4.5f, 2.345f)) == glm::uvec4(4, 2, 0, 0));
+            glm::vec2(4.5F, 2.345F)) == glm::uvec4(4, 2, 0, 0));
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::vec4, glm::dvec2>::convert(
@@ -618,15 +649,15 @@ TEST_CASE("Test MetadataConversions for vec4") {
   SECTION("converts from float") {
     // float to int
     REQUIRE(
-        MetadataConversions<glm::u8vec4, float>::convert(45.4f) ==
+        MetadataConversions<glm::u8vec4, float>::convert(45.4F) ==
         glm::u8vec4(45));
     REQUIRE(
         MetadataConversions<glm::i16vec4, double>::convert(-1.0111) ==
         glm::i16vec4(-1));
     // float to float
     REQUIRE(
-        MetadataConversions<glm::dvec4, float>::convert(-1234.5f) ==
-        glm::dvec4(-1234.5f));
+        MetadataConversions<glm::dvec4, float>::convert(-1234.5F) ==
+        glm::dvec4(-1234.5F));
     REQUIRE(
         MetadataConversions<glm::vec4, double>::convert(12.0) ==
         glm::vec4(12.0));
@@ -642,7 +673,7 @@ TEST_CASE("Test MetadataConversions for vec4") {
         glm::u8vec4(0, 255, 2, 1)));
     // float
     REQUIRE(!MetadataConversions<glm::i8vec4, glm::vec2>::convert(
-        glm::vec2(129.0f, -129.0f)));
+        glm::vec2(129.0F, -129.0F)));
     REQUIRE(!MetadataConversions<glm::vec4, glm::dvec4>::convert(
         glm::dvec4(std::numeric_limits<double>::max())));
   };
@@ -667,8 +698,8 @@ TEST_CASE("Test MetadataConversions for mat2") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::mat2, glm::mat2>::convert(
-            glm::mat2(-3.5f, 1.234f, 1.0f, 1.0f)) ==
-        glm::mat2(-3.5f, 1.234f, 1.0f, 1.0f));
+            glm::mat2(-3.5F, 1.234F, 1.0F, 1.0F)) ==
+        glm::mat2(-3.5F, 1.234F, 1.0F, 1.0F));
   }
 
   SECTION("converts from other mat2 types") {
@@ -688,8 +719,8 @@ TEST_CASE("Test MetadataConversions for mat2") {
     // float-to-float
     REQUIRE(
         MetadataConversions<glm::dmat2, glm::mat2>::convert(
-            glm::mat2(-3.5f, 1.234f, 2.4f, 1.0f)) ==
-        glm::dmat2(-3.5f, 1.234f, 2.4f, 1.0f));
+            glm::mat2(-3.5F, 1.234F, 2.4F, 1.0F)) ==
+        glm::dmat2(-3.5F, 1.234F, 2.4F, 1.0F));
   }
 
   SECTION("converts from mat3 types") {
@@ -711,9 +742,9 @@ TEST_CASE("Test MetadataConversions for mat2") {
 
     // clang-format off
     glm::mat3 mat3(
-      1.0f, 2.5f, 3.0f,
-      4.5f, 5.0f, 6.0f,
-      -7.8f, 8.9f, -9.99f
+      1.0F, 2.5F, 3.0F,
+      4.5F, 5.0F, 6.0F,
+      -7.8F, 8.9F, -9.99F
     );
     // clang-format on
     // float-to-int
@@ -786,15 +817,15 @@ TEST_CASE("Test MetadataConversions for mat2") {
   SECTION("converts from float") {
     // float to int
     REQUIRE(
-        MetadataConversions<glm::u8mat2x2, float>::convert(45.4f) ==
+        MetadataConversions<glm::u8mat2x2, float>::convert(45.4F) ==
         glm::u8mat2x2(45));
     REQUIRE(
         MetadataConversions<glm::i16mat2x2, double>::convert(-1.0111) ==
         glm::i16mat2x2(-1));
     // float to float
     REQUIRE(
-        MetadataConversions<glm::dmat2, float>::convert(-1234.5f) ==
-        glm::dmat2(-1234.5f));
+        MetadataConversions<glm::dmat2, float>::convert(-1234.5F) ==
+        glm::dmat2(-1234.5F));
     REQUIRE(
         MetadataConversions<glm::mat2, double>::convert(12.0) ==
         glm::mat2(12.0));
@@ -810,7 +841,7 @@ TEST_CASE("Test MetadataConversions for mat2") {
         glm::u8mat2x2(0, 255, 2, 1)));
     // float
     REQUIRE(!MetadataConversions<glm::i8mat2x2, glm::mat2>::convert(
-        glm::mat2(129.0f)));
+        glm::mat2(129.0F)));
     REQUIRE(!MetadataConversions<glm::mat2, glm::dmat2>::convert(
         glm::dmat2(std::numeric_limits<double>::max())));
   };
@@ -843,9 +874,9 @@ TEST_CASE("Test MetadataConversions for mat3") {
 
     // clang-format off
     glm::mat3 mat3(
-      1.0f, 2.4f, 3.0f,
-      4.0f, 5.55f, 6.0f,
-      -7.0f, 8.0f, -9.01f
+      1.0F, 2.4F, 3.0F,
+      4.0F, 5.55F, 6.0F,
+      -7.0F, 8.0F, -9.01F
     );
     // clang-format on
     // float-to-float
@@ -871,9 +902,9 @@ TEST_CASE("Test MetadataConversions for mat3") {
 
     // clang-format off
     glm::mat3 mat3(
-      1.0f, 2.4f, 3.0f,
-      4.0f, -5.0f, 6.0f,
-      7.7f, 8.01f, -9.3f
+      1.0F, 2.4F, 3.0F,
+      4.0F, -5.0F, 6.0F,
+      7.7F, 8.01F, -9.3F
     );
     // clang-format on
     // float-to-int
@@ -908,12 +939,12 @@ TEST_CASE("Test MetadataConversions for mat3") {
 
     // clang-format off
     glm::mat2 mat2(
-      1.0f, 2.5f,
-      3.0f, 4.5f
+      1.0F, 2.5F,
+      3.0F, 4.5F
     );
     glm::dmat3 expectedDoubleMat(
-      1.0f, 2.5f, 0,
-      3.0f, 4.5f, 0,
+      1.0F, 2.5F, 0,
+      3.0F, 4.5F, 0,
       0, 0, 0
     );
     // clang-format on
@@ -950,15 +981,15 @@ TEST_CASE("Test MetadataConversions for mat3") {
 
     // clang-format off
     glm::mat4 mat4(
-      1.0f, 2.5f, 3.0f, -4.0f,
-      4.5f, 5.0f, 6.0f, 7.0f,
-      7.8f, 8.9f, 9.99f, 10.1f,
-      0.0f, 0.0f, 0.0f, 1.0f
+      1.0F, 2.5F, 3.0F, -4.0F,
+      4.5F, 5.0F, 6.0F, 7.0F,
+      7.8F, 8.9F, 9.99F, 10.1F,
+      0.0F, 0.0F, 0.0F, 1.0F
     );
     glm::dmat3 expectedDoubleMat(
-      1.0f, 2.5f, 3.0f,
-      4.5f, 5.0f, 6.0f,
-      7.8f, 8.9f, 9.99f
+      1.0F, 2.5F, 3.0F,
+      4.5F, 5.0F, 6.0F,
+      7.8F, 8.9F, 9.99F
     );
     // clang-format on
     // float-to-int
@@ -996,15 +1027,15 @@ TEST_CASE("Test MetadataConversions for mat3") {
   SECTION("converts from float") {
     // float to int
     REQUIRE(
-        MetadataConversions<glm::u8mat3x3, float>::convert(45.4f) ==
+        MetadataConversions<glm::u8mat3x3, float>::convert(45.4F) ==
         glm::u8mat3x3(45));
     REQUIRE(
         MetadataConversions<glm::i16mat3x3, double>::convert(-1.0111) ==
         glm::i16mat3x3(-1));
     // float to float
     REQUIRE(
-        MetadataConversions<glm::dmat3, float>::convert(-1234.5f) ==
-        glm::dmat3(-1234.5f));
+        MetadataConversions<glm::dmat3, float>::convert(-1234.5F) ==
+        glm::dmat3(-1234.5F));
     REQUIRE(
         MetadataConversions<glm::mat3, double>::convert(12.0) ==
         glm::mat3(12.0));
@@ -1020,7 +1051,7 @@ TEST_CASE("Test MetadataConversions for mat3") {
         glm::u8mat2x2(0, 255, 2, 1)));
     // float
     REQUIRE(!MetadataConversions<glm::i8mat3x3, glm::mat2>::convert(
-        glm::mat2(129.0f)));
+        glm::mat2(129.0F)));
     REQUIRE(!MetadataConversions<glm::mat3, glm::dmat2>::convert(
         glm::dmat2(std::numeric_limits<double>::max())));
   };
@@ -1054,10 +1085,10 @@ TEST_CASE("Test MetadataConversions for mat4") {
 
     // clang-format off
     glm::mat4 mat4(
-      1.0f, 2.4f, 3.0f, 0.0f,
-      4.0f, 5.55f, 6.0f, 0.0f,
-      -7.0f, 8.0f, -9.01f, 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f
+      1.0F, 2.4F, 3.0F, 0.0F,
+      4.0F, 5.55F, 6.0F, 0.0F,
+      -7.0F, 8.0F, -9.01F, 0.0F,
+      0.0F, 0.0F, 0.0F, 1.0F
     );
     // clang-format on
     // float-to-float
@@ -1084,10 +1115,10 @@ TEST_CASE("Test MetadataConversions for mat4") {
 
     // clang-format off
     glm::mat4 mat4(
-      1.0f, 2.4f, 3.0f, 0.0f,
-      4.0f, -5.0f, 6.0f, 0.0f,
-      7.7f, 8.01f, -9.3f, 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f
+      1.0F, 2.4F, 3.0F, 0.0F,
+      4.0F, -5.0F, 6.0F, 0.0F,
+      7.7F, 8.01F, -9.3F, 0.0F,
+      0.0F, 0.0F, 0.0F, 1.0F
     );
     glm::i8mat4x4 expected(
       1, 2, 3, 0,
@@ -1133,12 +1164,12 @@ TEST_CASE("Test MetadataConversions for mat4") {
 
     // clang-format off
     glm::mat2 mat2(
-      1.0f, 2.5f,
-      3.0f, 4.5f
+      1.0F, 2.5F,
+      3.0F, 4.5F
     );
     glm::dmat4 expectedDoubleMat(
-      1.0f, 2.5f, 0, 0,
-      3.0f, 4.5f, 0, 0,
+      1.0F, 2.5F, 0, 0,
+      3.0F, 4.5F, 0, 0,
       0, 0, 0, 0,
       0, 0, 0, 0
     );
@@ -1180,15 +1211,15 @@ TEST_CASE("Test MetadataConversions for mat4") {
 
     // clang-format off
     glm::mat3 mat3(
-      1.0f, 2.5f, 3.0f,
-      4.5f, 5.0f, 6.0f,
-      7.8f, 8.9f, 9.99f
+      1.0F, 2.5F, 3.0F,
+      4.5F, 5.0F, 6.0F,
+      7.8F, 8.9F, 9.99F
     );
     glm::dmat4 expectedDoubleMat(
-      1.0f, 2.5f, 3.0f, 0.0f,
-      4.5f, 5.0f, 6.0f, 0.0f,
-      7.8f, 8.9f, 9.99f, 0.0f,
-      0.0f, 0.0f, 0.0f, 0.0f
+      1.0F, 2.5F, 3.0F, 0.0F,
+      4.5F, 5.0F, 6.0F, 0.0F,
+      7.8F, 8.9F, 9.99F, 0.0F,
+      0.0F, 0.0F, 0.0F, 0.0F
     );
     // clang-format on
     // float-to-int
@@ -1226,15 +1257,15 @@ TEST_CASE("Test MetadataConversions for mat4") {
   SECTION("converts from float") {
     // float to int
     REQUIRE(
-        MetadataConversions<glm::u8mat4x4, float>::convert(45.4f) ==
+        MetadataConversions<glm::u8mat4x4, float>::convert(45.4F) ==
         glm::u8mat4x4(45));
     REQUIRE(
         MetadataConversions<glm::i16mat4x4, double>::convert(-1.0111) ==
         glm::i16mat4x4(-1));
     // float to float
     REQUIRE(
-        MetadataConversions<glm::dmat4, float>::convert(-1234.5f) ==
-        glm::dmat4(-1234.5f));
+        MetadataConversions<glm::dmat4, float>::convert(-1234.5F) ==
+        glm::dmat4(-1234.5F));
     REQUIRE(
         MetadataConversions<glm::mat4, double>::convert(12.0) ==
         glm::mat4(12.0));
@@ -1250,7 +1281,7 @@ TEST_CASE("Test MetadataConversions for mat4") {
         glm::u8mat2x2(0, 255, 2, 1)));
     // float
     REQUIRE(!MetadataConversions<glm::i8mat4x4, glm::mat2>::convert(
-        glm::mat2(129.0f)));
+        glm::mat2(129.0F)));
     REQUIRE(!MetadataConversions<glm::mat4, glm::dmat2>::convert(
         glm::dmat2(std::numeric_limits<double>::max())));
   };
@@ -1286,7 +1317,7 @@ TEST_CASE("Test MetadataConversions for std::string") {
         MetadataConversions<std::string, uint16_t>::convert(1234) == "1234");
     // float
     REQUIRE(
-        MetadataConversions<std::string, float>::convert(1.2345f) ==
-        std::to_string(1.2345f).c_str());
+        MetadataConversions<std::string, float>::convert(1.2345F) ==
+        std::to_string(1.2345F).c_str());
   };
 }

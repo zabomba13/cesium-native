@@ -1,8 +1,15 @@
 #include "CesiumUtility/Gunzip.h"
+
+#include <gsl/span>
+#include <zconf-ng.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 #define ZLIB_CONST
 #include "zlib-ng.h"
 
-#define CHUNK 65536
+constexpr uint32_t CHUNK = 65536;
 
 bool CesiumUtility::isGzip(const gsl::span<const std::byte>& data) {
   if (data.size() < 3) {
@@ -14,7 +21,6 @@ bool CesiumUtility::isGzip(const gsl::span<const std::byte>& data) {
 bool CesiumUtility::gunzip(
     const gsl::span<const std::byte>& data,
     std::vector<std::byte>& out) {
-  int ret;
   unsigned int index = 0;
   zng_stream strm;
   strm.zalloc = Z_NULL;
@@ -22,7 +28,7 @@ bool CesiumUtility::gunzip(
   strm.opaque = Z_NULL;
   strm.avail_in = 0;
   strm.next_in = Z_NULL;
-  ret = zng_inflateInit2(&strm, 16 + MAX_WBITS);
+  int ret = zng_inflateInit2(&strm, 16 + MAX_WBITS);
   if (ret != Z_OK) {
     return false;
   }

@@ -1,6 +1,10 @@
 #include "CesiumUtility/DoublyLinkedList.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 using namespace CesiumUtility;
 
@@ -8,7 +12,7 @@ namespace {
 
 class TestNode {
 public:
-  TestNode(uint32_t valueParam) : value(valueParam), links() {}
+  explicit TestNode(uint32_t valueParam) : value(valueParam) {}
 
   uint32_t value;
   DoublyLinkedListPointers<TestNode> links;
@@ -18,7 +22,7 @@ void assertOrder(
     DoublyLinkedList<TestNode, &TestNode::links>& linkedList,
     const std::vector<uint32_t>& expectedOrder) {
   CHECK(linkedList.size() == expectedOrder.size());
-  if (expectedOrder.size() > 0) {
+  if (!expectedOrder.empty()) {
     REQUIRE(linkedList.head() != nullptr);
     REQUIRE(linkedList.tail() != nullptr);
 

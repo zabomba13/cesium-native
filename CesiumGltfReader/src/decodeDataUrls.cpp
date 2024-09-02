@@ -1,13 +1,23 @@
 #include "decodeDataUrls.h"
 
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/Image.h"
 #include "CesiumGltfReader/GltfReader.h"
 
 #include <CesiumGltf/Model.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <fmt/core.h>
+#include <gsl/span>
 #include <modp_b64.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace CesiumGltfReader {
 
@@ -87,7 +97,7 @@ std::optional<DecodeResult> tryDecode(const std::string& uri) {
 } // namespace
 
 void decodeDataUrls(
-    const GltfReader& reader,
+    const GltfReader& /* reader */,
     GltfReaderResult& readGltf,
     const GltfReaderOptions& options) {
   CESIUM_TRACE("CesiumGltfReader::decodeDataUrls");
@@ -134,8 +144,9 @@ void decodeDataUrls(
       continue;
     }
 
-    ImageReaderResult imageResult =
-        reader.readImage(decoded.value().data, options.ktx2TranscodeTargets);
+    ImageReaderResult imageResult = CesiumGltfReader::GltfReader::readImage(
+        decoded.value().data,
+        options.ktx2TranscodeTargets);
 
     if (!imageResult.image) {
       continue;

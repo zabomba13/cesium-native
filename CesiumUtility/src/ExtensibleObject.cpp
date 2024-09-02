@@ -1,5 +1,11 @@
 #include "CesiumUtility/ExtensibleObject.h"
 
+#include "CesiumUtility/JsonValue.h"
+
+#include <any>
+#include <string>
+#include <utility>
+
 namespace CesiumUtility {
 JsonValue* ExtensibleObject::getGenericExtension(
     const std::string& extensionName) noexcept {
@@ -14,7 +20,7 @@ const JsonValue* ExtensibleObject::getGenericExtension(
     return nullptr;
   }
 
-  const JsonValue* pValue = std::any_cast<JsonValue>(&it->second);
+  const auto* pValue = std::any_cast<JsonValue>(&it->second);
   return pValue;
 }
 } // namespace CesiumUtility

@@ -1,8 +1,18 @@
+#include "CesiumGeometry/BoundingSphere.h"
+#include "CesiumGeometry/OrientedBoundingBox.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/S2CellBoundingVolume.h"
+
 #include <Cesium3DTiles/BoundingVolume.h>
 #include <Cesium3DTiles/Extension3dTilesBoundingVolumeS2.h>
 #include <Cesium3DTilesContent/TileBoundingVolumes.h>
 
 #include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/geometric.hpp>
+
+#include <optional>
 
 using namespace Cesium3DTiles;
 using namespace Cesium3DTilesContent;
@@ -90,8 +100,7 @@ TEST_CASE("TileBoundingVolumes") {
     BoundingVolume bv{};
 
     // Example from 3DTILES_bounding_volume_S2 spec
-    Extension3dTilesBoundingVolumeS2& extension =
-        bv.addExtension<Extension3dTilesBoundingVolumeS2>();
+    auto& extension = bv.addExtension<Extension3dTilesBoundingVolumeS2>();
     extension.token = "89c6c7";
     extension.minimumHeight = 0.0;
     extension.maximumHeight = 1000.0;
@@ -106,8 +115,7 @@ TEST_CASE("TileBoundingVolumes") {
 
     BoundingVolume next{};
     TileBoundingVolumes::setS2CellBoundingVolume(next, *s2);
-    Extension3dTilesBoundingVolumeS2* pNextExtension =
-        bv.getExtension<Extension3dTilesBoundingVolumeS2>();
+    auto* pNextExtension = bv.getExtension<Extension3dTilesBoundingVolumeS2>();
     CHECK(pNextExtension->token == extension.token);
     CHECK(pNextExtension->minimumHeight == extension.minimumHeight);
     CHECK(pNextExtension->maximumHeight == extension.maximumHeight);

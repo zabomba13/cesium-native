@@ -1,9 +1,17 @@
 #include "CesiumJsonWriter/PrettyJsonWriter.h"
 
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
 #include <algorithm>
-#include <iterator>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 namespace CesiumJsonWriter {
 PrettyJsonWriter::PrettyJsonWriter() noexcept {
@@ -159,7 +167,7 @@ std::string_view PrettyJsonWriter::toStringView() {
 std::vector<std::byte> PrettyJsonWriter::toBytes() {
   const auto view = this->toStringView();
   std::vector<std::byte> result(view.size(), std::byte(0));
-  std::uint8_t* u8Pointer = reinterpret_cast<std::uint8_t*>(result.data());
+  auto* u8Pointer = reinterpret_cast<std::uint8_t*>(result.data());
   std::copy(view.begin(), view.end(), u8Pointer);
   return result;
 }

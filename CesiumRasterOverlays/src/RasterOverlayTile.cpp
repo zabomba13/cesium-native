@@ -1,10 +1,9 @@
-#include <CesiumAsync/IAssetResponse.h>
-#include <CesiumAsync/ITaskProcessor.h>
 #include <CesiumRasterOverlays/IPrepareRasterOverlayRendererResources.h>
 #include <CesiumRasterOverlays/RasterOverlay.h>
 #include <CesiumRasterOverlays/RasterOverlayTile.h>
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
-#include <CesiumUtility/joinToString.h>
+
+#include <memory>
 
 using namespace CesiumAsync;
 
@@ -15,7 +14,6 @@ RasterOverlayTile::RasterOverlayTile(
     : _pTileProvider(&tileProvider),
       _targetScreenPixels(0.0),
       _rectangle(CesiumGeometry::Rectangle(0.0, 0.0, 0.0, 0.0)),
-      _tileCredits(),
       _state(LoadState::Placeholder),
       _image(),
       _pRendererResources(nullptr),
@@ -28,7 +26,6 @@ RasterOverlayTile::RasterOverlayTile(
     : _pTileProvider(&tileProvider),
       _targetScreenPixels(targetScreenPixels),
       _rectangle(rectangle),
-      _tileCredits(),
       _state(LoadState::Unloaded),
       _image(),
       _pRendererResources(nullptr),

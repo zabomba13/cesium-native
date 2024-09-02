@@ -1,6 +1,16 @@
+#include "CesiumGeometry/QuadtreeTilingScheme.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumGeospatial/WebMercatorProjection.h"
+
 #include <CesiumQuantizedMeshTerrain/Layer.h>
 
+#include <optional>
 #include <string>
+#include <variant>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -13,19 +23,21 @@ const std::string webMercatorString("EPSG:3857");
 
 std::optional<Projection> Layer::getProjection(
     const CesiumGeospatial::Ellipsoid& ellipsoid) const noexcept {
-  if (this->projection == geographicString)
+  if (this->projection == geographicString) {
     return GeographicProjection(ellipsoid);
-  else if (this->projection == webMercatorString)
+  }
+  if (this->projection == webMercatorString) {
     return WebMercatorProjection(ellipsoid);
-  else
-    return std::nullopt;
+  }
+  return std::nullopt;
 }
 
 std::optional<CesiumGeometry::QuadtreeTilingScheme> Layer::getTilingScheme(
     const CesiumGeospatial::Ellipsoid& ellipsoid) const noexcept {
   std::optional<Projection> maybeProjection = this->getProjection(ellipsoid);
-  if (!maybeProjection)
+  if (!maybeProjection) {
     return std::nullopt;
+  }
 
   struct Operation {
     QuadtreeTilingScheme operator()(const GeographicProjection& geographic) {
@@ -49,15 +61,16 @@ std::optional<CesiumGeometry::QuadtreeTilingScheme> Layer::getTilingScheme(
 std::optional<CesiumGeospatial::BoundingRegion> Layer::getRootBoundingRegion(
     const CesiumGeospatial::Ellipsoid& ellipsoid) const noexcept {
   std::optional<Projection> maybeProjection = this->getProjection(ellipsoid);
-  if (!maybeProjection)
+  if (!maybeProjection) {
     return std::nullopt;
+  }
 
   struct Operation {
-    GlobeRectangle operator()(const GeographicProjection&) {
+    GlobeRectangle operator()(const GeographicProjection& /* projection */) {
       return GeographicProjection::MAXIMUM_GLOBE_RECTANGLE;
     }
 
-    GlobeRectangle operator()(const WebMercatorProjection&) {
+    GlobeRectangle operator()(const WebMercatorProjection& /* projection */) {
       return WebMercatorProjection::MAXIMUM_GLOBE_RECTANGLE;
     }
   };

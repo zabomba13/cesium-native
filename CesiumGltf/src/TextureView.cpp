@@ -1,9 +1,23 @@
 #include "CesiumGltf/TextureView.h"
 
+#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/KhrTextureTransform.h"
 #include "CesiumGltf/Model.h"
+#include "CesiumGltf/Sampler.h"
 #include "CesiumGltf/SamplerUtility.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumGltf/TextureInfo.h"
 
 #include <CesiumUtility/Assert.h>
+
+#include <glm/common.hpp>
+#include <glm/ext/vector_double2.hpp>
+
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <vector>
 
 namespace CesiumGltf {
 
@@ -63,7 +77,7 @@ TextureView::TextureView(
     return;
   }
 
-  const ExtensionKhrTextureTransform* pTextureTransform =
+  const auto* pTextureTransform =
       textureInfo.getExtension<ExtensionKhrTextureTransform>();
 
   if (pTextureTransform) {
@@ -117,7 +131,7 @@ std::vector<uint8_t> TextureView::sampleNearestPixel(
   CESIUM_ASSERT(this->_textureViewStatus == TextureViewStatus::Valid);
   std::vector<uint8_t> result(channels.size());
 
-  if (channels.size() == 0) {
+  if (channels.empty()) {
     return result;
   }
 
@@ -153,11 +167,12 @@ std::vector<uint8_t> TextureView::sampleNearestPixel(
       static_cast<int64_t>(image.height) - 1);
 
   int64_t pixelIndex =
-      image.bytesPerChannel * image.channels * (y * image.width + x);
+      static_cast<int64_t>(image.bytesPerChannel * image.channels) *
+      (y * image.width + x);
 
   // TODO: Currently stb only outputs uint8 pixel types. If that
   // changes this should account for additional pixel byte sizes.
-  const uint8_t* pValue =
+  const auto* pValue =
       reinterpret_cast<const uint8_t*>(image.pixelData.data() + pixelIndex);
   for (size_t i = 0; i < result.size(); i++) {
     result[i] = *(pValue + channels[i]);

@@ -1,13 +1,28 @@
 #include "decodeDraco.h"
 
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
 #include "CesiumGltfReader/GltfReader.h"
 
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/Model.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <draco/attributes/geometry_indices.h>
+#include <draco/attributes/point_attribute.h>
+#include <draco/core/status_or.h>
+#include <draco/mesh/mesh.h>
+#include <gsl/span>
+
 #include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
 #include <string>
+#include <utility>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -112,10 +127,10 @@ void copyDecodedIndices(
     return;
   }
 
-  if (pIndicesAccessor->count != pMesh->num_faces() * 3) {
+  if (pIndicesAccessor->count != static_cast<int64_t>(pMesh->num_faces() * 3)) {
     readGltf.warnings.emplace_back(
         "indices accessor doesn't match with decoded Draco indices");
-    pIndicesAccessor->count = pMesh->num_faces() * 3;
+    pIndicesAccessor->count = static_cast<int64_t>(pMesh->num_faces() * 3);
   }
 
   draco::PointIndex::ValueType numPoint = pMesh->num_points();
@@ -156,8 +171,8 @@ void copyDecodedIndices(
 
   static_assert(sizeof(draco::PointIndex) == sizeof(uint32_t));
 
-  const uint32_t* pSourceIndices =
-      reinterpret_cast<const uint32_t*>(&pMesh->face(draco::FaceIndex(0))[0]);
+  const auto* pSourceIndices = reinterpret_cast<const uint32_t*>(
+      pMesh->face(draco::FaceIndex(0)).data());
 
   switch (pIndicesAccessor->componentType) {
   case CesiumGltf::Accessor::ComponentType::BYTE:
@@ -222,8 +237,8 @@ void copyDecodedAttribute(
   CesiumGltf::Buffer& buffer = model.buffers.emplace_back();
 
   const int8_t numberOfComponents = pAccessor->computeNumberOfComponents();
-  const int64_t stride =
-      numberOfComponents * pAccessor->computeByteSizeOfComponent();
+  const auto stride = static_cast<int64_t>(
+      numberOfComponents * pAccessor->computeByteSizeOfComponent());
   const int64_t sizeBytes = pAccessor->count * stride;
 
   buffer.cesium.data.resize(static_cast<size_t>(sizeBytes));
@@ -264,7 +279,7 @@ void copyDecodedAttribute(
   default:
     readGltf.warnings.emplace_back(
         "Accessor uses an unknown componentType: " +
-        std::to_string(int32_t(pAccessor->componentType)));
+        std::to_string(pAccessor->componentType));
     break;
   }
 }
@@ -335,7 +350,7 @@ void decodeDraco(CesiumGltfReader::GltfReaderResult& readGltf) {
 
   for (CesiumGltf::Mesh& mesh : model.meshes) {
     for (CesiumGltf::MeshPrimitive& primitive : mesh.primitives) {
-      CesiumGltf::ExtensionKhrDracoMeshCompression* pDraco =
+      auto* pDraco =
           primitive
               .getExtension<CesiumGltf::ExtensionKhrDracoMeshCompression>();
       if (!pDraco) {

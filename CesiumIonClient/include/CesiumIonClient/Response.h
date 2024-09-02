@@ -43,7 +43,7 @@ template <typename T> struct Response final {
   /**
    * @brief The HTTP status code returned by Cesium ion.
    */
-  uint16_t httpStatusCode;
+  uint16_t httpStatusCode{};
 
   /**
    * @brief The error code, or empty string if there was no error.

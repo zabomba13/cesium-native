@@ -1,5 +1,20 @@
 #include "ImplicitOctreeLoader.h"
 
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "Cesium3DTilesContent/SubtreeAvailability.h"
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeometry/OctreeTileID.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGltf/Ktx2TranscodeTargets.h"
+#include "CesiumGltfReader/GltfReader.h"
 #include "logTileLoadResult.h"
 
 #include <Cesium3DTilesContent/GltfConverters.h>
@@ -7,11 +22,18 @@
 #include <Cesium3DTilesSelection/Tile.h>
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumUtility/Assert.h>
-#include <CesiumUtility/Uri.h>
 
+#include <glm/ext/matrix_double4x4.hpp>
 #include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
 
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 #include <variant>
+#include <vector>
 
 using namespace Cesium3DTilesContent;
 
@@ -49,7 +71,7 @@ std::vector<Tile> populateSubtree(
     const Tile& tile,
     ImplicitOctreeLoader& loader,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
-  const CesiumGeometry::OctreeTileID& octreeID =
+  const auto& octreeID =
       std::get<CesiumGeometry::OctreeTileID>(tile.getTileID());
 
   uint32_t relativeTileLevel = octreeID.level - subtreeRootID.level;
@@ -182,8 +204,7 @@ CesiumAsync::Future<TileLoadResult> requestTileContent(
                 // Report any errors if there are any
                 logTileLoadResult(pLogger, tileUrl, result.errors);
                 if (result.errors || !result.model) {
-                  return TileLoadResult::createFailedResult(
-                      std::move(pCompletedRequest));
+                  return TileLoadResult::createFailedResult(pCompletedRequest);
                 }
 
                 return TileLoadResult{
@@ -192,7 +213,7 @@ CesiumAsync::Future<TileLoadResult> requestTileContent(
                     std::nullopt,
                     std::nullopt,
                     std::nullopt,
-                    std::move(pCompletedRequest),
+                    pCompletedRequest,
                     {},
                     TileLoadResultState::Success,
                     ellipsoid};
@@ -260,10 +281,9 @@ ImplicitOctreeLoader::loadTileContent(const TileLoadInput& loadInput) {
 
             // tell client to retry later
             return TileLoadResult::createRetryLaterResult(nullptr);
-          } else {
-            // Subtree load failed, so this tile fails, too.
-            return TileLoadResult::createFailedResult(nullptr);
           }
+          // Subtree load failed, so this tile fails, too.
+          return TileLoadResult::createFailedResult(nullptr);
         });
   }
 

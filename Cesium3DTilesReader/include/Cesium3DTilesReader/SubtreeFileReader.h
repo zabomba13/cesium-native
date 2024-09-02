@@ -92,14 +92,15 @@ private:
       const std::string& url,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
       const gsl::span<const std::byte>& data) const noexcept;
-  CesiumAsync::Future<CesiumJsonReader::ReadJsonResult<Cesium3DTiles::Subtree>>
+  static CesiumAsync::Future<
+      CesiumJsonReader::ReadJsonResult<Cesium3DTiles::Subtree>>
   postprocess(
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
       const std::string& url,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
-      CesiumJsonReader::ReadJsonResult<Cesium3DTiles::Subtree>&& loaded)
-      const noexcept;
+      CesiumJsonReader::ReadJsonResult<Cesium3DTiles::Subtree>&&
+          loaded) noexcept;
 
   SubtreeReader _reader;
 };

@@ -1,8 +1,20 @@
 #include "CesiumAsync/GunzipAssetAccessor.h"
 
 #include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
 #include "CesiumAsync/IAssetResponse.h"
 #include "CesiumUtility/Gunzip.h"
+
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumAsync {
 
@@ -10,26 +22,26 @@ namespace {
 
 class GunzippedAssetResponse : public IAssetResponse {
 public:
-  GunzippedAssetResponse(const IAssetResponse* pOther) noexcept
+  explicit GunzippedAssetResponse(const IAssetResponse* pOther) noexcept
       : _pAssetResponse{pOther} {
     this->_dataValid = CesiumUtility::gunzip(
         this->_pAssetResponse->data(),
         this->_gunzippedData);
   }
 
-  virtual uint16_t statusCode() const noexcept override {
+  uint16_t statusCode() const noexcept override {
     return this->_pAssetResponse->statusCode();
   }
 
-  virtual std::string contentType() const override {
+  std::string contentType() const override {
     return this->_pAssetResponse->contentType();
   }
 
-  virtual const HttpHeaders& headers() const noexcept override {
+  const HttpHeaders& headers() const noexcept override {
     return this->_pAssetResponse->headers();
   }
 
-  virtual gsl::span<const std::byte> data() const noexcept override {
+  gsl::span<const std::byte> data() const noexcept override {
     return this->_dataValid ? this->_gunzippedData
                             : this->_pAssetResponse->data();
   }
@@ -42,35 +54,35 @@ private:
 
 class GunzippedAssetRequest : public IAssetRequest {
 public:
-  GunzippedAssetRequest(std::shared_ptr<IAssetRequest>&& pOther)
+  explicit GunzippedAssetRequest(std::shared_ptr<IAssetRequest>&& pOther)
       : _pAssetRequest(std::move(pOther)),
-        _AssetResponse(_pAssetRequest->response()){};
-  virtual const std::string& method() const noexcept override {
+        AssetResponse(_pAssetRequest->response()){};
+  const std::string& method() const noexcept override {
     return this->_pAssetRequest->method();
   }
 
-  virtual const std::string& url() const noexcept override {
+  const std::string& url() const noexcept override {
     return this->_pAssetRequest->url();
   }
 
-  virtual const HttpHeaders& headers() const noexcept override {
+  const HttpHeaders& headers() const noexcept override {
     return this->_pAssetRequest->headers();
   }
 
-  virtual const IAssetResponse* response() const noexcept override {
-    return &this->_AssetResponse;
+  const IAssetResponse* response() const noexcept override {
+    return &this->AssetResponse;
   }
 
 private:
   std::shared_ptr<IAssetRequest> _pAssetRequest;
-  GunzippedAssetResponse _AssetResponse;
+  GunzippedAssetResponse AssetResponse;
 };
 
 Future<std::shared_ptr<IAssetRequest>> gunzipIfNeeded(
     const AsyncSystem& asyncSystem,
     std::shared_ptr<IAssetRequest>&& pCompletedRequest) {
   const IAssetResponse* pResponse = pCompletedRequest->response();
-  if (pResponse && CesiumUtility::isGzip(pResponse->data())) {
+  if ((pResponse != nullptr) && CesiumUtility::isGzip(pResponse->data())) {
     return asyncSystem.runInWorkerThread(
         [pCompletedRequest = std::move(
              pCompletedRequest)]() mutable -> std::shared_ptr<IAssetRequest> {
@@ -87,7 +99,7 @@ GunzipAssetAccessor::GunzipAssetAccessor(
     const std::shared_ptr<IAssetAccessor>& pAssetAccessor)
     : _pAssetAccessor(pAssetAccessor) {}
 
-GunzipAssetAccessor::~GunzipAssetAccessor() noexcept {}
+GunzipAssetAccessor::~GunzipAssetAccessor() noexcept = default;
 
 Future<std::shared_ptr<IAssetRequest>> GunzipAssetAccessor::get(
     const AsyncSystem& asyncSystem,

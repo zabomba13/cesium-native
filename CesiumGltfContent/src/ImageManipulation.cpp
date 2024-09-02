@@ -1,7 +1,9 @@
 #include <CesiumGltf/ImageCesium.h>
 #include <CesiumGltfContent/ImageManipulation.h>
 
+#include <cstddef>
 #include <cstring>
+#include <vector>
 
 namespace Cesium {
 // Use STB resize in our own namespace to avoid conflicts from other libs
@@ -69,7 +71,7 @@ bool ImageManipulation::blitImage(
     return false;
   }
 
-  size_t bytesPerPixel = size_t(target.bytesPerChannel * target.channels);
+  auto bytesPerPixel = size_t(target.bytesPerChannel * target.channels);
   const size_t bytesPerSourceRow = bytesPerPixel * size_t(source.width);
   size_t bytesPerTargetRow = bytesPerPixel * size_t(target.width);
 
@@ -125,8 +127,7 @@ bool ImageManipulation::blitImage(
 
 namespace {
 void writePngToVector(void* context, void* data, int size) {
-  std::vector<std::byte>* pVector =
-      reinterpret_cast<std::vector<std::byte>*>(context);
+  auto* pVector = reinterpret_cast<std::vector<std::byte>*>(context);
   size_t previousSize = pVector->size();
   pVector->resize(previousSize + size_t(size));
   std::memcpy(pVector->data() + previousSize, data, size_t(size));

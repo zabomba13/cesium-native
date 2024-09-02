@@ -1,7 +1,17 @@
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGltfReader/GltfReader.h"
+
 #include <Cesium3DTilesContent/CmptToGltfConverter.h>
 #include <Cesium3DTilesContent/GltfConverters.h>
 
-#include <spdlog/fmt/fmt.h>
+#include <fmt/core.h>
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
+#include <vector>
 
 namespace Cesium3DTilesContent {
 namespace {
@@ -32,8 +42,7 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
     return assetFetcher.asyncSystem.createResolvedFuture(std::move(result));
   }
 
-  const CmptHeader* pHeader =
-      reinterpret_cast<const CmptHeader*>(cmptBinary.data());
+  const auto* pHeader = reinterpret_cast<const CmptHeader*>(cmptBinary.data());
   if (std::string(pHeader->magic, 4) != "cmpt") {
     result.errors.emplaceWarning(
         "Composite tile does not have the expected magic vaue 'cmpt'.");
@@ -65,7 +74,7 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
           "Composite tile ends before all embedded tiles could be read.");
       break;
     }
-    const InnerHeader* pInner =
+    const auto* pInner =
         reinterpret_cast<const InnerHeader*>(cmptBinary.data() + pos);
     if (pos + pInner->byteLength > pHeader->byteLength) {
       result.errors.emplaceWarning(

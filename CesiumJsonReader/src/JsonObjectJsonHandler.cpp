@@ -1,13 +1,19 @@
 #include "CesiumJsonReader/JsonObjectJsonHandler.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
+#include "CesiumJsonReader/JsonHandler.h"
+#include "CesiumUtility/JsonValue.h"
+
 #include <cstdint>
+#include <string>
+#include <string_view>
+#include <variant>
 
 namespace CesiumJsonReader {
 namespace {
 template <typename T>
 void addOrReplace(CesiumUtility::JsonValue& json, T value) {
-  CesiumUtility::JsonValue::Array* pArray =
-      std::get_if<CesiumUtility::JsonValue::Array>(&json.value);
+  auto* pArray = std::get_if<CesiumUtility::JsonValue::Array>(&json.value);
   if (pArray) {
     pArray->emplace_back(value);
   } else {
@@ -16,7 +22,7 @@ void addOrReplace(CesiumUtility::JsonValue& json, T value) {
 }
 } // namespace
 
-JsonObjectJsonHandler::JsonObjectJsonHandler() noexcept : JsonHandler() {}
+JsonObjectJsonHandler::JsonObjectJsonHandler() noexcept = default;
 
 void JsonObjectJsonHandler::reset(
     IJsonHandler* pParent,
@@ -63,8 +69,7 @@ IJsonHandler* JsonObjectJsonHandler::readDouble(double d) {
 
 IJsonHandler* JsonObjectJsonHandler::readString(const std::string_view& str) {
   CesiumUtility::JsonValue& current = *this->_stack.back();
-  CesiumUtility::JsonValue::Array* pArray =
-      std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
+  auto* pArray = std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
   if (pArray) {
     pArray->emplace_back(std::string(str));
   } else {
@@ -76,8 +81,7 @@ IJsonHandler* JsonObjectJsonHandler::readString(const std::string_view& str) {
 
 IJsonHandler* JsonObjectJsonHandler::readObjectStart() {
   CesiumUtility::JsonValue& current = *this->_stack.back();
-  CesiumUtility::JsonValue::Array* pArray =
-      std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
+  auto* pArray = std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
   if (pArray) {
     CesiumUtility::JsonValue& newObject =
         pArray->emplace_back(CesiumUtility::JsonValue::Object());
@@ -92,8 +96,7 @@ IJsonHandler* JsonObjectJsonHandler::readObjectStart() {
 IJsonHandler*
 JsonObjectJsonHandler::readObjectKey(const std::string_view& str) {
   CesiumUtility::JsonValue& json = *this->_stack.back();
-  CesiumUtility::JsonValue::Object* pObject =
-      std::get_if<CesiumUtility::JsonValue::Object>(&json.value);
+  auto* pObject = std::get_if<CesiumUtility::JsonValue::Object>(&json.value);
 
   auto it = pObject->emplace(str, CesiumUtility::JsonValue()).first;
   this->_stack.push_back(&it->second);
@@ -107,8 +110,7 @@ IJsonHandler* JsonObjectJsonHandler::readObjectEnd() {
 
 IJsonHandler* JsonObjectJsonHandler::readArrayStart() {
   CesiumUtility::JsonValue& current = *this->_stack.back();
-  CesiumUtility::JsonValue::Array* pArray =
-      std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
+  auto* pArray = std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
   if (pArray) {
     CesiumUtility::JsonValue& newArray =
         pArray->emplace_back(CesiumUtility::JsonValue::Array());
@@ -127,8 +129,7 @@ IJsonHandler* JsonObjectJsonHandler::readArrayEnd() {
 
 IJsonHandler* JsonObjectJsonHandler::doneElement() {
   CesiumUtility::JsonValue& current = *this->_stack.back();
-  CesiumUtility::JsonValue::Array* pArray =
-      std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
+  auto* pArray = std::get_if<CesiumUtility::JsonValue::Array>(&current.value);
   if (!pArray) {
     this->_stack.pop_back();
     return this->_stack.empty() ? this->parent() : this;

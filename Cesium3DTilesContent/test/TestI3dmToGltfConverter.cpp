@@ -1,11 +1,14 @@
+#include "Cesium3DTilesContent/GltfConverterResult.h"
 #include "ConvertTileToGltf.h"
 
 #include <CesiumGltf/AccessorView.h>
-#include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
 
-#include <catch2/catch.hpp>
-#include <glm/vec3.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+
+#include <filesystem>
 
 using namespace Cesium3DTilesContent;
 using namespace CesiumGltf;
@@ -25,7 +28,7 @@ TEST_CASE("I3dmToGltfConverter") {
         ExtensionExtMeshGpuInstancing::ExtensionName));
     REQUIRE(result.model->nodes.size() == 1);
 
-    ExtensionExtMeshGpuInstancing* pExtension =
+    auto* pExtension =
         result.model->nodes[0].getExtension<ExtensionExtMeshGpuInstancing>();
     REQUIRE(pExtension);
 
@@ -51,7 +54,7 @@ TEST_CASE("I3dmToGltfConverter") {
         ExtensionExtMeshGpuInstancing::ExtensionName));
     REQUIRE(result.model->nodes.size() == 1);
 
-    ExtensionExtMeshGpuInstancing* pExtension =
+    auto* pExtension =
         result.model->nodes[0].getExtension<ExtensionExtMeshGpuInstancing>();
     REQUIRE(pExtension);
 

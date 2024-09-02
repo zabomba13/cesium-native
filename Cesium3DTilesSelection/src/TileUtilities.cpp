@@ -1,15 +1,17 @@
 #include "TileUtilities.h"
 
-#include <CesiumGeospatial/BoundingRegion.h>
-#include <CesiumGeospatial/BoundingRegionWithLooseFittingHeights.h>
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "CesiumGeospatial/CartographicPolygon.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+
 #include <CesiumGeospatial/GlobeRectangle.h>
 
-#include <variant>
+#include <optional>
+#include <vector>
 
 using namespace CesiumGeospatial;
 
-namespace Cesium3DTilesSelection {
-namespace CesiumImpl {
+namespace Cesium3DTilesSelection::CesiumImpl {
 
 bool withinPolygons(
     const BoundingVolume& boundingVolume,
@@ -44,6 +46,4 @@ bool outsidePolygons(
       cartographicPolygons);
 }
 
-} // namespace CesiumImpl
-
-} // namespace Cesium3DTilesSelection
+} // namespace Cesium3DTilesSelection::CesiumImpl

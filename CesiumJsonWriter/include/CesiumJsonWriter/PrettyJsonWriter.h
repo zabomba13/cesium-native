@@ -30,7 +30,7 @@ public:
   bool Int64(std::int64_t i) override;
   bool Double(double d) override;
   bool RawNumber(const char* str, unsigned int length, bool copy) override;
-  bool Key(std::string_view string) override;
+  bool Key(std::string_view key) override;
   bool String(std::string_view string) override;
   bool StartObject() override;
   bool EndObject() override;

@@ -1,7 +1,12 @@
 #include "ResponseCacheControl.h"
 
+#include "CesiumAsync/HttpHeaders.h"
+
+#include <cstddef>
 #include <map>
+#include <optional>
 #include <set>
+#include <string>
 
 namespace CesiumAsync {
 static std::string trimSpace(const std::string& str);
@@ -30,8 +35,7 @@ ResponseCacheControl::ResponseCacheControl(
 
 /*static*/ std::optional<ResponseCacheControl>
 ResponseCacheControl::parseFromResponseHeaders(const HttpHeaders& headers) {
-  std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator
-      cacheControlIter = headers.find("Cache-Control");
+  auto cacheControlIter = headers.find("Cache-Control");
   if (cacheControlIter == headers.end()) {
     return std::nullopt;
   }
@@ -80,18 +84,21 @@ ResponseCacheControl::parseFromResponseHeaders(const HttpHeaders& headers) {
 
   std::optional<int> maxAge;
   mapIter = parameterizedDirectives.find("max-age");
-  if (mapIter != parameterizedDirectives.end())
+  if (mapIter != parameterizedDirectives.end()) {
     maxAge = std::stoi(mapIter->second);
+  }
 
   std::optional<int> sharedMaxAge;
   mapIter = parameterizedDirectives.find("s-maxage");
-  if (mapIter != parameterizedDirectives.end())
+  if (mapIter != parameterizedDirectives.end()) {
     sharedMaxAge = std::stoi(mapIter->second);
+  }
 
   std::optional<int> staleWhileRevalidate;
   mapIter = parameterizedDirectives.find("stale-while-revalidate");
-  if (mapIter != parameterizedDirectives.end())
+  if (mapIter != parameterizedDirectives.end()) {
     staleWhileRevalidate = std::stoi(mapIter->second);
+  }
 
   return ResponseCacheControl(
       mustRevalidate,

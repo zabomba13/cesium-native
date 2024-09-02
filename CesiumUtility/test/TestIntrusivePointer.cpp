@@ -1,6 +1,8 @@
 #include "CesiumUtility/IntrusivePointer.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <utility>
 
 using namespace CesiumUtility;
 
@@ -18,7 +20,6 @@ void createCopy(IntrusivePointer<Derived>& pDerived) {
   IntrusivePointer<Base> pBase = pDerived;
   CHECK(pBase->_references == 2);
   CHECK(pBase == pDerived);
-  return;
 }
 } // namespace
 TEST_CASE("IntrusivePointer") {

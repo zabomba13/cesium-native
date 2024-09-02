@@ -26,7 +26,7 @@ public:
   virtual bool Int64(std::int64_t i);
   virtual bool Double(double d);
   virtual bool RawNumber(const char* str, unsigned int length, bool copy);
-  virtual bool Key(std::string_view string);
+  virtual bool Key(std::string_view key);
   virtual bool String(std::string_view string);
   virtual bool StartObject();
   virtual bool EndObject();

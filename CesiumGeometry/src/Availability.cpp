@@ -1,6 +1,15 @@
 
 #include "CesiumGeometry/Availability.h"
 
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <variant>
+#include <vector>
+
 namespace CesiumGeometry {
 
 namespace AvailabilityUtilities {
@@ -28,8 +37,7 @@ uint32_t countOnesInBuffer(gsl::span<const std::byte> buffer) {
 }
 } // namespace AvailabilityUtilities
 
-AvailabilityNode::AvailabilityNode() noexcept
-    : subtree(std::nullopt), childNodes() {}
+AvailabilityNode::AvailabilityNode() noexcept : subtree(std::nullopt) {}
 
 void AvailabilityNode::setLoadedSubtree(
     AvailabilitySubtree&& subtree_,
@@ -57,9 +65,9 @@ void AvailabilityNode::setLoadedSubtree(
 
 AvailabilityAccessor::AvailabilityAccessor(
     const AvailabilityView& view,
-    const AvailabilitySubtree& subtree) noexcept {
-  this->pBufferView = std::get_if<SubtreeBufferView>(&view);
-  this->pConstant = std::get_if<ConstantAvailability>(&view);
+    const AvailabilitySubtree& subtree) noexcept
+    : pBufferView(std::get_if<SubtreeBufferView>(&view)),
+      pConstant(std::get_if<ConstantAvailability>(&view)) {
 
   if (this->pBufferView) {
     if (this->pBufferView->buffer < subtree.buffers.size()) {

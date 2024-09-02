@@ -1,6 +1,11 @@
 #include "CesiumAsync/AsyncSystem.h"
 
 #include "CesiumAsync/ITaskProcessor.h"
+#include "CesiumAsync/Impl/AsyncSystemSchedulers.h"
+#include "CesiumAsync/ThreadPool.h"
+
+#include <cstdint>
+#include <memory>
 
 namespace CesiumAsync {
 AsyncSystem::AsyncSystem(
@@ -17,7 +22,7 @@ bool AsyncSystem::dispatchOneMainThreadTask() {
   return this->_pSchedulers->mainThread.dispatchZeroOrOneContinuation();
 }
 
-ThreadPool AsyncSystem::createThreadPool(int32_t numberOfThreads) const {
+/*static*/ ThreadPool AsyncSystem::createThreadPool(int32_t numberOfThreads) {
   return ThreadPool(numberOfThreads);
 }
 

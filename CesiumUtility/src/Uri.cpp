@@ -3,11 +3,14 @@
 #include <CesiumUtility/joinToString.h>
 
 #include <uriparser/Uri.h>
+#include <uriparser/UriBase.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
+#include <functional>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace CesiumUtility {
@@ -63,7 +66,7 @@ std::string Uri::resolve(
     return relative;
   }
 
-  int charsRequired;
+  int charsRequired{};
   if (uriToStringCharsRequiredA(&resolvedUri, &charsRequired) != URI_SUCCESS) {
     uriFreeUriMembersA(&resolvedUri);
     uriFreeUriMembersA(&relativeUri);
@@ -86,7 +89,7 @@ std::string Uri::resolve(
 
   if (useBaseQuery) {
     std::string query(baseUri.query.first, baseUri.query.afterLast);
-    if (query.length() > 0) {
+    if (!query.empty()) {
       if (resolvedUri.query.first) {
         result += "&" + query;
       } else {
@@ -131,8 +134,8 @@ std::string Uri::getQueryValue(const std::string& url, const std::string& key) {
   if (uriParseSingleUriA(&uri, conformedUrl.c_str(), nullptr) != URI_SUCCESS) {
     return "";
   }
-  UriQueryListA* queryList;
-  int itemCount;
+  UriQueryListA* queryList{};
+  int itemCount{};
   if (uriDissectQueryMallocA(
           &queryList,
           &itemCount,
@@ -164,7 +167,7 @@ std::string Uri::substituteTemplateParameters(
   std::string placeholder;
 
   size_t startPos = 0;
-  size_t nextPos;
+  size_t nextPos{};
 
   // Find the start of a parameter
   while ((nextPos = templateUri.find('{', startPos)) != std::string::npos) {
@@ -218,16 +221,15 @@ std::string Uri::unixPathToUriPath(const std::string& unixPath) {
   if (uriUnixFilenameToUriStringA(unixPath.data(), result.data()) != 0) {
     // Error - return original string.
     return unixPath;
-  } else {
-    // An absolute URI will start with "file://". Remove this.
-    if (result.find("file://", 0, 7) != std::string::npos) {
-      result.erase(0, 7);
-    }
-
-    // Truncate at first null character
-    result.resize(std::strlen(result.data()));
-    return result;
   }
+  // An absolute URI will start with "file://". Remove this.
+  if (result.find("file://", 0, 7) != std::string::npos) {
+    result.erase(0, 7);
+  }
+
+  // Truncate at first null character
+  result.resize(std::strlen(result.data()));
+  return result;
 }
 
 std::string Uri::windowsPathToUriPath(const std::string& windowsPath) {
@@ -254,16 +256,15 @@ std::string Uri::windowsPathToUriPath(const std::string& windowsPath) {
       0) {
     // Error - return original string.
     return windowsPath;
-  } else {
-    // An absolute URI will start with "file://". Remove this.
-    if (result.find("file://", 0, 7) != std::string::npos) {
-      result.erase(0, 7);
-    }
-
-    // Truncate at first null character
-    result.resize(std::strlen(result.data()));
-    return result;
   }
+  // An absolute URI will start with "file://". Remove this.
+  if (result.find("file://", 0, 7) != std::string::npos) {
+    result.erase(0, 7);
+  }
+
+  // Truncate at first null character
+  result.resize(std::strlen(result.data()));
+  return result;
 }
 
 std::string Uri::nativePathToUriPath(const std::string& nativePath) {
@@ -285,11 +286,10 @@ std::string Uri::uriPathToUnixPath(const std::string& uriPath) {
   if (uriUriStringToUnixFilenameA(uriPath.data(), result.data()) != 0) {
     // Error - return original string.
     return uriPath;
-  } else {
-    // Truncate at first null character
-    result.resize(std::strlen(result.data()));
-    return result;
   }
+  // Truncate at first null character
+  result.resize(std::strlen(result.data()));
+  return result;
 }
 
 std::string Uri::uriPathToWindowsPath(const std::string& uriPath) {
@@ -311,18 +311,17 @@ std::string Uri::uriPathToWindowsPath(const std::string& uriPath) {
       0) {
     // Error - return original string.
     return uriPath;
-  } else {
-    // Truncate at first null character
-    result.resize(std::strlen(result.data()));
-    return result;
   }
+  // Truncate at first null character
+  result.resize(std::strlen(result.data()));
+  return result;
 }
 
-std::string Uri::uriPathToNativePath(const std::string& nativePath) {
+std::string Uri::uriPathToNativePath(const std::string& uriPath) {
 #ifdef _WIN32
-  return uriPathToWindowsPath(nativePath);
+  return uriPathToWindowsPath(uriPath);
 #else
-  return uriPathToUnixPath(nativePath);
+  return uriPathToUnixPath(uriPath);
 #endif
 }
 
@@ -381,7 +380,7 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
         continue;
       }
 
-      UriPathSegmentA* pSegment =
+      auto* pSegment =
           static_cast<UriPathSegmentA*>(malloc(sizeof(UriPathSegmentA)));
       memset(pSegment, 0, sizeof(UriPathSegmentA));
 
@@ -405,7 +404,7 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
     } while (startPos != std::string::npos);
   }
 
-  int charsRequired;
+  int charsRequired{};
   if (uriToStringCharsRequiredA(&parsedUri, &charsRequired) != URI_SUCCESS) {
     uriFreeUriMembersA(&parsedUri);
     return uri;

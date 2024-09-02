@@ -1,6 +1,21 @@
+#include "Cesium3DTiles/GroupMetadata.h"
+#include "Cesium3DTiles/Schema.h"
 #include "Cesium3DTilesContent/registerAllTileContentTypes.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
 #include "Cesium3DTilesSelection/Tileset.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
 #include "Cesium3DTilesSelection/ViewState.h"
+#include "Cesium3DTilesSelection/ViewUpdateResult.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/Promise.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Cartographic.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/S2CellBoundingVolume.h"
 #include "SimplePrepareRendererResource.h"
 
 #include <Cesium3DTiles/MetadataQuery.h>
@@ -12,13 +27,25 @@
 #include <CesiumNativeTests/readFile.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
-#include <glm/mat4x4.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/geometric.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
+#include <cstdint>
+#include <exception>
 #include <filesystem>
-#include <fstream>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace Cesium3DTilesSelection;
@@ -165,7 +192,7 @@ TEST_CASE("Test replace refinement for render") {
   REQUIRE(pTilesetJson);
   REQUIRE(pTilesetJson->getChildren().size() == 1);
 
-  const Tile* root = &pTilesetJson->getChildren()[0];
+  const Tile* root = pTilesetJson->getChildren().data();
 
   REQUIRE(root->getState() == TileLoadState::ContentLoading);
   for (const auto& child : root->getChildren()) {
@@ -204,7 +231,7 @@ TEST_CASE("Test replace refinement for render") {
       REQUIRE(result.tilesToRenderThisFrame.size() == 1);
       REQUIRE(result.tilesToRenderThisFrame.front() == root);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 2);
       REQUIRE(result.workerThreadTileLoadQueueLength == 0);
@@ -265,7 +292,7 @@ TEST_CASE("Test replace refinement for render") {
       REQUIRE(result.tilesToRenderThisFrame.size() == 1);
       REQUIRE(result.tilesToRenderThisFrame.front() == root);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 6);
       REQUIRE(result.workerThreadTileLoadQueueLength == 4);
@@ -339,7 +366,7 @@ TEST_CASE("Test replace refinement for render") {
       REQUIRE(result.tilesToRenderThisFrame.size() == 1);
       REQUIRE(result.tilesToRenderThisFrame.front() == root);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 7);
       REQUIRE(result.workerThreadTileLoadQueueLength == 5);
@@ -465,7 +492,7 @@ TEST_CASE("Test replace refinement for render") {
       REQUIRE(result.tilesToRenderThisFrame.size() == 1);
       REQUIRE(result.tilesToRenderThisFrame.front() == root);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 6);
       REQUIRE(result.workerThreadTileLoadQueueLength == 4);
@@ -555,9 +582,9 @@ TEST_CASE("Test additive refinement") {
   REQUIRE(pTilesetJson);
   REQUIRE(pTilesetJson->getChildren().size() == 1);
 
-  const Tile* root = &pTilesetJson->getChildren()[0];
+  const Tile* root = pTilesetJson->getChildren().data();
   REQUIRE(root->getState() == TileLoadState::ContentLoading);
-  REQUIRE(root->getChildren().size() == 0);
+  REQUIRE(root->getChildren().empty());
 
   SECTION("Load external tilesets") {
     ViewState viewState = zoomToTileset(tileset);
@@ -587,7 +614,7 @@ TEST_CASE("Test additive refinement") {
       REQUIRE(result.tilesToRenderThisFrame.size() == 1);
       REQUIRE(result.tilesToRenderThisFrame.front() == pTilesetJson);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 7);
       REQUIRE(result.workerThreadTileLoadQueueLength == 5);
@@ -636,7 +663,7 @@ TEST_CASE("Test additive refinement") {
       REQUIRE(result.tilesToRenderThisFrame[1] == root);
       REQUIRE(result.tilesToRenderThisFrame[2] == &parentB3DM);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 8);
       REQUIRE(result.workerThreadTileLoadQueueLength == 1);
@@ -650,7 +677,7 @@ TEST_CASE("Test additive refinement") {
 
       REQUIRE(result.tilesToRenderThisFrame.size() == 8);
 
-      REQUIRE(result.tilesFadingOut.size() == 0);
+      REQUIRE(result.tilesFadingOut.empty());
 
       REQUIRE(result.tilesVisited == 8);
       REQUIRE(result.workerThreadTileLoadQueueLength == 0);
@@ -708,7 +735,7 @@ TEST_CASE("Render any tiles even when one of children can't be rendered for "
   Tile* pTilesetJson = tileset.getRootTile();
   REQUIRE(pTilesetJson);
   REQUIRE(pTilesetJson->getChildren().size() == 1);
-  Tile* root = &pTilesetJson->getChildren()[0];
+  Tile* root = pTilesetJson->getChildren().data();
 
   REQUIRE(!doesTileMeetSSE(viewState, *root, tileset));
   REQUIRE(root->getState() == TileLoadState::ContentLoading);
@@ -724,7 +751,7 @@ TEST_CASE("Render any tiles even when one of children can't be rendered for "
     }
 
     REQUIRE(result.tilesToRenderThisFrame.size() == 2);
-    REQUIRE(result.tilesFadingOut.size() == 0);
+    REQUIRE(result.tilesFadingOut.empty());
     REQUIRE(result.tilesVisited == 5);
     REQUIRE(result.workerThreadTileLoadQueueLength == 3);
     REQUIRE(result.tilesCulled == 0);
@@ -748,7 +775,7 @@ TEST_CASE("Render any tiles even when one of children can't be rendered for "
     }
 
     REQUIRE(result.tilesToRenderThisFrame.size() == 5);
-    REQUIRE(result.tilesFadingOut.size() == 0);
+    REQUIRE(result.tilesFadingOut.empty());
     REQUIRE(result.tilesVisited == 5);
     REQUIRE(result.workerThreadTileLoadQueueLength == 0);
     REQUIRE(result.tilesCulled == 0);
@@ -805,7 +832,7 @@ TEST_CASE("Test multiple frustums") {
   const Tile* pTilesetJson = tileset.getRootTile();
   REQUIRE(pTilesetJson);
   REQUIRE(pTilesetJson->getChildren().size() == 1);
-  const Tile* root = &pTilesetJson->getChildren()[0];
+  const Tile* root = pTilesetJson->getChildren().data();
   REQUIRE(root->getState() == TileLoadState::ContentLoading);
   for (const auto& child : root->getChildren()) {
     REQUIRE(child.getState() == TileLoadState::Unloaded);
@@ -1013,7 +1040,7 @@ TEST_CASE("Can load example tileset.json from 3DTILES_bounding_volume_S2 "
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>>
       mockCompletedRequests;
 
-  const std::byte* pStart = reinterpret_cast<const std::byte*>(s.c_str());
+  const auto* pStart = reinterpret_cast<const std::byte*>(s.c_str());
 
   std::unique_ptr<SimpleAssetResponse> mockCompletedResponse =
       std::make_unique<SimpleAssetResponse>(
@@ -1046,7 +1073,7 @@ TEST_CASE("Can load example tileset.json from 3DTILES_bounding_volume_S2 "
   const Tile* pTilesetJson = tileset.getRootTile();
   REQUIRE(pTilesetJson);
   REQUIRE(pTilesetJson->getChildren().size() == 1);
-  const Tile* pRoot = &pTilesetJson->getChildren()[0];
+  const Tile* pRoot = pTilesetJson->getChildren().data();
 
   const S2CellBoundingVolume* pS2 =
       std::get_if<S2CellBoundingVolume>(&pRoot->getBoundingVolume());
@@ -1057,7 +1084,7 @@ TEST_CASE("Can load example tileset.json from 3DTILES_bounding_volume_S2 "
   CHECK(pS2->getMaximumHeight() == 1000000.0);
 
   REQUIRE(pRoot->getChildren().size() == 1);
-  const Tile* pChild = &pRoot->getChildren()[0];
+  const Tile* pChild = pRoot->getChildren().data();
   const S2CellBoundingVolume* pS2Child =
       std::get_if<S2CellBoundingVolume>(&pChild->getBoundingVolume());
   REQUIRE(pS2Child);
@@ -1067,7 +1094,7 @@ TEST_CASE("Can load example tileset.json from 3DTILES_bounding_volume_S2 "
   CHECK(pS2Child->getMaximumHeight() == 500000.0);
 
   REQUIRE(pChild->getChildren().size() == 1);
-  const Tile* pGrandchild = &pChild->getChildren()[0];
+  const Tile* pGrandchild = pChild->getChildren().data();
   const S2CellBoundingVolume* pS2Grandchild =
       std::get_if<S2CellBoundingVolume>(&pGrandchild->getBoundingVolume());
   REQUIRE(pS2Grandchild);
@@ -1077,7 +1104,7 @@ TEST_CASE("Can load example tileset.json from 3DTILES_bounding_volume_S2 "
   CHECK(pS2Grandchild->getMaximumHeight() == 250000.0);
 
   REQUIRE(pGrandchild->getChildren().size() == 1);
-  const Tile* pGreatGrandchild = &pGrandchild->getChildren()[0];
+  const Tile* pGreatGrandchild = pGrandchild->getChildren().data();
   const S2CellBoundingVolume* pS2GreatGrandchild =
       std::get_if<S2CellBoundingVolume>(&pGreatGrandchild->getBoundingVolume());
   REQUIRE(pS2GreatGrandchild);
@@ -1193,7 +1220,7 @@ TEST_CASE("Makes metadata available on external tilesets") {
   REQUIRE(pTilesetJson);
   REQUIRE(pTilesetJson->getChildren().size() == 1);
 
-  Tile* pRoot = &pTilesetJson->getChildren()[0];
+  Tile* pRoot = pTilesetJson->getChildren().data();
   REQUIRE(pRoot);
   REQUIRE(pRoot->getChildren().size() == 5);
   Tile* pExternal = &pRoot->getChildren()[4];
@@ -1509,18 +1536,19 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
       return pRootTile;
     }
 
-    virtual CesiumAsync::Future<TileLoadResult>
+    CesiumAsync::Future<TileLoadResult>
     loadTileContent(const TileLoadInput& input) override {
       if (&input.tile == this->_pRootTile) {
         TileLoadResult result{};
         result.contentKind = CesiumGltf::Model();
         return input.asyncSystem.createResolvedFuture(std::move(result));
-      } else if (input.tile.getParent() == this->_pRootTile) {
+      }
+      if (input.tile.getParent() == this->_pRootTile) {
         TileLoadResult result{};
         result.contentKind = TileEmptyContent();
         return input.asyncSystem.createResolvedFuture(std::move(result));
-      } else if (
-          input.tile.getParent() != nullptr &&
+      }
+      if (input.tile.getParent() != nullptr &&
           input.tile.getParent()->getParent() == this->_pRootTile) {
         this->_grandchildPromise =
             input.asyncSystem.createPromise<TileLoadResult>();
@@ -1531,9 +1559,9 @@ void runUnconditionallyRefinedTestCase(const TilesetOptions& options) {
           TileLoadResult::createFailedResult(nullptr));
     }
 
-    virtual TileChildrenResult createTileChildren(
-        const Tile&,
-        const CesiumGeospatial::Ellipsoid&) override {
+    TileChildrenResult createTileChildren(
+        const Tile& /* tile */,
+        const CesiumGeospatial::Ellipsoid& /* ellipsoid */) override {
       return TileChildrenResult{{}, TileLoadResultState::Failed};
     }
   };
@@ -1651,7 +1679,7 @@ TEST_CASE("Additive-refined tiles are added to the tilesFadingOut array") {
   ViewUpdateResult updateResult;
   ViewState viewState = zoomToTileset(tileset);
   while (tileset.getNumberOfTilesLoaded() == 0 ||
-         tileset.computeLoadProgress() < 100.0f) {
+         tileset.computeLoadProgress() < 100.0F) {
     updateResult = tileset.updateView({viewState});
   }
 

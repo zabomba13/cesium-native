@@ -1,6 +1,16 @@
+#include "CesiumGeometry/BoundingSphere.h"
+#include "CesiumGeometry/OrientedBoundingBox.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/S2CellBoundingVolume.h"
+#include "CesiumGeospatial/S2CellID.h"
+
 #include <Cesium3DTiles/BoundingVolume.h>
 #include <Cesium3DTiles/Extension3dTilesBoundingVolumeS2.h>
 #include <Cesium3DTilesContent/TileBoundingVolumes.h>
+
+#include <optional>
+#include <vector>
 
 using namespace Cesium3DTiles;
 using namespace CesiumGeometry;
@@ -10,8 +20,9 @@ namespace Cesium3DTilesContent {
 
 std::optional<OrientedBoundingBox> TileBoundingVolumes::getOrientedBoundingBox(
     const BoundingVolume& boundingVolume) {
-  if (boundingVolume.box.size() < 12)
+  if (boundingVolume.box.size() < 12) {
     return std::nullopt;
+  }
 
   const std::vector<double>& a = boundingVolume.box;
   return CesiumGeometry::OrientedBoundingBox(
@@ -42,8 +53,9 @@ void TileBoundingVolumes::setOrientedBoundingBox(
 std::optional<BoundingRegion> TileBoundingVolumes::getBoundingRegion(
     const BoundingVolume& boundingVolume,
     const Ellipsoid& ellipsoid) {
-  if (boundingVolume.region.size() < 6)
+  if (boundingVolume.region.size() < 6) {
     return std::nullopt;
+  }
 
   const std::vector<double>& a = boundingVolume.region;
   return CesiumGeospatial::BoundingRegion(
@@ -69,8 +81,9 @@ void TileBoundingVolumes::setBoundingRegion(
 
 std::optional<BoundingSphere>
 TileBoundingVolumes::getBoundingSphere(const BoundingVolume& boundingVolume) {
-  if (boundingVolume.sphere.size() < 4)
+  if (boundingVolume.sphere.size() < 4) {
     return std::nullopt;
+  }
 
   const std::vector<double>& a = boundingVolume.sphere;
   return CesiumGeometry::BoundingSphere(glm::dvec3(a[0], a[1], a[2]), a[3]);
@@ -88,10 +101,11 @@ std::optional<S2CellBoundingVolume>
 TileBoundingVolumes::getS2CellBoundingVolume(
     const BoundingVolume& boundingVolume,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
-  const Extension3dTilesBoundingVolumeS2* pExtension =
+  const auto* pExtension =
       boundingVolume.getExtension<Extension3dTilesBoundingVolumeS2>();
-  if (!pExtension)
+  if (!pExtension) {
     return std::nullopt;
+  }
 
   return CesiumGeospatial::S2CellBoundingVolume(
       CesiumGeospatial::S2CellID::fromToken(pExtension->token),
@@ -103,7 +117,7 @@ TileBoundingVolumes::getS2CellBoundingVolume(
 void TileBoundingVolumes::setS2CellBoundingVolume(
     Cesium3DTiles::BoundingVolume& boundingVolume,
     const CesiumGeospatial::S2CellBoundingVolume& s2BoundingVolume) {
-  Extension3dTilesBoundingVolumeS2& extension =
+  auto& extension =
       boundingVolume.addExtension<Extension3dTilesBoundingVolumeS2>();
   extension.token = s2BoundingVolume.getCellID().toToken();
   extension.minimumHeight = s2BoundingVolume.getMinimumHeight();

@@ -1,20 +1,28 @@
+#include "CesiumUtility/ErrorList.h"
+
 #include <Cesium3DTilesContent/GltfConverterUtility.h>
 #include <CesiumGltf/Accessor.h>
 #include <CesiumGltf/Buffer.h>
 #include <CesiumGltf/BufferView.h>
 #include <CesiumGltf/Model.h>
 #include <CesiumGltfContent/GltfUtilities.h>
-#include <CesiumUtility/Uri.h>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/matrix.hpp>
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 
-#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
-#include <iterator>
+#include <optional>
 #include <string>
+#include <utility>
+#include <vector>
 
-namespace Cesium3DTilesContent {
-namespace GltfConverterUtility {
+namespace Cesium3DTilesContent::GltfConverterUtility {
 using namespace CesiumGltf;
 
 std::optional<uint32_t> parseOffsetForSemantic(
@@ -106,7 +114,7 @@ int32_t createAccessorInGltf(
     const int32_t bufferViewId,
     const int32_t componentType,
     const int64_t count,
-    const std::string type) {
+    const std::string& type) {
   size_t accessorId = gltf.accessors.size();
   Accessor& accessor = gltf.accessors.emplace_back();
   accessor.bufferView = bufferViewId;
@@ -133,5 +141,4 @@ void applyRtcToNodes(Model& gltf, const glm::dvec3& rtc) {
   });
 }
 
-} // namespace GltfConverterUtility
-} // namespace Cesium3DTilesContent
+} // namespace Cesium3DTilesContent::GltfConverterUtility

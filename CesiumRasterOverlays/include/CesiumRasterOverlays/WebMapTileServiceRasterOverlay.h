@@ -145,7 +145,7 @@ public:
       const std::string& name,
       const std::string& url,
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& headers = {},
-      const WebMapTileServiceRasterOverlayOptions& tmsOptions = {},
+      const WebMapTileServiceRasterOverlayOptions& wmtsOptions = {},
       const RasterOverlayOptions& overlayOptions = {});
   virtual ~WebMapTileServiceRasterOverlay() override;
 

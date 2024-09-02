@@ -1,6 +1,13 @@
 #include "CesiumGeospatial/GlobeRectangle.h"
 
+#include "CesiumGeospatial/Cartographic.h"
+
 #include <CesiumUtility/Math.h>
+
+#include <glm/common.hpp>
+
+#include <optional>
+#include <utility>
 
 using namespace CesiumUtility;
 
@@ -24,25 +31,23 @@ Cartographic GlobeRectangle::computeCenter() const noexcept {
   if (this->_west <= this->_east) {
     // Simple rectangle not crossing the anti-meridian.
     return Cartographic((this->_west + this->_east) * 0.5, latitudeCenter, 0.0);
-  } else {
-    // Rectangle crosses the anti-meridian.
-    double westToAntiMeridian = Math::OnePi - this->_west;
-    double antiMeridianToEast = this->_east - -Math::OnePi;
-    double total = westToAntiMeridian + antiMeridianToEast;
-    if (westToAntiMeridian >= antiMeridianToEast) {
-      // Center is in the Eastern hemisphere.
-      return Cartographic(
-          glm::min(Math::OnePi, this->_west + total * 0.5),
-          latitudeCenter,
-          0.0);
-    } else {
-      // Center is in the Western hemisphere.
-      return Cartographic(
-          glm::max(-Math::OnePi, this->_east - total * 0.5),
-          latitudeCenter,
-          0.0);
-    }
   }
+  // Rectangle crosses the anti-meridian.
+  double westToAntiMeridian = Math::OnePi - this->_west;
+  double antiMeridianToEast = this->_east - -Math::OnePi;
+  double total = westToAntiMeridian + antiMeridianToEast;
+  if (westToAntiMeridian >= antiMeridianToEast) {
+    // Center is in the Eastern hemisphere.
+    return Cartographic(
+        glm::min(Math::OnePi, this->_west + total * 0.5),
+        latitudeCenter,
+        0.0);
+  }
+  // Center is in the Western hemisphere.
+  return Cartographic(
+      glm::max(-Math::OnePi, this->_east - total * 0.5),
+      latitudeCenter,
+      0.0);
 }
 
 bool GlobeRectangle::contains(const Cartographic& cartographic) const noexcept {
@@ -55,10 +60,9 @@ bool GlobeRectangle::contains(const Cartographic& cartographic) const noexcept {
   if (this->_west <= this->_east) {
     // Simple rectangle not crossing the anti-meridian.
     return longitude >= this->_west && longitude <= this->_east;
-  } else {
-    // Rectangle crosses the anti-meridian.
-    return longitude >= this->_west || longitude <= this->_east;
   }
+  // Rectangle crosses the anti-meridian.
+  return longitude >= this->_west || longitude <= this->_east;
 }
 
 bool GlobeRectangle::isEmpty() const noexcept {
@@ -148,9 +152,8 @@ GlobeRectangle::splitAtAntiMeridian() const noexcept {
 
   if (a.computeWidth() > b.computeWidth()) {
     return {a, b};
-  } else {
-    return {b, a};
   }
+  return {b, a};
 }
 
 bool GlobeRectangle::equals(

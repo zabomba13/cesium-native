@@ -1,5 +1,7 @@
 #include <CesiumUtility/ErrorList.h>
 
+#include <utility>
+
 namespace CesiumUtility {
 
 void ErrorList::merge(const ErrorList& errorList) {

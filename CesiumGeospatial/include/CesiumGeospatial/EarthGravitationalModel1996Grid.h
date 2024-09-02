@@ -53,7 +53,7 @@ private:
   /**
    * Returns the height of the given grid value, in meters.
    */
-  double getHeightForIndices(size_t vertical, size_t horizontal) const;
+  double getHeightForIndices(size_t horizontal, size_t vertical) const;
 
   std::vector<int16_t> _gridValues;
 };

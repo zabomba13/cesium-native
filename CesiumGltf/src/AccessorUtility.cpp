@@ -1,7 +1,14 @@
 #include "CesiumGltf/AccessorUtility.h"
 
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/AccessorView.h"
 #include "CesiumGltf/ExtensionExtMeshGpuInstancing.h"
+#include "CesiumGltf/MeshPrimitive.h"
 #include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
+
+#include <cstdint>
+#include <string>
 
 namespace CesiumGltf {
 PositionAccessorType
@@ -11,8 +18,9 @@ getPositionAccessorView(const Model& model, const MeshPrimitive& primitive) {
     return PositionAccessorType();
   }
 
-  const Accessor* pAccessor =
-      model.getSafe<Accessor>(&model.accessors, positionAttribute->second);
+  const auto* pAccessor = CesiumGltf::Model::getSafe<Accessor>(
+      &model.accessors,
+      positionAttribute->second);
   if (!pAccessor || pAccessor->type != Accessor::Type::VEC3 ||
       pAccessor->componentType != Accessor::ComponentType::FLOAT) {
     return PositionAccessorType();
@@ -28,8 +36,9 @@ getNormalAccessorView(const Model& model, const MeshPrimitive& primitive) {
     return NormalAccessorType();
   }
 
-  const Accessor* pAccessor =
-      model.getSafe<Accessor>(&model.accessors, normalAttribute->second);
+  const auto* pAccessor = CesiumGltf::Model::getSafe<Accessor>(
+      &model.accessors,
+      normalAttribute->second);
   if (!pAccessor || pAccessor->type != Accessor::Type::VEC3 ||
       pAccessor->componentType != Accessor::ComponentType::FLOAT) {
     return NormalAccessorType();
@@ -43,8 +52,8 @@ FeatureIdAccessorType getFeatureIdViewFromAccessorIndex(
     const Model& model,
     int32_t featureIdAccessor,
     bool instanceAttribute) {
-  const Accessor* pAccessor =
-      model.getSafe<Accessor>(&model.accessors, featureIdAccessor);
+  const auto* pAccessor =
+      CesiumGltf::Model::getSafe<Accessor>(&model.accessors, featureIdAccessor);
   if (!pAccessor || pAccessor->type != Accessor::Type::SCALAR ||
       pAccessor->normalized) {
     return FeatureIdAccessorType();
@@ -115,8 +124,8 @@ getIndexAccessorView(const Model& model, const MeshPrimitive& primitive) {
     return IndexAccessorType();
   }
 
-  const Accessor* pAccessor =
-      model.getSafe<Accessor>(&model.accessors, primitive.indices);
+  const auto* pAccessor =
+      CesiumGltf::Model::getSafe<Accessor>(&model.accessors, primitive.indices);
   if (!pAccessor || pAccessor->type != Accessor::Type::SCALAR ||
       pAccessor->normalized) {
     return AccessorView<uint8_t>();
@@ -145,8 +154,8 @@ TexCoordAccessorType getTexCoordAccessorView(
     return TexCoordAccessorType();
   }
 
-  const Accessor* pAccessor =
-      model.getSafe<Accessor>(&model.accessors, texCoord->second);
+  const auto* pAccessor =
+      CesiumGltf::Model::getSafe<Accessor>(&model.accessors, texCoord->second);
   if (!pAccessor || pAccessor->type != Accessor::Type::VEC2) {
     return TexCoordAccessorType();
   }
@@ -198,8 +207,8 @@ getQuaternionAccessorView(const Model& model, const Accessor* pAccessor) {
 
 QuaternionAccessorType
 getQuaternionAccessorView(const Model& model, int32_t accessorIndex) {
-  const Accessor* pAccessor =
-      model.getSafe<Accessor>(&model.accessors, accessorIndex);
+  const auto* pAccessor =
+      CesiumGltf::Model::getSafe<Accessor>(&model.accessors, accessorIndex);
   if (!pAccessor || pAccessor->type != Accessor::Type::VEC4) {
     return QuaternionAccessorType();
   }

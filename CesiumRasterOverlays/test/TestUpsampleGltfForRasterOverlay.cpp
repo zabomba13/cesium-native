@@ -1,3 +1,11 @@
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Node.h"
+
 #include <CesiumGeospatial/Cartographic.h>
 #include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumGltf/AccessorView.h>
@@ -6,9 +14,15 @@
 #include <CesiumRasterOverlays/RasterOverlayUtilities.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_bool3.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/gtc/epsilon.hpp>
 #include <glm/trigonometric.hpp>
 
+#include <cstdint>
 #include <cstring>
 #include <vector>
 
@@ -75,11 +89,10 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
       glm::vec2{1.0, 0.0},
       glm::vec2{1.0, 1.0}};
   std::vector<uint16_t> indices{0, 2, 1, 1, 2, 3};
-  uint32_t positionsBufferSize =
+  auto positionsBufferSize =
       static_cast<uint32_t>(positions.size() * sizeof(glm::vec3));
-  uint32_t uvsBufferSize =
-      static_cast<uint32_t>(uvs.size() * sizeof(glm::vec2));
-  uint32_t indicesBufferSize =
+  auto uvsBufferSize = static_cast<uint32_t>(uvs.size() * sizeof(glm::vec2));
+  auto indicesBufferSize =
       static_cast<uint32_t>(indices.size() * sizeof(uint16_t));
 
   Model model;
@@ -115,8 +128,7 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
   positionAccessor.componentType = Accessor::ComponentType::FLOAT;
   positionAccessor.type = Accessor::Type::VEC3;
 
-  int32_t positionAccessorIdx =
-      static_cast<int32_t>(model.accessors.size() - 1);
+  auto positionAccessorIdx = static_cast<int32_t>(model.accessors.size() - 1);
 
   // create uv
   model.bufferViews.emplace_back();
@@ -133,7 +145,7 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
   uvAccessor.componentType = Accessor::ComponentType::FLOAT;
   uvAccessor.type = Accessor::Type::VEC2;
 
-  int32_t uvAccessorIdx = static_cast<int32_t>(model.accessors.size() - 1);
+  auto uvAccessorIdx = static_cast<int32_t>(model.accessors.size() - 1);
 
   // create indices
   model.bufferViews.emplace_back();
@@ -228,42 +240,42 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(
         glm::epsilonEqual(
             p1,
-            (positions[0] + positions[2]) * 0.5f,
+            (positions[0] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
-            (upsampledPosition[1] + positions[1]) * 0.5f,
+            (upsampledPosition[1] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
-            (positions[0] + positions[1]) * 0.5f,
+            (positions[0] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
-            (positions[0] + positions[2]) * 0.5f,
+            (positions[0] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
-            (upsampledPosition[4] + positions[1]) * 0.5f,
+            (upsampledPosition[4] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
   }
 
@@ -271,7 +283,7 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     // Invert the V coordinate
     AccessorWriter<glm::vec2> uvWriter(model, 1);
     for (int64_t i = 0; i < uvWriter.size(); ++i) {
-      uvWriter[i].y = 1.0f - uvWriter[i].y;
+      uvWriter[i].y = 1.0F - uvWriter[i].y;
     }
 
     Model upsampledModel =
@@ -308,42 +320,42 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(
         glm::epsilonEqual(
             p1,
-            (positions[0] + positions[2]) * 0.5f,
+            (positions[0] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
-            (upsampledPosition[1] + positions[1]) * 0.5f,
+            (upsampledPosition[1] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
-            (positions[0] + positions[1]) * 0.5f,
+            (positions[0] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
-            (positions[0] + positions[2]) * 0.5f,
+            (positions[0] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
-            (upsampledPosition[4] + positions[1]) * 0.5f,
+            (upsampledPosition[4] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
   }
 
@@ -382,21 +394,21 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(
         glm::epsilonEqual(
             p1,
-            (positions[0] + positions[1]) * 0.5f,
+            (positions[0] + positions[1]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
-            (positions[1] + 0.5f * (positions[0] + positions[2])) * 0.5f,
+            (positions[1] + 0.5F * (positions[0] + positions[2])) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p4 = upsampledPosition[4];
@@ -410,14 +422,14 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(
         glm::epsilonEqual(
             p5,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p6 = upsampledPosition[6];
     REQUIRE(
         glm::epsilonEqual(
             p6,
-            (positions[1] + positions[3]) * 0.5f,
+            (positions[1] + positions[3]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
   }
 
@@ -456,35 +468,35 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(
         glm::epsilonEqual(
             p1,
-            (positions[1] + positions[3]) * 0.5f,
+            (positions[1] + positions[3]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
-            (positions[2] + 0.5f * (positions[1] + positions[3])) * 0.5f,
+            (positions[2] + 0.5F * (positions[1] + positions[3])) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
-            (positions[3] + positions[2]) * 0.5f,
+            (positions[3] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
-            (positions[1] + positions[3]) * 0.5f,
+            (positions[1] + positions[3]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p6 = upsampledPosition[6];
@@ -530,35 +542,35 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_SHORT indices") {
     REQUIRE(
         glm::epsilonEqual(
             p1,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p2 = upsampledPosition[2];
     REQUIRE(
         glm::epsilonEqual(
             p2,
-            (positions[0] + positions[2]) * 0.5f,
+            (positions[0] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p3 = upsampledPosition[3];
     REQUIRE(
         glm::epsilonEqual(
             p3,
-            (positions[2] + positions[3]) * 0.5f,
+            (positions[2] + positions[3]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p4 = upsampledPosition[4];
     REQUIRE(
         glm::epsilonEqual(
             p4,
-            (positions[2] + (positions[1] + positions[3]) * 0.5f) * 0.5f,
+            (positions[2] + (positions[1] + positions[3]) * 0.5F) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p5 = upsampledPosition[5];
     REQUIRE(
         glm::epsilonEqual(
             p5,
-            (positions[1] + positions[2]) * 0.5f,
+            (positions[1] + positions[2]) * 0.5F,
             glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
     glm::vec3 p6 = upsampledPosition[6];
@@ -1090,11 +1102,10 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
       glm::vec2{1.0, 0.0},
       glm::vec2{1.0, 1.0}};
   std::vector<uint8_t> indices{0, 2, 1, 1, 2, 3};
-  uint32_t positionsBufferSize =
+  auto positionsBufferSize =
       static_cast<uint32_t>(positions.size() * sizeof(glm::vec3));
-  uint32_t uvsBufferSize =
-      static_cast<uint32_t>(uvs.size() * sizeof(glm::vec2));
-  uint32_t indicesBufferSize =
+  auto uvsBufferSize = static_cast<uint32_t>(uvs.size() * sizeof(glm::vec2));
+  auto indicesBufferSize =
       static_cast<uint32_t>(indices.size() * sizeof(uint8_t));
 
   Model model;
@@ -1130,8 +1141,7 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   positionAccessor.componentType = Accessor::ComponentType::FLOAT;
   positionAccessor.type = Accessor::Type::VEC3;
 
-  int32_t positionAccessorIdx =
-      static_cast<int32_t>(model.accessors.size() - 1);
+  auto positionAccessorIdx = static_cast<int32_t>(model.accessors.size() - 1);
 
   // create uv
   model.bufferViews.emplace_back();
@@ -1148,7 +1158,7 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   uvAccessor.componentType = Accessor::ComponentType::FLOAT;
   uvAccessor.type = Accessor::Type::VEC2;
 
-  int32_t uvAccessorIdx = static_cast<int32_t>(model.accessors.size() - 1);
+  auto uvAccessorIdx = static_cast<int32_t>(model.accessors.size() - 1);
 
   // create indices
   model.bufferViews.emplace_back();
@@ -1235,41 +1245,41 @@ TEST_CASE("upsampleGltfForRasterOverlay with UNSIGNED_BYTE indices") {
   REQUIRE(
       glm::epsilonEqual(
           p1,
-          (positions[0] + positions[2]) * 0.5f,
+          (positions[0] + positions[2]) * 0.5F,
           glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
   glm::vec3 p2 = upsampledPosition[2];
   REQUIRE(
       glm::epsilonEqual(
           p2,
-          (upsampledPosition[1] + positions[1]) * 0.5f,
+          (upsampledPosition[1] + positions[1]) * 0.5F,
           glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
   glm::vec3 p3 = upsampledPosition[3];
   REQUIRE(
       glm::epsilonEqual(
           p3,
-          (positions[0] + positions[1]) * 0.5f,
+          (positions[0] + positions[1]) * 0.5F,
           glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
   glm::vec3 p4 = upsampledPosition[4];
   REQUIRE(
       glm::epsilonEqual(
           p4,
-          (positions[0] + positions[2]) * 0.5f,
+          (positions[0] + positions[2]) * 0.5F,
           glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
   glm::vec3 p5 = upsampledPosition[5];
   REQUIRE(
       glm::epsilonEqual(
           p5,
-          (positions[1] + positions[2]) * 0.5f,
+          (positions[1] + positions[2]) * 0.5F,
           glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 
   glm::vec3 p6 = upsampledPosition[6];
   REQUIRE(
       glm::epsilonEqual(
           p6,
-          (upsampledPosition[4] + positions[1]) * 0.5f,
+          (upsampledPosition[4] + positions[1]) * 0.5F,
           glm::vec3(static_cast<float>(Math::Epsilon7))) == glm::bvec3(true));
 }

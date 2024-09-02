@@ -91,9 +91,9 @@ private:
   bool
   tileIsAvailableInAnyLayer(const CesiumGeometry::QuadtreeTileID& tileID) const;
 
-  AvailableState tileIsAvailableInLayer(
+  static AvailableState tileIsAvailableInLayer(
       const CesiumGeometry::QuadtreeTileID& tileID,
-      const Layer& layer) const;
+      const Layer& layer);
 
   void createChildTile(
       const Tile& parent,

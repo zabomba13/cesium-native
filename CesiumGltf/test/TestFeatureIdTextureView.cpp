@@ -1,15 +1,24 @@
 #include "CesiumGltf/ExtensionExtMeshFeatures.h"
+#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/FeatureId.h"
+#include "CesiumGltf/FeatureIdTexture.h"
 #include "CesiumGltf/FeatureIdTextureView.h"
+#include "CesiumGltf/Image.h"
 #include "CesiumGltf/KhrTextureTransform.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
 #include "CesiumGltf/Model.h"
+#include "CesiumGltf/Sampler.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumGltf/TextureView.h"
 #include "CesiumUtility/Math.h"
 
-#include <catch2/catch.hpp>
-#include <gsl/span>
+#include <catch2/catch_test_macros.hpp>
 
-#include <climits>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <optional>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -23,8 +32,7 @@ TEST_CASE("Test FeatureIdTextureView on feature ID texture with invalid "
   sampler.wrapS = Sampler::WrapS::CLAMP_TO_EDGE;
   sampler.wrapT = Sampler::WrapT::CLAMP_TO_EDGE;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = -1;
@@ -51,8 +59,7 @@ TEST_CASE("Test FeatureIdTextureView on feature ID texture with invalid image "
   texture.sampler = 0;
   texture.source = -1;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -82,8 +89,7 @@ TEST_CASE("Test FeatureIdTextureView on feature ID texture with empty image") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -115,8 +121,7 @@ TEST_CASE("Test FeatureIdTextureView on feature ID texture with too many bytes "
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -149,8 +154,7 @@ TEST_CASE(
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -181,8 +185,7 @@ TEST_CASE(
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -213,8 +216,7 @@ TEST_CASE("Test FeatureIdTextureView on feature ID texture with out of range "
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -244,8 +246,7 @@ TEST_CASE("Test FeatureIdTextureView on valid feature ID texture") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -276,15 +277,14 @@ TEST_CASE("Test FeatureIdTextureView with applyKhrTextureTransformExtension = "
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
   featureIdTexture.texCoord = 0;
   featureIdTexture.channels = {0};
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       featureIdTexture.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {1.0, 2.0};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -325,15 +325,14 @@ TEST_CASE("Test FeatureIdTextureView with applyKhrTextureTransformExtension = "
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
   featureIdTexture.texCoord = 0;
   featureIdTexture.channels = {0};
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       featureIdTexture.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {1.0, 2.0};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -385,8 +384,7 @@ TEST_CASE("Test FeatureIdTextureView with makeImageCopy = true") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -430,8 +428,7 @@ TEST_CASE("Test getFeatureID on invalid feature ID texture view") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -471,8 +468,7 @@ TEST_CASE("Test getFeatureID on valid feature ID texture view") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -516,15 +512,14 @@ TEST_CASE("Test getFeatureID on view with applyKhrTextureTransformExtension = "
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
   featureIdTexture.texCoord = 0;
   featureIdTexture.channels = {0};
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       featureIdTexture.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {0.5, -0.5};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -567,15 +562,14 @@ TEST_CASE(
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
   featureIdTexture.texCoord = 0;
   featureIdTexture.channels = {0};
 
-  ExtensionKhrTextureTransform& textureTransformExtension =
+  auto& textureTransformExtension =
       featureIdTexture.addExtension<ExtensionKhrTextureTransform>();
   textureTransformExtension.offset = {0.5, -0.5};
   textureTransformExtension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -623,8 +617,7 @@ TEST_CASE("Test getFeatureId on view with makeImageCopy = true") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -674,8 +667,7 @@ TEST_CASE("Test getFeatureID rounds to nearest pixel") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -717,8 +709,7 @@ TEST_CASE("Test getFeatureID clamps values") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -760,8 +751,7 @@ TEST_CASE("Test getFeatureID handles multiple channels") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;
@@ -801,8 +791,7 @@ TEST_CASE("Check FeatureIdTextureView sampling with different wrap values") {
   texture.sampler = 0;
   texture.source = 0;
 
-  ExtensionExtMeshFeatures& meshFeatures =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& meshFeatures = primitive.addExtension<ExtensionExtMeshFeatures>();
 
   FeatureIdTexture featureIdTexture;
   featureIdTexture.index = 0;

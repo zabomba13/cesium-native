@@ -1,10 +1,32 @@
 #include "CesiumGltf/PropertyTableView.h"
 
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumGltf/PropertyTablePropertyView.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyView.h"
+#include "CesiumGltf/Schema.h"
+
+#include <glm/common.hpp>
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <string_view>
+
 namespace CesiumGltf {
 template <typename T>
 static PropertyViewStatusType checkOffsetsBuffer(
     const gsl::span<const std::byte>& offsetBuffer,
-    size_t valueBufferSize,
+    size_t valuesBufferSize,
     size_t instanceCount,
     bool checkBitSize,
     PropertyViewStatusType offsetsNotSortedError,
@@ -31,14 +53,14 @@ static PropertyViewStatusType checkOffsetsBuffer(
   }
 
   if (checkBitSize) {
-    if (offsetValues.back() / 8 <= valueBufferSize) {
+    if (offsetValues.back() / 8 <= valuesBufferSize) {
       return PropertyTablePropertyViewStatus::Valid;
     }
 
     return offsetOutOfBoundsError;
   }
 
-  if (offsetValues.back() <= valueBufferSize) {
+  if (offsetValues.back() <= valuesBufferSize) {
     return PropertyTablePropertyViewStatus::Valid;
   }
 
@@ -49,7 +71,7 @@ template <typename T>
 static PropertyViewStatusType checkStringAndArrayOffsetsBuffers(
     const gsl::span<const std::byte>& arrayOffsets,
     const gsl::span<const std::byte>& stringOffsets,
-    size_t valueBufferSize,
+    size_t valuesBufferSize,
     PropertyComponentType stringOffsetType,
     size_t propertyTableCount) noexcept {
   const auto status = checkOffsetsBuffer<T>(
@@ -70,7 +92,7 @@ static PropertyViewStatusType checkStringAndArrayOffsetsBuffers(
   case PropertyComponentType::Uint8:
     return checkOffsetsBuffer<uint8_t>(
         stringOffsets,
-        valueBufferSize,
+        valuesBufferSize,
         pValue[propertyTableCount] / sizeof(T),
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -78,7 +100,7 @@ static PropertyViewStatusType checkStringAndArrayOffsetsBuffers(
   case PropertyComponentType::Uint16:
     return checkOffsetsBuffer<uint16_t>(
         stringOffsets,
-        valueBufferSize,
+        valuesBufferSize,
         pValue[propertyTableCount] / sizeof(T),
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -86,7 +108,7 @@ static PropertyViewStatusType checkStringAndArrayOffsetsBuffers(
   case PropertyComponentType::Uint32:
     return checkOffsetsBuffer<uint32_t>(
         stringOffsets,
-        valueBufferSize,
+        valuesBufferSize,
         pValue[propertyTableCount] / sizeof(T),
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -94,7 +116,7 @@ static PropertyViewStatusType checkStringAndArrayOffsetsBuffers(
   case PropertyComponentType::Uint64:
     return checkOffsetsBuffer<uint64_t>(
         stringOffsets,
-        valueBufferSize,
+        valuesBufferSize,
         pValue[propertyTableCount] / sizeof(T),
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -111,7 +133,7 @@ PropertyTableView::PropertyTableView(
       _pPropertyTable{&propertyTable},
       _pClass{nullptr},
       _status() {
-  const ExtensionModelExtStructuralMetadata* pMetadata =
+  const auto* pMetadata =
       model.getExtension<ExtensionModelExtStructuralMetadata>();
   if (!pMetadata) {
     _status = PropertyTableViewStatus::ErrorMissingMetadataExtension;
@@ -153,13 +175,13 @@ PropertyViewStatusType PropertyTableView::getBufferSafe(
   buffer = {};
 
   const BufferView* pBufferView =
-      _pModel->getSafe(&_pModel->bufferViews, bufferViewIdx);
+      CesiumGltf::Model::getSafe(&_pModel->bufferViews, bufferViewIdx);
   if (!pBufferView) {
     return PropertyTablePropertyViewStatus::ErrorInvalidValueBufferView;
   }
 
   const Buffer* pBuffer =
-      _pModel->getSafe(&_pModel->buffers, pBufferView->buffer);
+      CesiumGltf::Model::getSafe(&_pModel->buffers, pBufferView->buffer);
   if (!pBuffer) {
     return PropertyTablePropertyViewStatus::ErrorInvalidValueBuffer;
   }
@@ -178,7 +200,7 @@ PropertyViewStatusType PropertyTableView::getBufferSafe(
 PropertyViewStatusType PropertyTableView::getArrayOffsetsBufferSafe(
     int32_t arrayOffsetsBufferView,
     PropertyComponentType arrayOffsetType,
-    size_t valueBufferSize,
+    size_t valuesBufferSize,
     size_t propertyTableCount,
     bool checkBitsSize,
     gsl::span<const std::byte>& arrayOffsetsBuffer) const noexcept {
@@ -192,7 +214,7 @@ PropertyViewStatusType PropertyTableView::getArrayOffsetsBufferSafe(
   case PropertyComponentType::Uint8:
     return checkOffsetsBuffer<uint8_t>(
         arrayOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         checkBitsSize,
         PropertyTablePropertyViewStatus::ErrorArrayOffsetsNotSorted,
@@ -200,7 +222,7 @@ PropertyViewStatusType PropertyTableView::getArrayOffsetsBufferSafe(
   case PropertyComponentType::Uint16:
     return checkOffsetsBuffer<uint16_t>(
         arrayOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         checkBitsSize,
         PropertyTablePropertyViewStatus::ErrorArrayOffsetsNotSorted,
@@ -208,7 +230,7 @@ PropertyViewStatusType PropertyTableView::getArrayOffsetsBufferSafe(
   case PropertyComponentType::Uint32:
     return checkOffsetsBuffer<uint32_t>(
         arrayOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         checkBitsSize,
         PropertyTablePropertyViewStatus::ErrorArrayOffsetsNotSorted,
@@ -216,7 +238,7 @@ PropertyViewStatusType PropertyTableView::getArrayOffsetsBufferSafe(
   case PropertyComponentType::Uint64:
     return checkOffsetsBuffer<uint64_t>(
         arrayOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         checkBitsSize,
         PropertyTablePropertyViewStatus::ErrorArrayOffsetsNotSorted,
@@ -229,7 +251,7 @@ PropertyViewStatusType PropertyTableView::getArrayOffsetsBufferSafe(
 PropertyViewStatusType PropertyTableView::getStringOffsetsBufferSafe(
     int32_t stringOffsetsBufferView,
     PropertyComponentType stringOffsetType,
-    size_t valueBufferSize,
+    size_t valuesBufferSize,
     size_t propertyTableCount,
     gsl::span<const std::byte>& stringOffsetsBuffer) const noexcept {
   const PropertyViewStatusType bufferStatus =
@@ -242,7 +264,7 @@ PropertyViewStatusType PropertyTableView::getStringOffsetsBufferSafe(
   case PropertyComponentType::Uint8:
     return checkOffsetsBuffer<uint8_t>(
         stringOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -250,7 +272,7 @@ PropertyViewStatusType PropertyTableView::getStringOffsetsBufferSafe(
   case PropertyComponentType::Uint16:
     return checkOffsetsBuffer<uint16_t>(
         stringOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -258,7 +280,7 @@ PropertyViewStatusType PropertyTableView::getStringOffsetsBufferSafe(
   case PropertyComponentType::Uint32:
     return checkOffsetsBuffer<uint32_t>(
         stringOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -266,7 +288,7 @@ PropertyViewStatusType PropertyTableView::getStringOffsetsBufferSafe(
   case PropertyComponentType::Uint64:
     return checkOffsetsBuffer<uint64_t>(
         stringOffsetsBuffer,
-        valueBufferSize,
+        valuesBufferSize,
         propertyTableCount,
         false,
         PropertyTablePropertyViewStatus::ErrorStringOffsetsNotSorted,
@@ -360,7 +382,7 @@ PropertyTableView::getBooleanArrayPropertyValues(
 
   // Handle fixed-length arrays
   if (fixedLengthArrayCount > 0) {
-    size_t maxRequiredBytes = static_cast<size_t>(glm::ceil(
+    auto maxRequiredBytes = static_cast<size_t>(glm::ceil(
         static_cast<double>(_pPropertyTable->count * fixedLengthArrayCount) /
         8.0));
 

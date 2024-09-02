@@ -1,10 +1,31 @@
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTexture.h"
+#include "CesiumGltf/PropertyTextureProperty.h"
+#include "CesiumGltf/PropertyTexturePropertyView.h"
 #include "CesiumGltf/PropertyTextureView.h"
+#include "CesiumGltf/PropertyTransformations.h"
+#include "CesiumGltf/Sampler.h"
+#include "CesiumGltf/Schema.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumGltf/TextureView.h"
 #include "CesiumUtility/Math.h"
 
-#include <catch2/catch.hpp>
-#include <gsl/span>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
 
+#include <array>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <optional>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -88,8 +109,7 @@ TEST_CASE("Test PropertyTextureView on model without EXT_structural_metadata "
 TEST_CASE("Test PropertyTextureView on model without metadata schema") {
   Model model;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   PropertyTexture& propertyTexture = metadata.propertyTextures.emplace_back();
   propertyTexture.classProperty = "TestClass";
@@ -111,8 +131,7 @@ TEST_CASE("Test PropertyTextureView on model without metadata schema") {
 TEST_CASE("Test property texture with nonexistent class") {
   Model model;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -152,8 +171,7 @@ TEST_CASE("Test scalar PropertyTextureProperty") {
   size_t textureIndex = model.textures.size() - 1;
   size_t imageIndex = model.images.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -204,7 +222,7 @@ TEST_CASE("Test scalar PropertyTextureProperty") {
     TextureViewOptions options;
     options.applyKhrTextureTransformExtension = true;
 
-    ExtensionKhrTextureTransform& extension =
+    auto& extension =
         propertyTextureProperty.addExtension<ExtensionKhrTextureTransform>();
     extension.offset = {0.5, -0.5};
     extension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -396,8 +414,7 @@ TEST_CASE("Test scalar PropertyTextureProperty (normalized)") {
   size_t textureIndex = model.textures.size() - 1;
   size_t imageIndex = model.images.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -449,7 +466,7 @@ TEST_CASE("Test scalar PropertyTextureProperty (normalized)") {
     TextureViewOptions options;
     options.applyKhrTextureTransformExtension = true;
 
-    ExtensionKhrTextureTransform& extension =
+    auto& extension =
         propertyTextureProperty.addExtension<ExtensionKhrTextureTransform>();
     extension.offset = {0.5, -0.5};
     extension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -586,8 +603,7 @@ TEST_CASE("Test vecN PropertyTextureProperty") {
   size_t textureIndex = model.textures.size() - 1;
   size_t imageIndex = model.images.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -639,7 +655,7 @@ TEST_CASE("Test vecN PropertyTextureProperty") {
     TextureViewOptions options;
     options.applyKhrTextureTransformExtension = true;
 
-    ExtensionKhrTextureTransform& extension =
+    auto& extension =
         propertyTextureProperty.addExtension<ExtensionKhrTextureTransform>();
     extension.offset = {0.5, -0.5};
     extension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -798,8 +814,7 @@ TEST_CASE("Test vecN PropertyTextureProperty (normalized)") {
   size_t textureIndex = model.textures.size() - 1;
   size_t imageIndex = model.images.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -851,7 +866,7 @@ TEST_CASE("Test vecN PropertyTextureProperty (normalized)") {
     TextureViewOptions options;
     options.applyKhrTextureTransformExtension = true;
 
-    ExtensionKhrTextureTransform& extension =
+    auto& extension =
         propertyTextureProperty.addExtension<ExtensionKhrTextureTransform>();
     extension.offset = {0.5, -0.5};
     extension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -1011,8 +1026,7 @@ TEST_CASE("Test array PropertyTextureProperty") {
   size_t textureIndex = model.textures.size() - 1;
   size_t imageIndex = model.images.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1080,7 +1094,7 @@ TEST_CASE("Test array PropertyTextureProperty") {
     TextureViewOptions options;
     options.applyKhrTextureTransformExtension = true;
 
-    ExtensionKhrTextureTransform& extension =
+    auto& extension =
         propertyTextureProperty.addExtension<ExtensionKhrTextureTransform>();
     extension.offset = {0.5, -0.5};
     extension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -1277,8 +1291,7 @@ TEST_CASE("Test array PropertyTextureProperty (normalized)") {
   size_t textureIndex = model.textures.size() - 1;
   size_t imageIndex = model.images.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1349,7 +1362,7 @@ TEST_CASE("Test array PropertyTextureProperty (normalized)") {
     TextureViewOptions options;
     options.applyKhrTextureTransformExtension = true;
 
-    ExtensionKhrTextureTransform& extension =
+    auto& extension =
         propertyTextureProperty.addExtension<ExtensionKhrTextureTransform>();
     extension.offset = {0.5, -0.5};
     extension.rotation = CesiumUtility::Math::PiOverTwo;
@@ -1516,10 +1529,10 @@ TEST_CASE("Test with PropertyTextureProperty offset, scale, min, max") {
 
   std::vector<uint32_t> expectedUint{16777216, 65545, 131604, 16777480};
 
-  const float offset = 1.0f;
-  const float scale = 2.0f;
-  const float min = -10.0f;
-  const float max = 10.0f;
+  const float offset = 1.0F;
+  const float scale = 2.0F;
+  const float min = -10.0F;
+  const float max = 10.0F;
 
   addTextureToModel(
       model,
@@ -1531,8 +1544,7 @@ TEST_CASE("Test with PropertyTextureProperty offset, scale, min, max") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1601,10 +1613,10 @@ TEST_CASE("Test with PropertyTextureProperty offset, scale, min, max") {
   }
 
   SECTION("Use own property values") {
-    const float newOffset = 1.0f;
-    const float newScale = -1.0f;
-    const float newMin = -3.0f;
-    const float newMax = 0.0f;
+    const float newOffset = 1.0F;
+    const float newScale = -1.0F;
+    const float newMin = -3.0F;
+    const float newMax = 0.0F;
     propertyTextureProperty.offset = newOffset;
     propertyTextureProperty.scale = newScale;
     propertyTextureProperty.min = newMin;
@@ -1654,8 +1666,7 @@ TEST_CASE(
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1755,8 +1766,7 @@ TEST_CASE("Test with PropertyTextureProperty noData") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1849,8 +1859,7 @@ TEST_CASE("Test with PropertyTextureProperty noData (normalized)") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1932,8 +1941,7 @@ TEST_CASE("Test with PropertyTextureProperty noData (normalized)") {
 TEST_CASE(
     "Test nonexistent PropertyTextureProperty with class property default") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1974,8 +1982,7 @@ TEST_CASE(
         glm::dvec2(0, 0.5),
         glm::dvec2(0.5, 0.5)};
 
-    for (size_t i = 0; i < texCoords.size(); ++i) {
-      glm::dvec2 uv = texCoords[i];
+    for (const glm::dvec2& uv : texCoords) {
       REQUIRE(uint8Property.get(uv[0], uv[1]) == defaultValue);
     }
   }
@@ -2025,8 +2032,7 @@ TEST_CASE(
 
 TEST_CASE("Test callback on invalid property texture view") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
   metadata.schema.emplace();
 
   // Property texture has a nonexistent class.
@@ -2061,8 +2067,7 @@ TEST_CASE("Test callback on invalid property texture view") {
 
 TEST_CASE("Test callback on invalid PropertyTextureProperty") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2102,8 +2107,7 @@ TEST_CASE("Test callback on invalid PropertyTextureProperty") {
 
 TEST_CASE("Test callback on invalid normalized PropertyTextureProperty") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2157,8 +2161,7 @@ TEST_CASE("Test callback for scalar PropertyTextureProperty") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2277,8 +2280,7 @@ TEST_CASE("Test callback for scalar PropertyTextureProperty (normalized)") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2406,8 +2408,7 @@ TEST_CASE("Test callback for vecN PropertyTextureProperty") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2536,8 +2537,7 @@ TEST_CASE("Test callback for vecN PropertyTextureProperty (normalized)") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2669,8 +2669,7 @@ TEST_CASE("Test callback for array PropertyTextureProperty") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2837,8 +2836,7 @@ TEST_CASE("Test callback for array PropertyTextureProperty (normalized)") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3008,8 +3006,7 @@ TEST_CASE("Test callback on unsupported PropertyTextureProperty") {
       data);
   size_t textureIndex = model.textures.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3088,8 +3085,7 @@ TEST_CASE("Test callback on unsupported PropertyTextureProperty") {
 TEST_CASE(
     "Test callback for empty PropertyTextureProperty with default value") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3137,8 +3133,7 @@ TEST_CASE(
               PropertyTexturePropertyViewStatus::EmptyPropertyWithDefault);
           REQUIRE(propertyValue.defaultValue() == defaultValue);
 
-          for (size_t i = 0; i < texCoords.size(); ++i) {
-            glm::dvec2& uv = texCoords[i];
+          for (const glm::dvec2& uv : texCoords) {
             REQUIRE(propertyValue.get(uv[0], uv[1]) == defaultValue);
           }
         } else {

@@ -1,3 +1,18 @@
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Cartographic.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumRasterOverlays/RasterOverlayDetails.h"
+#include "CesiumUtility/Math.h"
+
 #include <CesiumGeometry/clipTriangleAtAxisAlignedThreshold.h>
 #include <CesiumGeospatial/BoundingRegionBuilder.h>
 #include <CesiumGeospatial/Ellipsoid.h>
@@ -10,8 +25,23 @@
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <limits>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace CesiumGltfContent;
@@ -144,7 +174,8 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
 
         std::optional<SkirtMeshMetadata> skirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-        int64_t vertexBegin, vertexEnd;
+        int64_t vertexBegin{};
+        int64_t vertexEnd{};
         if (skirtMeshMetadata.has_value()) {
           vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
           vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
@@ -182,7 +213,7 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
           uvAccessor.bufferView = uvBufferViewId;
           uvAccessor.byteOffset = 0;
           uvAccessor.componentType = CesiumGltf::Accessor::ComponentType::FLOAT;
-          uvAccessor.count = int64_t(positionView.size());
+          uvAccessor.count = positionView.size();
           uvAccessor.type = CesiumGltf::Accessor::Type::VEC2;
           uvAccessor.min = {1.0, 1.0};
           uvAccessor.max = {0.0, 0.0};
@@ -290,7 +321,7 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
                     1.0));
 
             if (invertVCoordinate) {
-              uv.y = 1.0f - uv.y;
+              uv.y = 1.0F - uv.y;
             }
 
             mins[projectionIndex]->at(0) =
@@ -566,7 +597,7 @@ void copyVertexAttributes(
 
     void operator()(int vertexIndex) {
       for (FloatVertexAttribute& attribute : vertexAttributes) {
-        const float* pInput = reinterpret_cast<const float*>(
+        const auto* pInput = reinterpret_cast<const float*>(
             attribute.buffer.data() + attribute.offset +
             attribute.stride * vertexIndex);
         for (int32_t i = 0; i < attribute.numberOfFloatsPerVertex; ++i) {
@@ -587,10 +618,10 @@ void copyVertexAttributes(
 
     void operator()(const CesiumGeometry::InterpolatedVertex& vertex) {
       for (FloatVertexAttribute& attribute : vertexAttributes) {
-        const float* pInput0 = reinterpret_cast<const float*>(
+        const auto* pInput0 = reinterpret_cast<const float*>(
             attribute.buffer.data() + attribute.offset +
             attribute.stride * vertex.first);
-        const float* pInput1 = reinterpret_cast<const float*>(
+        const auto* pInput1 = reinterpret_cast<const float*>(
             attribute.buffer.data() + attribute.offset +
             attribute.stride * vertex.second);
         for (int32_t i = 0; i < attribute.numberOfFloatsPerVertex; ++i) {
@@ -1079,8 +1110,8 @@ bool upsamplePrimitiveForRasterOverlays(
     Accessor& accessor =
         model.accessors[static_cast<size_t>(attribute.accessorIndex)];
     accessor.count = numberOfVertices;
-    accessor.min = std::move(attribute.minimums);
-    accessor.max = std::move(attribute.maximums);
+    accessor.min = attribute.minimums;
+    accessor.max = attribute.maximums;
   }
 
   // Add an accessor for the indices
@@ -1096,7 +1127,7 @@ bool upsamplePrimitiveForRasterOverlays(
   // Populate the buffers
   Buffer& vertexBuffer = model.buffers[vertexBufferIndex];
   vertexBuffer.cesium.data.resize(newVertexFloats.size() * sizeof(float));
-  float* pAsFloats = reinterpret_cast<float*>(vertexBuffer.cesium.data.data());
+  auto* pAsFloats = reinterpret_cast<float*>(vertexBuffer.cesium.data.data());
   std::copy(newVertexFloats.begin(), newVertexFloats.end(), pAsFloats);
   vertexBuffer.byteLength = vertexBufferView.byteLength =
       int64_t(vertexBuffer.cesium.data.size());
@@ -1104,7 +1135,7 @@ bool upsamplePrimitiveForRasterOverlays(
 
   Buffer& indexBuffer = model.buffers[indexBufferIndex];
   indexBuffer.cesium.data.resize(indices.size() * sizeof(uint32_t));
-  uint32_t* pAsUint32s =
+  auto* pAsUint32s =
       reinterpret_cast<uint32_t*>(indexBuffer.cesium.data.data());
   std::copy(indices.begin(), indices.end(), pAsUint32s);
   indexBuffer.byteLength = indexBufferView.byteLength =
@@ -1198,7 +1229,7 @@ uint32_t getOrCreateVertex(
     }
   }
 
-  const uint32_t beforeOutput = static_cast<uint32_t>(output.size());
+  const auto beforeOutput = static_cast<uint32_t>(output.size());
   copyVertexAttributes(attributes, complements, clipVertex, output);
   uint32_t newIndex =
       beforeOutput / (static_cast<uint32_t>(output.size()) - beforeOutput);
@@ -1306,14 +1337,14 @@ void addEdge(
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.y,
-            invertV ? 1.0f : 0.0f,
+            invertV ? 1.0F : 0.0F,
             CesiumUtility::Math::Epsilon4)) {
       edgeIndices.south.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
     }
 
     if (CesiumUtility::Math::equalsEpsilon(
             uv.y,
-            invertV ? 0.0f : 1.0f,
+            invertV ? 0.0F : 1.0F,
             CesiumUtility::Math::Epsilon4)) {
       edgeIndices.north.emplace_back(EdgeVertex{clipVertexToIndices[i], uv});
     }
@@ -1341,7 +1372,7 @@ void addSkirt(
     int64_t vertexSizeFloats,
     int32_t positionAttributeIndex,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
-  uint32_t newEdgeIndex = uint32_t(output.size() / size_t(vertexSizeFloats));
+  auto newEdgeIndex = uint32_t(output.size() / size_t(vertexSizeFloats));
   for (size_t i = 0; i < edgeIndices.size(); ++i) {
     const uint32_t edgeIdx = edgeIndices[i];
     uint32_t offset = 0;
@@ -1589,8 +1620,8 @@ bool upsamplePrimitiveForRasterOverlays(
         textureCoordinateAttributeBaseName,
         textureCoordinateIndex,
         ellipsoid);
-  } else if (
-      indicesAccessorGltf.componentType ==
+  }
+  if (indicesAccessorGltf.componentType ==
       Accessor::ComponentType::UNSIGNED_SHORT) {
     return upsamplePrimitiveForRasterOverlays<uint16_t>(
         parentModel,
@@ -1602,8 +1633,8 @@ bool upsamplePrimitiveForRasterOverlays(
         textureCoordinateAttributeBaseName,
         textureCoordinateIndex,
         ellipsoid);
-  } else if (
-      indicesAccessorGltf.componentType ==
+  }
+  if (indicesAccessorGltf.componentType ==
       Accessor::ComponentType::UNSIGNED_INT) {
     return upsamplePrimitiveForRasterOverlays<uint32_t>(
         parentModel,
@@ -1677,8 +1708,7 @@ void copyImages(const Model& parentModel, Model& result) {
 // Copy and reconstruct buffer views and buffers from EXT_structural_metadata
 // property tables.
 void copyMetadataTables(const Model& parentModel, Model& result) {
-  ExtensionModelExtStructuralMetadata* pMetadata =
-      result.getExtension<ExtensionModelExtStructuralMetadata>();
+  auto* pMetadata = result.getExtension<ExtensionModelExtStructuralMetadata>();
   if (pMetadata) {
     for (auto& propertyTable : pMetadata->propertyTables) {
       for (auto& propertyPair : propertyTable.properties) {

@@ -1,3 +1,21 @@
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Cartographic.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/AccessorSpec.h"
+#include "CesiumGltf/Animation.h"
+#include "CesiumGltf/AnimationSampler.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTexture.h"
+#include "CesiumGltf/Skin.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumUtility/JsonValue.h"
+
 #include <CesiumGeometry/Axis.h>
 #include <CesiumGeometry/IntersectionTests.h>
 #include <CesiumGeometry/Ray.h>
@@ -9,7 +27,6 @@
 #include <CesiumGltf/ExtensionCesiumPrimitiveOutline.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionCesiumTileEdges.h>
-#include <CesiumGltf/ExtensionExtInstanceFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
@@ -21,10 +38,26 @@
 #include <CesiumGltfContent/SkirtMeshMetadata.h>
 #include <CesiumUtility/Assert.h>
 
-#include <glm/gtc/quaternion.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/matrix.hpp>
+
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstdint>
 #include <cstring>
-#include <unordered_set>
+#include <limits>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -33,7 +66,7 @@ namespace CesiumGltfContent {
 
 namespace {
 std::vector<int32_t> getIndexMap(const std::vector<bool>& usedIndices);
-}
+} // namespace
 
 /*static*/ std::optional<glm::dmat4x4>
 GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
@@ -133,8 +166,7 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
 /*static*/ glm::dmat4x4 GltfUtilities::applyRtcCenter(
     const CesiumGltf::Model& gltf,
     const glm::dmat4x4& rootTransform) {
-  const CesiumGltf::ExtensionCesiumRTC* cesiumRTC =
-      gltf.getExtension<CesiumGltf::ExtensionCesiumRTC>();
+  const auto* cesiumRTC = gltf.getExtension<CesiumGltf::ExtensionCesiumRTC>();
   if (cesiumRTC == nullptr) {
     return rootTransform;
   }
@@ -167,10 +199,9 @@ GltfUtilities::getNodeTransform(const CesiumGltf::Node& node) {
   int gltfUpAxisValue = static_cast<int>(gltfUpAxis.getSafeNumberOrDefault(1));
   if (gltfUpAxisValue == static_cast<int>(CesiumGeometry::Axis::X)) {
     return rootTransform * CesiumGeometry::Transforms::X_UP_TO_Z_UP;
-  } else if (gltfUpAxisValue == static_cast<int>(CesiumGeometry::Axis::Y)) {
+  }
+  if (gltfUpAxisValue == static_cast<int>(CesiumGeometry::Axis::Y)) {
     return rootTransform * CesiumGeometry::Transforms::Y_UP_TO_Z_UP;
-  } else if (gltfUpAxisValue == static_cast<int>(CesiumGeometry::Axis::Z)) {
-    // No transform required
   }
   return rootTransform;
 }
@@ -219,7 +250,8 @@ GltfUtilities::computeBoundingRegion(
 
         std::optional<SkirtMeshMetadata> skirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-        int64_t vertexBegin, vertexEnd;
+        int64_t vertexBegin{};
+        int64_t vertexEnd{};
         if (skirtMeshMetadata.has_value()) {
           vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
           vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
@@ -254,11 +286,11 @@ GltfUtilities::parseGltfCopyright(const CesiumGltf::Model& gltf) {
   std::vector<std::string_view> result;
   if (gltf.asset.copyright) {
     const std::string_view copyright = *gltf.asset.copyright;
-    if (copyright.size() > 0) {
+    if (!copyright.empty()) {
       size_t start = 0;
-      size_t end;
-      size_t ltrim;
-      size_t rtrim;
+      size_t end{};
+      size_t ltrim{};
+      size_t rtrim{};
       do {
         ltrim = copyright.find_first_not_of(" \t", start);
         end = copyright.find(';', ltrim);
@@ -311,8 +343,9 @@ size_t moveBufferContentWithoutRenumbering(
 } // namespace
 
 /*static*/ void GltfUtilities::collapseToSingleBuffer(CesiumGltf::Model& gltf) {
-  if (gltf.buffers.empty())
+  if (gltf.buffers.empty()) {
     return;
+  }
 
   Buffer& destinationBuffer = gltf.buffers[0];
 
@@ -326,9 +359,9 @@ size_t moveBufferContentWithoutRenumbering(
 
     // Leave intact any buffers that have a URI and no data.
     // Also leave intact meshopt fallback buffers without any data.
-    ExtensionBufferExtMeshoptCompression* pMeshOpt =
+    auto* pMeshOpt =
         sourceBuffer.getExtension<ExtensionBufferExtMeshoptCompression>();
-    bool isMeshOptFallback = pMeshOpt && pMeshOpt->fallback;
+    bool isMeshOptFallback = (pMeshOpt != nullptr) && pMeshOpt->fallback;
     if (sourceBuffer.cesium.data.empty() &&
         (sourceBuffer.uri || isMeshOptFallback)) {
       keepBuffer[i] = true;
@@ -350,7 +383,7 @@ size_t moveBufferContentWithoutRenumbering(
       bufferIndex = newIndex == -1 ? 0 : newIndex;
     }
 
-    ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
+    auto* pMeshOpt =
         bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
     if (pMeshOpt) {
       int32_t& meshOptBufferIndex = pMeshOpt->buffer;
@@ -369,7 +402,7 @@ size_t moveBufferContentWithoutRenumbering(
           gltf.buffers.begin(),
           gltf.buffers.end(),
           [&keepBuffer, &gltf](const Buffer& buffer) {
-            int64_t index = &buffer - &gltf.buffers[0];
+            int64_t index = &buffer - gltf.buffers.data();
             assert(index >= 0 && size_t(index) < keepBuffer.size());
             return !keepBuffer[size_t(index)];
           }),
@@ -380,8 +413,8 @@ size_t moveBufferContentWithoutRenumbering(
     CesiumGltf::Model& gltf,
     CesiumGltf::Buffer& destination,
     CesiumGltf::Buffer& source) {
-  int64_t sourceIndex = &source - &gltf.buffers[0];
-  int64_t destinationIndex = &destination - &gltf.buffers[0];
+  int64_t sourceIndex = &source - gltf.buffers.data();
+  int64_t destinationIndex = &destination - gltf.buffers.data();
 
   // Both buffers must exist in the glTF.
   if (sourceIndex < 0 || sourceIndex >= int64_t(gltf.buffers.size()) ||
@@ -401,7 +434,7 @@ size_t moveBufferContentWithoutRenumbering(
       bufferView.byteOffset += int64_t(start);
     }
 
-    ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
+    auto* pMeshOpt =
         bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
     if (pMeshOpt && pMeshOpt->buffer == sourceIndex) {
       pMeshOpt->buffer = int32_t(destinationIndex);
@@ -464,14 +497,15 @@ void findClosestRayHit(
       // Set result to this hit if closer, or the first one
       // Only consider hits in front of the ray
       bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
+      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest)) {
         tClosest = tCurr.value();
+      }
     }
   } else if (primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP) {
     for (int64_t i = 2; i < positionView.size(); ++i) {
       int64_t vert0Index = i - 2;
-      int64_t vert1Index;
-      int64_t vert2Index;
+      int64_t vert1Index{};
+      int64_t vert2Index{};
       if (i % 2) {
         vert1Index = i;
         vert2Index = i - 1;
@@ -505,8 +539,9 @@ void findClosestRayHit(
           cullBackFaces);
 
       bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
+      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest)) {
         tClosest = tCurr.value();
+      }
     }
   } else {
     assert(primitive.mode == MeshPrimitive::Mode::TRIANGLE_FAN);
@@ -541,8 +576,9 @@ void findClosestRayHit(
           cullBackFaces);
 
       bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
+      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest)) {
         tClosest = tCurr.value();
+      }
     }
   }
   tMinOut = tClosest;
@@ -574,9 +610,9 @@ void findClosestIndexedRayHit(
   if (primitive.mode == MeshPrimitive::Mode::TRIANGLES) {
     // Iterate through all complete triangles
     for (int64_t i = 2; i < indicesView.size(); i += 3) {
-      int64_t vert0Index = static_cast<int64_t>(indicesView[i - 2].value[0]);
-      int64_t vert1Index = static_cast<int64_t>(indicesView[i - 1].value[0]);
-      int64_t vert2Index = static_cast<int64_t>(indicesView[i].value[0]);
+      auto vert0Index = static_cast<int64_t>(indicesView[i - 2].value[0]);
+      auto vert1Index = static_cast<int64_t>(indicesView[i - 1].value[0]);
+      auto vert2Index = static_cast<int64_t>(indicesView[i].value[0]);
 
       // Ignore triangle if any index is bogus
       bool validIndices = vert0Index >= 0 && vert0Index < positionsCount &&
@@ -614,14 +650,15 @@ void findClosestIndexedRayHit(
       // Set result to this hit if closer, or the first one
       // Only consider hits in front of the ray
       bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
+      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest)) {
         tClosest = tCurr.value();
+      }
     }
   } else if (primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP) {
     for (int64_t i = 2; i < indicesView.size(); ++i) {
-      int64_t vert0Index = static_cast<int64_t>(indicesView[i - 2].value[0]);
-      int64_t vert1Index;
-      int64_t vert2Index;
+      auto vert0Index = static_cast<int64_t>(indicesView[i - 2].value[0]);
+      int64_t vert1Index{};
+      int64_t vert2Index{};
       if (i % 2) {
         vert1Index = static_cast<int64_t>(indicesView[i].value[0]);
         vert2Index = static_cast<int64_t>(indicesView[i - 1].value[0]);
@@ -663,13 +700,14 @@ void findClosestIndexedRayHit(
           cullBackFaces);
 
       bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
+      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest)) {
         tClosest = tCurr.value();
+      }
     }
   } else {
     assert(primitive.mode == MeshPrimitive::Mode::TRIANGLE_FAN);
 
-    int64_t vert0Index = static_cast<int64_t>(indicesView[0].value[0]);
+    auto vert0Index = static_cast<int64_t>(indicesView[0].value[0]);
 
     if (vert0Index < 0 || vert0Index >= positionsCount) {
       foundInvalidIndex = true;
@@ -681,8 +719,8 @@ void findClosestIndexedRayHit(
           static_cast<double>(viewVert0.value[2]));
 
       for (int64_t i = 2; i < indicesView.size(); ++i) {
-        int64_t vert1Index = static_cast<int64_t>(indicesView[i - 1].value[0]);
-        int64_t vert2Index = static_cast<int64_t>(indicesView[i].value[0]);
+        auto vert1Index = static_cast<int64_t>(indicesView[i - 1].value[0]);
+        auto vert2Index = static_cast<int64_t>(indicesView[i].value[0]);
 
         bool validIndices = vert1Index >= 0 && vert1Index < positionsCount &&
                             vert2Index >= 0 && vert2Index < positionsCount;
@@ -711,15 +749,17 @@ void findClosestIndexedRayHit(
             cullBackFaces);
 
         bool validHit = tCurr && tCurr.value() >= 0;
-        if (validHit && (tCurr < tClosest || tClosest == -1.0))
+        if (validHit && (tCurr < tClosest || tClosest == -1.0)) {
           tClosest = tCurr.value();
+        }
       }
     }
   }
 
-  if (foundInvalidIndex)
+  if (foundInvalidIndex) {
     warnings.push_back(
         "Found one or more invalid index values for indexed mesh");
+  }
 
   tMinOut = tClosest;
 }
@@ -731,35 +771,39 @@ struct VisitTextureIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     // Find textures in materials
     for (Material& material : gltf.materials) {
-      if (material.emissiveTexture)
+      if (material.emissiveTexture) {
         callback(material.emissiveTexture->index);
-      if (material.normalTexture)
+      }
+      if (material.normalTexture) {
         callback(material.normalTexture->index);
+      }
       if (material.pbrMetallicRoughness) {
-        if (material.pbrMetallicRoughness->baseColorTexture)
+        if (material.pbrMetallicRoughness->baseColorTexture) {
           callback(material.pbrMetallicRoughness->baseColorTexture->index);
-        if (material.pbrMetallicRoughness->metallicRoughnessTexture)
+        }
+        if (material.pbrMetallicRoughness->metallicRoughnessTexture) {
           callback(
               material.pbrMetallicRoughness->metallicRoughnessTexture->index);
+        }
       }
     }
 
     // Find textures in metadata
     for (Mesh& mesh : gltf.meshes) {
       for (MeshPrimitive& primitive : mesh.primitives) {
-        ExtensionExtMeshFeatures* pMeshFeatures =
+        auto* pMeshFeatures =
             primitive.getExtension<ExtensionExtMeshFeatures>();
         if (pMeshFeatures) {
           for (FeatureId& featureId : pMeshFeatures->featureIds) {
-            if (featureId.texture)
+            if (featureId.texture) {
               callback(featureId.texture->index);
+            }
           }
         }
       }
     }
 
-    ExtensionModelExtStructuralMetadata* pMetadata =
-        gltf.getExtension<ExtensionModelExtStructuralMetadata>();
+    auto* pMetadata = gltf.getExtension<ExtensionModelExtStructuralMetadata>();
     if (pMetadata) {
       for (PropertyTexture& propertyTexture : pMetadata->propertyTextures) {
         for (auto& pair : propertyTexture.properties) {
@@ -786,8 +830,8 @@ std::vector<int32_t> getIndexMap(const std::vector<bool>& usedIndices) {
   indexMap.reserve(usedIndices.size());
 
   int32_t nextIndex = 0;
-  for (size_t i = 0; i < usedIndices.size(); ++i) {
-    if (usedIndices[i]) {
+  for (bool usedIndex : usedIndices) {
+    if (usedIndex) {
       indexMap.push_back(nextIndex);
       ++nextIndex;
     } else {
@@ -804,15 +848,15 @@ struct VisitImageIds {
     for (Texture& texture : gltf.textures) {
       callback(texture.source);
 
-      ExtensionKhrTextureBasisu* pBasis =
-          texture.getExtension<ExtensionKhrTextureBasisu>();
-      if (pBasis)
+      auto* pBasis = texture.getExtension<ExtensionKhrTextureBasisu>();
+      if (pBasis) {
         callback(pBasis->source);
+      }
 
-      ExtensionTextureWebp* pWebP =
-          texture.getExtension<ExtensionTextureWebp>();
-      if (pWebP)
+      auto* pWebP = texture.getExtension<ExtensionTextureWebp>();
+      if (pWebP) {
         callback(pWebP->source);
+      }
     }
   }
 };
@@ -827,8 +871,7 @@ struct VisitAccessorIds {
           callback(pair.second);
         }
 
-        ExtensionCesiumTileEdges* pTileEdges =
-            primitive.getExtension<ExtensionCesiumTileEdges>();
+        auto* pTileEdges = primitive.getExtension<ExtensionCesiumTileEdges>();
         if (pTileEdges) {
           callback(pTileEdges->left);
           callback(pTileEdges->bottom);
@@ -836,7 +879,7 @@ struct VisitAccessorIds {
           callback(pTileEdges->top);
         }
 
-        ExtensionCesiumPrimitiveOutline* pPrimitiveOutline =
+        auto* pPrimitiveOutline =
             primitive.getExtension<ExtensionCesiumPrimitiveOutline>();
         if (pPrimitiveOutline) {
           callback(pPrimitiveOutline->indices);
@@ -856,8 +899,7 @@ struct VisitAccessorIds {
     }
 
     for (Node& node : gltf.nodes) {
-      ExtensionExtMeshGpuInstancing* pInstancing =
-          node.getExtension<ExtensionExtMeshGpuInstancing>();
+      auto* pInstancing = node.getExtension<ExtensionExtMeshGpuInstancing>();
       if (pInstancing) {
         for (auto& pair : pInstancing->attributes) {
           callback(pair.second);
@@ -884,7 +926,7 @@ struct VisitBufferViewIds {
 
     for (Mesh& mesh : gltf.meshes) {
       for (MeshPrimitive& primitive : mesh.primitives) {
-        ExtensionKhrDracoMeshCompression* pDraco =
+        auto* pDraco =
             primitive.getExtension<ExtensionKhrDracoMeshCompression>();
         if (pDraco) {
           callback(pDraco->bufferView);
@@ -892,8 +934,7 @@ struct VisitBufferViewIds {
       }
     }
 
-    ExtensionModelExtStructuralMetadata* pMetadata =
-        gltf.getExtension<ExtensionModelExtStructuralMetadata>();
+    auto* pMetadata = gltf.getExtension<ExtensionModelExtStructuralMetadata>();
     if (pMetadata) {
       for (PropertyTable& propertyTable : pMetadata->propertyTables) {
         for (auto& pair : propertyTable.properties) {
@@ -911,7 +952,7 @@ struct VisitBufferIds {
     for (BufferView& bufferView : gltf.bufferViews) {
       callback(bufferView.buffer);
 
-      ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
+      auto* pMeshOpt =
           bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
       if (pMeshOpt) {
         callback(pMeshOpt->buffer);
@@ -947,14 +988,16 @@ void removeUnusedElements(
   std::vector<bool> usedElements(elements.size(), false);
 
   for (int32_t index : extraUsedIndices) {
-    if (index >= 0 && size_t(index) < usedElements.size())
+    if (index >= 0 && size_t(index) < usedElements.size()) {
       usedElements[size_t(index)] = true;
+    }
   }
 
   // Determine which elements are used.
   visitFunction(gltf, [&usedElements](int32_t elementIndex) {
-    if (elementIndex >= 0 && size_t(elementIndex) < usedElements.size())
+    if (elementIndex >= 0 && size_t(elementIndex) < usedElements.size()) {
       usedElements[size_t(elementIndex)] = true;
+    }
   });
 
   // Update the element indices based on the unused indices being removed.
@@ -973,7 +1016,7 @@ void removeUnusedElements(
           elements.begin(),
           elements.end(),
           [&usedElements, &elements](T& element) {
-            int64_t index = &element - &elements[0];
+            int64_t index = &element - elements.data();
             CESIUM_ASSERT(index >= 0 && size_t(index) < usedElements.size());
             return !usedElements[size_t(index)];
           }),
@@ -1073,9 +1116,10 @@ void deleteBufferRange(
     int32_t bufferIndex,
     int64_t start,
     int64_t end) {
-  Buffer* pBuffer = gltf.getSafe(&gltf.buffers, bufferIndex);
-  if (pBuffer == nullptr)
+  Buffer* pBuffer = CesiumGltf::Model::getSafe(&gltf.buffers, bufferIndex);
+  if (pBuffer == nullptr) {
     return;
+  }
 
   CESIUM_ASSERT(size_t(pBuffer->byteLength) == pBuffer->cesium.data.size());
 
@@ -1087,8 +1131,9 @@ void deleteBufferRange(
   if (end < pBuffer->byteLength) {
     // Round down to the nearest multiple of 8 by clearing the low three bits.
     bytesToRemove = bytesToRemove & ~0b111;
-    if (bytesToRemove == 0)
+    if (bytesToRemove == 0) {
       return;
+    }
 
     end = start + bytesToRemove;
   }
@@ -1109,7 +1154,7 @@ void deleteBufferRange(
       }
     }
 
-    ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
+    auto* pMeshOpt =
         bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
     if (pMeshOpt && pMeshOpt->buffer == bufferIndex) {
       // Sanity check that we're not removing a part of the buffer used by this
@@ -1138,9 +1183,10 @@ void deleteBufferRange(
 void GltfUtilities::compactBuffer(
     CesiumGltf::Model& gltf,
     int32_t bufferIndex) {
-  Buffer* pBuffer = gltf.getSafe(&gltf.buffers, bufferIndex);
-  if (!pBuffer)
+  Buffer* pBuffer = CesiumGltf::Model::getSafe(&gltf.buffers, bufferIndex);
+  if (!pBuffer) {
     return;
+  }
 
   CESIUM_ASSERT(size_t(pBuffer->byteLength) == pBuffer->cesium.data.size());
 
@@ -1191,7 +1237,7 @@ void GltfUtilities::compactBuffer(
           bufferView.byteOffset + bufferView.byteLength);
     }
 
-    ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
+    auto* pMeshOpt =
         bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
     if (pMeshOpt && pMeshOpt->buffer == bufferIndex) {
       addUsedRange(
@@ -1277,8 +1323,9 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
               max[0],
               max[1],
               max[2]));
-  if (!boxT)
+  if (!boxT) {
     return std::optional<glm::dvec3>();
+  }
 
   double tClosest = -1.0;
 
@@ -1363,8 +1410,9 @@ std::optional<glm::dvec3> intersectRayScenePrimitive(
       });
   assert(tClosest >= -1.0);
 
-  if (tClosest == -1.0)
+  if (tClosest == -1.0) {
     return std::optional<glm::dvec3>();
+  }
 
   // It's temping to return the t value to the caller, but each primitive might
   // have different matrix transforms with different scaling values. The caller
@@ -1397,8 +1445,9 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
             primitive.mode == MeshPrimitive::Mode::TRIANGLES ||
             primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP ||
             primitive.mode == MeshPrimitive::Mode::TRIANGLE_FAN;
-        if (!isTriangleMode)
+        if (!isTriangleMode) {
           return;
+        }
 
         // Skip primitives that can't access positions
         auto positionAccessorIt = primitive.attributes.find("POSITION");
@@ -1436,8 +1485,9 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
             cullBackFaces,
             result.warnings);
 
-        if (!primitiveHitPoint.has_value())
+        if (!primitiveHitPoint.has_value()) {
           return;
+        }
 
         // We have a hit, determine if it's the closest one
 
@@ -1462,15 +1512,15 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
             glm::dot(rayToWorldPoint, rayToWorldPoint);
 
         // Use in result if it's first
-        int32_t meshId = static_cast<int32_t>(&mesh - &model.meshes[0]);
-        int32_t primitiveId =
-            static_cast<int32_t>(&primitive - &mesh.primitives[0]);
+        auto meshId = static_cast<int32_t>(&mesh - model.meshes.data());
+        auto primitiveId =
+            static_cast<int32_t>(&primitive - mesh.primitives.data());
 
         if (!result.hit.has_value()) {
           result.hit = RayGltfHit{
-              std::move(*primitiveHitPoint),
-              std::move(primitiveToWorld),
-              std::move(worldPoint),
+              *primitiveHitPoint,
+              primitiveToWorld,
+              worldPoint,
               rayToWorldPointDistanceSq,
               meshId,
               primitiveId};
@@ -1479,9 +1529,9 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
 
         // Use in result if it's closer
         if (rayToWorldPointDistanceSq < result.hit->rayToWorldPointDistanceSq) {
-          result.hit->primitivePoint = std::move(*primitiveHitPoint);
-          result.hit->primitiveToWorld = std::move(primitiveToWorld);
-          result.hit->worldPoint = std::move(worldPoint);
+          result.hit->primitivePoint = *primitiveHitPoint;
+          result.hit->primitiveToWorld = primitiveToWorld;
+          result.hit->worldPoint = worldPoint;
           result.hit->rayToWorldPointDistanceSq = rayToWorldPointDistanceSq;
           result.hit->meshId = meshId;
           result.hit->primitiveId = primitiveId;

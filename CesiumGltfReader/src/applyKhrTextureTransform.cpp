@@ -1,9 +1,27 @@
 #include "applyKhrTextureTransform.h"
 
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/TextureInfo.h"
+
 #include <CesiumGltf/AccessorView.h>
 #include <CesiumGltf/ExtensionKhrTextureTransform.h>
 #include <CesiumGltf/KhrTextureTransform.h>
-#include <CesiumGltfReader/GltfReader.h>
+
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_float2.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGltf;
 
@@ -18,7 +36,7 @@ bool transformBufferView(
     return false;
   }
 
-  glm::vec2* transformedUvs = reinterpret_cast<glm::vec2*>(data.data());
+  auto* transformedUvs = reinterpret_cast<glm::vec2*>(data.data());
 
   for (int i = 0; i < accessorView.size(); i++) {
     const glm::vec2& uv = accessorView[i];
@@ -36,13 +54,13 @@ void processTextureInfo(
     Model& model,
     MeshPrimitive& primitive,
     std::optional<T>& maybeTextureInfo) {
-  static_assert(std::is_base_of<TextureInfo, T>::value);
+  static_assert(std::is_base_of_v<TextureInfo, T>);
   if (!maybeTextureInfo) {
     return;
   }
 
   const TextureInfo& textureInfo = *maybeTextureInfo;
-  const ExtensionKhrTextureTransform* pTextureTransform =
+  const auto* pTextureTransform =
       textureInfo.getExtension<ExtensionKhrTextureTransform>();
   if (!pTextureTransform) {
     return;

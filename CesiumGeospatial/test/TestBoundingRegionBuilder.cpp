@@ -1,10 +1,10 @@
 #include "CesiumGeospatial/BoundingRegionBuilder.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
 
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
-
-#include <cstring>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace CesiumGeospatial;
 using namespace CesiumUtility;

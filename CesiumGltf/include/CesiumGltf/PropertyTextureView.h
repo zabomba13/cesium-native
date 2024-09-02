@@ -778,9 +778,9 @@ private:
 
   PropertyViewStatusType checkImage(const int32_t imageIndex) const noexcept;
 
-  PropertyViewStatusType checkChannels(
+  static PropertyViewStatusType checkChannels(
       const std::vector<int64_t>& channels,
-      const ImageCesium& image) const noexcept;
+      const ImageCesium& image) noexcept;
 
   const Model* _pModel;
   const PropertyTexture* _pPropertyTexture;

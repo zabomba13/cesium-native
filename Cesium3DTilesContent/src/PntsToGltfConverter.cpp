@@ -1,4 +1,17 @@
 #include "BatchTableToGltfStructuralMetadata.h"
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
+#include "CesiumGltf/Scene.h"
+#include "CesiumGltfReader/GltfReader.h"
 
 #include <Cesium3DTilesContent/GltfConverters.h>
 #include <Cesium3DTilesContent/PntsToGltfConverter.h>
@@ -6,8 +19,32 @@
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
 #include <CesiumUtility/AttributeCompression.h>
-#include <CesiumUtility/Log.h>
-#include <CesiumUtility/Math.h>
+
+#include <draco/core/data_buffer.h>
+#include <draco/core/draco_types.h>
+#include <draco/core/status_or.h>
+#include <fmt/core.h>
+#include <glm/common.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
+#include <gsl/span>
+#include <rapidjson/rapidjson.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -53,8 +90,7 @@ void parsePntsHeader(
     return;
   }
 
-  const PntsHeader* pHeader =
-      reinterpret_cast<const PntsHeader*>(pntsBinary.data());
+  const auto* pHeader = reinterpret_cast<const PntsHeader*>(pntsBinary.data());
 
   header = *pHeader;
   headerLength = sizeof(PntsHeader);
@@ -189,8 +225,8 @@ template <typename TColor> TColor srgbToLinear(const TColor srgb) {
   static_assert(
       std::is_same_v<TColor, glm::vec3> || std::is_same_v<TColor, glm::vec4>);
 
-  glm::vec3 srgbInput = glm::vec3(srgb);
-  glm::vec3 linearOutput = glm::pow(srgbInput, glm::vec3(2.2f));
+  glm::vec3 srgbInput(srgb);
+  glm::vec3 linearOutput = glm::pow(srgbInput, glm::vec3(2.2F));
 
   if constexpr (std::is_same_v<TColor, glm::vec4>) {
     return glm::vec4(linearOutput, srgb.w);
@@ -333,8 +369,6 @@ void parsePositionsFromFeatureTableJson(
   parsedContent.errors.emplaceError(
       "Error parsing PNTS feature table, one of POSITION or POSITION_QUANTIZED "
       "must be defined.");
-
-  return;
 }
 
 void parseColorsFromFeatureTableJson(
@@ -618,7 +652,7 @@ rapidjson::Document parseFeatureTableJson(
     parsedContent.errors.emplaceError(fmt::format(
         "Error when parsing feature table JSON, error code {} at byte offset "
         "{}",
-        document.GetParseError(),
+        static_cast<uint64_t>(document.GetParseError()),
         document.GetErrorOffset()));
     return document;
   }
@@ -763,7 +797,7 @@ void parseDracoExtensionFromBatchTableJson(
       continue;
     }
 
-    DracoMetadataSemantic semantic;
+    DracoMetadataSemantic semantic{};
     semantic.dracoId = dracoPropertyIt->value.GetInt();
     semantic.componentType = stringToMetadataComponentType.at(componentType);
     semantic.type = stringToMetadataType.at(type);
@@ -784,7 +818,7 @@ rapidjson::Document parseBatchTableJson(
         "Error when parsing batch table JSON, error code {} at byte "
         "offset "
         "{}. Skip parsing metadata",
-        document.GetParseError(),
+        static_cast<uint64_t>(document.GetParseError()),
         document.GetErrorOffset()));
     return document;
   }
@@ -798,7 +832,8 @@ bool validateDracoAttribute(
     const draco::PointAttribute* const pAttribute,
     const draco::DataType expectedDataType,
     const int32_t expectedNumComponents) {
-  return pAttribute && pAttribute->data_type() == expectedDataType &&
+  return (pAttribute != nullptr) &&
+         pAttribute->data_type() == expectedDataType &&
          pAttribute->num_components() == expectedNumComponents;
 }
 
@@ -855,17 +890,15 @@ void decodeDracoMetadata(
   std::vector<std::byte>& data = parsedContent.dracoBatchTableBinary;
 
   const auto& dracoMetadataSemantics = parsedContent.dracoMetadataSemantics;
-  for (auto dracoSemanticIt = dracoMetadataSemantics.begin();
-       dracoSemanticIt != dracoMetadataSemantics.end();
-       dracoSemanticIt++) {
-    DracoMetadataSemantic dracoSemantic = dracoSemanticIt->second;
+  for (const auto& dracoMetadataSemantic : dracoMetadataSemantics) {
+    DracoMetadataSemantic dracoSemantic = dracoMetadataSemantic.second;
     draco::PointAttribute* pAttribute =
         pPointCloud->attribute(dracoSemantic.dracoId);
     if (!validateDracoMetadataAttribute(pAttribute, dracoSemantic)) {
       parsedContent.errors.emplaceWarning(fmt::format(
           "Error decoding {} property in the 3DTILES_draco_compression "
           "extension. Skip parsing metadata.",
-          dracoSemanticIt->first));
+          dracoMetadataSemantic.first));
       parsedContent.dracoMetadataHasErrors = true;
       return;
     }
@@ -875,7 +908,7 @@ void decodeDracoMetadata(
     // These do not test for validity since the batch table and extension
     // were validated in parseDracoExtensionFromBatchTableJson.
     auto batchTableSemanticIt =
-        batchTableJson.FindMember(dracoSemanticIt->first.c_str());
+        batchTableJson.FindMember(dracoMetadataSemantic.first.c_str());
     rapidjson::Value& batchTableSemantic =
         batchTableSemanticIt->value.GetObject();
     auto byteOffsetIt = batchTableSemantic.FindMember("byteOffset");
@@ -986,7 +1019,7 @@ void decodeDraco(
           const glm::u8vec4 rgbaColor = *reinterpret_cast<const glm::u8vec4*>(
               decodedBuffer->data() + decodedByteOffset +
               decodedByteStride * i);
-          outColors[i] = srgbToLinear(glm::vec4(rgbaColor) / 255.0f);
+          outColors[i] = srgbToLinear(glm::vec4(rgbaColor) / 255.0F);
         }
       } else if (
           parsedContent.colorType == PntsColorType::RGB &&
@@ -1005,7 +1038,7 @@ void decodeDraco(
           const glm::u8vec3 rgbColor = *reinterpret_cast<const glm::u8vec3*>(
               decodedBuffer->data() + decodedByteOffset +
               decodedByteStride * i);
-          outColors[i] = srgbToLinear(glm::vec3(rgbColor) / 255.0f);
+          outColors[i] = srgbToLinear(glm::vec3(rgbColor) / 255.0F);
         }
       } else {
         parsedContent.errors.emplaceWarning(
@@ -1088,7 +1121,7 @@ void parsePositionsFromFeatureTableBinary(
     const gsl::span<const std::byte>& featureTableBinaryData,
     PntsContent& parsedContent) {
   std::vector<std::byte>& positionData = parsedContent.position.data;
-  if (positionData.size() > 0) {
+  if (!positionData.empty()) {
     // If data isn't empty, it must have been decoded from Draco.
     return;
   }
@@ -1116,7 +1149,7 @@ void parsePositionsFromFeatureTableBinary(
     const glm::vec3 quantizedVolumeOffset(
         parsedContent.quantizedVolumeOffset.value());
 
-    const glm::vec3 quantizedPositionScalar = quantizedVolumeScale / 65535.0f;
+    const glm::vec3 quantizedPositionScalar = quantizedVolumeScale / 65535.0F;
 
     for (size_t i = 0; i < pointsLength; i++) {
       const glm::vec3 quantizedPosition(
@@ -1153,7 +1186,7 @@ void parseColorsFromFeatureTableBinary(
     PntsContent& parsedContent) {
   PntsSemantic& color = parsedContent.color.value();
   std::vector<std::byte>& colorData = color.data;
-  if (colorData.size() > 0) {
+  if (!colorData.empty()) {
     // If data isn't empty, it must have been decoded from Draco.
     return;
   }
@@ -1175,7 +1208,7 @@ void parseColorsFromFeatureTableBinary(
         pointsLength);
 
     for (size_t i = 0; i < pointsLength; i++) {
-      glm::vec4 normalizedColor = glm::vec4(rgbaColors[i]) / 255.0f;
+      glm::vec4 normalizedColor = glm::vec4(rgbaColors[i]) / 255.0F;
       outColors[i] = srgbToLinear(normalizedColor);
     }
   } else if (parsedContent.colorType == PntsColorType::RGB) {
@@ -1188,7 +1221,7 @@ void parseColorsFromFeatureTableBinary(
         pointsLength);
 
     for (size_t i = 0; i < pointsLength; i++) {
-      glm::vec3 normalizedColor = glm::vec3(rgbColors[i]) / 255.0f;
+      glm::vec3 normalizedColor = glm::vec3(rgbColors[i]) / 255.0F;
       outColors[i] = srgbToLinear(normalizedColor);
     }
   } else if (parsedContent.colorType == PntsColorType::RGB565) {
@@ -1215,7 +1248,7 @@ void parseNormalsFromFeatureTableBinary(
     PntsContent& parsedContent) {
   PntsSemantic& normal = parsedContent.normal.value();
   std::vector<std::byte>& normalData = normal.data;
-  if (normalData.size() > 0) {
+  if (!normalData.empty()) {
     // If data isn't empty, it must have been decoded from Draco.
     return;
   }
@@ -1254,7 +1287,7 @@ void parseBatchIdsFromFeatureTableBinary(
     PntsContent& parsedContent) {
   PntsSemantic& batchId = parsedContent.batchId.value();
   std::vector<std::byte>& batchIdData = batchId.data;
-  if (batchIdData.size() > 0) {
+  if (!batchIdData.empty()) {
     // If data isn't empty, it must have been decoded from Draco.
     return;
   }
@@ -1331,7 +1364,7 @@ int32_t createAccessorInGltf(
     const int32_t bufferViewId,
     const int32_t componentType,
     const int64_t count,
-    const std::string type) {
+    const std::string& type) {
   size_t accessorId = gltf.accessors.size();
   Accessor& accessor = gltf.accessors.emplace_back();
   accessor.bufferView = bufferViewId;
@@ -1344,9 +1377,9 @@ int32_t createAccessorInGltf(
 }
 
 void addPositionsToGltf(PntsContent& parsedContent, Model& gltf) {
-  const int64_t count = static_cast<int64_t>(parsedContent.pointsLength);
-  const int64_t byteStride = static_cast<int64_t>(sizeof(glm ::vec3));
-  const int64_t byteLength = static_cast<int64_t>(byteStride * count);
+  const auto count = static_cast<int64_t>(parsedContent.pointsLength);
+  const auto byteStride = static_cast<int64_t>(sizeof(glm ::vec3));
+  const auto byteLength = static_cast<int64_t>(byteStride * count);
   int32_t bufferId =
       createBufferInGltf(gltf, std::move(parsedContent.position.data));
   int32_t bufferViewId =
@@ -1377,7 +1410,7 @@ void addPositionsToGltf(PntsContent& parsedContent, Model& gltf) {
 void addColorsToGltf(PntsContent& parsedContent, Model& gltf) {
   PntsSemantic& color = parsedContent.color.value();
 
-  const int64_t count = static_cast<int64_t>(parsedContent.pointsLength);
+  const auto count = static_cast<int64_t>(parsedContent.pointsLength);
   int64_t byteStride = 0;
   const int32_t componentType = Accessor::ComponentType::FLOAT;
   std::string type;
@@ -1392,7 +1425,7 @@ void addColorsToGltf(PntsContent& parsedContent, Model& gltf) {
     type = Accessor::Type::VEC3;
   }
 
-  const int64_t byteLength = static_cast<int64_t>(byteStride * count);
+  const auto byteLength = static_cast<int64_t>(byteStride * count);
   int32_t bufferId = createBufferInGltf(gltf, std::move(color.data));
   int32_t bufferViewId =
       createBufferViewInGltf(gltf, bufferId, byteLength, byteStride);
@@ -1412,9 +1445,9 @@ void addColorsToGltf(PntsContent& parsedContent, Model& gltf) {
 void addNormalsToGltf(PntsContent& parsedContent, Model& gltf) {
   PntsSemantic& normal = parsedContent.normal.value();
 
-  const int64_t count = static_cast<int64_t>(parsedContent.pointsLength);
-  const int64_t byteStride = static_cast<int64_t>(sizeof(glm ::vec3));
-  const int64_t byteLength = static_cast<int64_t>(byteStride * count);
+  const auto count = static_cast<int64_t>(parsedContent.pointsLength);
+  const auto byteStride = static_cast<int64_t>(sizeof(glm ::vec3));
+  const auto byteLength = static_cast<int64_t>(byteStride * count);
 
   int32_t bufferId = createBufferInGltf(gltf, std::move(normal.data));
   int32_t bufferViewId =
@@ -1433,7 +1466,7 @@ void addNormalsToGltf(PntsContent& parsedContent, Model& gltf) {
 void addBatchIdsToGltf(PntsContent& parsedContent, CesiumGltf::Model& gltf) {
   PntsSemantic& batchId = parsedContent.batchId.value();
 
-  const int64_t count = static_cast<int64_t>(parsedContent.pointsLength);
+  const auto count = static_cast<int64_t>(parsedContent.pointsLength);
   int32_t componentType = Accessor::ComponentType::UNSIGNED_SHORT;
   if (parsedContent.batchIdComponentType) {
     switch (parsedContent.batchIdComponentType.value()) {
@@ -1450,7 +1483,7 @@ void addBatchIdsToGltf(PntsContent& parsedContent, CesiumGltf::Model& gltf) {
     }
     const int64_t byteStride =
         Accessor::computeByteSizeOfComponent(componentType);
-    const int64_t byteLength = static_cast<int64_t>(byteStride * count);
+    const auto byteLength = static_cast<int64_t>(byteStride * count);
 
     int32_t bufferId = createBufferInGltf(gltf, std::move(batchId.data));
     int32_t bufferViewId =
@@ -1511,7 +1544,7 @@ void createGltfFromParsedContent(
     addColorsToGltf(parsedContent, gltf);
   } else if (parsedContent.constantRgba) {
     glm::vec4 materialColor(parsedContent.constantRgba.value());
-    materialColor = srgbToLinear(materialColor / 255.0f);
+    materialColor = srgbToLinear(materialColor / 255.0F);
 
     material.pbrMetallicRoughness.value().baseColorFactor =
         {materialColor.x, materialColor.y, materialColor.z, materialColor.w};

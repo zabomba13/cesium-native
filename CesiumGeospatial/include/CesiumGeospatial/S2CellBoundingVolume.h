@@ -108,9 +108,9 @@ private:
   S2CellID _cellID;
   double _minimumHeight;
   double _maximumHeight;
-  glm::dvec3 _center;
+  glm::dvec3 _center{};
   std::array<CesiumGeometry::Plane, 6> _boundingPlanes;
-  std::array<glm::dvec3, 8> _vertices;
+  std::array<glm::dvec3, 8> _vertices{};
 };
 
 } // namespace CesiumGeospatial

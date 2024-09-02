@@ -1,15 +1,27 @@
-#include "TileUtilities.h"
+#include "Cesium3DTilesSelection/BoundingVolume.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumRasterOverlays/RasterOverlayDetails.h"
+#include "CesiumUtility/IntrusivePointer.h"
+#include "CesiumUtility/Tracing.h"
 
 #include <Cesium3DTilesSelection/IPrepareRendererResources.h>
 #include <Cesium3DTilesSelection/RasterMappedTo3DTile.h>
-#include <Cesium3DTilesSelection/RasterOverlayCollection.h>
 #include <Cesium3DTilesSelection/Tile.h>
 #include <Cesium3DTilesSelection/TileContent.h>
-#include <Cesium3DTilesSelection/Tileset.h>
 #include <Cesium3DTilesSelection/TilesetExternals.h>
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumRasterOverlays/RasterOverlayUtilities.h>
 #include <CesiumUtility/Assert.h>
+
+#include <glm/ext/vector_double4.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <vector>
 
 using namespace Cesium3DTilesSelection;
 using namespace CesiumGeometry;
@@ -27,8 +39,9 @@ RasterOverlayTile* findTileOverlay(Tile& tile, const RasterOverlay& overlay) {
       tiles.end(),
       [&overlay](RasterMappedTo3DTile& raster) noexcept {
         RasterOverlayTile* pReady = raster.getReadyTile();
-        if (pReady == nullptr)
+        if (pReady == nullptr) {
           return false;
+        }
 
         return &pReady->getTileProvider().getOwner() == &overlay;
       });
@@ -38,9 +51,8 @@ RasterOverlayTile* findTileOverlay(Tile& tile, const RasterOverlay& overlay) {
     // Prefer the loading tile if there is one.
     if (mapped.getLoadingTile()) {
       return mapped.getLoadingTile();
-    } else {
-      return mapped.getReadyTile();
     }
+    return mapped.getReadyTile();
   }
 
   return nullptr;
@@ -181,9 +193,8 @@ RasterOverlayTile::MoreDetailAvailable RasterMappedTo3DTile::update(
 
   if (!this->_originalFailed && this->_pReadyTile) {
     return this->_pReadyTile->isMoreDetailAvailable();
-  } else {
-    return RasterOverlayTile::MoreDetailAvailable::No;
   }
+  return RasterOverlayTile::MoreDetailAvailable::No;
 }
 
 bool RasterMappedTo3DTile::isMoreDetailAvailable() const noexcept {
@@ -254,9 +265,8 @@ int32_t addProjectionToList(
   if (it == projections.end()) {
     projections.emplace_back(projection);
     return int32_t(projections.size()) - 1;
-  } else {
-    return int32_t(it - projections.begin());
   }
+  return int32_t(it - projections.begin());
 }
 
 RasterMappedTo3DTile* addRealTile(
@@ -269,10 +279,9 @@ RasterMappedTo3DTile* addRealTile(
       provider.getTile(rectangle, screenPixels);
   if (!pTile) {
     return nullptr;
-  } else {
-    return &tile.getMappedRasterTiles().emplace_back(
-        RasterMappedTo3DTile(pTile, textureCoordinateIndex));
   }
+  return &tile.getMappedRasterTiles().emplace_back(
+      RasterMappedTo3DTile(pTile, textureCoordinateIndex));
 }
 
 } // namespace
@@ -302,8 +311,8 @@ RasterMappedTo3DTile* addRealTile(
         overlayDetails.findRectangleForOverlayProjection(projection);
     if (pRectangle) {
       // We have a rectangle and texture coordinates for this projection.
-      int32_t index =
-          int32_t(pRectangle - &overlayDetails.rasterOverlayRectangles[0]);
+      auto index =
+          int32_t(pRectangle - overlayDetails.rasterOverlayRectangles.data());
       const glm::dvec2 screenPixels =
           RasterOverlayUtilities::computeDesiredScreenPixels(
               tile.getNonZeroGeometricError(),
@@ -312,18 +321,17 @@ RasterMappedTo3DTile* addRealTile(
               *pRectangle,
               ellipsoid);
       return addRealTile(tile, tileProvider, *pRectangle, screenPixels, index);
-    } else {
-      // We don't have a precise rectangle for this projection, which means the
-      // tile was loaded before we knew we needed this projection. We'll need to
-      // reload the tile (later).
-      int32_t existingIndex =
-          int32_t(overlayDetails.rasterOverlayProjections.size());
-      int32_t textureCoordinateIndex =
-          existingIndex + addProjectionToList(missingProjections, projection);
-      return &tile.getMappedRasterTiles().emplace_back(RasterMappedTo3DTile(
-          getPlaceholderTile(placeholder),
-          textureCoordinateIndex));
     }
+    // We don't have a precise rectangle for this projection, which means the
+    // tile was loaded before we knew we needed this projection. We'll need to
+    // reload the tile (later).
+    auto existingIndex =
+        int32_t(overlayDetails.rasterOverlayProjections.size());
+    int32_t textureCoordinateIndex =
+        existingIndex + addProjectionToList(missingProjections, projection);
+    return &tile.getMappedRasterTiles().emplace_back(RasterMappedTo3DTile(
+        getPlaceholderTile(placeholder),
+        textureCoordinateIndex));
   }
 
   // Maybe we can derive a precise rectangle from the bounding volume.
@@ -347,12 +355,11 @@ RasterMappedTo3DTile* addRealTile(
         *maybeRectangle,
         screenPixels,
         textureCoordinateIndex);
-  } else {
-    // No precise rectangle yet, so return a placeholder for now.
-    return &tile.getMappedRasterTiles().emplace_back(RasterMappedTo3DTile(
-        getPlaceholderTile(placeholder),
-        textureCoordinateIndex));
   }
+  // No precise rectangle yet, so return a placeholder for now.
+  return &tile.getMappedRasterTiles().emplace_back(RasterMappedTo3DTile(
+      getPlaceholderTile(placeholder),
+      textureCoordinateIndex));
 }
 
 void RasterMappedTo3DTile::computeTranslationAndScale(const Tile& tile) {

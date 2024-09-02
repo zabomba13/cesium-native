@@ -1,5 +1,11 @@
 #include "CesiumJsonReader/ObjectJsonHandler.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
+
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace CesiumJsonReader {
 IJsonHandler* ObjectJsonHandler::readObjectStart() {
   ++this->_depth;
@@ -14,8 +20,9 @@ IJsonHandler* ObjectJsonHandler::readObjectEnd() {
 
   --this->_depth;
 
-  if (this->_depth > 0)
+  if (this->_depth > 0) {
     return this->EndSubObject();
+  }
 
   return this->parent();
 }

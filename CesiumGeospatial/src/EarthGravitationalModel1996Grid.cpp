@@ -2,9 +2,12 @@
 #include <CesiumGeospatial/EarthGravitationalModel1996Grid.h>
 #include <CesiumUtility/Math.h>
 
-#include <algorithm>
-#include <filesystem>
-#include <fstream>
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
 #include <vector>
 
 using namespace CesiumUtility;
@@ -38,7 +41,7 @@ CesiumGeospatial::EarthGravitationalModel1996Grid::fromBuffer(
   gridValues.resize(TOTAL_VALUES);
 
   const std::byte* pRead = buffer.data();
-  std::byte* pWrite = reinterpret_cast<std::byte*>(gridValues.data());
+  auto* pWrite = reinterpret_cast<std::byte*>(gridValues.data());
 
   for (size_t i = 0; i < TOTAL_BYTES; i += 2) {
     // WW15MGH.DAC is in big endian, so we swap the bytes
@@ -56,11 +59,11 @@ double EarthGravitationalModel1996Grid::sampleHeight(
       Math::clamp(position.latitude, -Math::PiOverTwo, Math::PiOverTwo);
 
   const double horizontalIndexDecimal = (NUM_COLUMNS * longitude) / Math::TwoPi;
-  const size_t horizontalIndex = static_cast<size_t>(horizontalIndexDecimal);
+  const auto horizontalIndex = static_cast<size_t>(horizontalIndexDecimal);
 
   const double verticalIndexDecimal =
       ((NUM_ROWS - 1) * (Math::PiOverTwo - latitude)) / Math::OnePi;
-  const size_t verticalIndex = static_cast<size_t>(verticalIndexDecimal);
+  const auto verticalIndex = static_cast<size_t>(verticalIndexDecimal);
 
   // Get the normalized position of the coordinates within the grid tile
   const double xn = horizontalIndexDecimal - double(horizontalIndex);

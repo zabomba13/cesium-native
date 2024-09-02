@@ -1,3 +1,13 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumUtility/Assert.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGltfReader/GltfReader.h>
 #include <CesiumRasterOverlays/IPrepareRasterOverlayRendererResources.h>
@@ -7,7 +17,20 @@
 #include <CesiumUtility/Tracing.h>
 #include <CesiumUtility/joinToString.h>
 
+#include <glm/ext/vector_double2.hpp>
+#include <gsl/span>
 #include <spdlog/fwd.h>
+#include <spdlog/spdlog.h>
+
+#include <any>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGeometry;
@@ -35,12 +58,10 @@ RasterOverlayTileProvider::RasterOverlayTileProvider(
       _projection(CesiumGeospatial::GeographicProjection(ellipsoid)),
       _coverageRectangle(CesiumGeospatial::GeographicProjection::
                              computeMaximumProjectedRectangle(ellipsoid)),
-      _pPlaceholder(),
+      _pPlaceholder(new RasterOverlayTile(*this)),
       _tileDataBytes(0),
       _totalTilesCurrentlyLoading(0),
-      _throttledTilesCurrentlyLoading(0) {
-  this->_pPlaceholder = new RasterOverlayTile(*this);
-}
+      _throttledTilesCurrentlyLoading(0) {}
 
 RasterOverlayTileProvider::RasterOverlayTileProvider(
     const CesiumUtility::IntrusivePointer<const RasterOverlay>& pOwner,
@@ -182,7 +203,7 @@ RasterOverlayTileProvider::loadTileImageFromUrl(
             const gsl::span<const std::byte> data = pResponse->data();
 
             CesiumGltfReader::ImageReaderResult loadedImage =
-                RasterOverlayTileProvider::_gltfReader.readImage(
+                CesiumGltfReader::GltfReader::readImage(
                     data,
                     Ktx2TranscodeTargets);
 
@@ -207,8 +228,8 @@ namespace {
 struct LoadResult {
   RasterOverlayTile::LoadState state = RasterOverlayTile::LoadState::Unloaded;
   CesiumGltf::ImageCesium image = {};
-  CesiumGeometry::Rectangle rectangle = {};
-  std::vector<Credit> credits = {};
+  CesiumGeometry::Rectangle rectangle;
+  std::vector<Credit> credits;
   void* pRendererResources = nullptr;
   bool moreDetailAvailable = true;
 };
@@ -235,7 +256,7 @@ struct LoadResult {
  * @param rendererOptions Renderer options
  * @return The `LoadResult`
  */
-static LoadResult createLoadResultFromLoadedImage(
+LoadResult createLoadResultFromLoadedImage(
     const std::shared_ptr<IPrepareRasterOverlayRendererResources>&
         pPrepareRendererResources,
     const std::shared_ptr<spdlog::logger>& pLogger,

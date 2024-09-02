@@ -2,7 +2,11 @@
 
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <gsl/span>
+
+#include <cstddef>
+#include <string>
 
 using namespace CesiumGltf;
 using namespace CesiumUtility;
@@ -71,7 +75,7 @@ TEST_CASE(
   REQUIRE(readerResult.errors.empty());
   REQUIRE(readerResult.model.has_value());
 
-  ExtensionModelExtStructuralMetadata* pMetadata =
+  auto* pMetadata =
       readerResult.model->getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pMetadata);
 

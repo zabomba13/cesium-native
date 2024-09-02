@@ -1,12 +1,22 @@
 #include "CesiumGeospatial/BoundingRegion.h"
 
+#include "CesiumGeometry/CullingResult.h"
+#include "CesiumGeospatial/Ellipsoid.h"
 #include "CesiumGeospatial/EllipsoidTangentPlane.h"
+#include "CesiumGeospatial/GlobeRectangle.h"
 
 #include <CesiumGeometry/IntersectionTests.h>
 #include <CesiumGeometry/Plane.h>
 #include <CesiumGeometry/Ray.h>
 #include <CesiumUtility/Math.h>
 
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/geometric.hpp>
+
+#include <cmath>
+#include <optional>
 #include <stdexcept>
 
 using namespace CesiumUtility;
@@ -92,8 +102,8 @@ BoundingRegion::BoundingRegion(
     this->_southwestCornerCartesian = intersection.value();
     southSurfaceNormal = ellipsoid.geodeticSurfaceNormal(southCenterCartesian);
   } else {
-    southSurfaceNormal =
-        ellipsoid.geodeticSurfaceNormal(rectangle.getSoutheast());
+    southSurfaceNormal = CesiumGeospatial::Ellipsoid::geodeticSurfaceNormal(
+        rectangle.getSoutheast());
   }
   this->_southNormal =
       glm::normalize(glm::cross(southSurfaceNormal, westVector));
@@ -124,8 +134,8 @@ BoundingRegion::BoundingRegion(
     this->_northeastCornerCartesian = intersection.value();
     northSurfaceNormal = ellipsoid.geodeticSurfaceNormal(northCenterCartesian);
   } else {
-    northSurfaceNormal =
-        ellipsoid.geodeticSurfaceNormal(rectangle.getNorthwest());
+    northSurfaceNormal = CesiumGeospatial::Ellipsoid::geodeticSurfaceNormal(
+        rectangle.getNorthwest());
   }
   this->_northNormal =
       glm::normalize(glm::cross(westVector, northSurfaceNormal));
@@ -276,7 +286,6 @@ static OrientedBoundingBox fromPlaneExtents(
   }
   //>>includeEnd('debug');
 
-  double minX, maxX, minY, maxY, minZ, maxZ;
   Plane plane(glm::dvec3(0.0, 0.0, 1.0), 0.0);
 
   if (rectangle.computeWidth() <= Math::OnePi) {
@@ -340,14 +349,14 @@ static OrientedBoundingBox fromPlaneExtents(
     const glm::dvec2 perimeterProjectedSC =
         tangentPlane.projectPointToNearestOnPlane(perimeterCartesianSC);
 
-    minX = glm::min(
+    double minX = glm::min(
         glm::min(perimeterProjectedNW.x, perimeterProjectedCW.x),
         perimeterProjectedSW.x);
 
-    maxX = -minX; // symmetrical
+    double maxX = -minX; // symmetrical
 
-    maxY = glm::max(perimeterProjectedNW.y, perimeterProjectedNC.y);
-    minY = glm::min(perimeterProjectedSW.y, perimeterProjectedSC.y);
+    double maxY = glm::max(perimeterProjectedNW.y, perimeterProjectedNC.y);
+    double minY = glm::min(perimeterProjectedSW.y, perimeterProjectedSC.y);
 
     // Compute minimum Z using the rectangle at minimum height, since it will be
     // deeper than the maximum height
@@ -358,13 +367,13 @@ static OrientedBoundingBox fromPlaneExtents(
     perimeterCartesianSW =
         ellipsoid.cartographicToCartesian(perimeterCartographicSW);
 
-    minZ = glm::min(
+    double minZ = glm::min(
         plane.getPointDistance(perimeterCartesianNW),
         plane.getPointDistance(perimeterCartesianSW));
-    maxZ = maximumHeight; // Since the tangent plane touches the surface at
-                          // height = 0, this is okay
+    double maxZ = maximumHeight; // Since the tangent plane touches the surface
+                                 // at height = 0, this is okay
 
-    // Esure our box is at least a millimeter in each direction to avoid
+    // Ensure our box is at least a millimeter in each direction to avoid
     // problems with degenerate or nearly-degenerate bounding regions.
     const double oneMillimeter = 0.001;
     if (maxX - minX < oneMillimeter) {
@@ -426,28 +435,29 @@ static OrientedBoundingBox fromPlaneExtents(
           centerLongitude + Math::PiOverTwo,
           latitudeNearestToEquator,
           maximumHeight));
-  maxX = glm::dot(plane.projectPointOntoPlane(horizonCartesian), planeXAxis);
-  minX = -maxX; // symmetrical
+  double maxX =
+      glm::dot(plane.projectPointOntoPlane(horizonCartesian), planeXAxis);
+  double minX = -maxX; // symmetrical
 
   // Get the min and max Y, using the height that will give the largest extent
-  maxY = ellipsoid
-             .cartographicToCartesian(Cartographic(
-                 0.0,
-                 rectangle.getNorth(),
-                 fullyBelowEquator ? minimumHeight : maximumHeight))
-             .z;
-  minY = ellipsoid
-             .cartographicToCartesian(Cartographic(
-                 0.0,
-                 rectangle.getSouth(),
-                 fullyAboveEquator ? minimumHeight : maximumHeight))
-             .z;
+  double maxY = ellipsoid
+                    .cartographicToCartesian(Cartographic(
+                        0.0,
+                        rectangle.getNorth(),
+                        fullyBelowEquator ? minimumHeight : maximumHeight))
+                    .z;
+  double minY = ellipsoid
+                    .cartographicToCartesian(Cartographic(
+                        0.0,
+                        rectangle.getSouth(),
+                        fullyAboveEquator ? minimumHeight : maximumHeight))
+                    .z;
   const glm::dvec3 farZ = ellipsoid.cartographicToCartesian(Cartographic(
       rectangle.getEast(),
       latitudeNearestToEquator,
       maximumHeight));
-  minZ = plane.getPointDistance(farZ);
-  maxZ = 0.0; // plane origin starts at maxZ already
+  double minZ = plane.getPointDistance(farZ);
+  double maxZ = 0.0; // plane origin starts at maxZ already
 
   // min and max are local to the plane axes
   return fromPlaneExtents(

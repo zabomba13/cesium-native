@@ -1,9 +1,16 @@
 #include "CesiumGeospatial/Ellipsoid.h"
 
+#include "CesiumGeospatial/Cartographic.h"
+
 #include <CesiumUtility/Math.h>
 
+#include <glm/common.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
+
+#include <cmath>
+#include <optional>
 
 using namespace CesiumUtility;
 
@@ -17,8 +24,8 @@ Ellipsoid::geodeticSurfaceNormal(const glm::dvec3& position) const noexcept {
   return glm::normalize(position * this->_oneOverRadiiSquared);
 }
 
-glm::dvec3 Ellipsoid::geodeticSurfaceNormal(
-    const Cartographic& cartographic) const noexcept {
+/*static*/ glm::dvec3
+Ellipsoid::geodeticSurfaceNormal(const Cartographic& cartographic) noexcept {
   const double longitude = cartographic.longitude;
   const double latitude = cartographic.latitude;
   const double cosLatitude = glm::cos(latitude);
@@ -31,7 +38,8 @@ glm::dvec3 Ellipsoid::geodeticSurfaceNormal(
 
 glm::dvec3 Ellipsoid::cartographicToCartesian(
     const Cartographic& cartographic) const noexcept {
-  glm::dvec3 n = this->geodeticSurfaceNormal(cartographic);
+  glm::dvec3 n =
+      CesiumGeospatial::Ellipsoid::geodeticSurfaceNormal(cartographic);
   glm::dvec3 k = this->_radiiSquared * n;
   const double gamma = sqrt(glm::dot(n, k));
   k /= gamma;
@@ -100,17 +108,17 @@ Ellipsoid::scaleToGeodeticSurface(const glm::dvec3& cartesian) const noexcept {
       ((1.0 - ratio) * glm::length(cartesian)) / (0.5 * glm::length(gradient));
   double correction = 0.0;
 
-  double func;
-  double denominator;
-  double xMultiplier;
-  double yMultiplier;
-  double zMultiplier;
-  double xMultiplier2;
-  double yMultiplier2;
-  double zMultiplier2;
-  double xMultiplier3;
-  double yMultiplier3;
-  double zMultiplier3;
+  double func{};
+  double denominator{};
+  double xMultiplier{};
+  double yMultiplier{};
+  double zMultiplier{};
+  double xMultiplier2{};
+  double yMultiplier2{};
+  double zMultiplier2{};
+  double xMultiplier3{};
+  double yMultiplier3{};
+  double zMultiplier3{};
 
   do {
     lambda -= correction;

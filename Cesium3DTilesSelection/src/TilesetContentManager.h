@@ -100,8 +100,8 @@ public:
 
   int64_t getTotalDataUsed() const noexcept;
 
-  bool tileNeedsWorkerThreadLoading(const Tile& tile) const noexcept;
-  bool tileNeedsMainThreadLoading(const Tile& tile) const noexcept;
+  static bool tileNeedsWorkerThreadLoading(const Tile& tile) noexcept;
+  static bool tileNeedsMainThreadLoading(const Tile& tile) noexcept;
 
   // Transition the tile from the ContentLoaded to the Done state.
   void finishLoading(Tile& tile, const TilesetOptions& tilesetOptions);
@@ -117,9 +117,9 @@ private:
 
   void updateDoneState(Tile& tile, const TilesetOptions& tilesetOptions);
 
-  void unloadContentLoadedState(Tile& tile);
+  void unloadContentLoadedState(Tile& tile) const;
 
-  void unloadDoneState(Tile& tile);
+  void unloadDoneState(Tile& tile) const;
 
   void notifyTileStartLoading(const Tile* pTile) noexcept;
 

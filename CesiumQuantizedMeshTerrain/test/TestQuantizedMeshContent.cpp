@@ -1,15 +1,38 @@
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+
 #include <Cesium3DTilesContent/registerAllTileContentTypes.h>
 #include <CesiumGeometry/QuadtreeTilingScheme.h>
 #include <CesiumGeometry/Rectangle.h>
 #include <CesiumGeospatial/GeographicProjection.h>
-#include <CesiumGeospatial/Projection.h>
 #include <CesiumGltf/AccessorView.h>
 #include <CesiumQuantizedMeshTerrain/QuantizedMeshLoader.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
-#include <glm/glm.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/common.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
+#include <gsl/span>
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <optional>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 using namespace Cesium3DTilesContent;
@@ -49,12 +72,12 @@ template <typename T> struct MeshData {
 };
 
 struct Extension {
-  uint8_t extensionID;
+  uint8_t extensionID{};
   std::vector<std::byte> extensionData;
 };
 
 template <typename T> struct QuantizedMesh {
-  QuantizedMeshHeader header;
+  QuantizedMeshHeader header{};
   MeshData<T> vertexData;
   std::vector<Extension> extensions;
 };
@@ -73,16 +96,16 @@ static int32_t zigZagDecode(int32_t value) {
 
 static void octEncode(glm::vec3 normal, uint8_t& x, uint8_t& y) {
   float inv =
-      1.0f / (glm::abs(normal.x) + glm::abs(normal.y) + glm::abs(normal.z));
+      1.0F / (glm::abs(normal.x) + glm::abs(normal.y) + glm::abs(normal.z));
   glm::vec2 p;
   p.x = normal.x * inv;
   p.y = normal.y * inv;
 
   if (normal.z <= 0.0) {
     x = static_cast<uint8_t>(Math::toSNorm(
-        (1.0f - glm::abs(p.y)) * static_cast<float>(Math::signNotZero(p.x))));
+        (1.0F - glm::abs(p.y)) * static_cast<float>(Math::signNotZero(p.x))));
     y = static_cast<uint8_t>(Math::toSNorm(
-        (1.0f - glm::abs(p.x)) * static_cast<float>(Math::signNotZero(p.y))));
+        (1.0F - glm::abs(p.x)) * static_cast<float>(Math::signNotZero(p.y))));
   } else {
     x = static_cast<uint8_t>(Math::toSNorm(p.x));
     y = static_cast<uint8_t>(Math::toSNorm(p.y));
@@ -142,8 +165,7 @@ convertQuantizedMeshToBinary(const QuantizedMesh<T>& quantizedMesh) {
 
   // vertex count
   offset += length;
-  uint32_t vertexCount =
-      static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+  auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
   length = sizeof(vertexCount);
   std::memcpy(buffer.data() + offset, &vertexCount, length);
 
@@ -188,7 +210,7 @@ convertQuantizedMeshToBinary(const QuantizedMesh<T>& quantizedMesh) {
 
   // west edge count
   offset += length;
-  uint32_t westIndicesCount =
+  auto westIndicesCount =
       static_cast<uint32_t>(quantizedMesh.vertexData.westIndices.size());
   length = sizeof(westIndicesCount);
   std::memcpy(buffer.data() + offset, &westIndicesCount, length);
@@ -203,7 +225,7 @@ convertQuantizedMeshToBinary(const QuantizedMesh<T>& quantizedMesh) {
 
   // south edge count
   offset += length;
-  uint32_t southIndicesCount =
+  auto southIndicesCount =
       static_cast<uint32_t>(quantizedMesh.vertexData.southIndices.size());
   length = sizeof(southIndicesCount);
   std::memcpy(buffer.data() + offset, &southIndicesCount, length);
@@ -218,7 +240,7 @@ convertQuantizedMeshToBinary(const QuantizedMesh<T>& quantizedMesh) {
 
   // east edge count
   offset += length;
-  uint32_t eastIndicesCount =
+  auto eastIndicesCount =
       static_cast<uint32_t>(quantizedMesh.vertexData.eastIndices.size());
   length = sizeof(eastIndicesCount);
   std::memcpy(buffer.data() + offset, &eastIndicesCount, length);
@@ -233,7 +255,7 @@ convertQuantizedMeshToBinary(const QuantizedMesh<T>& quantizedMesh) {
 
   // north edge count
   offset += length;
-  uint32_t northIndicesCount =
+  auto northIndicesCount =
       static_cast<uint32_t>(quantizedMesh.vertexData.northIndices.size());
   length = sizeof(northIndicesCount);
   std::memcpy(buffer.data() + offset, &northIndicesCount, length);
@@ -255,7 +277,7 @@ convertQuantizedMeshToBinary(const QuantizedMesh<T>& quantizedMesh) {
 
     // serialize extension length
     offset += length;
-    uint32_t extensionLength =
+    auto extensionLength =
         static_cast<uint32_t>(extension.extensionData.size());
     length = sizeof(extensionLength);
     std::memcpy(buffer.data() + offset, &extensionLength, length);
@@ -309,13 +331,13 @@ static QuantizedMesh<T> createGridQuantizedMesh(
   for (uint32_t y = 0; y < height; ++y) {
     for (uint32_t x = 0; x < width; ++x) {
       // encode u, v, and height buffers
-      uint16_t u = static_cast<uint16_t>(
+      auto u = static_cast<uint16_t>(
           (static_cast<double>(x) / static_cast<double>(width - 1)) * 32767.0);
-      uint16_t v = static_cast<uint16_t>(
+      auto v = static_cast<uint16_t>(
           ((static_cast<double>(y) / static_cast<double>(height - 1))) *
           32767.0);
-      int16_t deltaU = static_cast<int16_t>(u - lastU);
-      int16_t deltaV = static_cast<int16_t>(v - lastV);
+      auto deltaU = static_cast<int16_t>(u - lastU);
+      auto deltaV = static_cast<int16_t>(v - lastV);
       quantizedMesh.vertexData.u.emplace_back(zigzagEncode(deltaU));
       quantizedMesh.vertexData.v.emplace_back(zigzagEncode(deltaV));
       quantizedMesh.vertexData.height.push_back(0);
@@ -396,7 +418,7 @@ void checkGridMesh(
   int32_t v = 0;
 
   std::vector<glm::dvec2> uvs;
-  uvs.reserve(verticesWidth * verticesHeight);
+  uvs.reserve(static_cast<size_t>(verticesWidth * verticesHeight));
   uint32_t positionIdx = 0;
   uint32_t idx = 0;
   for (uint32_t y = 0; y < verticesHeight; ++y) {
@@ -422,7 +444,7 @@ void checkGridMesh(
       glm::dvec3 expectPosition =
           ellipsoid.cartographicToCartesian(Cartographic(longitude, latitude));
 
-      glm::dvec3 position = static_cast<glm::dvec3>(positions[positionIdx]);
+      auto position = static_cast<glm::dvec3>(positions[positionIdx]);
       position += glm::dvec3(
           quantizedMesh.header.boundingSphereCenterX,
           quantizedMesh.header.boundingSphereCenterY,
@@ -468,8 +490,9 @@ void checkGridMesh(
   size_t eastIndicesCount = quantizedMesh.vertexData.eastIndices.size();
   size_t northIndicesCount = quantizedMesh.vertexData.northIndices.size();
 
-  size_t gridVerticesCount = verticesWidth * verticesHeight;
-  size_t gridIndicesCount = (verticesHeight - 1) * (verticesWidth - 1) * 6;
+  auto gridVerticesCount = static_cast<size_t>(verticesWidth * verticesHeight);
+  auto gridIndicesCount =
+      static_cast<size_t>((verticesHeight - 1) * (verticesWidth - 1) * 6);
   size_t totalSkirtVertices = westIndicesCount + southIndicesCount +
                               eastIndicesCount + northIndicesCount;
   size_t totalSkirtIndices = (totalSkirtVertices - 4) * 6;
@@ -489,7 +512,7 @@ void checkGridMesh(
     glm::dvec3 expectPosition = ellipsoid.cartographicToCartesian(
         Cartographic(longitude, latitude, -skirtHeight));
 
-    glm::dvec3 position =
+    auto position =
         static_cast<glm::dvec3>(positions[int64_t(currentVertexCount + i)]);
     position += glm::dvec3(
         quantizedMesh.header.boundingSphereCenterX,
@@ -509,7 +532,7 @@ void checkGridMesh(
     glm::dvec3 expectPosition = ellipsoid.cartographicToCartesian(
         Cartographic(longitude, latitude, -skirtHeight));
 
-    glm::dvec3 position =
+    auto position =
         static_cast<glm::dvec3>(positions[int64_t(currentVertexCount + i)]);
     position += glm::dvec3(
         quantizedMesh.header.boundingSphereCenterX,
@@ -529,7 +552,7 @@ void checkGridMesh(
     glm::dvec3 expectPosition = ellipsoid.cartographicToCartesian(
         Cartographic(longitude, latitude, -skirtHeight));
 
-    glm::dvec3 position =
+    auto position =
         static_cast<glm::dvec3>(positions[int64_t(currentVertexCount + i)]);
     position += glm::dvec3(
         quantizedMesh.header.boundingSphereCenterX,
@@ -548,7 +571,7 @@ void checkGridMesh(
     glm::dvec3 expectPosition = ellipsoid.cartographicToCartesian(
         Cartographic(longitude, latitude, -skirtHeight));
 
-    glm::dvec3 position =
+    auto position =
         static_cast<glm::dvec3>(positions[int64_t(currentVertexCount + i)]);
     position += glm::dvec3(
         quantizedMesh.header.boundingSphereCenterX,
@@ -570,7 +593,8 @@ static void checkGeneratedGridNormal(
     uint32_t verticesWidth,
     uint32_t verticesHeight) {
   uint32_t totalGridIndices = (verticesWidth - 1) * (verticesHeight - 1) * 6;
-  std::vector<glm::vec3> expectedNormals(verticesWidth * verticesHeight);
+  std::vector<glm::vec3> expectedNormals(
+      static_cast<size_t>(verticesWidth * verticesHeight));
   for (uint32_t i = 0; i < totalGridIndices; i += 3) {
     I id0 = indices[i];
     I id1 = indices[i + 1];
@@ -616,7 +640,7 @@ static void checkGeneratedGridNormal(
   size_t eastIndicesCount = quantizedMesh.vertexData.eastIndices.size();
   size_t northIndicesCount = quantizedMesh.vertexData.northIndices.size();
 
-  size_t gridVerticesCount = verticesWidth * verticesHeight;
+  auto gridVerticesCount = static_cast<size_t>(verticesWidth * verticesHeight);
   size_t totalSkirtVertices = westIndicesCount + southIndicesCount +
                               eastIndicesCount + northIndicesCount;
 
@@ -697,10 +721,11 @@ static void checkGltfSanity(const Model& model) {
   for (const Mesh& mesh : model.meshes) {
     for (const MeshPrimitive& primitive : mesh.primitives) {
       const Accessor* pIndicesAccessor =
-          model.getSafe(&model.accessors, primitive.indices);
+          CesiumGltf::Model::getSafe(&model.accessors, primitive.indices);
       REQUIRE(pIndicesAccessor);
-      const BufferView* pIndicesBufferView =
-          model.getSafe(&model.bufferViews, pIndicesAccessor->bufferView);
+      const BufferView* pIndicesBufferView = CesiumGltf::Model::getSafe(
+          &model.bufferViews,
+          pIndicesAccessor->bufferView);
       REQUIRE(pIndicesBufferView);
 
       CHECK(
@@ -709,10 +734,11 @@ static void checkGltfSanity(const Model& model) {
 
       for (const auto& attribute : primitive.attributes) {
         const Accessor* pAttributeAccessor =
-            model.getSafe(&model.accessors, attribute.second);
+            CesiumGltf::Model::getSafe(&model.accessors, attribute.second);
         REQUIRE(pAttributeAccessor);
-        const BufferView* pAttributeBufferView =
-            model.getSafe(&model.bufferViews, pAttributeAccessor->bufferView);
+        const BufferView* pAttributeBufferView = CesiumGltf::Model::getSafe(
+            &model.bufferViews,
+            pAttributeAccessor->bufferView);
         REQUIRE(pAttributeBufferView);
 
         CHECK(pAttributeBufferView->target == BufferView::Target::ARRAY_BUFFER);
@@ -817,8 +843,8 @@ TEST_CASE("Test converting quantized mesh to gltf with skirt") {
     CHECK(normals.status() == AccessorViewStatus::Valid);
 
     Cartographic center = boundingVolume.getRectangle().computeCenter();
-    glm::vec3 geodeticNormal =
-        static_cast<glm::vec3>(ellipsoid.geodeticSurfaceNormal(center));
+    glm::vec3 geodeticNormal = static_cast<glm::vec3>(
+        CesiumGeospatial::Ellipsoid::geodeticSurfaceNormal(center));
     checkGeneratedGridNormal(
         quantizedMesh,
         normals,
@@ -891,8 +917,8 @@ TEST_CASE("Test converting quantized mesh to gltf with skirt") {
     CHECK(normals.status() == AccessorViewStatus::Valid);
 
     Cartographic center = boundingVolume.getRectangle().computeCenter();
-    glm::vec3 geodeticNormal =
-        static_cast<glm::vec3>(ellipsoid.geodeticSurfaceNormal(center));
+    glm::vec3 geodeticNormal = static_cast<glm::vec3>(
+        CesiumGeospatial::Ellipsoid::geodeticSurfaceNormal(center));
     checkGeneratedGridNormal(
         quantizedMesh,
         normals,
@@ -965,8 +991,8 @@ TEST_CASE("Test converting quantized mesh to gltf with skirt") {
     CHECK(normals.status() == AccessorViewStatus::Valid);
 
     Cartographic center = boundingVolume.getRectangle().computeCenter();
-    glm::vec3 geodeticNormal =
-        static_cast<glm::vec3>(ellipsoid.geodeticSurfaceNormal(center));
+    glm::vec3 geodeticNormal = static_cast<glm::vec3>(
+        CesiumGeospatial::Ellipsoid::geodeticSurfaceNormal(center));
     checkGeneratedGridNormal(
         quantizedMesh,
         normals,
@@ -1001,9 +1027,11 @@ TEST_CASE("Test converting quantized mesh to gltf with skirt") {
     // add oct-encoded normal extension. This is just a random direction and
     // not really normal. We want to make sure the normal is written to the gltf
     glm::vec3 normal = glm::normalize(glm::vec3(0.2, 1.4, 0.3));
-    uint8_t x = 0, y = 0;
+    uint8_t x = 0;
+    uint8_t y = 0;
     octEncode(normal, x, y);
-    std::vector<std::byte> octNormals(verticesWidth * verticesHeight * 2);
+    std::vector<std::byte> octNormals(
+        static_cast<size_t>(verticesWidth * verticesHeight * 2));
     for (size_t i = 0; i < octNormals.size(); i += 2) {
       octNormals[i] = std::byte(x);
       octNormals[i + 1] = std::byte(y);
@@ -1045,7 +1073,8 @@ TEST_CASE("Test converting quantized mesh to gltf with skirt") {
 
     REQUIRE(
         static_cast<size_t>(normals.size()) ==
-        (verticesWidth * verticesHeight + totalSkirtVerticesCount));
+        (static_cast<size_t>(
+            verticesWidth * verticesHeight + totalSkirtVerticesCount)));
     for (int64_t i = 0; i < normals.size(); ++i) {
       REQUIRE(Math::equalsEpsilon(normals[i].x, normal.x, Math::Epsilon2));
       REQUIRE(Math::equalsEpsilon(normals[i].y, normal.y, Math::Epsilon2));
@@ -1088,9 +1117,11 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
   // add oct-encoded normal extension. This is just a random direction and not
   // really normal. We want to make sure the normal is written to the gltf
   glm::vec3 normal = glm::normalize(glm::vec3(0.2, 1.4, 0.3));
-  uint8_t x = 0, y = 0;
+  uint8_t x = 0;
+  uint8_t y = 0;
   octEncode(normal, x, y);
-  std::vector<std::byte> octNormals(verticesWidth * verticesHeight * 2);
+  std::vector<std::byte> octNormals(
+      static_cast<size_t>(verticesWidth * verticesHeight * 2));
   for (size_t i = 0; i < octNormals.size(); i += 2) {
     octNormals[i] = std::byte(x);
     octNormals[i + 1] = std::byte(y);
@@ -1126,8 +1157,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize vertex count
     offset += length;
-    uint32_t vertexCount =
-        static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+    auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
     length = sizeof(vertexCount);
     std::memcpy(quantizedMeshBin.data() + offset, &vertexCount, length);
 
@@ -1166,8 +1196,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize vertex count
     offset += length;
-    uint32_t vertexCount =
-        static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+    auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
     length = sizeof(vertexCount);
     std::memcpy(quantizedMeshBin.data() + offset, &vertexCount, length);
 
@@ -1197,7 +1226,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize triangle count
     offset += length;
-    uint32_t triangleCount =
+    auto triangleCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.indices.size() / 3);
     length = sizeof(triangleCount);
     std::memcpy(quantizedMeshBin.data() + offset, &triangleCount, length);
@@ -1231,8 +1260,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize vertex count
     offset += length;
-    uint32_t vertexCount =
-        static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+    auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
     length = sizeof(vertexCount);
     std::memcpy(quantizedMeshBin.data() + offset, &vertexCount, length);
 
@@ -1262,7 +1290,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize triangle count
     offset += length;
-    uint32_t triangleCount =
+    auto triangleCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.indices.size() / 3);
     length = sizeof(triangleCount);
     std::memcpy(quantizedMeshBin.data() + offset, &triangleCount, length);
@@ -1277,7 +1305,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize west edge
     offset += length;
-    uint32_t westCount =
+    auto westCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.westIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &westCount, length);
@@ -1313,8 +1341,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize vertex count
     offset += length;
-    uint32_t vertexCount =
-        static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+    auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
     length = sizeof(vertexCount);
     std::memcpy(quantizedMeshBin.data() + offset, &vertexCount, length);
 
@@ -1344,7 +1371,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize triangle count
     offset += length;
-    uint32_t triangleCount =
+    auto triangleCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.indices.size() / 3);
     length = sizeof(triangleCount);
     std::memcpy(quantizedMeshBin.data() + offset, &triangleCount, length);
@@ -1359,7 +1386,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize west edge
     offset += length;
-    uint32_t westCount =
+    auto westCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.westIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &westCount, length);
@@ -1373,7 +1400,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize south edge
     offset += length;
-    uint32_t southCount =
+    auto southCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.southIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &southCount, length);
@@ -1411,8 +1438,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize vertex count
     offset += length;
-    uint32_t vertexCount =
-        static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+    auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
     length = sizeof(vertexCount);
     std::memcpy(quantizedMeshBin.data() + offset, &vertexCount, length);
 
@@ -1442,7 +1468,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize triangle count
     offset += length;
-    uint32_t triangleCount =
+    auto triangleCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.indices.size() / 3);
     length = sizeof(triangleCount);
     std::memcpy(quantizedMeshBin.data() + offset, &triangleCount, length);
@@ -1457,7 +1483,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize west edge
     offset += length;
-    uint32_t westCount =
+    auto westCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.westIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &westCount, length);
@@ -1471,7 +1497,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize south edge
     offset += length;
-    uint32_t southCount =
+    auto southCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.southIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &southCount, length);
@@ -1485,7 +1511,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize east edge
     offset += length;
-    uint32_t eastCount =
+    auto eastCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.eastIndices.size());
     length = sizeof(eastCount);
     std::memcpy(quantizedMeshBin.data() + offset, &eastCount, length);
@@ -1525,8 +1551,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize vertex count
     offset += length;
-    uint32_t vertexCount =
-        static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
+    auto vertexCount = static_cast<uint32_t>(quantizedMesh.vertexData.u.size());
     length = sizeof(vertexCount);
     std::memcpy(quantizedMeshBin.data() + offset, &vertexCount, length);
 
@@ -1556,7 +1581,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize triangle count
     offset += length;
-    uint32_t triangleCount =
+    auto triangleCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.indices.size() / 3);
     length = sizeof(triangleCount);
     std::memcpy(quantizedMeshBin.data() + offset, &triangleCount, length);
@@ -1571,7 +1596,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize west edge
     offset += length;
-    uint32_t westCount =
+    auto westCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.westIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &westCount, length);
@@ -1585,7 +1610,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize south edge
     offset += length;
-    uint32_t southCount =
+    auto southCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.southIndices.size());
     length = sizeof(westCount);
     std::memcpy(quantizedMeshBin.data() + offset, &southCount, length);
@@ -1599,7 +1624,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize east edge
     offset += length;
-    uint32_t eastCount =
+    auto eastCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.eastIndices.size());
     length = sizeof(eastCount);
     std::memcpy(quantizedMeshBin.data() + offset, &eastCount, length);
@@ -1613,7 +1638,7 @@ TEST_CASE("Test converting ill-formed quantized mesh") {
 
     // serialize north edge
     offset += length;
-    uint32_t northCount =
+    auto northCount =
         static_cast<uint32_t>(quantizedMesh.vertexData.northIndices.size());
     length = sizeof(northCount);
     std::memcpy(quantizedMeshBin.data() + offset, &northCount, length);

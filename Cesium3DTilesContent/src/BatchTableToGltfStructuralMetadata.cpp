@@ -1,6 +1,18 @@
 #include "BatchTableToGltfStructuralMetadata.h"
 
 #include "BatchTableHierarchyPropertyValues.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/FeatureId.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
+#include "CesiumGltf/Schema.h"
+#include "CesiumUtility/ErrorList.h"
+#include "CesiumUtility/JsonValue.h"
 
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
@@ -9,15 +21,27 @@
 #include <CesiumGltf/PropertyType.h>
 #include <CesiumGltf/PropertyTypeTraits.h>
 #include <CesiumUtility/Assert.h>
-#include <CesiumUtility/Log.h>
 
-#include <glm/glm.hpp>
+#include <fmt/core.h>
+#include <glm/common.hpp>
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <limits>
 #include <map>
+#include <optional>
+#include <string>
 #include <type_traits>
 #include <unordered_set>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace Cesium3DTilesContent::CesiumImpl;
@@ -45,7 +69,7 @@ struct MaskedType {
 
   MaskedType() : MaskedType(true){};
 
-  MaskedType(bool defaultValue)
+  explicit MaskedType(bool defaultValue)
       : isInt8(defaultValue),
         isUint8(defaultValue),
         isInt16(defaultValue),
@@ -101,7 +125,7 @@ struct MaskedArrayType {
 
   MaskedArrayType() : MaskedArrayType(true){};
 
-  MaskedArrayType(bool defaultValue)
+  explicit MaskedArrayType(bool defaultValue)
       : elementType(defaultValue),
         minArrayCount(std::numeric_limits<uint32_t>::max()),
         maxArrayCount(std::numeric_limits<uint32_t>::min()){};
@@ -173,9 +197,9 @@ private:
   bool _canUseNullStringSentinel = true;
 
 public:
-  CompatibleTypes() : _type(){};
-  CompatibleTypes(const MaskedType& maskedType) : _type(maskedType){};
-  CompatibleTypes(const MaskedArrayType& maskedArrayType)
+  CompatibleTypes() = default;
+  explicit CompatibleTypes(const MaskedType& maskedType) : _type(maskedType){};
+  explicit CompatibleTypes(const MaskedArrayType& maskedArrayType)
       : _type(maskedArrayType){};
 
   /**
@@ -257,7 +281,7 @@ public:
    */
   void operator&=(const MaskedType& inMaskedType) noexcept {
     if (std::holds_alternative<MaskedType>(_type)) {
-      MaskedType& maskedType = std::get<MaskedType>(_type);
+      auto& maskedType = std::get<MaskedType>(_type);
       maskedType &= inMaskedType;
       return;
     }
@@ -275,7 +299,7 @@ public:
    */
   void operator&=(const MaskedArrayType& inArrayType) noexcept {
     if (std::holds_alternative<MaskedArrayType>(_type)) {
-      MaskedArrayType& arrayType = std::get<MaskedArrayType>(_type);
+      auto& arrayType = std::get<MaskedArrayType>(_type);
       arrayType &= inArrayType;
       return;
     }
@@ -298,11 +322,10 @@ public:
     } else
 
         if (std::holds_alternative<MaskedArrayType>(inTypes._type)) {
-      const MaskedArrayType& arrayType =
-          std::get<MaskedArrayType>(inTypes._type);
+      const auto& arrayType = std::get<MaskedArrayType>(inTypes._type);
       operator&=(arrayType);
     } else {
-      const MaskedType& maskedType = std::get<MaskedType>(inTypes._type);
+      const auto& maskedType = std::get<MaskedType>(inTypes._type);
       operator&=(maskedType);
     }
 
@@ -355,8 +378,7 @@ public:
    * Gets a possible sentinel value for this type. If no value can be used, this
    * returns std::nullopt.
    */
-  const std::optional<CesiumUtility::JsonValue>
-  getSentinelValue() const noexcept {
+  std::optional<CesiumUtility::JsonValue> getSentinelValue() const noexcept {
     if (isCompatibleWithSignedInteger()) {
       if (_canUseZeroSentinel) {
         return 0;
@@ -387,7 +409,7 @@ public:
    * This is helpful for when a property contains a sentinel value as non-null
    * data; the sentinel value can then be removed from consideration.
    */
-  void removeSentinelValues(CesiumUtility::JsonValue value) noexcept {
+  void removeSentinelValues(const CesiumUtility::JsonValue& value) noexcept {
     if (value.isNumber()) {
       // Don't try to use string as sentinels for numbers.
       _canUseNullStringSentinel = false;
@@ -406,7 +428,7 @@ public:
       _canUseZeroSentinel = false;
       _canUseNegativeOneSentinel = false;
 
-      auto stringValue = value.getString();
+      const std::string& stringValue = value.getString();
       if (stringValue == "null") {
         _canUseNullStringSentinel = false;
       }
@@ -505,7 +527,7 @@ void copyStringBuffer(
   std::memcpy(buffer.data(), rapidjsonStrBuffer.GetString(), buffer.size());
 
   offsetBuffer.resize(sizeof(OffsetType) * rapidjsonOffsets.size());
-  OffsetType* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
+  auto* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   for (size_t i = 0; i < rapidjsonOffsets.size(); ++i) {
     offset[i] = static_cast<OffsetType>(rapidjsonOffsets[i]);
   }
@@ -515,7 +537,7 @@ class ArrayOfPropertyValues {
 public:
   class const_iterator {
   public:
-    const_iterator(const rapidjson::Value* p) : _p(p) {}
+    explicit const_iterator(const rapidjson::Value* p) : _p(p) {}
 
     const_iterator& operator++() {
       ++this->_p;
@@ -538,7 +560,7 @@ public:
     const rapidjson::Value* _p;
   };
 
-  ArrayOfPropertyValues(const rapidjson::Value& propertyValues)
+  explicit ArrayOfPropertyValues(const rapidjson::Value& propertyValues)
       : _propertyValues(propertyValues) {}
 
   const_iterator begin() const {
@@ -841,8 +863,8 @@ void copyVariableLengthScalarArraysToBuffers(
   valueBuffer.resize(sizeof(ValueType) * numOfElements);
   offsetBuffer.resize(
       sizeof(OffsetType) * static_cast<size_t>(propertyTable.count + 1));
-  ValueType* value = reinterpret_cast<ValueType*>(valueBuffer.data());
-  OffsetType* offsetValue = reinterpret_cast<OffsetType*>(offsetBuffer.data());
+  auto* value = reinterpret_cast<ValueType*>(valueBuffer.data());
+  auto* offsetValue = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   OffsetType prevOffset = 0;
   auto it = propertyValue.begin();
   for (int64_t i = 0; i < propertyTable.count; ++i) {
@@ -880,11 +902,11 @@ void updateScalarArrayProperty(
 
   // Handle fixed-length arrays.
   if (arrayType.minArrayCount == arrayType.maxArrayCount) {
-    const size_t arrayCount = static_cast<size_t>(arrayType.minArrayCount);
+    const auto arrayCount = static_cast<size_t>(arrayType.minArrayCount);
     const size_t numOfValues =
         static_cast<size_t>(propertyTable.count) * arrayCount;
     std::vector<std::byte> valueBuffer(sizeof(ValueType) * numOfValues);
-    ValueType* value = reinterpret_cast<ValueType*>(valueBuffer.data());
+    auto* value = reinterpret_cast<ValueType*>(valueBuffer.data());
     auto it = propertyValue.begin();
     for (int64_t i = 0; i < propertyTable.count; ++i) {
       const auto& jsonArrayMember = *it;
@@ -973,7 +995,7 @@ void copyStringsToBuffers(
   for (int64_t i = 0; i < propertyTable.count; ++i) {
     const auto& arrayMember = *it;
     for (const auto& str : arrayMember.GetArray()) {
-      OffsetType byteLength = static_cast<OffsetType>(
+      auto byteLength = static_cast<OffsetType>(
           str.GetStringLength() * sizeof(rapidjson::Value::Ch));
       std::memcpy(valueBuffer.data() + offset, str.GetString(), byteLength);
       std::memcpy(
@@ -1000,7 +1022,7 @@ void copyArrayOffsetsForStringArraysToBuffer(
   OffsetType prevOffset = 0;
   offsetBuffer.resize(
       static_cast<size_t>(propertyTable.count + 1) * sizeof(OffsetType));
-  OffsetType* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
+  auto* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   auto it = propertyValue.begin();
   for (int64_t i = 0; i < propertyTable.count; ++i) {
     const auto& arrayMember = *it;
@@ -1139,12 +1161,12 @@ void copyVariableLengthBooleanArraysToBuffers(
     const PropertyTable& propertyTable,
     const TValueGetter& propertyValue) {
   size_t currentIndex = 0;
-  const size_t totalByteLength =
+  const auto totalByteLength =
       static_cast<size_t>(glm::ceil(static_cast<double>(numOfElements) / 8.0));
   valueBuffer.resize(totalByteLength);
   offsetBuffer.resize(
       static_cast<size_t>(propertyTable.count + 1) * sizeof(OffsetType));
-  OffsetType* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
+  auto* offset = reinterpret_cast<OffsetType*>(offsetBuffer.data());
   OffsetType prevOffset = 0;
   auto it = propertyValue.begin();
   for (int64_t i = 0; i < propertyTable.count; ++i) {
@@ -1183,10 +1205,10 @@ void updateBooleanArrayProperty(
 
   // Fixed-length array of booleans
   if (arrayType.minArrayCount == arrayType.maxArrayCount) {
-    const size_t arrayCount = static_cast<size_t>(arrayType.minArrayCount);
+    const auto arrayCount = static_cast<size_t>(arrayType.minArrayCount);
     const size_t numOfElements =
         static_cast<size_t>(propertyTable.count) * arrayCount;
-    const size_t totalByteLength = static_cast<size_t>(
+    const auto totalByteLength = static_cast<size_t>(
         glm::ceil(static_cast<double>(numOfElements) / 8.0));
     std::vector<std::byte> valueBuffer(totalByteLength);
     size_t currentIndex = 0;
@@ -1621,7 +1643,7 @@ void updateExtensionWithBinaryProperty(
 
   binaryProperty.batchTableByteOffset = byteOffset;
   binaryProperty.gltfByteOffset = gltfBufferOffset;
-  binaryProperty.byteLength = static_cast<int64_t>(bufferView.byteLength);
+  binaryProperty.byteLength = bufferView.byteLength;
 }
 
 void updateExtensionWithBatchTableHierarchy(
@@ -1659,7 +1681,7 @@ void updateExtensionWithBatchTableHierarchy(
   // Find all the properties.
   std::unordered_set<std::string> properties;
 
-  for (auto classIt = classesIt->value.Begin();
+  for (const auto* classIt = classesIt->value.Begin();
        classIt != classesIt->value.End();
        ++classIt) {
     auto instancesIt = classIt->FindMember("instances");
@@ -1723,7 +1745,7 @@ void convertBatchTableToGltfStructuralMetadataExtension(
     gltf.buffers.emplace_back();
   }
 
-  ExtensionModelExtStructuralMetadata& modelExtension =
+  auto& modelExtension =
       gltf.addExtension<ExtensionModelExtStructuralMetadata>();
   gltf.addExtensionUsed(ExtensionModelExtStructuralMetadata::ExtensionName);
 
@@ -1868,8 +1890,7 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromB3dm(
       primitive.attributes.erase("_BATCHID");
 
       // Also rename the attribute in the Draco extension, if it exists.
-      ExtensionKhrDracoMeshCompression* pDraco =
-          primitive.getExtension<ExtensionKhrDracoMeshCompression>();
+      auto* pDraco = primitive.getExtension<ExtensionKhrDracoMeshCompression>();
       if (pDraco) {
         auto dracoIt = pDraco->attributes.find("_BATCHID");
         if (dracoIt != pDraco->attributes.end()) {
@@ -1878,8 +1899,7 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromB3dm(
         }
       }
 
-      ExtensionExtMeshFeatures& extension =
-          primitive.addExtension<ExtensionExtMeshFeatures>();
+      auto& extension = primitive.addExtension<ExtensionExtMeshFeatures>();
       gltf.addExtensionUsed(ExtensionExtMeshFeatures::ExtensionName);
 
       FeatureId& featureID = extension.featureIds.emplace_back();
@@ -1954,8 +1974,7 @@ ErrorList BatchTableToGltfStructuralMetadata::convertFromPnts(
   CESIUM_ASSERT(mesh.primitives.size() == 1);
   MeshPrimitive& primitive = mesh.primitives[0];
 
-  ExtensionExtMeshFeatures& extension =
-      primitive.addExtension<ExtensionExtMeshFeatures>();
+  auto& extension = primitive.addExtension<ExtensionExtMeshFeatures>();
   gltf.addExtensionUsed(ExtensionExtMeshFeatures::ExtensionName);
 
   FeatureId& featureID = extension.featureIds.emplace_back();

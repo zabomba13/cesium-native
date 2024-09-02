@@ -1,9 +1,18 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/SharedFuture.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumRasterOverlays/RasterOverlay.h>
 #include <CesiumRasterOverlays/RasterOverlayLoadFailureDetails.h>
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumUtility/Assert.h>
 
-#include <spdlog/fwd.h>
+#include <memory>
+#include <string>
+#include <utility>
 
 using namespace CesiumAsync;
 using namespace CesiumRasterOverlays;
@@ -23,7 +32,7 @@ public:
             pAssetAccessor,
             ellipsoid) {}
 
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage>
+  CesiumAsync::Future<LoadedRasterOverlayImage>
   loadTileImage(RasterOverlayTile& /* overlayTile */) override {
     return this->getAsyncSystem()
         .createResolvedFuture<LoadedRasterOverlayImage>({});
@@ -34,7 +43,7 @@ public:
 RasterOverlay::RasterOverlay(
     const std::string& name,
     const RasterOverlayOptions& options)
-    : _name(name), _options(options), _destructionCompleteDetails{} {}
+    : _name(name), _options(options) {}
 
 RasterOverlay::~RasterOverlay() noexcept {
   if (this->_destructionCompleteDetails.has_value()) {

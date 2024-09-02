@@ -93,10 +93,10 @@ private:
   double _destinationHeight;
 
   Ellipsoid _ellipsoid;
-  glm::dvec3 _sourceDirection;
-  glm::dvec3 _rotationAxis;
-  glm::dvec3 _sourceEcef;
-  glm::dvec3 _destinationEcef;
+  glm::dvec3 _sourceDirection{};
+  glm::dvec3 _rotationAxis{};
+  glm::dvec3 _sourceEcef{};
+  glm::dvec3 _destinationEcef{};
 };
 
 } // namespace CesiumGeospatial

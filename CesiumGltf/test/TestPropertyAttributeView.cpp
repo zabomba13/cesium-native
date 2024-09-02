@@ -1,11 +1,38 @@
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyAttribute.h"
+#include "CesiumGltf/PropertyAttributeProperty.h"
+#include "CesiumGltf/PropertyAttributePropertyView.h"
 #include "CesiumGltf/PropertyAttributeView.h"
+#include "CesiumGltf/PropertyTransformations.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyTypeTraits.h"
+#include "CesiumGltf/Schema.h"
 
 #include <CesiumUtility/Assert.h>
 
-#include <catch2/catch.hpp>
-#include <gsl/span>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <optional>
+#include <string>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -118,8 +145,7 @@ TEST_CASE("Test PropertyAttributeView on model without EXT_structural_metadata "
 TEST_CASE("Test PropertyAttributeView on model without metadata schema") {
   Model model;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   PropertyAttribute& propertyAttribute =
       metadata.propertyAttributes.emplace_back();
@@ -140,8 +166,7 @@ TEST_CASE("Test PropertyAttributeView on model without metadata schema") {
 TEST_CASE("Test property attribute with nonexistent class") {
   Model model;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -178,8 +203,7 @@ TEST_CASE("Test scalar PropertyAttributeProperty") {
   size_t bufferIndex = model.buffers.size() - 1;
   size_t bufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -348,8 +372,7 @@ TEST_CASE("Test scalar PropertyAttributeProperty (normalized)") {
   addAttributeToModel<uint8_t, true>(model, primitive, attributeName, data);
   size_t accessorIndex = model.accessors.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -455,8 +478,7 @@ TEST_CASE("Test vecN PropertyAttributeProperty") {
   size_t bufferIndex = model.buffers.size() - 1;
   size_t bufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -623,8 +645,7 @@ TEST_CASE("Test vecN PropertyAttributeProperty (normalized)") {
   addAttributeToModel<glm::u8vec2, true>(model, primitive, attributeName, data);
   size_t accessorIndex = model.accessors.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -748,8 +769,7 @@ TEST_CASE("Test matN PropertyAttributeProperty") {
   size_t bufferIndex = model.buffers.size() - 1;
   size_t bufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -939,8 +959,7 @@ TEST_CASE("Test matN PropertyAttributeProperty (normalized)") {
       data);
   size_t accessorIndex = model.accessors.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1051,18 +1070,17 @@ TEST_CASE("Test with PropertyAttributeProperty offset, scale, min, max") {
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
 
-  std::vector<float> data{1.0f, 2.0f, 3.0f, 4.0f};
+  std::vector<float> data{1.0F, 2.0F, 3.0F, 4.0F};
 
-  const float offset = 1.0f;
-  const float scale = 2.0f;
-  const float min = 3.0f;
-  const float max = 9.0f;
+  const float offset = 1.0F;
+  const float scale = 2.0F;
+  const float min = 3.0F;
+  const float max = 9.0F;
 
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1108,7 +1126,7 @@ TEST_CASE("Test with PropertyAttributeProperty offset, scale, min, max") {
     REQUIRE(property.min() == min);
     REQUIRE(property.max() == max);
 
-    std::vector<float> expected{3.0f, 5.0f, 7.0f, 9.0f};
+    std::vector<float> expected{3.0F, 5.0F, 7.0F, 9.0F};
     for (size_t i = 0; i < data.size(); ++i) {
       REQUIRE(property.getRaw(static_cast<int64_t>(i)) == data[i]);
       REQUIRE(property.get(static_cast<int64_t>(i)) == expected[i]);
@@ -1116,10 +1134,10 @@ TEST_CASE("Test with PropertyAttributeProperty offset, scale, min, max") {
   }
 
   SECTION("Use own property values") {
-    const float newOffset = 0.5f;
-    const float newScale = -1.0f;
-    const float newMin = -3.5f;
-    const float newMax = -0.5f;
+    const float newOffset = 0.5F;
+    const float newScale = -1.0F;
+    const float newMin = -3.5F;
+    const float newMax = -0.5F;
     propertyAttributeProperty.offset = newOffset;
     propertyAttributeProperty.scale = newScale;
     propertyAttributeProperty.min = newMin;
@@ -1133,7 +1151,7 @@ TEST_CASE("Test with PropertyAttributeProperty offset, scale, min, max") {
     REQUIRE(property.min() == newMin);
     REQUIRE(property.max() == newMax);
 
-    std::vector<float> expected{-0.5f, -1.5f, -2.5f, -3.5f};
+    std::vector<float> expected{-0.5F, -1.5F, -2.5F, -3.5F};
     for (size_t i = 0; i < data.size(); ++i) {
       REQUIRE(property.getRaw(static_cast<int64_t>(i)) == data[i]);
       REQUIRE(property.get(static_cast<int64_t>(i)) == expected[i]);
@@ -1158,8 +1176,7 @@ TEST_CASE("Test with PropertyAttributeProperty offset, scale, min, max "
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel<uint8_t, true>(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1253,8 +1270,7 @@ TEST_CASE("Test with PropertyAttributeProperty noData") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1334,8 +1350,7 @@ TEST_CASE("Test with PropertyAttributeProperty noData (normalized)") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel<uint8_t, true>(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1421,8 +1436,7 @@ TEST_CASE(
 
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1512,8 +1526,7 @@ TEST_CASE("Test callback on invalid property Attribute view") {
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
   metadata.schema.emplace();
 
   // Property Attribute has a nonexistent class.
@@ -1553,8 +1566,7 @@ TEST_CASE("Test callback on invalid PropertyAttributeProperty") {
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1599,8 +1611,7 @@ TEST_CASE("Test callback on invalid normalized PropertyAttributeProperty") {
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1649,8 +1660,7 @@ TEST_CASE("Test callback for scalar PropertyAttributeProperty") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1716,8 +1726,7 @@ TEST_CASE("Test callback for scalar PropertyAttributeProperty (normalized)") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel<int16_t, true>(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1790,8 +1799,7 @@ TEST_CASE("Test callback for vecN PropertyAttributeProperty") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1861,8 +1869,7 @@ TEST_CASE("Test callback for vecN PropertyAttributeProperty (normalized)") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel<glm::i8vec2, true>(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1945,8 +1952,7 @@ TEST_CASE("Test callback for matN PropertyAttributeProperty") {
   const std::string attributeName = "_ATTRIBUTE";
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2030,8 +2036,7 @@ TEST_CASE("Test callback for matN PropertyAttributeProperty (normalized)") {
       attributeName,
       data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2095,8 +2100,7 @@ TEST_CASE("Test callback on unsupported PropertyAttributeProperty") {
   Mesh& mesh = model.meshes.emplace_back();
   MeshPrimitive& primitive = mesh.primitives.emplace_back();
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2185,8 +2189,7 @@ TEST_CASE(
       glm::vec3(0, 1, 0)};
   addAttributeToModel(model, primitive, attributeName, data);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];

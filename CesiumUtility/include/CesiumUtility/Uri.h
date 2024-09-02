@@ -16,7 +16,7 @@ public:
       const std::string& key,
       const std::string& value);
   static std::string
-  getQueryValue(const std::string& uri, const std::string& key);
+  getQueryValue(const std::string& url, const std::string& key);
 
   typedef std::string
   SubstitutionCallbackSignature(const std::string& placeholder);

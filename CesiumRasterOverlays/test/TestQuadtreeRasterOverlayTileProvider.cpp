@@ -1,11 +1,38 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/ITaskProcessor.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeometry/QuadtreeTilingScheme.h"
+#include "CesiumGeometry/Rectangle.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/GeographicProjection.h"
+#include "CesiumGeospatial/Projection.h"
+#include "CesiumNativeTests/SimpleAssetRequest.h"
 #include "CesiumRasterOverlays/QuadtreeRasterOverlayTileProvider.h"
 #include "CesiumRasterOverlays/RasterOverlay.h"
 #include "CesiumRasterOverlays/RasterOverlayTile.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/IntrusivePointer.h"
 
 #include <CesiumGeospatial/WebMercatorProjection.h>
 #include <CesiumNativeTests/SimpleAssetAccessor.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGeometry;
@@ -52,8 +79,8 @@ public:
   // The tiles that will return an error from loadQuadtreeTileImage.
   std::vector<QuadtreeTileID> errorTiles;
 
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage>
-  loadQuadtreeTileImage(const QuadtreeTileID& tileID) const {
+  CesiumAsync::Future<LoadedRasterOverlayImage>
+  loadQuadtreeTileImage(const QuadtreeTileID& tileID) const override {
     LoadedRasterOverlayImage result;
     result.rectangle = this->getTilingScheme().tileToRectangle(tileID);
 
@@ -69,7 +96,7 @@ public:
       result.image->bytesPerChannel = 1;
       result.image->channels = 4;
       result.image->pixelData.resize(
-          this->getWidth() * this->getHeight() * 4,
+          static_cast<size_t>(this->getWidth() * this->getHeight() * 4),
           std::byte(tileID.level));
     }
 
@@ -79,12 +106,12 @@ public:
 
 class TestRasterOverlay : public RasterOverlay {
 public:
-  TestRasterOverlay(
+  explicit TestRasterOverlay(
       const std::string& name,
       const RasterOverlayOptions& options = RasterOverlayOptions())
       : RasterOverlay(name, options) {}
 
-  virtual CesiumAsync::Future<CreateTileProviderResult> createTileProvider(
+  CesiumAsync::Future<CreateTileProviderResult> createTileProvider(
       const CesiumAsync::AsyncSystem& asyncSystem,
       const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
       const std::shared_ptr<CreditSystem>& /* pCreditSystem */,
@@ -122,7 +149,7 @@ public:
 
 class MockTaskProcessor : public ITaskProcessor {
 public:
-  virtual void startTask(std::function<void()> f) { std::thread(f).detach(); }
+  void startTask(std::function<void()> f) override { std::thread(f).detach(); }
 };
 
 } // namespace
@@ -173,7 +200,7 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
     const ImageCesium& image = pTile->getImage();
     CHECK(image.width > 0);
     CHECK(image.height > 0);
-    CHECK(image.pixelData.size() > 0);
+    CHECK(!image.pixelData.empty());
     CHECK(std::all_of(
         image.pixelData.begin(),
         image.pixelData.end(),
@@ -183,8 +210,7 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
   SECTION("uses a mix of levels when a tile returns an error") {
     glm::dvec2 center(0.1, 0.2);
 
-    TestTileProvider* pTestProvider =
-        static_cast<TestTileProvider*>(pProvider.get());
+    auto* pTestProvider = dynamic_cast<TestTileProvider*>(pProvider.get());
 
     // Select a rectangle that spans four tiles at tile level 8.
     const uint32_t expectedLevel = 8;
@@ -227,7 +253,7 @@ TEST_CASE("QuadtreeRasterOverlayTileProvider getTile") {
     const ImageCesium& image = pTile->getImage();
     CHECK(image.width > 0);
     CHECK(image.height > 0);
-    CHECK(image.pixelData.size() > 0);
+    CHECK(!image.pixelData.empty());
 
     // We should have pixels from both level 7 and level 8.
     CHECK(std::all_of(

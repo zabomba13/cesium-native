@@ -1,10 +1,20 @@
 #include "BatchTableToGltfStructuralMetadata.h"
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGltfReader/GltfReader.h"
 
 #include <Cesium3DTilesContent/B3dmToGltfConverter.h>
 #include <Cesium3DTilesContent/BinaryToGltfConverter.h>
 #include <Cesium3DTilesContent/GltfConverters.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
-#include <CesiumUtility/Log.h>
+
+#include <fmt/core.h>
+#include <gsl/span>
+#include <rapidjson/document.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 namespace Cesium3DTilesContent {
 namespace {
@@ -46,8 +56,7 @@ void parseB3dmHeader(
     return;
   }
 
-  const B3dmHeader* pHeader =
-      reinterpret_cast<const B3dmHeader*>(b3dmBinary.data());
+  const auto* pHeader = reinterpret_cast<const B3dmHeader*>(b3dmBinary.data());
 
   header = *pHeader;
   headerLength = sizeof(B3dmHeader);
@@ -66,7 +75,7 @@ void parseB3dmHeader(
   if (pHeader->batchTableJsonByteLength >= 570425344) {
     // First legacy check
     headerLength = sizeof(B3dmHeaderLegacy1);
-    const B3dmHeaderLegacy1* pLegacy1 =
+    const auto* pLegacy1 =
         reinterpret_cast<const B3dmHeaderLegacy1*>(b3dmBinary.data());
     header.batchTableJsonByteLength = pLegacy1->batchTableByteLength;
     header.batchTableBinaryByteLength = 0;
@@ -85,7 +94,7 @@ void parseB3dmHeader(
   } else if (pHeader->batchTableBinaryByteLength >= 570425344) {
     // Second legacy check
     headerLength = sizeof(B3dmHeaderLegacy2);
-    const B3dmHeaderLegacy2* pLegacy2 =
+    const auto* pLegacy2 =
         reinterpret_cast<const B3dmHeaderLegacy2*>(b3dmBinary.data());
     header.batchTableJsonByteLength = pLegacy2->batchTableJsonByteLength;
     header.batchTableBinaryByteLength = pLegacy2->batchTableBinaryByteLength;
@@ -149,7 +158,7 @@ rapidjson::Document parseFeatureTableJsonData(
     result.errors.emplaceError(fmt::format(
         "Error when parsing feature table JSON, error code {} at byte offset "
         "{}",
-        document.GetParseError(),
+        static_cast<uint64_t>(document.GetParseError()),
         document.GetErrorOffset()));
     return document;
   }
@@ -211,7 +220,7 @@ void convertB3dmMetadataToGltfStructuralMetadata(
             "Error when parsing batch table JSON, error code {} at byte "
             "offset "
             "{}. Skip parsing metadata",
-            batchTableJson.GetParseError(),
+            static_cast<uint64_t>(batchTableJson.GetParseError()),
             batchTableJson.GetErrorOffset()));
         return;
       }
@@ -232,7 +241,7 @@ CesiumAsync::Future<GltfConverterResult> B3dmToGltfConverter::convert(
     const CesiumGltfReader::GltfReaderOptions& options,
     const AssetFetcher& assetFetcher) {
   GltfConverterResult result;
-  B3dmHeader header;
+  B3dmHeader header{};
   uint32_t headerLength = 0;
   parseB3dmHeader(b3dmBinary, header, headerLength, result);
   if (result.errors) {

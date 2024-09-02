@@ -1,8 +1,15 @@
+#include "CesiumGeometry/CullingResult.h"
+#include "CesiumGeometry/Plane.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumUtility/Math.h"
+
 #include <CesiumGeospatial/S2CellBoundingVolume.h>
 #include <CesiumGeospatial/S2CellID.h>
 
-#include <catch2/catch.hpp>
-#include <glm/geometric.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <gsl/span>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;

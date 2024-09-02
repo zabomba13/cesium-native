@@ -1,8 +1,7 @@
 #include "CesiumGeometry/Transforms.h"
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/geometric.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/mat4x4.hpp>
 
 namespace CesiumGeometry {
 
@@ -87,7 +86,7 @@ void Transforms::computeTranslationRotationScaleFromMatrix(
     glm::dquat* pRotation,
     glm::dvec3* pScale) {
   if (pRotation || pScale) {
-    glm::dmat3 rotationAndScale = glm::dmat3(matrix);
+    glm::dmat3 rotationAndScale(matrix);
     double lengthColumn0 = glm::length(rotationAndScale[0]);
     double lengthColumn1 = glm::length(rotationAndScale[1]);
     double lengthColumn2 = glm::length(rotationAndScale[2]);
@@ -105,14 +104,17 @@ void Transforms::computeTranslationRotationScaleFromMatrix(
       scale *= -1.0;
     }
 
-    if (pRotation)
+    if (pRotation) {
       *pRotation = glm::quat_cast(rotationMatrix);
-    if (pScale)
+    }
+    if (pScale) {
       *pScale = scale;
+    }
   }
 
-  if (pTranslation)
+  if (pTranslation) {
     *pTranslation = glm::dvec3(matrix[3]);
+  }
 }
 
 } // namespace CesiumGeometry

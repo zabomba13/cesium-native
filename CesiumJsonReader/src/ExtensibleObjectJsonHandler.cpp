@@ -1,16 +1,18 @@
 #include "CesiumJsonReader/ExtensibleObjectJsonHandler.h"
 
 #include "CesiumJsonReader/ExtensionsJsonHandler.h"
-#include "CesiumJsonReader/JsonHandler.h"
+#include "CesiumJsonReader/IJsonHandler.h"
 #include "CesiumJsonReader/JsonReaderOptions.h"
 #include "CesiumJsonReader/ObjectJsonHandler.h"
+#include "CesiumUtility/ExtensibleObject.h"
+
+#include <string>
+#include <string_view>
 
 namespace CesiumJsonReader {
 ExtensibleObjectJsonHandler::ExtensibleObjectJsonHandler(
     const JsonReaderOptions& context) noexcept
-    : ObjectJsonHandler(),
-      _extras(),
-      _extensions(context),
+    : _extensions(context),
       _captureUnknownProperties(context.getCaptureUnknownProperties()) {}
 
 void ExtensibleObjectJsonHandler::reset(
@@ -25,8 +27,9 @@ IJsonHandler* ExtensibleObjectJsonHandler::readObjectKeyExtensibleObject(
     CesiumUtility::ExtensibleObject& o) {
   using namespace std::string_literals;
 
-  if ("extras"s == str)
+  if ("extras"s == str) {
     return property("extras", this->_extras, o.extras);
+  }
 
   if ("extensions"s == str) {
     this->_extensions.reset(this, &o, objectType);
@@ -41,9 +44,8 @@ IJsonHandler* ExtensibleObjectJsonHandler::readObjectKeyExtensibleObject(
     CesiumUtility::JsonValue& value = it->second;
     this->_unknownProperties.reset(this, &value);
     return &this->_unknownProperties;
-  } else {
-    // Ignore this unknown property.
-    return this->ignoreAndContinue();
   }
+  // Ignore this unknown property.
+  return this->ignoreAndContinue();
 }
 } // namespace CesiumJsonReader

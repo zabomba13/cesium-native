@@ -1,23 +1,47 @@
 #include "CesiumIonClient/Connection.h"
 
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumIonClient/ApplicationData.h"
+#include "CesiumIonClient/Assets.h"
+#include "CesiumIonClient/Defaults.h"
+#include "CesiumIonClient/Profile.h"
+#include "CesiumIonClient/Response.h"
+#include "CesiumIonClient/Token.h"
+#include "CesiumIonClient/TokenList.h"
 #include "fillWithRandomBytes.h"
-#include "parseLinkHeader.h"
 
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/SpanHelper.h>
 #include <CesiumUtility/Uri.h>
 #include <CesiumUtility/joinToString.h>
 
+#include <gsl/span>
 #include <httplib.h>
 #include <modp_b64.h>
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
+#include <rapidjson/rapidjson.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 #include <uriparser/Uri.h>
+#include <uriparser/UriBase.h>
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <optional>
+#include <stdexcept>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -710,7 +734,7 @@ TokenList tokenListFromJson(const rapidjson::Value& json) {
   if (itemsIt != json.MemberEnd() && itemsIt->value.IsArray()) {
     const rapidjson::Value& items = itemsIt->value;
 
-    for (auto it = items.Begin(); it != items.End(); ++it) {
+    for (const auto* it = items.Begin(); it != items.End(); ++it) {
       std::optional<Token> token = tokenFromJson(*it);
       if (!token) {
         continue;
@@ -869,7 +893,7 @@ CesiumAsync::Future<Response<Token>> Connection::createToken(
 
   writer.Key("scopes");
   writer.StartArray();
-  for (auto& scope : scopes) {
+  for (const auto& scope : scopes) {
     writer.String(scope.c_str(), rapidjson::SizeType(scope.size()));
   }
   writer.EndArray();
@@ -888,7 +912,7 @@ CesiumAsync::Future<Response<Token>> Connection::createToken(
   writer.Key("allowedUrls");
   if (allowedUrls) {
     writer.StartArray();
-    for (auto& allowedUrl : allowedUrls.value()) {
+    for (const auto& allowedUrl : allowedUrls.value()) {
       writer.String(allowedUrl.c_str(), rapidjson::SizeType(allowedUrl.size()));
     }
     writer.EndArray();
@@ -969,7 +993,7 @@ Future<Response<NoValue>> Connection::modifyToken(
 
   writer.Key("scopes");
   writer.StartArray();
-  for (auto& scope : newScopes) {
+  for (const auto& scope : newScopes) {
     writer.String(scope.c_str(), rapidjson::SizeType(scope.size()));
   }
   writer.EndArray();
@@ -977,7 +1001,7 @@ Future<Response<NoValue>> Connection::modifyToken(
   writer.Key("newAllowedUrls");
   if (newAllowedUrls) {
     writer.StartArray();
-    for (auto& allowedUrl : newAllowedUrls.value()) {
+    for (const auto& allowedUrl : newAllowedUrls.value()) {
       writer.String(allowedUrl.c_str(), rapidjson::SizeType(allowedUrl.size()));
     }
     writer.EndArray();
@@ -1020,12 +1044,12 @@ Future<Response<NoValue>> Connection::modifyToken(
 
 /*static*/ std::optional<std::string>
 Connection::getIdFromToken(const std::string& token) {
-  size_t startPos = token.find(".");
+  size_t startPos = token.find('.');
   if (startPos == std::string::npos || startPos == token.size() - 1) {
     return std::nullopt;
   }
 
-  size_t endPos = token.find(".", startPos + 1);
+  size_t endPos = token.find('.', startPos + 1);
   if (endPos == std::string::npos) {
     return std::nullopt;
   }

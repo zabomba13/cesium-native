@@ -9,4 +9,5 @@ CMakeSettings.json
 *.DS_Store
 test.db
 build-wsl
+build-ninja
 .idea

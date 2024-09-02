@@ -1,12 +1,21 @@
+#include "CesiumGltf/Buffer.h"
 #include "CesiumGltfWriter/GltfWriter.h"
+#include "CesiumJsonWriter/ExtensionWriterContext.h"
+#include "CesiumUtility/ExtensibleObject.h"
 
-#include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltfReader/GltfReader.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <gsl/span>
 #include <rapidjson/document.h>
 
+#include <algorithm>
 #include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <string>
+#include <vector>
 
 namespace {
 void check(const std::string& input, const std::string& expectedOutput) {
@@ -42,12 +51,12 @@ void check(const std::string& input, const std::string& expectedOutput) {
 
 bool hasSpaces(const std::string& input) {
   return std::count_if(input.begin(), input.end(), [](unsigned char c) {
-    return std::isspace(c);
-  });
+           return std::isspace(c);
+         }) != 0;
 }
 
 struct ExtensionModelTest final : public CesiumUtility::ExtensibleObject {
-  static inline constexpr const char* ExtensionName = "PRIVATE_model_test";
+  static constexpr const char* ExtensionName = "PRIVATE_model_test";
 };
 
 } // namespace

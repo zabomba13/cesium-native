@@ -1,8 +1,25 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumNativeTests/SimpleAssetResponse.h"
+
 #include <CesiumNativeTests/FileAccessor.h>
 #include <CesiumNativeTests/SimpleAssetRequest.h>
 
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <fstream>
+#include <ios>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumNativeTests {
 
@@ -34,11 +51,10 @@ std::unique_ptr<SimpleAssetResponse> readFileUri(const std::string& uri) {
   file.read(reinterpret_cast<char*>(result.data()), size);
   if (!file) {
     return response(503);
-  } else {
-    contentType = "application/octet-stream";
-    headers.insert({"content-type", contentType});
-    return response(200);
   }
+  contentType = "application/octet-stream";
+  headers.insert({"content-type", contentType});
+  return response(200);
 }
 } // namespace
 
@@ -67,7 +83,7 @@ FileAccessor::request(
     const std::string& verb,
     const std::string& url,
     const std::vector<THeader>& headers,
-    const gsl::span<const std::byte>&) {
+    const gsl::span<const std::byte>& /* contentPayload */) {
   if (verb == "GET") {
     return get(asyncSystem, url, headers);
   }

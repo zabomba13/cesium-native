@@ -1,4 +1,17 @@
-#include <CesiumGeometry/Transforms.h>
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Sampler.h"
+#include "CesiumGltf/Texture.h"
+#include "CesiumGltf/TextureInfo.h"
+#include "CesiumNativeTests/SimpleAssetRequest.h"
+#include "CesiumNativeTests/SimpleAssetResponse.h"
+#include "CesiumRasterOverlays/RasterOverlayDetails.h"
+
 #include <CesiumGeospatial/Cartographic.h>
 #include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumGeospatial/GlobeTransforms.h>
@@ -18,11 +31,24 @@
 #include <CesiumRasterOverlays/TileMapServiceRasterOverlay.h>
 #include <CesiumUtility/IntrusivePointer.h>
 
-#include <catch2/catch.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double4.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <spdlog/spdlog.h>
 
-#include <fstream>
-#include <iostream>
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGeometry;
@@ -73,8 +99,9 @@ TEST_CASE("Add raster overlay to glTF") {
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
            dataDir / "Cesium_Logo_Color")) {
-    if (!entry.is_regular_file())
+    if (!entry.is_regular_file()) {
       continue;
+    }
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
@@ -226,17 +253,19 @@ TEST_CASE("Add raster overlay to glTF") {
                 }
 
                 Material& material = gltf.materials[size_t(primitive.material)];
-                if (!material.pbrMetallicRoughness)
+                if (!material.pbrMetallicRoughness) {
                   material.pbrMetallicRoughness.emplace();
-                if (!material.pbrMetallicRoughness->baseColorTexture)
+                }
+                if (!material.pbrMetallicRoughness->baseColorTexture) {
                   material.pbrMetallicRoughness->baseColorTexture.emplace();
+                }
 
                 TextureInfo& colorTexture =
                     *material.pbrMetallicRoughness->baseColorTexture;
                 colorTexture.index = int32_t(gltf.textures.size() - 1);
                 colorTexture.texCoord = textureCoordinateIndex;
 
-                ExtensionKhrTextureTransform& textureTransform =
+                auto& textureTransform =
                     colorTexture.addExtension<ExtensionKhrTextureTransform>();
                 textureTransform.offset = {
                     textureTranslationAndScale.x,

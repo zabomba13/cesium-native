@@ -117,9 +117,9 @@ public:
    */
   static std::optional<glm::dvec3> rayTriangle(
       const Ray& ray,
-      const glm::dvec3& p0,
-      const glm::dvec3& p1,
-      const glm::dvec3& p2,
+      const glm::dvec3& v0,
+      const glm::dvec3& v1,
+      const glm::dvec3& v2,
       bool cullBackFaces = false);
 
   /**

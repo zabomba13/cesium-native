@@ -1,6 +1,19 @@
 #include "dequantizeMeshData.h"
 
-#include <CesiumGltfReader/GltfReader.h>
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/AccessorSpec.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGltf;
 
@@ -11,16 +24,16 @@ namespace {
 template <typename T> float intToFloat(T t) = delete;
 
 template <> float intToFloat(std::int8_t c) {
-  return std::max(c / 127.0f, -1.0f);
+  return std::max(c / 127.0F, -1.0F);
 }
 
-template <> float intToFloat(std::uint8_t c) { return c / 127.0f; }
+template <> float intToFloat(std::uint8_t c) { return c / 127.0F; }
 
 template <> float intToFloat(std::int16_t c) {
-  return std::max(c / 65535.0f, -1.0f);
+  return std::max(c / 65535.0F, -1.0F);
 }
 
-template <> float intToFloat(std::uint16_t c) { return c / 65535.0f; }
+template <> float intToFloat(std::uint16_t c) { return c / 65535.0F; }
 
 template <typename T, size_t N>
 void normalizeQuantized(
@@ -63,7 +76,7 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
     return;
   }
 
-  int64_t byteStride;
+  int64_t byteStride{};
   if (pBufferView->byteStride) {
     byteStride = *pBufferView->byteStride;
   } else {
@@ -159,7 +172,7 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
 void dequantizeMeshData(Model& model) {
   for (Mesh& mesh : model.meshes) {
     for (MeshPrimitive& primitive : mesh.primitives) {
-      for (std::pair<const std::string, int32_t> attribute :
+      for (const std::pair<const std::string, int32_t>& attribute :
            primitive.attributes) {
         Accessor* pAccessor =
             Model::getSafe(&model.accessors, attribute.second);

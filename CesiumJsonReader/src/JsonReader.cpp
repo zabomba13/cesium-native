@@ -1,8 +1,19 @@
 #include "CesiumJsonReader/JsonReader.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
+
 #include <CesiumUtility/Assert.h>
 
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <rapidjson/error/error.h>
 #include <rapidjson/reader.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumJsonReader {
 namespace {
@@ -26,7 +37,7 @@ struct Dispatcher {
   bool Int64(int64_t i) { return update(pCurrent->readInt64(i)); }
   bool Uint64(uint64_t i) { return update(pCurrent->readUint64(i)); }
   bool Double(double d) { return update(pCurrent->readDouble(d)); }
-  bool RawNumber(
+  static bool RawNumber(
       const char* /* str */,
       size_t /* length */,
       bool /* copy */) noexcept {
@@ -94,7 +105,7 @@ std::string getMessageFromRapidJsonError(rapidjson::ParseErrorCode code) {
 
 JsonReader::FinalJsonHandler::FinalJsonHandler(
     std::vector<std::string>& warnings)
-    : JsonHandler(), _warnings(warnings), _pInputStream(nullptr) {
+    : _warnings(warnings), _pInputStream(nullptr) {
   reset(this);
 }
 
@@ -158,9 +169,9 @@ void JsonReader::FinalJsonHandler::setInputStream(
 void CesiumJsonReader::JsonReader::internalRead(
     const rapidjson::Value& jsonValue,
     IJsonHandler& handler,
-    FinalJsonHandler&,
-    std::vector<std::string>&,
-    std::vector<std::string>&) {
+    FinalJsonHandler& /* finalHandler */,
+    std::vector<std::string>& /* errors */,
+    std::vector<std::string>& /* warnings */) {
   Dispatcher dispatcher{&handler};
   jsonValue.Accept(dispatcher);
 }

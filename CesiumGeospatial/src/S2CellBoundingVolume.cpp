@@ -1,13 +1,24 @@
 #include "CesiumGeospatial/S2CellBoundingVolume.h"
 
-#include <CesiumUtility/Assert.h>
-#include <CesiumUtility/Math.h>
+#include "CesiumGeometry/CullingResult.h"
+#include "CesiumGeometry/Plane.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Cartographic.h"
+#include "CesiumGeospatial/Ellipsoid.h"
 
+#include <CesiumUtility/Assert.h>
+
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/vector_double3.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtx/norm.hpp>
 #include <glm/matrix.hpp>
+#include <gsl/span>
 
 #include <array>
+#include <cstddef>
+#include <limits>
+#include <optional>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -110,7 +121,7 @@ computeIntersection(const Plane& p0, const Plane& p1, const Plane& p2) {
 
 std::array<glm::dvec3, 8>
 computeVertices(const std::array<Plane, 6>& boundingPlanes) {
-  std::array<glm::dvec3, 8> vertices;
+  std::array<glm::dvec3, 8> vertices{};
 
   for (size_t i = 0; i < 4; ++i) {
     // Vertices on the top plane.
@@ -157,9 +168,9 @@ CesiumGeometry::CullingResult S2CellBoundingVolume::intersectPlane(
     const CesiumGeometry::Plane& plane) const noexcept {
   size_t plusCount = 0;
   size_t negCount = 0;
-  for (size_t i = 0; i < this->_vertices.size(); ++i) {
+  for (const auto& vertex : this->_vertices) {
     double distanceToPlane =
-        glm::dot(plane.getNormal(), this->_vertices[i]) + plane.getDistance();
+        glm::dot(plane.getNormal(), vertex) + plane.getDistance();
     if (distanceToPlane < 0.0) {
       ++negCount;
     } else {
@@ -169,7 +180,8 @@ CesiumGeometry::CullingResult S2CellBoundingVolume::intersectPlane(
 
   if (plusCount == this->_vertices.size()) {
     return CullingResult::Inside;
-  } else if (negCount == this->_vertices.size()) {
+  }
+  if (negCount == this->_vertices.size()) {
     return CullingResult::Outside;
   }
   return CullingResult::Intersecting;
@@ -323,7 +335,7 @@ glm::dvec3 closestPointPolygon(
 double S2CellBoundingVolume::computeDistanceSquaredToPosition(
     const glm::dvec3& position) const noexcept {
   size_t numSelectedPlanes = 0;
-  std::array<size_t, 6> selectedPlaneIndices;
+  std::array<size_t, 6> selectedPlaneIndices{};
 
   if (this->_boundingPlanes[0].getPointDistance(position) > 0.0) {
     selectedPlaneIndices[numSelectedPlanes++] = 0;
@@ -359,7 +371,8 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
         edgeNormals);
 
     return glm::distance2(facePoint, position);
-  } else if (numSelectedPlanes == 2) {
+  }
+  if (numSelectedPlanes == 2) {
     // Handles Case II
     // Since we are on the ellipsoid, the dihedral angle between a top plane and
     // a side plane will always be acute, so we can do a faster check there.
@@ -392,7 +405,8 @@ double S2CellBoundingVolume::computeDistanceSquaredToPosition(
       }
     }
     return minimumDistanceSquared;
-  } else if (numSelectedPlanes > 3) {
+  }
+  if (numSelectedPlanes > 3) {
     // Handles Case IV
     std::array<glm::dvec3, 4> vertices = getPlaneVertices(this->_vertices, 1);
     glm::dvec3 facePoint = closestPointPolygon(

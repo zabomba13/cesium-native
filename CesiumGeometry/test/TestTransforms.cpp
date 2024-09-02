@@ -1,9 +1,8 @@
 #include "CesiumGeometry/Transforms.h"
 
-#include <CesiumUtility/Math.h>
-
-#include <catch2/catch.hpp>
-#include <glm/mat4x4.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double4.hpp>
 
 TEST_CASE("Transforms convert the axes correctly") {
 

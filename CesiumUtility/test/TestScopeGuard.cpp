@@ -1,10 +1,12 @@
 #include <CesiumUtility/ScopeGuard.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <utility>
 
 namespace {
 struct ExitFunctor {
-  void operator()() { ++(*check); }
+  void operator()() const { ++(*check); }
 
   int* check{nullptr};
 };

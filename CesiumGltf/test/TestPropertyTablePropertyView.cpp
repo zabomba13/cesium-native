@@ -1,12 +1,37 @@
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTableProperty.h"
 #include "CesiumGltf/PropertyTablePropertyView.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyTypeTraits.h"
+#include "CesiumUtility/JsonValue.h"
 
 #include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_int2.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
 #include <gsl/span>
 
 #include <bitset>
 #include <climits>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <optional>
+#include <string_view>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -576,7 +601,7 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
   }
 
   SECTION("Float") {
-    std::vector<float> data{12.3333f, -12.44555f, -5.6111f, 6.7421f};
+    std::vector<float> data{12.3333F, -12.44555F, -5.6111F, 6.7421F};
     checkNumeric(data);
   }
 
@@ -590,10 +615,10 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
   }
 
   SECTION("Float with Offset / Scale") {
-    std::vector<float> values{12.5f, -12.5f, -5.0f, 6.75f};
-    const float offset = 1.0f;
-    const float scale = 2.0f;
-    std::vector<std::optional<float>> expected{26.0f, -24.0f, -9.0f, 14.5f};
+    std::vector<float> values{12.5F, -12.5F, -5.0F, 6.75F};
+    const float offset = 1.0F;
+    const float scale = 2.0F;
+    std::vector<std::optional<float>> expected{26.0F, -24.0F, -9.0F, 14.5F};
     checkNumeric(values, expected, offset, scale);
   }
 
@@ -633,7 +658,7 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
   }
 
   SECTION("Overrides class property values") {
-    std::vector<float> values{1.0f, 3.0f, 2.0f, 4.0f};
+    std::vector<float> values{1.0F, 3.0F, 2.0F, 4.0F};
     std::vector<std::byte> data;
     data.resize(values.size() * sizeof(float));
     std::memcpy(data.data(), values.data(), data.size());
@@ -641,16 +666,16 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
     ClassProperty classProperty;
     classProperty.type = ClassProperty::Type::SCALAR;
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
-    classProperty.offset = 0.0f;
-    classProperty.scale = 1.0f;
-    classProperty.min = 1.0f;
-    classProperty.max = 4.0f;
+    classProperty.offset = 0.0F;
+    classProperty.scale = 1.0F;
+    classProperty.min = 1.0F;
+    classProperty.max = 4.0F;
 
     PropertyTableProperty propertyTableProperty;
-    propertyTableProperty.offset = 1.0f;
-    propertyTableProperty.scale = 2.0f;
-    propertyTableProperty.min = 3.0f;
-    propertyTableProperty.max = 9.0f;
+    propertyTableProperty.offset = 1.0F;
+    propertyTableProperty.scale = 2.0F;
+    propertyTableProperty.min = 3.0F;
+    propertyTableProperty.max = 9.0F;
 
     PropertyTablePropertyView<float> property(
         propertyTableProperty,
@@ -658,12 +683,12 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
         static_cast<int64_t>(values.size()),
         gsl::span<const std::byte>(data.data(), data.size()));
 
-    REQUIRE(property.offset() == 1.0f);
-    REQUIRE(property.scale() == 2.0f);
-    REQUIRE(property.min() == 3.0f);
-    REQUIRE(property.max() == 9.0f);
+    REQUIRE(property.offset() == 1.0F);
+    REQUIRE(property.scale() == 2.0F);
+    REQUIRE(property.min() == 3.0F);
+    REQUIRE(property.max() == 9.0F);
 
-    std::vector<float> expected{3.0, 7.0f, 5.0f, 9.0f};
+    std::vector<float> expected{3.0, 7.0F, 5.0F, 9.0F};
     for (int64_t i = 0; i < property.size(); ++i) {
       REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
       REQUIRE(property.get(i) == Approx(expected[static_cast<size_t>(i)]));
@@ -728,10 +753,10 @@ TEST_CASE("Check scalar PropertyTablePropertyView (normalized)") {
 TEST_CASE("Check vecN PropertyTablePropertyView") {
   SECTION("Float Vec2") {
     std::vector<glm::vec2> data{
-        glm::vec2(10.001f, 0.005f),
-        glm::vec2(-20.8f, 50.0f),
-        glm::vec2(99.9f, -9.9f),
-        glm::vec2(-64.456f, 12.01f)};
+        glm::vec2(10.001F, 0.005F),
+        glm::vec2(-20.8F, 50.0F),
+        glm::vec2(99.9F, -9.9F),
+        glm::vec2(-64.456F, 12.01F)};
     checkNumeric(data);
   }
 
@@ -755,16 +780,16 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
 
   SECTION("Float Vec3 with Offset / Scale") {
     std::vector<glm::vec3> values{
-        glm::vec3(0.0f, -1.5f, -5.0f),
-        glm::vec3(6.5f, 2.0f, 4.0f),
-        glm::vec3(8.0f, -3.0f, 1.0f),
+        glm::vec3(0.0F, -1.5F, -5.0F),
+        glm::vec3(6.5F, 2.0F, 4.0F),
+        glm::vec3(8.0F, -3.0F, 1.0F),
     };
-    JsonValue::Array offset{1.0f, 2.0f, 3.0f};
-    JsonValue::Array scale{2.0f, 1.0f, 2.0f};
+    JsonValue::Array offset{1.0F, 2.0F, 3.0F};
+    JsonValue::Array scale{2.0F, 1.0F, 2.0F};
     std::vector<std::optional<glm::vec3>> expected{
-        glm::vec3(1.0f, 0.5f, -7.0f),
-        glm::vec3(14.0f, 4.0f, 11.0f),
-        glm::vec3(17.0f, -1.0f, 5.0f),
+        glm::vec3(1.0F, 0.5F, -7.0F),
+        glm::vec3(14.0F, 4.0F, 11.0F),
+        glm::vec3(17.0F, -1.0F, 5.0F),
     };
     checkNumeric(values, expected, offset, scale);
   }
@@ -810,9 +835,9 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
 
   SECTION("Overrides class property values") {
     std::vector<glm::vec2> values{
-        glm::vec2(1.0f, 3.0f),
-        glm::vec2(2.5f, 2.5f),
-        glm::vec2(2.0f, 4.0f)};
+        glm::vec2(1.0F, 3.0F),
+        glm::vec2(2.5F, 2.5F),
+        glm::vec2(2.0F, 4.0F)};
     std::vector<std::byte> data;
     data.resize(values.size() * sizeof(glm::vec2));
     std::memcpy(data.data(), values.data(), data.size());
@@ -820,16 +845,16 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
     ClassProperty classProperty;
     classProperty.type = ClassProperty::Type::VEC2;
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
-    classProperty.offset = {0.0f, 0.0f};
-    classProperty.scale = {1.0f, 1.0f};
-    classProperty.min = {1.0f, 2.5f};
-    classProperty.max = {2.5f, 4.0f};
+    classProperty.offset = {0.0F, 0.0F};
+    classProperty.scale = {1.0F, 1.0F};
+    classProperty.min = {1.0F, 2.5F};
+    classProperty.max = {2.5F, 4.0F};
 
     PropertyTableProperty propertyTableProperty;
-    propertyTableProperty.offset = {1.0f, 0.5f};
-    propertyTableProperty.scale = {2.0f, 1.0f};
-    propertyTableProperty.min = {3.0f, 3.0f};
-    propertyTableProperty.max = {6.0f, 4.5f};
+    propertyTableProperty.offset = {1.0F, 0.5F};
+    propertyTableProperty.scale = {2.0F, 1.0F};
+    propertyTableProperty.min = {3.0F, 3.0F};
+    propertyTableProperty.max = {6.0F, 4.5F};
 
     PropertyTablePropertyView<glm::vec2> property(
         propertyTableProperty,
@@ -837,15 +862,15 @@ TEST_CASE("Check vecN PropertyTablePropertyView") {
         static_cast<int64_t>(values.size()),
         gsl::span<const std::byte>(data.data(), data.size()));
 
-    REQUIRE(property.offset() == glm::vec2(1.0f, 0.5f));
-    REQUIRE(property.scale() == glm::vec2(2.0f, 1.0f));
-    REQUIRE(property.min() == glm::vec2(3.0f, 3.0f));
-    REQUIRE(property.max() == glm::vec2(6.0f, 4.5f));
+    REQUIRE(property.offset() == glm::vec2(1.0F, 0.5F));
+    REQUIRE(property.scale() == glm::vec2(2.0F, 1.0F));
+    REQUIRE(property.min() == glm::vec2(3.0F, 3.0F));
+    REQUIRE(property.max() == glm::vec2(6.0F, 4.5F));
 
     std::vector<glm::vec2> expected{
-        glm::vec2(3.0f, 3.5f),
-        glm::vec2(6.0f, 3.0f),
-        glm::vec2(5.0f, 4.5f)};
+        glm::vec2(3.0F, 3.5F),
+        glm::vec2(6.0F, 3.0F),
+        glm::vec2(5.0F, 4.5F)};
     for (int64_t i = 0; i < property.size(); ++i) {
       REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
       REQUIRE(property.get(i) == expected[static_cast<size_t>(i)]);
@@ -923,14 +948,14 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
     // clang-format off
     std::vector<glm::mat2> data{
         glm::mat2(
-          1.0f,  2.0f,
-          3.0f,  4.0f),
+          1.0F,  2.0F,
+          3.0F,  4.0F),
         glm::mat2(
-          -10.0f, 40.0f,
-           0.08f,  5.4f),
+          -10.0F, 40.0F,
+           0.08F,  5.4F),
         glm::mat2(
-          9.99f, -2.0f,
-          -0.4f, 0.23f)
+          9.99F, -2.0F,
+          -0.4F, 0.23F)
     };
     // clang-format on
     checkNumeric(data);
@@ -983,31 +1008,31 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
     // clang-format off
     std::vector<glm::mat2> values{
         glm::mat2(
-          1.0f, 3.0f,
-          4.0f, 2.0f),
+          1.0F, 3.0F,
+          4.0F, 2.0F),
         glm::mat2(
-          6.5f, 2.0f,
-          -2.0f, 0.0f),
+          6.5F, 2.0F,
+          -2.0F, 0.0F),
         glm::mat2(
-          8.0f, -1.0f,
-          -3.0f, 1.0f),
+          8.0F, -1.0F,
+          -3.0F, 1.0F),
     };
     JsonValue::Array offset{
-      1.0f, 2.0f,
-      3.0f, 1.0f};
+      1.0F, 2.0F,
+      3.0F, 1.0F};
     JsonValue::Array scale {
-      2.0f, 0.0f,
-      0.0f, 2.0f};
+      2.0F, 0.0F,
+      0.0F, 2.0F};
     std::vector<std::optional<glm::mat2>> expected{
         glm::mat2(
-          3.0f, 2.0f,
-          3.0f, 5.0f),
+          3.0F, 2.0F,
+          3.0F, 5.0F),
         glm::mat2(
-          14.0f, 2.0f,
-          3.0f, 1.0f),
+          14.0F, 2.0F,
+          3.0F, 1.0F),
         glm::mat2(
-          17.0f, 2.0f,
-          3.0f, 3.0f),
+          17.0F, 2.0F,
+          3.0F, 3.0F),
     };
     // clang-format on
     checkNumeric(values, expected, offset, scale);
@@ -1086,9 +1111,9 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
   SECTION("Overrides class property values") {
     // clang-fomrat off
     std::vector<glm::mat2> values{
-        glm::mat2(1.0f),
-        glm::mat2(2.5f, 1.0f, 1.0f, 2.5f),
-        glm::mat2(3.0f)};
+        glm::mat2(1.0F),
+        glm::mat2(2.5F, 1.0F, 1.0F, 2.5F),
+        glm::mat2(3.0F)};
     // clang-format on
     std::vector<std::byte> data;
     data.resize(values.size() * sizeof(glm::mat2));
@@ -1099,33 +1124,33 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
     classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
     // clang-format off
     classProperty.offset = {
-      0.0f, 0.0f,
-      0.0f, 0.0f};
+      0.0F, 0.0F,
+      0.0F, 0.0F};
     classProperty.scale = {
-      1.0f, 1.0f,
-      1.0f, 1.0f};
+      1.0F, 1.0F,
+      1.0F, 1.0F};
     classProperty.min = {
-      1.0f, 0.0f,
-      0.0f, 1.0f};
+      1.0F, 0.0F,
+      0.0F, 1.0F};
     classProperty.max = {
-      3.0f, 0.0f,
-      0.0f, 3.0f};
+      3.0F, 0.0F,
+      0.0F, 3.0F};
     // clang-format on
 
     PropertyTableProperty propertyTableProperty;
     // clang-format off
     propertyTableProperty.offset = {
-      1.0f, 0.5f,
-      0.5f, 1.0f};
+      1.0F, 0.5F,
+      0.5F, 1.0F};
     propertyTableProperty.scale = {
-      2.0f, 1.0f,
-      0.0f, 1.0f};
+      2.0F, 1.0F,
+      0.0F, 1.0F};
     propertyTableProperty.min = {
-      3.0f, 0.5f,
-      0.5f, 2.0f};
+      3.0F, 0.5F,
+      0.5F, 2.0F};
     propertyTableProperty.max = {
-      7.0f, 1.5f,
-      0.5f, 4.0f};
+      7.0F, 1.5F,
+      0.5F, 4.0F};
     // clang-format on
 
     PropertyTablePropertyView<glm::mat2> property(
@@ -1136,28 +1161,28 @@ TEST_CASE("Check matN PropertyTablePropertyView") {
 
     // clang-format off
     REQUIRE(property.offset() == glm::mat2(
-      1.0f, 0.5f,
-      0.5f, 1.0f));
+      1.0F, 0.5F,
+      0.5F, 1.0F));
     REQUIRE(property.scale() == glm::mat2(
-      2.0f, 1.0f,
-      0.0f, 1.0f));
+      2.0F, 1.0F,
+      0.0F, 1.0F));
     REQUIRE(property.min() == glm::mat2(
-      3.0f, 0.5f,
-      0.5f, 2.0f));
+      3.0F, 0.5F,
+      0.5F, 2.0F));
     REQUIRE(property.max() == glm::mat2(
-      7.0f, 1.5f,
-      0.5f, 4.0f));
+      7.0F, 1.5F,
+      0.5F, 4.0F));
 
     std::vector<glm::mat2> expected{
         glm::mat2(
-          3.0f, 0.5f,
-          0.5f, 2.0f),
+          3.0F, 0.5F,
+          0.5F, 2.0F),
         glm::mat2(
-          6.0f, 1.5f,
-          0.5f, 3.5f),
+          6.0F, 1.5F,
+          0.5F, 3.5F),
         glm::mat2(
-          7.0f, 0.5f,
-          0.5f, 4.0f)};
+          7.0F, 0.5F,
+          0.5F, 4.0F)};
     // clang-format on
     for (int64_t i = 0; i < property.size(); ++i) {
       REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
@@ -1312,12 +1337,9 @@ TEST_CASE("Check string PropertyTablePropertyView") {
   uint32_t currentOffset = 0;
   std::vector<std::byte> buffer;
   buffer.resize(totalSize);
-  for (size_t i = 0; i < strings.size(); ++i) {
-    std::memcpy(
-        buffer.data() + currentOffset,
-        strings[i].data(),
-        strings[i].size());
-    currentOffset += static_cast<uint32_t>(strings[i].size());
+  for (const auto& string : strings) {
+    std::memcpy(buffer.data() + currentOffset, string.data(), string.size());
+    currentOffset += static_cast<uint32_t>(string.size());
   }
 
   // copy offset to buffer
@@ -1486,8 +1508,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
   SECTION("Array of 4 floats") {
     // clang-format off
     std::vector<float> data{
-        10.022f, -12.43f, 242.2f, 1.111f,
-        3.333f, 440000.1f, -33.3f, 14.55f};
+        10.022F, -12.43F, 242.2F, 1.111F,
+        3.333F, 440000.1F, -33.3F, 14.55F};
     // clang-format on
     checkFixedLengthArray(data, 4);
   }
@@ -1513,17 +1535,17 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
   SECTION("Array of 4 floats with offset / scale") {
     // clang-format off
     std::vector<float> data{
-      1.0f, 2.0f, 3.0f, 4.0f,
-      5.0f, -1.0f, 0.0f, 2.0f
+      1.0F, 2.0F, 3.0F, 4.0F,
+      5.0F, -1.0F, 0.0F, 2.0F
     };
     // clang-format on
 
-    JsonValue::Array offset{1.0f, 0.0f, -1.0f, 0.0f};
-    JsonValue::Array scale{1.0f, 2.0f, 1.0f, 2.0f};
+    JsonValue::Array offset{1.0F, 0.0F, -1.0F, 0.0F};
+    JsonValue::Array scale{1.0F, 2.0F, 1.0F, 2.0F};
 
     std::vector<std::optional<std::vector<float>>> expected{
-        std::vector<float>{2.0f, 4.0f, 2.0f, 8.0f},
-        std::vector<float>{6.0f, -2.0f, -1.0f, 4.0f}};
+        std::vector<float>{2.0F, 4.0F, 2.0F, 8.0F},
+        std::vector<float>{6.0F, -2.0F, -1.0F, 4.0F}};
     checkFixedLengthArray(data, 4, expected, offset, scale);
   }
 
@@ -1575,8 +1597,8 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
   SECTION("Overrides class property values") {
     // clang-format off
     std::vector<float> data{
-        1.0f, 2.0f, 3.0f, 4.0f,
-        0.0f, -1.0f, 1.0f, -2.0f};
+        1.0F, 2.0F, 3.0F, 4.0F,
+        0.0F, -1.0F, 1.0F, -2.0F};
     // clang-format on
     const int64_t count = 4;
     const int64_t instanceCount = 2;
@@ -1593,14 +1615,14 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
     classProperty.count = count;
     classProperty.offset = {0, 0, 0, 0};
     classProperty.scale = {1, 1, 1, 1};
-    classProperty.min = {0.0f, -1.0f, 1.0f, -2.0f};
-    classProperty.max = {1.0f, 2.0f, 3.0f, 4.0f};
+    classProperty.min = {0.0F, -1.0F, 1.0F, -2.0F};
+    classProperty.max = {1.0F, 2.0F, 3.0F, 4.0F};
 
     PropertyTableProperty propertyTableProperty;
     propertyTableProperty.offset = {2, 1, 0, -1};
     propertyTableProperty.scale = {1, 0, 1, -1};
-    propertyTableProperty.min = {0.0f, 1.0f, 1.0f, -2.0f};
-    propertyTableProperty.max = {1.0f, 1.0f, 3.0f, 4.0f};
+    propertyTableProperty.min = {0.0F, 1.0F, 1.0F, -2.0F};
+    propertyTableProperty.max = {1.0F, 1.0F, 3.0F, 4.0F};
 
     PropertyTablePropertyView<PropertyArrayView<float>> property(
         propertyTableProperty,
@@ -1622,14 +1644,14 @@ TEST_CASE("Check fixed-length scalar array PropertyTablePropertyView") {
     checkArrayEqual(*property.scale(), {1, 0, 1, -1});
 
     REQUIRE(property.min());
-    checkArrayEqual(*property.min(), {0.0f, 1.0f, 1.0f, -2.0f});
+    checkArrayEqual(*property.min(), {0.0F, 1.0F, 1.0F, -2.0F});
 
     REQUIRE(property.max());
-    checkArrayEqual(*property.max(), {1.0f, 1.0f, 3.0f, 4.0f});
+    checkArrayEqual(*property.max(), {1.0F, 1.0F, 3.0F, 4.0F});
 
     std::vector<std::vector<float>> expected{
-        {3.0f, 1.0, 3.0f, -5.0f},
-        {2.0f, 1.0f, 1.0f, 1.0f}};
+        {3.0F, 1.0, 3.0F, -5.0F},
+        {2.0F, 1.0F, 1.0F, 1.0F}};
     size_t expectedIdx = 0;
     for (int64_t i = 0; i < property.size(); ++i) {
       PropertyArrayView<float> rawValues = property.getRaw(i);
@@ -1715,29 +1737,29 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
 
   SECTION("Array of 3 vec4s") {
     std::vector<glm::vec4> data{
-        glm::vec4(40.2f, -1.2f, 8.8f, 1.0f),
-        glm::vec4(1.4f, 0.11, 34.0f, 0.0f),
-        glm::vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        glm::vec4(1.0f, 2.0f, 3.0f, 6.0f),
-        glm::vec4(1.08f, -3.71f, 18.0f, -7.0f),
-        glm::vec4(-17.0f, 33.0f, 8.0f, -3.0f)};
+        glm::vec4(40.2F, -1.2F, 8.8F, 1.0F),
+        glm::vec4(1.4F, 0.11, 34.0F, 0.0F),
+        glm::vec4(0.0F, 0.0F, 0.0F, 1.0F),
+        glm::vec4(1.0F, 2.0F, 3.0F, 6.0F),
+        glm::vec4(1.08F, -3.71F, 18.0F, -7.0F),
+        glm::vec4(-17.0F, 33.0F, 8.0F, -3.0F)};
     checkFixedLengthArray(data, 3);
   }
 
   SECTION("Array of 2 vec2s with offset / scale") {
     // clang-format off
     std::vector<glm::vec2> data{
-      glm::vec2(1.0f, 2.0f), glm::vec2(3.0f, 4.0f),
-      glm::vec2(5.0f, -1.0f), glm::vec2(0.0f, 2.0f)
+      glm::vec2(1.0F, 2.0F), glm::vec2(3.0F, 4.0F),
+      glm::vec2(5.0F, -1.0F), glm::vec2(0.0F, 2.0F)
     };
     // clang-format on
 
-    JsonValue::Array offset{{1.0f, 0.0f}, {-1.0f, 0.0f}};
-    JsonValue::Array scale{{1.0f, 2.0f}, {1.0f, 2.0f}};
+    JsonValue::Array offset{{1.0F, 0.0F}, {-1.0F, 0.0F}};
+    JsonValue::Array scale{{1.0F, 2.0F}, {1.0F, 2.0F}};
 
     std::vector<std::optional<std::vector<glm::vec2>>> expected{
-        std::vector<glm::vec2>{glm::vec2(2.0f, 4.0f), glm::vec2(2.0f, 8.0f)},
-        std::vector<glm::vec2>{glm::vec2(6.0f, -2.0f), glm::vec2(-1.0f, 4.0f)}};
+        std::vector<glm::vec2>{glm::vec2(2.0F, 4.0F), glm::vec2(2.0F, 8.0F)},
+        std::vector<glm::vec2>{glm::vec2(6.0F, -2.0F), glm::vec2(-1.0F, 4.0F)}};
     checkFixedLengthArray(data, 2, expected, offset, scale);
   }
 
@@ -1789,8 +1811,8 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
   SECTION("Overrides class property values") {
     // clang-format off
     std::vector<glm::vec2> data{
-        glm::vec2(1.0f, 2.0f), glm::vec2(3.0f, 4.0f),
-        glm::vec2(0.0f, -1.0f), glm::vec2(1.0f, -2.0f)};
+        glm::vec2(1.0F, 2.0F), glm::vec2(3.0F, 4.0F),
+        glm::vec2(0.0F, -1.0F), glm::vec2(1.0F, -2.0F)};
     // clang-format on
     const int64_t count = 2;
     const int64_t instanceCount = 2;
@@ -1807,14 +1829,14 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
     classProperty.count = count;
     classProperty.offset = JsonValue::Array{{0, 0}, {0, 0}};
     classProperty.scale = JsonValue::Array{{1, 1}, {1, 1}};
-    classProperty.min = JsonValue::Array{{0.0f, -1.0f}, {1.0f, -2.0f}};
-    classProperty.max = JsonValue::Array{{1.0f, 2.0f}, {3.0f, 4.0f}};
+    classProperty.min = JsonValue::Array{{0.0F, -1.0F}, {1.0F, -2.0F}};
+    classProperty.max = JsonValue::Array{{1.0F, 2.0F}, {3.0F, 4.0F}};
 
     PropertyTableProperty propertyTableProperty;
     propertyTableProperty.offset = JsonValue::Array{{2, 1}, {0, -1}};
     propertyTableProperty.scale = JsonValue::Array{{1, 0}, {1, -1}};
-    propertyTableProperty.min = JsonValue::Array{{0.0f, 1.0f}, {1.0f, -2.0f}};
-    propertyTableProperty.max = JsonValue::Array{{1.0f, 1.0f}, {3.0f, 4.0f}};
+    propertyTableProperty.min = JsonValue::Array{{0.0F, 1.0F}, {1.0F, -2.0F}};
+    propertyTableProperty.max = JsonValue::Array{{1.0F, 1.0F}, {3.0F, 4.0F}};
 
     PropertyTablePropertyView<PropertyArrayView<glm::vec2>> property(
         propertyTableProperty,
@@ -1838,16 +1860,16 @@ TEST_CASE("Check fixed-length vecN array PropertyTablePropertyView") {
     REQUIRE(property.min());
     checkArrayEqual(
         *property.min(),
-        {glm::vec2{0.0f, 1.0f}, glm::vec2{1.0f, -2.0f}});
+        {glm::vec2{0.0F, 1.0F}, glm::vec2{1.0F, -2.0F}});
 
     REQUIRE(property.max());
     checkArrayEqual(
         *property.max(),
-        {glm::vec2(1.0f, 1.0f), glm::vec2(3.0f, 4.0f)});
+        {glm::vec2(1.0F, 1.0F), glm::vec2(3.0F, 4.0F)});
 
     std::vector<std::vector<glm::vec2>> expected{
-        {glm::vec2(3.0f, 1.0f), glm::vec2(3.0f, -5.0f)},
-        {glm::vec2(2.0f, 1.0f), glm::vec2(1.0f, 1.0f)}};
+        {glm::vec2(3.0F, 1.0F), glm::vec2(3.0F, -5.0F)},
+        {glm::vec2(2.0F, 1.0F), glm::vec2(1.0F, 1.0F)}};
     size_t expectedIdx = 0;
     for (int64_t i = 0; i < property.size(); ++i) {
       PropertyArrayView<glm::vec2> rawValues = property.getRaw(i);
@@ -1914,8 +1936,8 @@ TEST_CASE(
   SECTION("Overrides class property values") {
     // clang-format off
     std::vector<glm::vec2> data{
-        glm::vec2(1.0f, 2.0f), glm::vec2(3.0f, 4.0f),
-        glm::vec2(0.0f, -1.0f), glm::vec2(1.0f, -2.0f)};
+        glm::vec2(1.0F, 2.0F), glm::vec2(3.0F, 4.0F),
+        glm::vec2(0.0F, -1.0F), glm::vec2(1.0F, -2.0F)};
     // clang-format on
     const int64_t count = 2;
     const int64_t instanceCount = 2;
@@ -1932,14 +1954,14 @@ TEST_CASE(
     classProperty.count = count;
     classProperty.offset = JsonValue::Array{{0, 0}, {0, 0}};
     classProperty.scale = JsonValue::Array{{1, 1}, {1, 1}};
-    classProperty.min = JsonValue::Array{{0.0f, -1.0f}, {1.0f, -2.0f}};
-    classProperty.max = JsonValue::Array{{1.0f, 2.0f}, {3.0f, 4.0f}};
+    classProperty.min = JsonValue::Array{{0.0F, -1.0F}, {1.0F, -2.0F}};
+    classProperty.max = JsonValue::Array{{1.0F, 2.0F}, {3.0F, 4.0F}};
 
     PropertyTableProperty propertyTableProperty;
     propertyTableProperty.offset = JsonValue::Array{{2, 1}, {0, -1}};
     propertyTableProperty.scale = JsonValue::Array{{1, 0}, {1, -1}};
-    propertyTableProperty.min = JsonValue::Array{{0.0f, 1.0f}, {1.0f, -2.0f}};
-    propertyTableProperty.max = JsonValue::Array{{1.0f, 1.0f}, {3.0f, 4.0f}};
+    propertyTableProperty.min = JsonValue::Array{{0.0F, 1.0F}, {1.0F, -2.0F}};
+    propertyTableProperty.max = JsonValue::Array{{1.0F, 1.0F}, {3.0F, 4.0F}};
 
     PropertyTablePropertyView<PropertyArrayView<glm::vec2>> property(
         propertyTableProperty,
@@ -1963,16 +1985,16 @@ TEST_CASE(
     REQUIRE(property.min());
     checkArrayEqual(
         *property.min(),
-        {glm::vec2{0.0f, 1.0f}, glm::vec2{1.0f, -2.0f}});
+        {glm::vec2{0.0F, 1.0F}, glm::vec2{1.0F, -2.0F}});
 
     REQUIRE(property.max());
     checkArrayEqual(
         *property.max(),
-        {glm::vec2(1.0f, 1.0f), glm::vec2(3.0f, 4.0f)});
+        {glm::vec2(1.0F, 1.0F), glm::vec2(3.0F, 4.0F)});
 
     std::vector<std::vector<glm::vec2>> expected{
-        {glm::vec2(3.0f, 1.0f), glm::vec2(3.0f, -5.0f)},
-        {glm::vec2(2.0f, 1.0f), glm::vec2(1.0f, 1.0f)}};
+        {glm::vec2(3.0F, 1.0F), glm::vec2(3.0F, -5.0F)},
+        {glm::vec2(2.0F, 1.0F), glm::vec2(1.0F, 1.0F)}};
     size_t expectedIdx = 0;
     for (int64_t i = 0; i < property.size(); ++i) {
       PropertyArrayView<glm::vec2> rawValues = property.getRaw(i);
@@ -2093,44 +2115,44 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
     // clang-format off
     std::vector<glm::mat2> data{
       glm::mat2(
-        1.0f, 2.0f,
-        3.0f, 4.0f),
+        1.0F, 2.0F,
+        3.0F, 4.0F),
       glm::mat2(
-        5.0f, -1.0f,
-        0.0f, 2.0f),
+        5.0F, -1.0F,
+        0.0F, 2.0F),
       glm::mat2(
-        -1.0f, -1.0f,
-        0.0f, -2.0f),
+        -1.0F, -1.0F,
+        0.0F, -2.0F),
       glm::mat2(
-        0.0f, -2.0f,
-        4.0f, 3.0f)};
+        0.0F, -2.0F,
+        4.0F, 3.0F)};
 
     JsonValue::Array offset{
-      {1.0f, 0.0f,
-       2.0f, 3.0f},
-      {-1.0f, 0.0f,
-        0.0f, 2.0f}};
+      {1.0F, 0.0F,
+       2.0F, 3.0F},
+      {-1.0F, 0.0F,
+        0.0F, 2.0F}};
     JsonValue::Array scale{
-      {1.0f, 2.0f,
-       1.0f, 0.0f},
-      {1.0f, -1.0f,
-      -1.0f, 2.0f}};
+      {1.0F, 2.0F,
+       1.0F, 0.0F},
+      {1.0F, -1.0F,
+      -1.0F, 2.0F}};
 
     std::vector<std::optional<std::vector<glm::mat2>>> expected{
       std::vector<glm::mat2>{
         glm::mat2(
-          2.0f, 4.0f,
-          5.0f, 3.0f),
+          2.0F, 4.0F,
+          5.0F, 3.0F),
         glm::mat2(
-          4.0f, 1.0f,
-          0.0f, 6.0f)},
+          4.0F, 1.0F,
+          0.0F, 6.0F)},
       std::vector<glm::mat2>{
         glm::mat2(
-          0.0f, -2.0f,
-          2.0f, 3.0f),
+          0.0F, -2.0F,
+          2.0F, 3.0F),
         glm::mat2(
-          -1.0f, 2.0f,
-          -4.0f, 8.0f)}};
+          -1.0F, 2.0F,
+          -4.0F, 8.0F)}};
     // clang-format on
     checkFixedLengthArray(data, 2, expected, offset, scale);
   }
@@ -2237,10 +2259,10 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
   SECTION("Overrides class property values") {
     // clang-format off
     std::vector<glm::mat2> data{
-        glm::mat2(1.0f),
-        glm::mat2(2.0f),
-        glm::mat2(3.0f),
-        glm::mat2(4.0f)};
+        glm::mat2(1.0F),
+        glm::mat2(2.0F),
+        glm::mat2(3.0F),
+        glm::mat2(4.0F)};
     // clang-format on
     const int64_t count = 2;
     const int64_t instanceCount = 2;
@@ -2267,15 +2289,15 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
       {1, 1,
        1, 1}};
     classProperty.min = JsonValue::Array{
-      {1.0f, 0.0f,
-       0.0f, 1.0f},
-      {2.0f, 0.0f,
-       0.0f, 2.0f}};
+      {1.0F, 0.0F,
+       0.0F, 1.0F},
+      {2.0F, 0.0F,
+       0.0F, 2.0F}};
     classProperty.max = JsonValue::Array{
-      {3.0f, 0.0f,
-       0.0f, 3.0f},
-      {4.0f, 0.0f,
-       0.0f, 4.0f}};
+      {3.0F, 0.0F,
+       0.0F, 3.0F},
+      {4.0F, 0.0F,
+       0.0F, 4.0F}};
     // clang-format on
 
     PropertyTableProperty propertyTableProperty;
@@ -2291,15 +2313,15 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
       {1, -1,
        3, 2}};
     propertyTableProperty.min = JsonValue::Array{
-      {2.0f, 1.0f,
-      -1.0f, 0.0f},
-      {2.0f, -1.0f,
-      -4.0f, 4.0f}};
+      {2.0F, 1.0F,
+      -1.0F, 0.0F},
+      {2.0F, -1.0F,
+      -4.0F, 4.0F}};
     propertyTableProperty.max = JsonValue::Array{
-      {5.0f, 1.0f,
-      -1.0f, 4.0f},
-      {4.0f, -1.0f,
-       4.0f, 8.0f}};
+      {5.0F, 1.0F,
+      -1.0F, 4.0F},
+      {4.0F, -1.0F,
+       4.0F, 8.0F}};
     // clang-format on
 
     PropertyTablePropertyView<PropertyArrayView<glm::mat2>> property(
@@ -2337,34 +2359,34 @@ TEST_CASE("Check fixed-length matN array PropertyTablePropertyView") {
     REQUIRE(property.min());
     checkArrayEqual(*property.min(), {
       glm::mat2{
-        2.0f, 1.0f,
-        -1.0f, 0.0f},
+        2.0F, 1.0F,
+        -1.0F, 0.0F},
       glm::mat2{
-        2.0f, -1.0f,
-        -4.0f, 4.0f}});
+        2.0F, -1.0F,
+        -4.0F, 4.0F}});
 
     REQUIRE(property.max());
     checkArrayEqual( *property.max(), {
       glm::mat2(
-        5.0f, 1.0f,
-        -1.0f, 4.0f),
+        5.0F, 1.0F,
+        -1.0F, 4.0F),
       glm::mat2(
-        4.0f, -1.0f,
-        4.0f, 8.0f)});
+        4.0F, -1.0F,
+        4.0F, 8.0F)});
 
     std::vector<std::vector<glm::mat2>> expected{
       {glm::mat2(
-        3.0f, 1.0f,
-        -1.0f, 0.0f),
+        3.0F, 1.0F,
+        -1.0F, 0.0F),
        glm::mat2(
-        2.0f, -1.0f,
-        4.0f, 4.0f)},
+        2.0F, -1.0F,
+        4.0F, 4.0F)},
       {glm::mat2(
-        5.0f, 1.0f,
-        -1.0f, 4.0f),
+        5.0F, 1.0F,
+        -1.0F, 4.0F),
        glm::mat2(
-        4.0f, -1.0f,
-        4.0f, 8.0f)}};
+        4.0F, -1.0F,
+        4.0F, 8.0F)}};
     // clang-format on
     size_t expectedIdx = 0;
     for (int64_t i = 0; i < property.size(); ++i) {

@@ -1,9 +1,11 @@
 #include <CesiumGltf/ImageCesium.h>
 #include <CesiumGltfContent/ImageManipulation.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
+#include <cstddef>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace CesiumGltfContent;
@@ -150,13 +152,13 @@ TEST_CASE("ImageManipulation::blitImage") {
           source.bytesPerChannel),
       std::byte(2));
 
-  PixelRectangle sourceRect;
+  PixelRectangle sourceRect{};
   sourceRect.x = 1;
   sourceRect.y = 2;
   sourceRect.width = 3;
   sourceRect.height = 4;
 
-  PixelRectangle targetRect;
+  PixelRectangle targetRect{};
   targetRect.x = 6;
   targetRect.y = 5;
   targetRect.width = 3;
@@ -186,7 +188,7 @@ TEST_CASE("ImageManipulation::blitImage") {
   };
 
   auto verifySuccessfulCopy = [&target, &targetRect, &contains]() {
-    size_t bytesPerPixel = size_t(target.bytesPerChannel * target.channels);
+    auto bytesPerPixel = size_t(target.bytesPerChannel * target.channels);
 
     for (size_t j = 0; j < size_t(target.height); ++j) {
       for (size_t i = 0; i < size_t(target.width); ++i) {

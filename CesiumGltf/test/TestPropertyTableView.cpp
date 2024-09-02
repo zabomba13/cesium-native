@@ -1,9 +1,36 @@
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/PropertyTableProperty.h"
 #include "CesiumGltf/PropertyTablePropertyView.h"
 #include "CesiumGltf/PropertyTableView.h"
+#include "CesiumGltf/PropertyTransformations.h"
+#include "CesiumGltf/Schema.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/common.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_int2.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_uint2.hpp>
+#include <glm/ext/vector_uint3.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <optional>
+#include <string_view>
+#include <vector>
 
 using namespace CesiumGltf;
 
@@ -49,8 +76,7 @@ TEST_CASE("Test PropertyTableView on model without EXT_structural_metadata "
 TEST_CASE("Test PropertyTableView on model without metadata schema") {
   Model model;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
@@ -72,8 +98,7 @@ TEST_CASE("Test PropertyTableView on model without metadata schema") {
 TEST_CASE("Test property table with nonexistent class") {
   Model model;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -106,8 +131,7 @@ TEST_CASE("Test scalar PropertyTableProperty") {
   size_t valueBufferIndex = model.buffers.size() - 1;
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -257,8 +281,7 @@ TEST_CASE("Test scalar PropertyTableProperty (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -367,8 +390,7 @@ TEST_CASE("Test vecN PropertyTableProperty") {
   size_t valueBufferIndex = model.buffers.size() - 1;
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -537,8 +559,7 @@ TEST_CASE("Test vecN PropertyTableProperty (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -663,8 +684,7 @@ TEST_CASE("Test matN PropertyTableProperty") {
   size_t valueBufferIndex = model.buffers.size() - 1;
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -845,8 +865,7 @@ TEST_CASE("Test matN PropertyTableProperty (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -964,7 +983,7 @@ TEST_CASE("Test boolean PropertyTableProperty") {
       expected.emplace_back(false);
     }
 
-    uint8_t expectedValue = expected.back();
+    uint8_t expectedValue = static_cast<uint8_t>(expected.back());
     int64_t byteIndex = i / 8;
     int64_t bitIndex = i % 8;
     values[static_cast<size_t>(byteIndex)] = static_cast<uint8_t>(
@@ -972,8 +991,7 @@ TEST_CASE("Test boolean PropertyTableProperty") {
   }
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -982,7 +1000,7 @@ TEST_CASE("Test boolean PropertyTableProperty") {
 
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
-  propertyTable.count = static_cast<int64_t>(instanceCount);
+  propertyTable.count = instanceCount;
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -1036,7 +1054,7 @@ TEST_CASE("Test string PropertyTableProperty") {
   std::vector<std::byte> stringOffsets(
       (expected.size() + 1) * sizeof(uint32_t));
   std::vector<std::byte> values(totalBytes);
-  uint32_t* offsetValue = reinterpret_cast<uint32_t*>(stringOffsets.data());
+  auto* offsetValue = reinterpret_cast<uint32_t*>(stringOffsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     const std::string& expectedValue = expected[i];
     std::memcpy(
@@ -1055,8 +1073,7 @@ TEST_CASE("Test string PropertyTableProperty") {
   size_t offsetBufferIndex = model.buffers.size() - 1;
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1144,7 +1161,7 @@ TEST_CASE("Test string PropertyTableProperty") {
   }
 
   SECTION("Offset values are not sorted ascending") {
-    uint32_t* offset = reinterpret_cast<uint32_t*>(
+    auto* offset = reinterpret_cast<uint32_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[2] =
         static_cast<uint32_t>(model.buffers[valueBufferIndex].byteLength + 4);
@@ -1156,7 +1173,7 @@ TEST_CASE("Test string PropertyTableProperty") {
   }
 
   SECTION("Offset value points outside of value buffer") {
-    uint32_t* offset = reinterpret_cast<uint32_t*>(
+    auto* offset = reinterpret_cast<uint32_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] =
         static_cast<uint32_t>(model.buffers[valueBufferIndex].byteLength + 4);
@@ -1176,8 +1193,7 @@ TEST_CASE("Test fixed-length scalar array") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1305,8 +1321,7 @@ TEST_CASE("Test fixed-length scalar array (normalized)") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1416,7 +1431,7 @@ TEST_CASE("Test variable-length scalar array") {
 
   std::vector<std::byte> values(numOfElements * sizeof(uint16_t));
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     std::memcpy(
         values.data() + offsetValue[i] * sizeof(uint16_t),
@@ -1433,8 +1448,7 @@ TEST_CASE("Test variable-length scalar array") {
   size_t offsetBufferIndex = model.buffers.size() - 1;
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1538,7 +1552,7 @@ TEST_CASE("Test variable-length scalar array") {
   SECTION("Offset values are not sorted ascending") {
     propertyTableProperty.arrayOffsetType =
         PropertyTableProperty::ArrayOffsetType::UINT64;
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] = 0;
     PropertyTablePropertyView<PropertyArrayView<uint16_t>> arrayProperty =
@@ -1549,7 +1563,7 @@ TEST_CASE("Test variable-length scalar array") {
   }
 
   SECTION("Offset value points outside of value buffer") {
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] =
         static_cast<uint32_t>(model.buffers[valueBufferIndex].byteLength + 4);
@@ -1589,7 +1603,7 @@ TEST_CASE("Test variable-length scalar array (normalized)") {
 
   std::vector<std::byte> values(numOfElements * sizeof(uint16_t));
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     std::memcpy(
         values.data() + offsetValue[i] * sizeof(uint16_t),
@@ -1604,8 +1618,7 @@ TEST_CASE("Test variable-length scalar array (normalized)") {
   addBufferToModel(model, offsets);
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1685,8 +1698,7 @@ TEST_CASE("Test fixed-length vecN array") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1825,8 +1837,7 @@ TEST_CASE("Test fixed-length vecN array (normalized)") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -1945,7 +1956,7 @@ TEST_CASE("Test variable-length vecN array") {
 
   std::vector<std::byte> values(numOfElements * sizeof(glm::ivec3));
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     std::memcpy(
         values.data() + offsetValue[i] * sizeof(glm::ivec3),
@@ -1962,8 +1973,7 @@ TEST_CASE("Test variable-length vecN array") {
   size_t offsetBufferIndex = model.buffers.size() - 1;
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2066,7 +2076,7 @@ TEST_CASE("Test variable-length vecN array") {
   SECTION("Offset values are not sorted ascending") {
     propertyTableProperty.arrayOffsetType =
         PropertyTableProperty::ArrayOffsetType::UINT64;
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] = 0;
     PropertyTablePropertyView<PropertyArrayView<glm::ivec3>> arrayProperty =
@@ -2078,7 +2088,7 @@ TEST_CASE("Test variable-length vecN array") {
   }
 
   SECTION("Offset value points outside of value buffer") {
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] =
         static_cast<uint32_t>(model.buffers[valueBufferIndex].byteLength + 4);
@@ -2120,7 +2130,7 @@ TEST_CASE("Test variable-length vecN array (normalized)") {
 
   std::vector<std::byte> values(numOfElements * sizeof(glm::ivec3));
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     std::memcpy(
         values.data() + offsetValue[i] * sizeof(glm::ivec3),
@@ -2135,8 +2145,7 @@ TEST_CASE("Test variable-length vecN array (normalized)") {
   addBufferToModel(model, offsets);
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2229,8 +2238,7 @@ TEST_CASE("Test fixed-length matN array") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2380,8 +2388,7 @@ TEST_CASE("Test fixed-length matN array (normalized)") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2519,7 +2526,7 @@ TEST_CASE("Test variable-length matN array") {
 
   std::vector<std::byte> values(numOfElements * sizeof(glm::imat2x2));
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     std::memcpy(
         values.data() + offsetValue[i] * sizeof(glm::imat2x2),
@@ -2536,8 +2543,7 @@ TEST_CASE("Test variable-length matN array") {
   size_t offsetBufferIndex = model.buffers.size() - 1;
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2640,7 +2646,7 @@ TEST_CASE("Test variable-length matN array") {
   SECTION("Offset values are not sorted ascending") {
     propertyTableProperty.arrayOffsetType =
         PropertyTableProperty::ArrayOffsetType::UINT64;
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] = 0;
     PropertyTablePropertyView<PropertyArrayView<glm::imat2x2>> arrayProperty =
@@ -2652,7 +2658,7 @@ TEST_CASE("Test variable-length matN array") {
   }
 
   SECTION("Offset value points outside of value buffer") {
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] =
         static_cast<uint32_t>(model.buffers[valueBufferIndex].byteLength + 4);
@@ -2713,7 +2719,7 @@ TEST_CASE("Test variable-length matN array (normalized)") {
 
   std::vector<std::byte> values(numOfElements * sizeof(glm::imat2x2));
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     std::memcpy(
         values.data() + offsetValue[i] * sizeof(glm::imat2x2),
@@ -2728,8 +2734,7 @@ TEST_CASE("Test variable-length matN array (normalized)") {
   addBufferToModel(model, offsets);
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2811,11 +2816,11 @@ TEST_CASE("Test fixed-length boolean array") {
       false,
       true};
   std::vector<uint8_t> values;
-  size_t requiredBytesSize = static_cast<size_t>(
+  auto requiredBytesSize = static_cast<size_t>(
       glm::ceil(static_cast<double>(expected.size()) / 8.0));
   values.resize(requiredBytesSize);
   for (size_t i = 0; i < expected.size(); ++i) {
-    uint8_t expectedValue = expected[i];
+    uint8_t expectedValue = static_cast<uint8_t>(expected[i]);
     size_t byteIndex = i / 8;
     size_t bitIndex = i % 8;
     values[byteIndex] =
@@ -2824,8 +2829,7 @@ TEST_CASE("Test fixed-length boolean array") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -2928,15 +2932,15 @@ TEST_CASE("Test variable-length boolean array") {
     numOfElements += expectedMember.size();
   }
 
-  size_t requiredBytesSize =
+  auto requiredBytesSize =
       static_cast<size_t>(glm::ceil(static_cast<double>(numOfElements) / 8.0));
   std::vector<std::byte> values(requiredBytesSize);
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint64_t));
-  uint64_t* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint64_t*>(offsets.data());
   size_t indexSoFar = 0;
   for (size_t i = 0; i < expected.size(); ++i) {
-    for (size_t j = 0; j < expected[i].size(); ++j) {
-      uint8_t expectedValue = expected[i][j];
+    for (bool expect : expected[i]) {
+      auto expectedValue = static_cast<uint8_t>(expect);
       size_t byteIndex = indexSoFar / 8;
       size_t bitIndex = indexSoFar % 8;
       values[byteIndex] = static_cast<std::byte>(
@@ -2954,8 +2958,7 @@ TEST_CASE("Test variable-length boolean array") {
   size_t offsetBufferIndex = model.buffers.size() - 1;
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3045,7 +3048,7 @@ TEST_CASE("Test variable-length boolean array") {
   SECTION("Offset values are not sorted ascending") {
     propertyTableProperty.arrayOffsetType =
         PropertyTableProperty::ArrayOffsetType::UINT64;
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] = 0;
     PropertyTablePropertyView<PropertyArrayView<bool>> arrayProperty =
@@ -3056,7 +3059,7 @@ TEST_CASE("Test variable-length boolean array") {
   }
 
   SECTION("Offset value points outside of value buffer") {
-    uint64_t* offset = reinterpret_cast<uint64_t*>(
+    auto* offset = reinterpret_cast<uint64_t*>(
         model.buffers[offsetBufferIndex].cesium.data.data());
     offset[propertyTable.count] = static_cast<uint32_t>(
         model.buffers[valueBufferIndex].byteLength * 8 + 20);
@@ -3095,7 +3098,7 @@ TEST_CASE("Test fixed-length arrays of strings") {
 
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint32_t));
   std::vector<std::byte> values(totalBytes);
-  uint32_t* offsetValue = reinterpret_cast<uint32_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint32_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     const std::string& expectedValue = expected[i];
     std::memcpy(
@@ -3112,8 +3115,7 @@ TEST_CASE("Test fixed-length arrays of strings") {
   addBufferToModel(model, offsets);
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3256,13 +3258,11 @@ TEST_CASE("Test variable-length arrays of strings") {
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint32_t));
   std::vector<std::byte> stringOffsets((numOfElements + 1) * sizeof(uint32_t));
   std::vector<std::byte> values(totalBytes);
-  uint32_t* offsetValue = reinterpret_cast<uint32_t*>(offsets.data());
-  uint32_t* stringOffsetValue =
-      reinterpret_cast<uint32_t*>(stringOffsets.data());
+  auto* offsetValue = reinterpret_cast<uint32_t*>(offsets.data());
+  auto* stringOffsetValue = reinterpret_cast<uint32_t*>(stringOffsets.data());
   size_t strOffsetIdx = 0;
   for (size_t i = 0; i < expected.size(); ++i) {
-    for (size_t j = 0; j < expected[i].size(); ++j) {
-      const std::string& expectedValue = expected[i][j];
+    for (const auto& expectedValue : expected[i]) {
       std::memcpy(
           values.data() + stringOffsetValue[strOffsetIdx],
           expectedValue.c_str(),
@@ -3290,8 +3290,7 @@ TEST_CASE("Test variable-length arrays of strings") {
   size_t stringOffsetBuffer = model.buffers.size() - 1;
   size_t stringOffsetBufferView = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3409,7 +3408,7 @@ TEST_CASE("Test variable-length arrays of strings") {
   }
 
   SECTION("Array offset values are not sorted ascending") {
-    uint32_t* offset = reinterpret_cast<uint32_t*>(
+    auto* offset = reinterpret_cast<uint32_t*>(
         model.buffers[arrayOffsetBuffer].cesium.data.data());
     offset[0] = static_cast<uint32_t>(1000);
     PropertyTablePropertyView<PropertyArrayView<std::string_view>>
@@ -3423,7 +3422,7 @@ TEST_CASE("Test variable-length arrays of strings") {
   }
 
   SECTION("String offset values are not sorted ascending") {
-    uint32_t* offset = reinterpret_cast<uint32_t*>(
+    auto* offset = reinterpret_cast<uint32_t*>(
         model.buffers[stringOffsetBuffer].cesium.data.data());
     offset[0] = static_cast<uint32_t>(1000);
     PropertyTablePropertyView<PropertyArrayView<std::string_view>>
@@ -3437,7 +3436,7 @@ TEST_CASE("Test variable-length arrays of strings") {
   }
 
   SECTION("Array offset value points outside of value buffer") {
-    uint32_t* offset = reinterpret_cast<uint32_t*>(
+    auto* offset = reinterpret_cast<uint32_t*>(
         model.buffers[arrayOffsetBuffer].cesium.data.data());
     uint32_t previousValue = offset[propertyTable.count];
     offset[propertyTable.count] = static_cast<uint32_t>(100000);
@@ -3452,7 +3451,7 @@ TEST_CASE("Test variable-length arrays of strings") {
   }
 
   SECTION("String offset value points outside of value buffer") {
-    uint32_t* offset = reinterpret_cast<uint32_t*>(
+    auto* offset = reinterpret_cast<uint32_t*>(
         model.buffers[stringOffsetBuffer].cesium.data.data());
     uint32_t previousValue = offset[6];
     offset[6] = static_cast<uint32_t>(100000);
@@ -3480,17 +3479,16 @@ TEST_CASE("Test variable-length arrays of strings") {
 
 TEST_CASE("Test with PropertyTableProperty offset, scale, min, max") {
   Model model;
-  std::vector<float> values = {1.0f, 2.0f, 3.0f, 4.0f};
-  const float offset = 0.5f;
-  const float scale = 2.0f;
-  const float min = 3.5f;
-  const float max = 8.5f;
+  std::vector<float> values = {1.0F, 2.0F, 3.0F, 4.0F};
+  const float offset = 0.5F;
+  const float scale = 2.0F;
+  const float min = 3.5F;
+  const float max = 8.5F;
 
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3545,10 +3543,10 @@ TEST_CASE("Test with PropertyTableProperty offset, scale, min, max") {
   }
 
   SECTION("Use own property values") {
-    const float newOffset = 1.0f;
-    const float newScale = -1.0f;
-    const float newMin = -3.0f;
-    const float newMax = 0.0f;
+    const float newOffset = 1.0F;
+    const float newScale = -1.0F;
+    const float newMin = -3.0F;
+    const float newMax = 0.0F;
     propertyTableProperty.offset = newOffset;
     propertyTableProperty.scale = newScale;
     propertyTableProperty.min = newMin;
@@ -3583,8 +3581,7 @@ TEST_CASE(
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3676,8 +3673,7 @@ TEST_CASE("Test with PropertyTableProperty noData value") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3756,8 +3752,7 @@ TEST_CASE("Test with PropertyTableProperty noData value (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3833,8 +3828,7 @@ TEST_CASE("Test with PropertyTableProperty noData value (normalized)") {
 TEST_CASE(
     "Test nonexistent PropertyTableProperty with class property default") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -3922,8 +3916,7 @@ TEST_CASE(
 
 TEST_CASE("Test callback on invalid property table view") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
   metadata.schema.emplace();
 
   // Property table has a nonexistent class.
@@ -3961,8 +3954,7 @@ TEST_CASE("Test callback on invalid property table view") {
 
 TEST_CASE("Test callback for invalid PropertyTableProperty") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4005,8 +3997,7 @@ TEST_CASE("Test callback for invalid PropertyTableProperty") {
 
 TEST_CASE("Test callback for invalid normalized PropertyTableProperty") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4060,8 +4051,7 @@ TEST_CASE("Test callback for scalar PropertyTableProperty") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4127,8 +4117,7 @@ TEST_CASE("Test callback for scalar PropertyTableProperty (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4199,8 +4188,7 @@ TEST_CASE("Test callback for vecN PropertyTableProperty") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4270,8 +4258,7 @@ TEST_CASE("Test callback for vecN PropertyTableProperty (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4350,8 +4337,7 @@ TEST_CASE("Test callback for matN PropertyTableProperty") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4429,8 +4415,7 @@ TEST_CASE("Test callback for matN PropertyTableProperty (normalized)") {
   addBufferToModel(model, values);
   size_t valueBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4504,7 +4489,7 @@ TEST_CASE("Test callback for boolean PropertyTableProperty") {
       expected.emplace_back(false);
     }
 
-    uint8_t expectedValue = expected.back();
+    uint8_t expectedValue = static_cast<uint8_t>(expected.back());
     int64_t byteIndex = i / 8;
     int64_t bitIndex = i % 8;
     values[static_cast<size_t>(byteIndex)] = static_cast<uint8_t>(
@@ -4513,8 +4498,7 @@ TEST_CASE("Test callback for boolean PropertyTableProperty") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4523,7 +4507,7 @@ TEST_CASE("Test callback for boolean PropertyTableProperty") {
 
   PropertyTable& propertyTable = metadata.propertyTables.emplace_back();
   propertyTable.classProperty = "TestClass";
-  propertyTable.count = static_cast<int64_t>(instanceCount);
+  propertyTable.count = instanceCount;
 
   PropertyTableProperty& propertyTableProperty =
       propertyTable.properties["TestClassProperty"];
@@ -4584,7 +4568,7 @@ TEST_CASE("Test callback for string PropertyTableProperty") {
   std::vector<std::byte> stringOffsets(
       (expected.size() + 1) * sizeof(uint32_t));
   std::vector<std::byte> values(totalBytes);
-  uint32_t* offsetValue = reinterpret_cast<uint32_t*>(stringOffsets.data());
+  auto* offsetValue = reinterpret_cast<uint32_t*>(stringOffsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     const std::string& expectedValue = expected[i];
     std::memcpy(
@@ -4601,8 +4585,7 @@ TEST_CASE("Test callback for string PropertyTableProperty") {
   addBufferToModel(model, stringOffsets);
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4670,8 +4653,7 @@ TEST_CASE("Test callback for scalar array PropertyTableProperty") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4745,8 +4727,7 @@ TEST_CASE("Test callback for scalar array PropertyTableProperty (normalized)") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4827,8 +4808,7 @@ TEST_CASE("Test callback for vecN array PropertyTableProperty") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -4908,8 +4888,7 @@ TEST_CASE("Test callback for vecN array PropertyTableProperty (normalized)") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -5004,8 +4983,7 @@ TEST_CASE("Test callback for matN array PropertyTableProperty") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -5084,11 +5062,11 @@ TEST_CASE("Test callback for boolean array PropertyTableProperty") {
       false,
       true};
   std::vector<uint8_t> values;
-  size_t requiredBytesSize = static_cast<size_t>(
+  auto requiredBytesSize = static_cast<size_t>(
       glm::ceil(static_cast<double>(expected.size()) / 8.0));
   values.resize(requiredBytesSize);
   for (size_t i = 0; i < expected.size(); ++i) {
-    uint8_t expectedValue = expected[i];
+    uint8_t expectedValue = static_cast<uint8_t>(expected[i]);
     size_t byteIndex = i / 8;
     size_t bitIndex = i % 8;
     values[byteIndex] =
@@ -5097,8 +5075,7 @@ TEST_CASE("Test callback for boolean array PropertyTableProperty") {
 
   addBufferToModel(model, values);
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -5179,7 +5156,7 @@ TEST_CASE("Test callback for string array PropertyTableProperty") {
 
   std::vector<std::byte> offsets((expected.size() + 1) * sizeof(uint32_t));
   std::vector<std::byte> values(totalBytes);
-  uint32_t* offsetValue = reinterpret_cast<uint32_t*>(offsets.data());
+  auto* offsetValue = reinterpret_cast<uint32_t*>(offsets.data());
   for (size_t i = 0; i < expected.size(); ++i) {
     const std::string& expectedValue = expected[i];
     std::memcpy(
@@ -5196,8 +5173,7 @@ TEST_CASE("Test callback for string array PropertyTableProperty") {
   addBufferToModel(model, offsets);
   size_t offsetBufferViewIndex = model.bufferViews.size() - 1;
 
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];
@@ -5284,8 +5260,7 @@ TEST_CASE("Test callback for string array PropertyTableProperty") {
 
 TEST_CASE("Test callback for empty PropertyTableProperty with default value") {
   Model model;
-  ExtensionModelExtStructuralMetadata& metadata =
-      model.addExtension<ExtensionModelExtStructuralMetadata>();
+  auto& metadata = model.addExtension<ExtensionModelExtStructuralMetadata>();
 
   Schema& schema = metadata.schema.emplace();
   Class& testClass = schema.classes["TestClass"];

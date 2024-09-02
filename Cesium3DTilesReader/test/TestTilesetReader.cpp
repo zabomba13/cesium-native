@@ -1,16 +1,20 @@
+#include "CesiumJsonReader/JsonReaderOptions.h"
+
 #include <Cesium3DTiles/Extension3dTilesBoundingVolumeS2.h>
 #include <Cesium3DTilesReader/TilesetReader.h>
 #include <CesiumJsonReader/JsonReader.h>
 #include <CesiumNativeTests/readFile.h>
 
-#include <catch2/catch.hpp>
-#include <glm/vec3.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <gsl/span>
-#include <rapidjson/reader.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <string>
+#include <vector>
 
 TEST_CASE("Reads tileset JSON") {
   using namespace std::string_literals;
@@ -26,8 +30,8 @@ TEST_CASE("Reads tileset JSON") {
 
   REQUIRE(tileset.asset.version == "1.0");
   REQUIRE(tileset.geometricError == 494.50961650991815);
-  REQUIRE(tileset.extensionsUsed.size() == 0);
-  REQUIRE(tileset.extensionsRequired.size() == 0);
+  REQUIRE(tileset.extensionsUsed.empty());
+  REQUIRE(tileset.extensionsRequired.empty());
 
   REQUIRE(tileset.properties.size() == 3);
   CHECK(tileset.properties.at("Longitude").minimum == -0.0005589940528287436);
@@ -232,7 +236,7 @@ TEST_CASE("Reads 3DTILES_content_gltf") {
   CHECK(tileset.extensionsUsed == tilesetExtensionUsed);
   CHECK(tileset.extensionsUsed == tilesetExtensionUsed);
 
-  Cesium3DTiles::Extension3dTilesBoundingVolumeS2* boundingVolumeS2 =
+  auto* boundingVolumeS2 =
       tileset.root.boundingVolume
           .getExtension<Cesium3DTiles::Extension3dTilesBoundingVolumeS2>();
   REQUIRE(boundingVolumeS2);

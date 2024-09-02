@@ -39,7 +39,7 @@ public:
 
     explicit iterator(
         const CesiumGeometry::QuadtreeTileID& parentTileID,
-        bool isFirst) noexcept;
+        bool isEnd) noexcept;
 
     const CesiumGeometry::QuadtreeTileID& operator*() const {
       return this->_current;
@@ -85,7 +85,7 @@ public:
 
     explicit iterator(
         const CesiumGeometry::OctreeTileID& parentTileID,
-        bool isFirst) noexcept;
+        bool isEnd) noexcept;
 
     const CesiumGeometry::OctreeTileID& operator*() const {
       return this->_current;
@@ -191,7 +191,7 @@ public:
    * @return The relative Morton index.
    */
   static uint64_t computeRelativeMortonIndex(
-      const CesiumGeometry::QuadtreeTileID& subtreeID,
+      const CesiumGeometry::QuadtreeTileID& subtreeRootID,
       const CesiumGeometry::QuadtreeTileID& tileID);
 
   /**

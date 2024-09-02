@@ -3,6 +3,7 @@
 // implementation can be found at this link
 // https://github.com/boostorg/chrono/blob/aa51cbd5121ed29093484f53e5f96e13a9a915b4/include/boost/chrono/io/time_point_io.hpp#L784
 
+// NOLINTBEGIN
 #include "InternalTimegm.h"
 
 #include <cstdint>
@@ -68,3 +69,4 @@ int32_t daysFrom1jan(int32_t year, int32_t month, int32_t day) {
 }
 
 } // namespace CesiumAsync
+// NOLINTEND

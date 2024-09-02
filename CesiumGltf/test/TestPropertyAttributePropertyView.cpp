@@ -1,11 +1,32 @@
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyAttributeProperty.h"
 #include "CesiumGltf/PropertyAttributePropertyView.h"
+#include "CesiumGltf/PropertyTransformations.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyTypeTraits.h"
+#include "CesiumUtility/JsonValue.h"
 
 #include <CesiumUtility/Assert.h>
 
-#include <catch2/catch.hpp>
-#include <gsl/span>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <optional>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -207,17 +228,17 @@ TEST_CASE("Check scalar PropertyAttributePropertyView") {
   }
 
   SECTION("float") {
-    std::vector<float> data{12.3333f, -12.44555f, -5.6111f, 6.7421f};
+    std::vector<float> data{12.3333F, -12.44555F, -5.6111F, 6.7421F};
     checkAttributeValues(data);
   }
 
   SECTION("float with offset / scale") {
-    std::vector<float> data{1.0f, 2.0f, 3.0f, 4.0f};
+    std::vector<float> data{1.0F, 2.0F, 3.0F, 4.0F};
 
-    const float offset = 1.0f;
-    const float scale = 2.0f;
+    const float offset = 1.0F;
+    const float scale = 2.0F;
 
-    std::vector<std::optional<float>> expected{3.0f, 5.0f, 7.0f, 9.0f};
+    std::vector<std::optional<float>> expected{3.0F, 5.0F, 7.0F, 9.0F};
     checkAttributeValues(data, expected, offset, scale);
   }
 
@@ -326,28 +347,28 @@ TEST_CASE("Check vecN PropertyAttributePropertyView") {
 
   SECTION("glm::vec3") {
     std::vector<glm::vec3> data{
-        glm::vec3(1.5f, 2.0f, -3.3f),
-        glm::vec3(4.12f, -5.008f, 6.0f),
-        glm::vec3(7.0f, 8.0f, 9.01f),
-        glm::vec3(-0.28f, 5.0f, 1.2f)};
+        glm::vec3(1.5F, 2.0F, -3.3F),
+        glm::vec3(4.12F, -5.008F, 6.0F),
+        glm::vec3(7.0F, 8.0F, 9.01F),
+        glm::vec3(-0.28F, 5.0F, 1.2F)};
     checkAttributeValues(data);
   }
 
   SECTION("glm::vec3 with offset / scale") {
     std::vector<glm::vec3> data{
-        glm::vec3(1.0f, 2.0f, 3.0f),
-        glm::vec3(-1.0f, -2.0f, -3.0f),
-        glm::vec3(0.0f),
-        glm::vec3(1.0f)};
+        glm::vec3(1.0F, 2.0F, 3.0F),
+        glm::vec3(-1.0F, -2.0F, -3.0F),
+        glm::vec3(0.0F),
+        glm::vec3(1.0F)};
 
-    JsonValue::Array offset{1.0f, 0.0f, -1.0f};
-    JsonValue::Array scale{2.0f, 2.0f, 2.0f};
+    JsonValue::Array offset{1.0F, 0.0F, -1.0F};
+    JsonValue::Array scale{2.0F, 2.0F, 2.0F};
 
     std::vector<std::optional<glm::vec3>> expected{
-        glm::vec3(3.0f, 4.0f, 5.0f),
-        glm::vec3(-1.0f, -4.0f, -7.0f),
-        glm::vec3(1.0f, 0.0f, -1.0f),
-        glm::vec3(3.0f, 2.0f, 1.0f)};
+        glm::vec3(3.0F, 4.0F, 5.0F),
+        glm::vec3(-1.0F, -4.0F, -7.0F),
+        glm::vec3(1.0F, 0.0F, -1.0F),
+        glm::vec3(3.0F, 2.0F, 1.0F)};
 
     checkAttributeValues(data, expected, offset, scale);
   }
@@ -486,14 +507,14 @@ TEST_CASE("Check matN PropertyAttributePropertyView") {
     // clang-format off
     std::vector<glm::mat2> data{
         glm::mat2(
-          1.0f, 2.0f,
-          3.0f, 4.0f),
+          1.0F, 2.0F,
+          3.0F, 4.0F),
         glm::mat2(
-          -10.0f, 40.0f,
-           0.08f, 5.4f),
+          -10.0F, 40.0F,
+           0.08F, 5.4F),
         glm::mat2(
-          9.99f, -2.0f,
-          -0.4f, 0.23f)
+          9.99F, -2.0F,
+          -0.4F, 0.23F)
     };
     // clang-format on
     checkAttributeValues(data);
@@ -523,20 +544,20 @@ TEST_CASE("Check matN PropertyAttributePropertyView") {
     // clang-format off
     std::vector<glm::mat4> data{
         glm::mat4(
-           1.0f,  2.0f,  3.0f,  4.0f,
-           5.0f,  6.0f,  7.0f,  8.0f,
-           9.0f, 10.0f, 11.0f, 12.0f,
-          13.0f, 14.0f, 15.0f, 16.0f),
+           1.0F,  2.0F,  3.0F,  4.0F,
+           5.0F,  6.0F,  7.0F,  8.0F,
+           9.0F, 10.0F, 11.0F, 12.0F,
+          13.0F, 14.0F, 15.0F, 16.0F),
         glm::mat4(
-           0.1f,   0.2f,   0.3f,   0.4f,
-           0.5f,   0.6f,   0.7f,   0.8f,
-          -9.0f, -10.0f, -11.0f, -12.0f,
-          13.0f,  14.0f,  15.0f,  16.0f),
+           0.1F,   0.2F,   0.3F,   0.4F,
+           0.5F,   0.6F,   0.7F,   0.8F,
+          -9.0F, -10.0F, -11.0F, -12.0F,
+          13.0F,  14.0F,  15.0F,  16.0F),
         glm::mat4(
-          1.0f, 0.0f,  0.0f, 10.0f,
-          0.0f, 0.0f, -1.0f, -3.5f,
-          0.0f, 1.0f,  0.0f, 20.4f,
-          0.0f, 0.0f,  0.0f,  1.0f)
+          1.0F, 0.0F,  0.0F, 10.0F,
+          0.0F, 0.0F, -1.0F, -3.5F,
+          0.0F, 1.0F,  0.0F, 20.4F,
+          0.0F, 0.0F,  0.0F,  1.0F)
     };
     // clang-format on
     checkAttributeValues(data);
@@ -546,32 +567,32 @@ TEST_CASE("Check matN PropertyAttributePropertyView") {
     // clang-format off
     std::vector<glm::mat2> data{
         glm::mat2(
-          1.0f, 3.0f,
-          4.0f, 2.0f),
+          1.0F, 3.0F,
+          4.0F, 2.0F),
         glm::mat2(
-          6.5f, 2.0f,
-          -2.0f, 0.0f),
+          6.5F, 2.0F,
+          -2.0F, 0.0F),
         glm::mat2(
-          8.0f, -1.0f,
-          -3.0f, 1.0f),
+          8.0F, -1.0F,
+          -3.0F, 1.0F),
     };
     const JsonValue::Array offset{
-      1.0f, 2.0f,
-      3.0f, 1.0f};
+      1.0F, 2.0F,
+      3.0F, 1.0F};
     const JsonValue::Array scale {
-      2.0f, 0.0f,
-      0.0f, 2.0f};
+      2.0F, 0.0F,
+      0.0F, 2.0F};
 
     std::vector<std::optional<glm::mat2>> expected{
         glm::mat2(
-          3.0f, 2.0f,
-          3.0f, 5.0f),
+          3.0F, 2.0F,
+          3.0F, 5.0F),
         glm::mat2(
-          14.0f, 2.0f,
-          3.0f, 1.0f),
+          14.0F, 2.0F,
+          3.0F, 1.0F),
         glm::mat2(
-          17.0f, 2.0f,
-          3.0f, 3.0f),
+          17.0F, 2.0F,
+          3.0F, 3.0F),
     };
     // clang-format on
     checkAttributeValues(data, expected, offset, scale);
@@ -761,7 +782,7 @@ TEST_CASE("Check matN PropertyAttributePropertyView (normalized)") {
 TEST_CASE("Check that PropertyAttributeProperty values override class property "
           "values") {
   Model model;
-  std::vector<float> data{1.0f, 2.0f, 3.0f, 4.0f};
+  std::vector<float> data{1.0F, 2.0F, 3.0F, 4.0F};
 
   Buffer& buffer = model.buffers.emplace_back();
   buffer.cesium.data.resize(data.size() * sizeof(float));
@@ -789,17 +810,17 @@ TEST_CASE("Check that PropertyAttributeProperty values override class property "
   classProperty.type = ClassProperty::Type::SCALAR;
   classProperty.componentType = ClassProperty::ComponentType::FLOAT32;
 
-  classProperty.offset = 0.0f;
-  classProperty.scale = 1.0f;
-  classProperty.min = -10.0f;
-  classProperty.max = 10.0f;
+  classProperty.offset = 0.0F;
+  classProperty.scale = 1.0F;
+  classProperty.min = -10.0F;
+  classProperty.max = 10.0F;
 
-  const float offset = 1.0f;
-  const float scale = 2.0f;
-  const float min = 3.0f;
-  const float max = 9.0f;
+  const float offset = 1.0F;
+  const float scale = 2.0F;
+  const float min = 3.0F;
+  const float max = 9.0F;
 
-  std::vector<std::optional<float>> expected{3.0f, 5.0f, 7.0f, 9.0f};
+  std::vector<std::optional<float>> expected{3.0F, 5.0F, 7.0F, 9.0F};
 
   PropertyAttributeProperty property;
   property.offset = offset;

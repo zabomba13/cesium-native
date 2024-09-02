@@ -1,3 +1,9 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumNativeTests/SimpleAssetRequest.h"
+#include "CesiumNativeTests/SimpleAssetResponse.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumNativeTests/SimpleAssetAccessor.h>
 #include <CesiumNativeTests/SimpleTaskProcessor.h>
 #include <CesiumNativeTests/readFile.h>
@@ -6,9 +12,17 @@
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumRasterOverlays/TileMapServiceRasterOverlay.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <spdlog/spdlog.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace CesiumNativeTests;
@@ -24,8 +38,9 @@ TEST_CASE("TileMapServiceRasterOverlay") {
   std::map<std::string, std::shared_ptr<SimpleAssetRequest>> mapUrlToRequest;
   for (const auto& entry : std::filesystem::recursive_directory_iterator(
            dataDir / "Cesium_Logo_Color")) {
-    if (!entry.is_regular_file())
+    if (!entry.is_regular_file()) {
       continue;
+    }
     auto pResponse = std::make_unique<SimpleAssetResponse>(
         uint16_t(200),
         "application/binary",
@@ -124,7 +139,7 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             xmlUrlWithParameter,
             CesiumAsync::HttpHeaders{},
             std::make_unique<SimpleAssetResponse>(
-                *static_cast<const SimpleAssetResponse*>(
+                *reinterpret_cast<const SimpleAssetResponse*>(
                     pExistingRequest->response())));
 
     pRasterOverlay =
@@ -179,7 +194,7 @@ TEST_CASE("TileMapServiceRasterOverlay") {
             xmlUrlWithParameter,
             CesiumAsync::HttpHeaders{},
             std::make_unique<SimpleAssetResponse>(
-                *static_cast<const SimpleAssetResponse*>(
+                *reinterpret_cast<const SimpleAssetResponse*>(
                     pExistingRequest->response())));
 
     pRasterOverlay = new TileMapServiceRasterOverlay("test", url);

@@ -1,3 +1,9 @@
+#include "CesiumAsync/Future.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumAsync/IAssetAccessor.h>
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
@@ -10,14 +16,20 @@
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumUtility/CreditSystem.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Log.h>
-#include <CesiumUtility/Math.h>
 #include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
+#include <gsl/span>
+#include <nonstd/expected.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/pointer.h>
+#include <spdlog/logger.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -143,10 +155,10 @@ public:
         });
   }
 
-  virtual ~BingMapsTileProvider() {}
+  ~BingMapsTileProvider() override = default;
 
 protected:
-  virtual CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
+  CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
       const CesiumGeometry::QuadtreeTileID& tileID) const override {
     std::string url = CesiumUtility::Uri::substituteTemplateParameters(
         this->_urlTemplate,
@@ -200,8 +212,8 @@ protected:
 private:
   static std::string tileXYToQuadKey(uint32_t level, uint32_t x, uint32_t y) {
     std::string quadkey;
-    for (int32_t i = static_cast<int32_t>(level); i >= 0; --i) {
-      const uint32_t bitmask = static_cast<uint32_t>(1 << i);
+    for (auto i = static_cast<int32_t>(level); i >= 0; --i) {
+      const auto bitmask = static_cast<uint32_t>(1 << i);
       uint32_t digit = 0;
 
       if ((x & bitmask) != 0) {
@@ -238,7 +250,7 @@ BingMapsRasterOverlay::BingMapsRasterOverlay(
       _culture(culture),
       _ellipsoid(ellipsoid) {}
 
-BingMapsRasterOverlay::~BingMapsRasterOverlay() {}
+BingMapsRasterOverlay::~BingMapsRasterOverlay() = default;
 
 namespace {
 
@@ -375,7 +387,7 @@ BingMapsRasterOverlay::createTileProvider(
           fmt::format(
               "Error while parsing Bing Maps imagery metadata, error code "
               "{} at byte offset {}",
-              response.GetParseError(),
+              static_cast<uint64_t>(response.GetParseError()),
               response.GetErrorOffset())});
     }
 

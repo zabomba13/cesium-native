@@ -1,6 +1,17 @@
 #include "CesiumGeometry/OctreeAvailability.h"
 
+#include "CesiumGeometry/Availability.h"
+#include "CesiumGeometry/OctreeTileID.h"
+#include "CesiumGeometry/TileAvailabilityFlags.h"
 #include "CesiumUtility/Assert.h"
+
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
 
 namespace CesiumGeometry {
 
@@ -89,14 +100,14 @@ uint8_t OctreeAvailability::computeAvailability(
 
       uint32_t availabilityIndex = relativeMortonIndex + offset;
       uint32_t byteIndex = availabilityIndex >> 3;
-      uint8_t bitIndex = static_cast<uint8_t>(availabilityIndex & 7);
-      uint8_t bitMask = static_cast<uint8_t>(1 << bitIndex);
+      auto bitIndex = static_cast<uint8_t>(availabilityIndex & 7);
+      auto bitMask = static_cast<uint8_t>(1 << bitIndex);
 
       // Check tile availability.
       if ((tileAvailabilityAccessor.isConstant() &&
            tileAvailabilityAccessor.getConstant()) ||
           (tileAvailabilityAccessor.isBufferView() &&
-           (uint8_t)tileAvailabilityAccessor[byteIndex] & bitMask)) {
+           (((uint8_t)tileAvailabilityAccessor[byteIndex] & bitMask) != 0))) {
         availability |= TileAvailabilityFlags::TILE_AVAILABLE;
       }
 
@@ -104,7 +115,8 @@ uint8_t OctreeAvailability::computeAvailability(
       if ((contentAvailabilityAccessor.isConstant() &&
            contentAvailabilityAccessor.getConstant()) ||
           (contentAvailabilityAccessor.isBufferView() &&
-           (uint8_t)contentAvailabilityAccessor[byteIndex] & bitMask)) {
+           (((uint8_t)contentAvailabilityAccessor[byteIndex] & bitMask) !=
+            0))) {
         availability |= TileAvailabilityFlags::CONTENT_AVAILABLE;
       }
 
@@ -134,15 +146,14 @@ uint8_t OctreeAvailability::computeAvailability(
 
     } else if (subtreeAvailabilityAccessor.isBufferView()) {
       uint32_t byteIndex = childSubtreeMortonIndex >> 3;
-      uint8_t bitIndex = static_cast<uint8_t>(childSubtreeMortonIndex & 7);
-      uint8_t bitMask = static_cast<uint8_t>(1 << bitIndex);
+      auto bitIndex = static_cast<uint8_t>(childSubtreeMortonIndex & 7);
+      auto bitMask = static_cast<uint8_t>(1 << bitIndex);
 
       gsl::span<const std::byte> clippedSubtreeAvailability =
           subtreeAvailabilityAccessor.getBufferAccessor().subspan(0, byteIndex);
-      uint8_t availabilityByte =
-          (uint8_t)subtreeAvailabilityAccessor[byteIndex];
+      auto availabilityByte = (uint8_t)subtreeAvailabilityAccessor[byteIndex];
 
-      childSubtreeAvailable = availabilityByte & bitMask;
+      childSubtreeAvailable = (availabilityByte & bitMask) != 0;
       // Calculte the index the child subtree is stored in.
       if (childSubtreeAvailable) {
         childSubtreeIndex =
@@ -191,14 +202,13 @@ bool OctreeAvailability::addSubtree(
     if (this->_pRoot) {
       // The root subtree already exists.
       return false;
-    } else {
-      // Set the root subtree.
-      this->_pRoot = std::make_unique<AvailabilityNode>();
-      this->_pRoot->setLoadedSubtree(
-          std::move(newSubtree),
-          this->_maximumChildrenSubtrees);
-      return true;
     }
+    // Set the root subtree.
+    this->_pRoot = std::make_unique<AvailabilityNode>();
+    this->_pRoot->setLoadedSubtree(
+        std::move(newSubtree),
+        this->_maximumChildrenSubtrees);
+    return true;
   }
 
   if (!this->_pRoot) {
@@ -241,15 +251,14 @@ bool OctreeAvailability::addSubtree(
       childSubtreeIndex = childSubtreeMortonIndex;
     } else if (subtreeAvailabilityAccessor.isBufferView()) {
       uint32_t byteIndex = childSubtreeMortonIndex >> 3;
-      uint8_t bitIndex = static_cast<uint8_t>(childSubtreeMortonIndex & 7);
-      uint8_t bitMask = static_cast<uint8_t>(1 << bitIndex);
+      auto bitIndex = static_cast<uint8_t>(childSubtreeMortonIndex & 7);
+      auto bitMask = static_cast<uint8_t>(1 << bitIndex);
 
       gsl::span<const std::byte> clippedSubtreeAvailability =
           subtreeAvailabilityAccessor.getBufferAccessor().subspan(0, byteIndex);
-      uint8_t availabilityByte =
-          (uint8_t)subtreeAvailabilityAccessor[byteIndex];
+      auto availabilityByte = (uint8_t)subtreeAvailabilityAccessor[byteIndex];
 
-      childSubtreeAvailable = availabilityByte & bitMask;
+      childSubtreeAvailable = (availabilityByte & bitMask) != 0;
       // Calculte the index the child subtree is stored in.
       if (childSubtreeAvailable) {
         childSubtreeIndex =
@@ -281,12 +290,11 @@ bool OctreeAvailability::addSubtree(
             std::move(newSubtree),
             this->_maximumChildrenSubtrees);
         return true;
-      } else {
-        // We need to traverse this child subtree to find where to add the new
-        // subtree.
-        pNode = pNode->childNodes[childSubtreeIndex].get();
-        level += this->_subtreeLevels;
       }
+      // We need to traverse this child subtree to find where to add the new
+      // subtree.
+      pNode = pNode->childNodes[childSubtreeIndex].get();
+      level += this->_subtreeLevels;
     } else {
       // This child subtree is marked as non-available.
       // TODO: warn of invalid availability
@@ -303,7 +311,7 @@ uint8_t OctreeAvailability::computeAvailability(
 
   // If this is root of the subtree and the subtree isn't loaded yet, we can
   // atleast assume this tile and its subtree are available.
-  bool subtreeLoaded = pNode && pNode->subtree;
+  bool subtreeLoaded = (pNode != nullptr) && pNode->subtree;
   uint32_t relativeLevel = tileID.level % this->_subtreeLevels;
   if (!subtreeLoaded) {
     if (relativeLevel == 0) {
@@ -343,14 +351,14 @@ uint8_t OctreeAvailability::computeAvailability(
 
   uint32_t availabilityIndex = relativeMortonIndex + offset;
   uint32_t byteIndex = availabilityIndex >> 3;
-  uint8_t bitIndex = static_cast<uint8_t>(availabilityIndex & 7);
-  uint8_t bitMask = static_cast<uint8_t>(1 << bitIndex);
+  auto bitIndex = static_cast<uint8_t>(availabilityIndex & 7);
+  auto bitMask = static_cast<uint8_t>(1 << bitIndex);
 
   // Check tile availability.
   if ((tileAvailabilityAccessor.isConstant() &&
        tileAvailabilityAccessor.getConstant()) ||
       (tileAvailabilityAccessor.isBufferView() &&
-       (uint8_t)tileAvailabilityAccessor[byteIndex] & bitMask)) {
+       (((uint8_t)tileAvailabilityAccessor[byteIndex] & bitMask) != 0))) {
     availability |= TileAvailabilityFlags::TILE_AVAILABLE;
   }
 
@@ -358,7 +366,7 @@ uint8_t OctreeAvailability::computeAvailability(
   if ((contentAvailabilityAccessor.isConstant() &&
        contentAvailabilityAccessor.getConstant()) ||
       (contentAvailabilityAccessor.isBufferView() &&
-       (uint8_t)contentAvailabilityAccessor[byteIndex] & bitMask)) {
+       (((uint8_t)contentAvailabilityAccessor[byteIndex] & bitMask) != 0))) {
     availability |= TileAvailabilityFlags::CONTENT_AVAILABLE;
   }
 
@@ -382,11 +390,10 @@ AvailabilityNode* OctreeAvailability::addNode(
     if (this->_pRoot) {
       // The root node already exists.
       return nullptr;
-    } else {
-      // Set the root node.
-      this->_pRoot = std::make_unique<AvailabilityNode>();
-      return this->_pRoot.get();
     }
+    // Set the root node.
+    this->_pRoot = std::make_unique<AvailabilityNode>();
+    return this->_pRoot.get();
   }
 
   // We can't insert a new child node if the parent does not have a loaded
@@ -417,14 +424,14 @@ AvailabilityNode* OctreeAvailability::addNode(
     subtreeIndex = mortonIndex;
   } else if (subtreeAvailabilityAccessor.isBufferView()) {
     uint32_t byteIndex = mortonIndex >> 3;
-    uint8_t bitIndex = static_cast<uint8_t>(mortonIndex & 7);
-    uint8_t bitMask = static_cast<uint8_t>(1 << bitIndex);
+    auto bitIndex = static_cast<uint8_t>(mortonIndex & 7);
+    auto bitMask = static_cast<uint8_t>(1 << bitIndex);
 
     gsl::span<const std::byte> clippedSubtreeAvailability =
         subtreeAvailabilityAccessor.getBufferAccessor().subspan(0, byteIndex);
-    uint8_t availabilityByte = (uint8_t)subtreeAvailabilityAccessor[byteIndex];
+    auto availabilityByte = (uint8_t)subtreeAvailabilityAccessor[byteIndex];
 
-    subtreeAvailable = availabilityByte & bitMask;
+    subtreeAvailable = ((availabilityByte & bitMask) != 0);
 
     // Calculte the index the child subtree is stored in.
     if (subtreeAvailable) {
@@ -451,7 +458,7 @@ AvailabilityNode* OctreeAvailability::addNode(
 
 bool OctreeAvailability::addLoadedSubtree(
     AvailabilityNode* pNode,
-    AvailabilitySubtree&& newSubtree) noexcept {
+    AvailabilitySubtree&& newSubtree) const noexcept {
   if (!pNode || pNode->subtree) {
     return false;
   }
@@ -488,14 +495,14 @@ std::optional<uint32_t> OctreeAvailability::findChildNodeIndex(
     subtreeIndex = mortonIndex;
   } else if (subtreeAvailabilityAccessor.isBufferView()) {
     uint32_t byteIndex = mortonIndex >> 3;
-    uint8_t bitIndex = static_cast<uint8_t>(mortonIndex & 7);
-    uint8_t bitMask = static_cast<uint8_t>(1 << bitIndex);
+    auto bitIndex = static_cast<uint8_t>(mortonIndex & 7);
+    auto bitMask = static_cast<uint8_t>(1 << bitIndex);
 
     gsl::span<const std::byte> clippedSubtreeAvailability =
         subtreeAvailabilityAccessor.getBufferAccessor().subspan(0, byteIndex);
-    uint8_t availabilityByte = (uint8_t)subtreeAvailabilityAccessor[byteIndex];
+    auto availabilityByte = (uint8_t)subtreeAvailabilityAccessor[byteIndex];
 
-    subtreeAvailable = availabilityByte & bitMask;
+    subtreeAvailable = (availabilityByte & bitMask) != 0;
 
     // Calculte the index the child subtree is stored in.
     if (subtreeAvailable) {
