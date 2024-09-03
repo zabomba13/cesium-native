@@ -25,7 +25,7 @@ IJsonHandler* ExtensibleObjectJsonHandler::readObjectKeyExtensibleObject(
     const std::string& objectType,
     const std::string_view& str,
     CesiumUtility::ExtensibleObject& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   if ("extras"s == str) {
     return property("extras", this->_extras, o.extras);

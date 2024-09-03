@@ -28,7 +28,7 @@ struct CESIUMGEOMETRY_API SubtreeBufferView {
   uint8_t buffer;
 };
 
-typedef std::variant<ConstantAvailability, SubtreeBufferView> AvailabilityView;
+using AvailabilityView = std::variant<ConstantAvailability, SubtreeBufferView>;
 
 struct CESIUMGEOMETRY_API AvailabilitySubtree {
   AvailabilityView tileAvailability;
@@ -94,9 +94,10 @@ public:
   bool getConstant() const { return pConstant->constant; }
 
   /**
-   * @brief Unsafe is isBufferView is false.
+   * @brief Unsafe if isBufferView is false.
    */
   const gsl::span<const std::byte>& getBufferAccessor() const {
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     return *bufferAccessor;
   }
 
@@ -104,6 +105,7 @@ public:
    * @brief Unsafe if isBufferView is false.
    */
   const std::byte& operator[](size_t i) const {
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     return bufferAccessor.value()[i];
   }
 

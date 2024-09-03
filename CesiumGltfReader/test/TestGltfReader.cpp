@@ -49,7 +49,7 @@ using namespace CesiumUtility;
 using namespace CesiumNativeTests;
 
 TEST_CASE("CesiumGltfReader::GltfReader") {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
   std::string s = R"(
     {

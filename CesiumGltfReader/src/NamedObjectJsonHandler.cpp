@@ -25,7 +25,7 @@ NamedObjectJsonHandler::readObjectKeyNamedObject(
     const std::string& objectType,
     const std::string_view& str,
     CesiumGltf::NamedObject& o) {
-  using namespace std::string_literals;
+  using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
   if ("name"s == str) {
     return property("name", this->_name, o.name);
   }

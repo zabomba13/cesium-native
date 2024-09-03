@@ -15,14 +15,14 @@
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
-#include <string>
+#include <string> // NOLINT(misc-include-cleaner)
 #include <utility>
 #include <vector>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
 using namespace CesiumUtility;
-using namespace std::string_literals;
+using std::string_literals::operator""s; // NOLINT(misc-include-cleaner)
 
 namespace Cesium3DTilesSelection {
 Tile::Tile(TilesetContentLoader* pLoader) noexcept
