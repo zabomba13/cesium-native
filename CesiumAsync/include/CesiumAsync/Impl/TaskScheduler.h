@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #pragma once
 
 #include "ImmediateScheduler.h"
@@ -22,3 +23,4 @@ private:
 
 } // namespace CesiumImpl
 } // namespace CesiumAsync
+// NOLINTEND(misc-include-cleaner)

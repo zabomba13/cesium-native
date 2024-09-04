@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #pragma once
 
 #include "cesium-async++.h"
@@ -43,3 +44,4 @@ template <typename T> struct RemoveFuture<const async::shared_task<T>> {
 // End omitting doxgen warnings for Impl namespace
 } // namespace CesiumImpl
 } // namespace CesiumAsync
+// NOLINTEND(misc-include-cleaner)

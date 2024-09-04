@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #include <CesiumAsync/Impl/ImmediateScheduler.h>
 #include <CesiumAsync/Impl/cesium-async++.h>
 #include <CesiumAsync/ThreadPool.h>
@@ -26,3 +27,4 @@ ThreadPool::Scheduler::Scheduler(int32_t numberOfThreads)
 void ThreadPool::Scheduler::schedule(async::task_run_handle t) {
   this->scheduler.schedule(std::move(t));
 }
+// NOLINTEND(misc-include-cleaner)

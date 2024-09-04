@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #include <CesiumAsync/Impl/QueuedScheduler.h>
 #include <CesiumAsync/Impl/cesium-async++.h>
 
@@ -114,3 +115,4 @@ void QueuedScheduler::unblock() {
 }
 
 } // namespace CesiumAsync::CesiumImpl
+// NOLINTEND(misc-include-cleaner)

@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #pragma once
 
 #include "Future.h"
@@ -327,3 +328,4 @@ private:
   template <typename T> friend class Future;
 };
 } // namespace CesiumAsync
+// NOLINTEND(misc-include-cleaner)

@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #pragma once
 
 #include "Impl/AsyncSystemSchedulers.h"
@@ -329,3 +330,4 @@ private:
 };
 
 } // namespace CesiumAsync
+// NOLINTEND(misc-include-cleaner)

@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #include <CesiumAsync/ITaskProcessor.h>
 #include <CesiumAsync/Impl/TaskScheduler.h>
 #include <CesiumAsync/Impl/cesium-async++.h>
@@ -30,3 +31,4 @@ void TaskScheduler::schedule(async::task_run_handle t) {
     pReceiver->taskHandle.run();
   });
 }
+// NOLINTEND(misc-include-cleaner)

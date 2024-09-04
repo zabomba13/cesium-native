@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #pragma once
 
 #include "Future.h"
@@ -102,3 +103,4 @@ private:
 };
 
 } // namespace CesiumAsync
+// NOLINTEND(misc-include-cleaner)

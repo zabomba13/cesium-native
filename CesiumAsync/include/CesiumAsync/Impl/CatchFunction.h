@@ -1,3 +1,4 @@
+// NOLINTBEGIN(misc-include-cleaner)
 #pragma once
 
 #include "unwrapFuture.h"
@@ -74,3 +75,4 @@ struct CatchFunction<Func, void, Scheduler, TaskParameter> {
 // End omitting doxgen warnings for Impl namespace
 } // namespace CesiumImpl
 } // namespace CesiumAsync
+// NOLINTEND(misc-include-cleaner)
