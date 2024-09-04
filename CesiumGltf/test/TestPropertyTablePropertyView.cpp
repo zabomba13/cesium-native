@@ -1,10 +1,10 @@
-#include "CesiumGltf/ClassProperty.h"
-#include "CesiumGltf/PropertyArrayView.h"
-#include "CesiumGltf/PropertyTableProperty.h"
-#include "CesiumGltf/PropertyTablePropertyView.h"
-#include "CesiumGltf/PropertyType.h"
-#include "CesiumGltf/PropertyTypeTraits.h"
-#include "CesiumUtility/JsonValue.h"
+#include <CesiumGltf/ClassProperty.h>
+#include <CesiumGltf/PropertyArrayView.h>
+#include <CesiumGltf/PropertyTableProperty.h>
+#include <CesiumGltf/PropertyTablePropertyView.h>
+#include <CesiumGltf/PropertyType.h>
+#include <CesiumGltf/PropertyTypeTraits.h>
+#include <CesiumUtility/JsonValue.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>

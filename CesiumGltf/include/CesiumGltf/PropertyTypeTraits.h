@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CesiumGltf/PropertyArrayView.h"
-#include "CesiumGltf/PropertyType.h"
+#include "PropertyArrayView.h"
+#include "PropertyType.h"
 
 #include <glm/glm.hpp>
 

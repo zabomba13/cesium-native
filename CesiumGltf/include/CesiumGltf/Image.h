@@ -1,8 +1,9 @@
 #pragma once
 
-#include "CesiumGltf/ImageCesium.h"
-#include "CesiumGltf/ImageSpec.h"
-#include "CesiumGltf/Library.h"
+#include "ImageCesium.h"
+#include "Library.h"
+
+#include <CesiumGltf/ImageSpec.h>
 
 namespace CesiumGltf {
 /** @copydoc ImageSpec */

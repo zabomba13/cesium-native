@@ -1,8 +1,9 @@
 #pragma once
 
-#include "CesiumGltf/BufferCesium.h"
-#include "CesiumGltf/BufferSpec.h"
-#include "CesiumGltf/Library.h"
+#include "BufferCesium.h"
+#include "Library.h"
+
+#include <CesiumGltf/BufferSpec.h>
 
 namespace CesiumGltf {
 /** @copydoc BufferSpec */

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CesiumJsonWriter/JsonWriter.h"
-#include "CesiumJsonWriter/Library.h"
+#include "JsonWriter.h"
+#include "Library.h"
 
 #include <any>
 #include <functional>

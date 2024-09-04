@@ -1,8 +1,6 @@
-#include "CesiumAsync/ThreadPool.h"
-
-#include "CesiumAsync/Impl/ImmediateScheduler.h"
-
-#include <async++.h>
+#include <CesiumAsync/Impl/ImmediateScheduler.h>
+#include <CesiumAsync/Impl/cesium-async++.h>
+#include <CesiumAsync/ThreadPool.h>
 
 #include <cstddef>
 #include <cstdint>

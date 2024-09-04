@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CesiumGltfReader/Library.h"
+#include "Library.h"
 
 #include <CesiumAsync/AsyncSystem.h>
 #include <CesiumAsync/Future.h>

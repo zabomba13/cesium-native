@@ -1,16 +1,15 @@
 #include "applyKhrTextureTransform.h"
 
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Buffer.h"
-#include "CesiumGltf/BufferView.h"
-#include "CesiumGltf/Material.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltf/TextureInfo.h"
-
+#include <CesiumGltf/Accessor.h>
 #include <CesiumGltf/AccessorView.h>
+#include <CesiumGltf/Buffer.h>
+#include <CesiumGltf/BufferView.h>
 #include <CesiumGltf/ExtensionKhrTextureTransform.h>
 #include <CesiumGltf/KhrTextureTransform.h>
+#include <CesiumGltf/Material.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
+#include <CesiumGltf/TextureInfo.h>
 
 #include <glm/ext/vector_double2.hpp>
 #include <glm/ext/vector_float2.hpp>

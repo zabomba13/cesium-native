@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CesiumGltf/PropertyType.h"
+#include "PropertyType.h"
 
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/SpanHelper.h>

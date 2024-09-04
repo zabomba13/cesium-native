@@ -1,14 +1,13 @@
 #include "decodeDraco.h"
 
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Buffer.h"
-#include "CesiumGltf/BufferView.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltfReader/GltfReader.h"
-
+#include <CesiumGltf/Accessor.h>
+#include <CesiumGltf/Buffer.h>
+#include <CesiumGltf/BufferView.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
 #include <CesiumGltf/Model.h>
+#include <CesiumGltfReader/GltfReader.h>
 #include <CesiumUtility/Tracing.h>
 
 #include <draco/attributes/geometry_indices.h>

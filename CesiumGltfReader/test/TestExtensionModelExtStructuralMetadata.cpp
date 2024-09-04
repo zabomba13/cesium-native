@@ -1,6 +1,5 @@
-#include "CesiumGltfReader/GltfReader.h"
-
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
+#include <CesiumGltfReader/GltfReader.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <gsl/span>

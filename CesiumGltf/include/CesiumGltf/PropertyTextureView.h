@@ -1,11 +1,12 @@
 #pragma once
 
-#include "CesiumGltf/Class.h"
-#include "CesiumGltf/ClassProperty.h"
-#include "CesiumGltf/Model.h"
-#include "CesiumGltf/PropertyTexture.h"
-#include "CesiumGltf/PropertyTexturePropertyView.h"
-#include "CesiumGltf/TextureView.h"
+#include "PropertyTexturePropertyView.h"
+#include "TextureView.h"
+
+#include <CesiumGltf/Class.h>
+#include <CesiumGltf/ClassProperty.h>
+#include <CesiumGltf/Model.h>
+#include <CesiumGltf/PropertyTexture.h>
 
 namespace CesiumGltf {
 /**

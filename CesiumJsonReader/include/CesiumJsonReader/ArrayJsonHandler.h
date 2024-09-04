@@ -1,11 +1,12 @@
 #pragma once
 
-#include "CesiumUtility/Assert.h"
 #include "DoubleJsonHandler.h"
 #include "IntegerJsonHandler.h"
 #include "JsonHandler.h"
 #include "Library.h"
 #include "StringJsonHandler.h"
+
+#include <CesiumUtility/Assert.h>
 
 #include <functional>
 #include <memory>

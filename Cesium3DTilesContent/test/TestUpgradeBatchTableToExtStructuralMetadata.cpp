@@ -1,23 +1,23 @@
 #include "BatchTableToGltfStructuralMetadata.h"
-#include "Cesium3DTilesContent/GltfConverterResult.h"
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Class.h"
-#include "CesiumGltf/ClassProperty.h"
-#include "CesiumGltf/FeatureId.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltf/Model.h"
-#include "CesiumGltf/PropertyArrayView.h"
-#include "CesiumGltf/PropertyTable.h"
-#include "CesiumGltf/Schema.h"
-#include "CesiumGltfReader/GltfReader.h"
 #include "ConvertTileToGltf.h"
 
+#include <Cesium3DTilesContent/GltfConverterResult.h>
+#include <CesiumGltf/Accessor.h>
+#include <CesiumGltf/Class.h>
+#include <CesiumGltf/ClassProperty.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
+#include <CesiumGltf/FeatureId.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
+#include <CesiumGltf/Model.h>
+#include <CesiumGltf/PropertyArrayView.h>
+#include <CesiumGltf/PropertyTable.h>
 #include <CesiumGltf/PropertyTablePropertyView.h>
 #include <CesiumGltf/PropertyTableView.h>
+#include <CesiumGltf/Schema.h>
+#include <CesiumGltfReader/GltfReader.h>
 #include <CesiumUtility/Math.h>
 
 #include <catch2/catch_approx.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CesiumGltf/PropertyType.h"
+#include "PropertyType.h"
 #include "getOffsetFromOffsetsBuffer.h"
 
 #include <CesiumUtility/SpanHelper.h>

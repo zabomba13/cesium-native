@@ -1,5 +1,4 @@
-#include "CesiumJsonReader/JsonReader.h"
-
+#include <CesiumJsonReader/JsonReader.h>
 #include <CesiumQuantizedMeshTerrain/Layer.h>
 #include <CesiumQuantizedMeshTerrain/LayerReader.h>
 #include <CesiumQuantizedMeshTerrain/LayerWriter.h>

@@ -1,15 +1,14 @@
-#include "CesiumGeometry/QuadtreeTileID.h"
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Buffer.h"
-#include "CesiumGltf/BufferView.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltf/Node.h"
-
+#include <CesiumGeometry/QuadtreeTileID.h>
 #include <CesiumGeospatial/Cartographic.h>
 #include <CesiumGeospatial/Ellipsoid.h>
+#include <CesiumGltf/Accessor.h>
 #include <CesiumGltf/AccessorView.h>
 #include <CesiumGltf/AccessorWriter.h>
+#include <CesiumGltf/Buffer.h>
+#include <CesiumGltf/BufferView.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
+#include <CesiumGltf/Node.h>
 #include <CesiumGltfContent/SkirtMeshMetadata.h>
 #include <CesiumRasterOverlays/RasterOverlayUtilities.h>
 #include <CesiumUtility/Math.h>

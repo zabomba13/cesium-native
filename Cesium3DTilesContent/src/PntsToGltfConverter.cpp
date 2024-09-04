@@ -1,23 +1,23 @@
 #include "BatchTableToGltfStructuralMetadata.h"
-#include "Cesium3DTilesContent/GltfConverterResult.h"
-#include "CesiumAsync/Future.h"
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Buffer.h"
-#include "CesiumGltf/BufferView.h"
-#include "CesiumGltf/Material.h"
-#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltf/Model.h"
-#include "CesiumGltf/Node.h"
-#include "CesiumGltf/Scene.h"
-#include "CesiumGltfReader/GltfReader.h"
 
+#include <Cesium3DTilesContent/GltfConverterResult.h>
 #include <Cesium3DTilesContent/GltfConverters.h>
 #include <Cesium3DTilesContent/PntsToGltfConverter.h>
+#include <CesiumAsync/Future.h>
 #include <CesiumGeometry/Transforms.h>
+#include <CesiumGltf/Accessor.h>
+#include <CesiumGltf/Buffer.h>
+#include <CesiumGltf/BufferView.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
+#include <CesiumGltf/Material.h>
+#include <CesiumGltf/MaterialPBRMetallicRoughness.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
+#include <CesiumGltf/Model.h>
+#include <CesiumGltf/Node.h>
+#include <CesiumGltf/Scene.h>
+#include <CesiumGltfReader/GltfReader.h>
 #include <CesiumUtility/AttributeCompression.h>
 
 #include <draco/core/data_buffer.h>

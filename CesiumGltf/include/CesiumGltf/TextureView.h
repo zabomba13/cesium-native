@@ -1,9 +1,10 @@
 #pragma once
 
-#include "CesiumGltf/ImageCesium.h"
-#include "CesiumGltf/KhrTextureTransform.h"
-#include "CesiumGltf/Sampler.h"
-#include "CesiumGltf/TextureInfo.h"
+#include "ImageCesium.h"
+#include "KhrTextureTransform.h"
+
+#include <CesiumGltf/Sampler.h>
+#include <CesiumGltf/TextureInfo.h>
 
 #include <vector>
 

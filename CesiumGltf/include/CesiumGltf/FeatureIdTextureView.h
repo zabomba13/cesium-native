@@ -1,7 +1,8 @@
 #pragma once
 
-#include "CesiumGltf/FeatureIdTexture.h"
-#include "CesiumGltf/TextureView.h"
+#include "TextureView.h"
+
+#include <CesiumGltf/FeatureIdTexture.h>
 
 #include <cmath>
 #include <cstdint>

@@ -1,6 +1,5 @@
-#include "CesiumGeometry/Plane.h"
-#include "CesiumGeospatial/Cartographic.h"
-
+#include <CesiumGeometry/Plane.h>
+#include <CesiumGeospatial/Cartographic.h>
 #include <CesiumGeospatial/Ellipsoid.h>
 
 #include <catch2/catch_test_macros.hpp>

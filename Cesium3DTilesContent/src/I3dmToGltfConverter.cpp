@@ -1,23 +1,22 @@
 // Heavily inspired by PntsToGltfConverter.cpp
 
-#include "Cesium3DTilesContent/GltfConverterResult.h"
-#include "Cesium3DTilesContent/GltfConverters.h"
-#include "CesiumAsync/Future.h"
-#include "CesiumAsync/HttpHeaders.h"
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltfReader/GltfReader.h"
-
 #include <Cesium3DTilesContent/BinaryToGltfConverter.h>
+#include <Cesium3DTilesContent/GltfConverterResult.h>
 #include <Cesium3DTilesContent/GltfConverterUtility.h>
+#include <Cesium3DTilesContent/GltfConverters.h>
 #include <Cesium3DTilesContent/I3dmToGltfConverter.h>
+#include <CesiumAsync/Future.h>
+#include <CesiumAsync/HttpHeaders.h>
 #include <CesiumGeospatial/LocalHorizontalCoordinateSystem.h>
+#include <CesiumGltf/Accessor.h>
 #include <CesiumGltf/AccessorUtility.h>
 #include <CesiumGltf/AccessorView.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
 #include <CesiumGltf/Model.h>
 #include <CesiumGltfContent/GltfUtilities.h>
+#include <CesiumGltfReader/GltfReader.h>
 #include <CesiumUtility/AttributeCompression.h>
 #include <CesiumUtility/Math.h>
 #include <CesiumUtility/Uri.h>

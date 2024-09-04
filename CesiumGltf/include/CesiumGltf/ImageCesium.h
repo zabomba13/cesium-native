@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CesiumGltf/Ktx2TranscodeTargets.h"
-#include "CesiumGltf/Library.h"
+#include "Ktx2TranscodeTargets.h"
+#include "Library.h"
 
 #include <cstddef>
 #include <cstdint>

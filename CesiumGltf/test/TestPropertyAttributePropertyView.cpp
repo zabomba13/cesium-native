@@ -1,17 +1,16 @@
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/AccessorView.h"
-#include "CesiumGltf/Buffer.h"
-#include "CesiumGltf/BufferView.h"
-#include "CesiumGltf/ClassProperty.h"
-#include "CesiumGltf/Model.h"
-#include "CesiumGltf/PropertyAttributeProperty.h"
-#include "CesiumGltf/PropertyAttributePropertyView.h"
-#include "CesiumGltf/PropertyTransformations.h"
-#include "CesiumGltf/PropertyType.h"
-#include "CesiumGltf/PropertyTypeTraits.h"
-#include "CesiumUtility/JsonValue.h"
-
+#include <CesiumGltf/Accessor.h>
+#include <CesiumGltf/AccessorView.h>
+#include <CesiumGltf/Buffer.h>
+#include <CesiumGltf/BufferView.h>
+#include <CesiumGltf/ClassProperty.h>
+#include <CesiumGltf/Model.h>
+#include <CesiumGltf/PropertyAttributeProperty.h>
+#include <CesiumGltf/PropertyAttributePropertyView.h>
+#include <CesiumGltf/PropertyTransformations.h>
+#include <CesiumGltf/PropertyType.h>
+#include <CesiumGltf/PropertyTypeTraits.h>
 #include <CesiumUtility/Assert.h>
+#include <CesiumUtility/JsonValue.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <glm/ext/matrix_double2x2.hpp>

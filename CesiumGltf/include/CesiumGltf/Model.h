@@ -1,6 +1,7 @@
 #pragma once
 
-#include <CesiumGltf/Library.h>
+#include "Library.h"
+
 #include <CesiumGltf/ModelSpec.h>
 #include <CesiumUtility/ErrorList.h>
 

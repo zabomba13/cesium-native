@@ -1,8 +1,6 @@
-#include "CesiumAsync/Impl/TaskScheduler.h"
-
-#include "CesiumAsync/ITaskProcessor.h"
-
-#include <async++.h>
+#include <CesiumAsync/ITaskProcessor.h>
+#include <CesiumAsync/Impl/TaskScheduler.h>
+#include <CesiumAsync/Impl/cesium-async++.h>
 
 #include <memory>
 #include <utility>

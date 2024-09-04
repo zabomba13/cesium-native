@@ -1,11 +1,12 @@
 #pragma once
 
 #include "BoundingRegion.h"
-#include "CesiumGeometry/AxisAlignedBox.h"
-#include "CesiumGeometry/Rectangle.h"
 #include "Ellipsoid.h"
 #include "GeographicProjection.h"
 #include "WebMercatorProjection.h"
+
+#include <CesiumGeometry/AxisAlignedBox.h>
+#include <CesiumGeometry/Rectangle.h>
 
 #include <glm/vec2.hpp>
 

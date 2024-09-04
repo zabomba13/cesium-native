@@ -1,10 +1,11 @@
 #pragma once
 
-#include "CesiumGltf/Class.h"
-#include "CesiumGltf/Model.h"
-#include "CesiumGltf/PropertyTable.h"
-#include "CesiumGltf/PropertyTablePropertyView.h"
-#include "CesiumGltf/PropertyType.h"
+#include "PropertyTablePropertyView.h"
+#include "PropertyType.h"
+
+#include <CesiumGltf/Class.h>
+#include <CesiumGltf/Model.h>
+#include <CesiumGltf/PropertyTable.h>
 
 #include <glm/common.hpp>
 

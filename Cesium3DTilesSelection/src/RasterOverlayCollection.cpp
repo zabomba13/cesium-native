@@ -1,14 +1,13 @@
-#include "Cesium3DTilesSelection/Tile.h"
-#include "Cesium3DTilesSelection/TilesetExternals.h"
-#include "CesiumAsync/Future.h"
-#include "CesiumGeospatial/Ellipsoid.h"
-#include "CesiumRasterOverlays/RasterOverlay.h"
-#include "CesiumRasterOverlays/RasterOverlayLoadFailureDetails.h"
-#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
-#include "CesiumUtility/IntrusivePointer.h"
-
 #include <Cesium3DTilesSelection/RasterOverlayCollection.h>
+#include <Cesium3DTilesSelection/Tile.h>
+#include <Cesium3DTilesSelection/TilesetExternals.h>
+#include <CesiumAsync/Future.h>
+#include <CesiumGeospatial/Ellipsoid.h>
+#include <CesiumRasterOverlays/RasterOverlay.h>
+#include <CesiumRasterOverlays/RasterOverlayLoadFailureDetails.h>
+#include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumUtility/Assert.h>
+#include <CesiumUtility/IntrusivePointer.h>
 
 #include <fmt/core.h>
 #include <glm/ext/vector_double2.hpp>

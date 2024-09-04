@@ -1,11 +1,11 @@
 #pragma once
 
-#include "CesiumGltf/AccessorView.h"
-#include "CesiumGltf/PropertyAttributeProperty.h"
-#include "CesiumGltf/PropertyTransformations.h"
-#include "CesiumGltf/PropertyTypeTraits.h"
-#include "CesiumGltf/PropertyView.h"
+#include "AccessorView.h"
+#include "PropertyTransformations.h"
+#include "PropertyTypeTraits.h"
+#include "PropertyView.h"
 
+#include <CesiumGltf/PropertyAttributeProperty.h>
 #include <CesiumUtility/Assert.h>
 
 #include <cmath>

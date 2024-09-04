@@ -1,6 +1,5 @@
-#include "CesiumAsync/Impl/QueuedScheduler.h"
-
-#include <async++.h>
+#include <CesiumAsync/Impl/QueuedScheduler.h>
+#include <CesiumAsync/Impl/cesium-async++.h>
 
 #include <condition_variable>
 #include <cstddef>

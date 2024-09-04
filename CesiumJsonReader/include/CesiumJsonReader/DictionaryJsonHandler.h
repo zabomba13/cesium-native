@@ -1,8 +1,9 @@
 #pragma once
 
-#include "CesiumUtility/Assert.h"
 #include "Library.h"
 #include "ObjectJsonHandler.h"
+
+#include <CesiumUtility/Assert.h>
 
 #include <map>
 #include <unordered_map>

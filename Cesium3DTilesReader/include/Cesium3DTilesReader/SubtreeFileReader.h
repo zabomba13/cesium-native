@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Cesium3DTilesReader/Library.h>
+#include "Library.h"
+
 #include <Cesium3DTilesReader/SubtreeReader.h>
 #include <CesiumAsync/AsyncSystem.h>
 #include <CesiumAsync/Future.h>

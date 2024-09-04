@@ -1,8 +1,8 @@
 #pragma once
 
+#include "GltfConverterResult.h"
 #include "Library.h"
 
-#include <Cesium3DTilesContent/GltfConverterResult.h>
 #include <CesiumAsync/Future.h>
 #include <CesiumAsync/IAssetAccessor.h>
 #include <CesiumGeometry/Axis.h>

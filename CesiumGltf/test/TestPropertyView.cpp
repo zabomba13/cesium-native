@@ -1,7 +1,7 @@
-#include "CesiumGltf/ClassProperty.h"
-#include "CesiumGltf/PropertyArrayView.h"
-#include "CesiumGltf/PropertyView.h"
-#include "CesiumUtility/JsonValue.h"
+#include <CesiumGltf/ClassProperty.h>
+#include <CesiumGltf/PropertyArrayView.h>
+#include <CesiumGltf/PropertyView.h>
+#include <CesiumUtility/JsonValue.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <glm/ext/matrix_double2x2.hpp>
@@ -825,7 +825,7 @@ TEST_CASE("MatN PropertyView") {
     classProperty.type = ClassProperty::Type::MAT2;
     classProperty.componentType = ClassProperty::ComponentType::INT8;
     classProperty.required = true;
-    
+
     // clang-format off
     classProperty.defaultProperty = {
       1, 2,

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "CesiumGltf/PropertyArrayView.h"
-#include "CesiumGltf/PropertyTransformations.h"
-#include "CesiumGltf/PropertyTypeTraits.h"
-#include "CesiumGltf/PropertyView.h"
+#include "PropertyArrayView.h"
+#include "PropertyTransformations.h"
+#include "PropertyTypeTraits.h"
+#include "PropertyView.h"
 
 #include <CesiumUtility/Assert.h>
 

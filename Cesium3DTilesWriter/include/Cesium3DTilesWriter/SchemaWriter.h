@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Cesium3DTilesWriter/Library.h"
+#include "Library.h"
 
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
 

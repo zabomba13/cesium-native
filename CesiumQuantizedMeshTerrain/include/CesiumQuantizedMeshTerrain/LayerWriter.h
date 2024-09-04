@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CesiumQuantizedMeshTerrain/Library.h"
+#include "Library.h"
 
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
 

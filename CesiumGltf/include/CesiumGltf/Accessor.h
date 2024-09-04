@@ -1,7 +1,8 @@
 #pragma once
 
-#include "CesiumGltf/AccessorSpec.h"
-#include "CesiumGltf/Library.h"
+#include "Library.h"
+
+#include <CesiumGltf/AccessorSpec.h>
 
 #include <cstdint>
 

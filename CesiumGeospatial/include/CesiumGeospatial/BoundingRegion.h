@@ -6,7 +6,6 @@
 
 #include <CesiumGeometry/CullingResult.h>
 #include <CesiumGeometry/OrientedBoundingBox.h>
-#include <CesiumGeospatial/Ellipsoid.h>
 
 namespace CesiumGeometry {
 class Plane;

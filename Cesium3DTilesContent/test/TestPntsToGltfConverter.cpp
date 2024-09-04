@@ -1,20 +1,20 @@
-#include "Cesium3DTilesContent/GltfConverterResult.h"
-#include "CesiumGltf/Accessor.h"
-#include "CesiumGltf/Buffer.h"
-#include "CesiumGltf/BufferView.h"
-#include "CesiumGltf/FeatureId.h"
-#include "CesiumGltf/Material.h"
-#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
-#include "CesiumGltf/Mesh.h"
-#include "CesiumGltf/MeshPrimitive.h"
-#include "CesiumGltf/Model.h"
-#include "CesiumGltf/Node.h"
 #include "ConvertTileToGltf.h"
 
+#include <Cesium3DTilesContent/GltfConverterResult.h>
+#include <CesiumGltf/Accessor.h>
+#include <CesiumGltf/Buffer.h>
+#include <CesiumGltf/BufferView.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
+#include <CesiumGltf/FeatureId.h>
+#include <CesiumGltf/Material.h>
+#include <CesiumGltf/MaterialPBRMetallicRoughness.h>
+#include <CesiumGltf/Mesh.h>
+#include <CesiumGltf/MeshPrimitive.h>
+#include <CesiumGltf/Model.h>
+#include <CesiumGltf/Node.h>
 #include <CesiumUtility/Math.h>
 
 #include <catch2/catch_approx.hpp>

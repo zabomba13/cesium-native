@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CesiumAsync/Future.h"
+#include "Future.h"
 #include "Impl/AsyncSystemSchedulers.h"
 #include "Impl/cesium-async++.h"
 
