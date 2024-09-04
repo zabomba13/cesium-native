@@ -2,9 +2,10 @@
 
 #include "Library.h"
 #include "TileOcclusionRendererProxy.h"
-#include "spdlog-cesium.h"
 
 #include <CesiumAsync/AsyncSystem.h>
+
+#include <spdlog/logger.h>
 
 #include <memory>
 
