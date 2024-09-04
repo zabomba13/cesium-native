@@ -6,7 +6,6 @@
 #include <CesiumAsync/IAssetRequest.h>
 #include <CesiumGeospatial/Ellipsoid.h>
 
-#include <functional>
 #include <memory>
 
 namespace CesiumRasterOverlays {

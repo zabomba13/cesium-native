@@ -3,7 +3,6 @@
 #include "HttpHeaders.h"
 #include "Library.h"
 
-#include <functional>
 #include <string>
 
 namespace CesiumAsync {

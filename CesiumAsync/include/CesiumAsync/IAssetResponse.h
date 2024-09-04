@@ -7,7 +7,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <map>
 #include <string>
 
 namespace CesiumAsync {

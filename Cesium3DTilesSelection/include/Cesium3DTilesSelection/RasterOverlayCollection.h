@@ -12,7 +12,6 @@
 
 #include <gsl/span>
 
-#include <memory>
 #include <vector>
 
 namespace Cesium3DTilesSelection {

@@ -1,18 +1,30 @@
 #include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/CacheItem.h"
 #include "CesiumAsync/CachingAssetAccessor.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumAsync/IAssetResponse.h"
 #include "CesiumAsync/ICacheDatabase.h"
-#include "CesiumAsync/ITaskProcessor.h"
 #include "MockAssetAccessor.h"
 #include "MockAssetRequest.h"
 #include "MockAssetResponse.h"
 #include "MockTaskProcessor.h"
 #include "ResponseCacheControl.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <gsl/span>
 #include <spdlog/spdlog.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <ctime>
+#include <memory>
 #include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 

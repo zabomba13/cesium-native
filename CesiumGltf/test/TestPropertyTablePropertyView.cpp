@@ -1,12 +1,38 @@
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTableProperty.h"
 #include "CesiumGltf/PropertyTablePropertyView.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyTypeTraits.h"
+#include "CesiumUtility/JsonValue.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double2x2.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/matrix_float2x2.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_int2.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
+#include <glm/fwd.hpp>
 #include <gsl/span>
 
 #include <bitset>
 #include <climits>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <optional>
+#include <string_view>
 #include <vector>
 
 using namespace CesiumGltf;
@@ -91,7 +117,8 @@ static void checkNumeric(
   for (int64_t i = 0; i < property.size(); ++i) {
     REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
     if constexpr (IsMetadataFloating<T>::value) {
-      REQUIRE(property.get(i) == Approx(*expected[static_cast<size_t>(i)]));
+      REQUIRE(
+          property.get(i) == Catch::Approx(*expected[static_cast<size_t>(i)]));
     } else {
       REQUIRE(property.get(i) == expected[static_cast<size_t>(i)]);
     }
@@ -666,7 +693,8 @@ TEST_CASE("Check scalar PropertyTablePropertyView") {
     std::vector<float> expected{3.0, 7.0f, 5.0f, 9.0f};
     for (int64_t i = 0; i < property.size(); ++i) {
       REQUIRE(property.getRaw(i) == values[static_cast<size_t>(i)]);
-      REQUIRE(property.get(i) == Approx(expected[static_cast<size_t>(i)]));
+      REQUIRE(
+          property.get(i) == Catch::Approx(expected[static_cast<size_t>(i)]));
     }
   }
 }

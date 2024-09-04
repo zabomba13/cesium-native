@@ -1,7 +1,17 @@
 #include "decodeMeshOpt.h"
 
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+
 #include <CesiumGltf/ExtensionBufferViewExtMeshoptCompression.h>
 #include <CesiumGltfReader/GltfReader.h>
+
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
+#include <vector>
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -84,16 +94,10 @@ int decodeBufferView(
         reinterpret_cast<const unsigned char*>(buffer.data()),
         buffer.size());
   } else {
-    if (meshOpt.byteStride == sizeof(std::uint16_t)) {
-      return decodeIndices(
-          reinterpret_cast<std::uint16_t*>(data),
-          buffer,
-          meshOpt);
-    } else if (meshOpt.byteStride == sizeof(std::uint32_t)) {
-      return decodeIndices(
-          reinterpret_cast<std::uint32_t*>(data),
-          buffer,
-          meshOpt);
+    if (meshOpt.byteStride == sizeof(uint16_t)) {
+      return decodeIndices(reinterpret_cast<uint16_t*>(data), buffer, meshOpt);
+    } else if (meshOpt.byteStride == sizeof(uint32_t)) {
+      return decodeIndices(reinterpret_cast<uint32_t*>(data), buffer, meshOpt);
     } else {
       return -1;
     }

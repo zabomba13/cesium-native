@@ -1,15 +1,36 @@
 #include "CesiumIonTilesetLoader.h"
 
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetOptions.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetRequest.h"
+#include "CesiumGeospatial/Ellipsoid.h"
 #include "LayerJsonTerrainLoader.h"
+#include "TilesetContentLoaderResult.h"
 #include "TilesetJsonLoader.h"
 
 #include <CesiumAsync/IAssetAccessor.h>
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Log.h>
 #include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <spdlog/logger.h>
+#include <spdlog/spdlog.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace Cesium3DTilesSelection {
 namespace {
@@ -57,7 +78,7 @@ std::optional<std::string> getNewAccessToken(
         pLogger,
         "Error when parsing Cesium ion response, error code {} at byte offset "
         "{}",
-        ionResponse.GetParseError(),
+        static_cast<int>(ionResponse.GetParseError()),
         ionResponse.GetErrorOffset());
     return std::nullopt;
   }
@@ -252,7 +273,7 @@ mainThreadHandleEndpointResponse(
     result.errors.emplaceError(fmt::format(
         "Error when parsing Cesium ion response JSON, error code {} at byte "
         "offset {}",
-        ionResponse.GetParseError(),
+        static_cast<int>(ionResponse.GetParseError()),
         ionResponse.GetErrorOffset()));
     return externals.asyncSystem.createResolvedFuture(std::move(result));
   }

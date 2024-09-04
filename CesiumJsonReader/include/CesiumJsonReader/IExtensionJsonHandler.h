@@ -4,7 +4,6 @@
 
 #include <CesiumUtility/ExtensibleObject.h>
 
-#include <any>
 #include <string_view>
 
 namespace CesiumJsonReader {

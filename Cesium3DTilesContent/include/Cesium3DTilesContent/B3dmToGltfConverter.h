@@ -8,8 +8,6 @@
 
 #include <gsl/span>
 
-#include <optional>
-
 namespace Cesium3DTilesContent {
 struct AssetFetcher;
 

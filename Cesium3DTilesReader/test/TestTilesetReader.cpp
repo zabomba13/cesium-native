@@ -1,19 +1,24 @@
+#include "CesiumJsonReader/JsonReaderOptions.h"
+
 #include <Cesium3DTiles/Extension3dTilesBoundingVolumeS2.h>
 #include <Cesium3DTilesReader/TilesetReader.h>
 #include <CesiumJsonReader/JsonReader.h>
 #include <CesiumNativeTests/readFile.h>
 
-#include <catch2/catch.hpp>
-#include <glm/vec3.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <gsl/span>
-#include <rapidjson/reader.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <string>
+#include <vector>
 
 TEST_CASE("Reads tileset JSON") {
-  using namespace std::string_literals;
+  // NOLINTNEXTLINE(misc-include-cleaner)
+  using std::string_literals::operator""s;
 
   std::filesystem::path tilesetFile = Cesium3DTilesReader_TEST_DATA_DIR;
   tilesetFile /= "tileset.json";
@@ -164,10 +169,10 @@ TEST_CASE("Reads extras") {
   CesiumUtility::JsonValue::Array array = pC2->getArray();
   CHECK(array.size() == 5);
   CHECK(array[0].getSafeNumber<double>() == 1.0);
-  CHECK(array[1].getSafeNumber<std::uint64_t>() == 2);
-  CHECK(array[2].getSafeNumber<std::uint8_t>() == 3);
-  CHECK(array[3].getSafeNumber<std::int16_t>() == 4);
-  CHECK(array[4].getSafeNumber<std::int32_t>() == 5);
+  CHECK(array[1].getSafeNumber<uint64_t>() == 2);
+  CHECK(array[2].getSafeNumber<uint8_t>() == 3);
+  CHECK(array[3].getSafeNumber<int16_t>() == 4);
+  CHECK(array[4].getSafeNumber<int32_t>() == 5);
 
   CesiumUtility::JsonValue* pC3 = cit->second.getValuePtrForKey("C3");
   REQUIRE(pC3 != nullptr);
@@ -294,7 +299,8 @@ TEST_CASE("Reads custom extension") {
 }
 
 TEST_CASE("Reads tileset JSON with unknown properties") {
-  using namespace std::string_literals;
+  // NOLINTNEXTLINE(misc-include-cleaner)
+  using std::string_literals::operator""s;
 
   std::filesystem::path tilesetFile = Cesium3DTilesReader_TEST_DATA_DIR;
   tilesetFile /= "tileset-with-unsupported-properties.json";
@@ -358,7 +364,8 @@ TEST_CASE("Reads tileset JSON with unknown properties") {
 
 TEST_CASE("Reads tileset JSON with unknown properties and ignores them when "
           "requested") {
-  using namespace std::string_literals;
+  // NOLINTNEXTLINE(misc-include-cleaner)
+  using std::string_literals::operator""s;
 
   std::filesystem::path tilesetFile = Cesium3DTilesReader_TEST_DATA_DIR;
   tilesetFile /= "tileset-with-unsupported-properties.json";

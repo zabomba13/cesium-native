@@ -1,8 +1,18 @@
+#include "CesiumGeometry/BoundingSphere.h"
+#include "CesiumGeometry/OrientedBoundingBox.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGeospatial/S2CellBoundingVolume.h"
+
 #include <Cesium3DTiles/BoundingVolume.h>
 #include <Cesium3DTiles/Extension3dTilesBoundingVolumeS2.h>
 #include <Cesium3DTilesContent/TileBoundingVolumes.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/geometric.hpp>
+
+#include <optional>
 
 using namespace Cesium3DTiles;
 using namespace Cesium3DTilesContent;
@@ -26,12 +36,12 @@ TEST_CASE("TileBoundingVolumes") {
         TileBoundingVolumes::getOrientedBoundingBox(bv);
     REQUIRE(box);
 
-    CHECK(box->getCenter().x == Approx(0.0));
-    CHECK(box->getCenter().y == Approx(0.0));
-    CHECK(box->getCenter().z == Approx(10.0));
-    CHECK(glm::length(box->getHalfAxes()[0]) == Approx(100.0));
-    CHECK(glm::length(box->getHalfAxes()[1]) == Approx(100.0));
-    CHECK(glm::length(box->getHalfAxes()[2]) == Approx(10.0));
+    CHECK(box->getCenter().x == Catch::Approx(0.0));
+    CHECK(box->getCenter().y == Catch::Approx(0.0));
+    CHECK(box->getCenter().z == Catch::Approx(10.0));
+    CHECK(glm::length(box->getHalfAxes()[0]) == Catch::Approx(100.0));
+    CHECK(glm::length(box->getHalfAxes()[1]) == Catch::Approx(100.0));
+    CHECK(glm::length(box->getHalfAxes()[2]) == Catch::Approx(10.0));
 
     BoundingVolume next{};
     TileBoundingVolumes::setOrientedBoundingBox(next, *box);
@@ -48,10 +58,10 @@ TEST_CASE("TileBoundingVolumes") {
         TileBoundingVolumes::getBoundingSphere(bv);
     REQUIRE(sphere);
 
-    CHECK(sphere->getCenter().x == Approx(0.0));
-    CHECK(sphere->getCenter().y == Approx(0.0));
-    CHECK(sphere->getCenter().z == Approx(10.0));
-    CHECK(sphere->getRadius() == Approx(141.4214));
+    CHECK(sphere->getCenter().x == Catch::Approx(0.0));
+    CHECK(sphere->getCenter().y == Catch::Approx(0.0));
+    CHECK(sphere->getCenter().z == Catch::Approx(10.0));
+    CHECK(sphere->getRadius() == Catch::Approx(141.4214));
 
     BoundingVolume next{};
     TileBoundingVolumes::setBoundingSphere(next, *sphere);
@@ -74,12 +84,14 @@ TEST_CASE("TileBoundingVolumes") {
         TileBoundingVolumes::getBoundingRegion(bv, Ellipsoid::WGS84);
     REQUIRE(region);
 
-    CHECK(region->getRectangle().getWest() == Approx(-1.3197004795898053));
-    CHECK(region->getRectangle().getSouth() == Approx(0.6988582109));
-    CHECK(region->getRectangle().getEast() == Approx(-1.3196595204101946));
-    CHECK(region->getRectangle().getNorth() == Approx(0.6988897891));
-    CHECK(region->getMinimumHeight() == Approx(0.0));
-    CHECK(region->getMaximumHeight() == Approx(20.0));
+    CHECK(
+        region->getRectangle().getWest() == Catch::Approx(-1.3197004795898053));
+    CHECK(region->getRectangle().getSouth() == Catch::Approx(0.6988582109));
+    CHECK(
+        region->getRectangle().getEast() == Catch::Approx(-1.3196595204101946));
+    CHECK(region->getRectangle().getNorth() == Catch::Approx(0.6988897891));
+    CHECK(region->getMinimumHeight() == Catch::Approx(0.0));
+    CHECK(region->getMaximumHeight() == Catch::Approx(20.0));
 
     BoundingVolume next{};
     TileBoundingVolumes::setBoundingRegion(next, *region);
@@ -101,8 +113,8 @@ TEST_CASE("TileBoundingVolumes") {
     REQUIRE(s2);
 
     CHECK(s2->getCellID().getID() == S2CellID::fromToken("89c6c7").getID());
-    CHECK(s2->getMinimumHeight() == Approx(0.0));
-    CHECK(s2->getMaximumHeight() == Approx(1000.0));
+    CHECK(s2->getMinimumHeight() == Catch::Approx(0.0));
+    CHECK(s2->getMaximumHeight() == Catch::Approx(1000.0));
 
     BoundingVolume next{};
     TileBoundingVolumes::setS2CellBoundingVolume(next, *s2);

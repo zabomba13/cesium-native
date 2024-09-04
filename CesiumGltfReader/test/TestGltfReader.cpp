@@ -1,4 +1,16 @@
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/Image.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
 #include "CesiumGltfReader/GltfReader.h"
+#include "CesiumJsonReader/JsonReaderOptions.h"
+#include "CesiumNativeTests/SimpleAssetRequest.h"
+#include "CesiumNativeTests/SimpleAssetResponse.h"
+#include "CesiumUtility/JsonValue.h"
 
 #include <CesiumAsync/AsyncSystem.h>
 #include <CesiumGltf/AccessorView.h>
@@ -11,15 +23,24 @@
 #include <CesiumNativeTests/waitForFuture.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
-#include <glm/vec3.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
 #include <gsl/span>
-#include <rapidjson/reader.h>
 
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
-#include <fstream>
 #include <limits>
+#include <map>
+#include <memory>
 #include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace CesiumGltf;
@@ -28,7 +49,8 @@ using namespace CesiumUtility;
 using namespace CesiumNativeTests;
 
 TEST_CASE("CesiumGltfReader::GltfReader") {
-  using namespace std::string_literals;
+  // NOLINTNEXTLINE(misc-include-cleaner)
+  using std::string_literals::operator""s;
 
   std::string s = R"(
     {
@@ -287,10 +309,10 @@ TEST_CASE("Nested extras deserializes properly") {
   std::vector<JsonValue>& array = std::get<std::vector<JsonValue>>(pC2->value);
   CHECK(array.size() == 5);
   CHECK(array[0].getSafeNumber<double>() == 1.0);
-  CHECK(array[1].getSafeNumber<std::uint64_t>() == 2);
-  CHECK(array[2].getSafeNumber<std::uint8_t>() == 3);
-  CHECK(array[3].getSafeNumber<std::int16_t>() == 4);
-  CHECK(array[4].getSafeNumber<std::int32_t>() == 5);
+  CHECK(array[1].getSafeNumber<uint64_t>() == 2);
+  CHECK(array[2].getSafeNumber<uint8_t>() == 3);
+  CHECK(array[3].getSafeNumber<int16_t>() == 4);
+  CHECK(array[4].getSafeNumber<int32_t>() == 5);
 }
 
 TEST_CASE("Can deserialize KHR_draco_mesh_compression") {

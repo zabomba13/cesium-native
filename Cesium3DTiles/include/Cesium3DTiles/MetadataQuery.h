@@ -1,11 +1,14 @@
 #pragma once
 
+#include <Cesium3DTiles/Class.h>
+#include <Cesium3DTiles/ClassProperty.h>
+#include <Cesium3DTiles/Library.h>
 #include <Cesium3DTiles/MetadataEntity.h>
 #include <Cesium3DTiles/Schema.h>
 #include <CesiumUtility/JsonValue.h>
 
+#include <optional>
 #include <string>
-#include <unordered_map>
 
 namespace Cesium3DTiles {
 

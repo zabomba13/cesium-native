@@ -1,6 +1,26 @@
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumRasterOverlays/RasterOverlayLoadFailureDetails.h"
+#include "CesiumRasterOverlays/RasterOverlayTileProvider.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <Cesium3DTilesSelection/RasterOverlayCollection.h>
 #include <CesiumUtility/Assert.h>
-#include <CesiumUtility/Tracing.h>
+
+#include <fmt/core.h>
+#include <glm/ext/vector_double2.hpp>
+#include <nonstd/expected.hpp>
+#include <spdlog/spdlog.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGeometry;
 using namespace CesiumGeospatial;
@@ -123,7 +143,7 @@ void RasterOverlayCollection::add(
               pList->overlays.end(),
               pOverlay);
           if (it != pList->overlays.end()) {
-            std::int64_t index = it - pList->overlays.begin();
+            int64_t index = it - pList->overlays.begin();
             pList->tileProviders[size_t(index)] = *result;
           }
         } else {

@@ -4,9 +4,9 @@
 #include "Library.h"
 
 #include <any>
+#include <string>
 #include <unordered_map>
 #include <utility>
-#include <vector>
 
 namespace CesiumUtility {
 /**

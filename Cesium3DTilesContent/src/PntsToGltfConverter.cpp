@@ -1,4 +1,17 @@
 #include "BatchTableToGltfStructuralMetadata.h"
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
+#include "CesiumGltf/Material.h"
+#include "CesiumGltf/MaterialPBRMetallicRoughness.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/Node.h"
+#include "CesiumGltf/Scene.h"
+#include "CesiumGltfReader/GltfReader.h"
 
 #include <Cesium3DTilesContent/GltfConverters.h>
 #include <Cesium3DTilesContent/PntsToGltfConverter.h>
@@ -6,8 +19,32 @@
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
 #include <CesiumUtility/AttributeCompression.h>
-#include <CesiumUtility/Log.h>
-#include <CesiumUtility/Math.h>
+
+#include <draco/core/data_buffer.h>
+#include <draco/core/draco_types.h>
+#include <draco/core/status_or.h>
+#include <fmt/core.h>
+#include <glm/common.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_float4.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
+#include <gsl/span>
+#include <rapidjson/rapidjson.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -616,9 +653,10 @@ rapidjson::Document parseFeatureTableJson(
       featureTableJsonData.size());
   if (document.HasParseError()) {
     parsedContent.errors.emplaceError(fmt::format(
-        "Error when parsing feature table JSON, error code {} at byte offset "
+        "Error when parsing feature table JSON, error code {} at byte "
+        "offset "
         "{}",
-        document.GetParseError(),
+        static_cast<int>(document.GetParseError()),
         document.GetErrorOffset()));
     return document;
   }
@@ -784,7 +822,7 @@ rapidjson::Document parseBatchTableJson(
         "Error when parsing batch table JSON, error code {} at byte "
         "offset "
         "{}. Skip parsing metadata",
-        document.GetParseError(),
+        static_cast<int>(document.GetParseError()),
         document.GetErrorOffset()));
     return document;
   }

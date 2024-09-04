@@ -1,5 +1,21 @@
+#include "Cesium3DTiles/Schema.h"
+#include "Cesium3DTilesSelection/Tile.h"
+#include "Cesium3DTilesSelection/TileContent.h"
+#include "Cesium3DTilesSelection/TileLoadResult.h"
+#include "Cesium3DTilesSelection/TileRefine.h"
+#include "Cesium3DTilesSelection/TilesetContentLoader.h"
+#include "Cesium3DTilesSelection/TilesetExternals.h"
+#include "Cesium3DTilesSelection/TilesetMetadata.h"
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumGeometry/Axis.h"
+#include "CesiumGeometry/BoundingSphere.h"
+#include "CesiumGeometry/OrientedBoundingBox.h"
+#include "CesiumGeospatial/BoundingRegion.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumUtility/CreditSystem.h"
 #include "ImplicitQuadtreeLoader.h"
 #include "SimplePrepareRendererResource.h"
+#include "TilesetContentLoaderResult.h"
 #include "TilesetJsonLoader.h"
 
 #include <Cesium3DTilesContent/registerAllTileContentTypes.h>
@@ -9,11 +25,23 @@
 #include <CesiumNativeTests/SimpleTaskProcessor.h>
 #include <CesiumNativeTests/readFile.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/matrix_double3x3.hpp>
+#include <glm/ext/matrix_double4x4.hpp>
+#include <spdlog/spdlog.h>
 
+#include <array>
 #include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <map>
 #include <memory>
+#include <optional>
 #include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 using namespace CesiumAsync;
 using namespace Cesium3DTilesSelection;
@@ -135,12 +163,16 @@ TEST_CASE("Test creating tileset json loader") {
     const auto* pRegion =
         std::get_if<CesiumGeospatial::BoundingRegion>(&boundingVolume);
     CHECK(pRegion != nullptr);
-    CHECK(pRegion->getMinimumHeight() == Approx(0.0));
-    CHECK(pRegion->getMaximumHeight() == Approx(88.0));
-    CHECK(pRegion->getRectangle().getWest() == Approx(-1.3197209591796106));
-    CHECK(pRegion->getRectangle().getEast() == Approx(-1.3196390408203893));
-    CHECK(pRegion->getRectangle().getSouth() == Approx(0.6988424218));
-    CHECK(pRegion->getRectangle().getNorth() == Approx(0.6989055782));
+    CHECK(pRegion->getMinimumHeight() == Catch::Approx(0.0));
+    CHECK(pRegion->getMaximumHeight() == Catch::Approx(88.0));
+    CHECK(
+        pRegion->getRectangle().getWest() ==
+        Catch::Approx(-1.3197209591796106));
+    CHECK(
+        pRegion->getRectangle().getEast() ==
+        Catch::Approx(-1.3196390408203893));
+    CHECK(pRegion->getRectangle().getSouth() == Catch::Approx(0.6988424218));
+    CHECK(pRegion->getRectangle().getNorth() == Catch::Approx(0.6989055782));
 
     // check root children
     auto children = pRootTile->getChildren();
@@ -202,12 +234,16 @@ TEST_CASE("Test creating tileset json loader") {
     const auto* pRegion =
         std::get_if<CesiumGeospatial::BoundingRegion>(&boundingVolume);
     CHECK(pRegion != nullptr);
-    CHECK(pRegion->getMinimumHeight() == Approx(0.0));
-    CHECK(pRegion->getMaximumHeight() == Approx(88.0));
-    CHECK(pRegion->getRectangle().getWest() == Approx(-1.3197209591796106));
-    CHECK(pRegion->getRectangle().getEast() == Approx(-1.3196390408203893));
-    CHECK(pRegion->getRectangle().getSouth() == Approx(0.6988424218));
-    CHECK(pRegion->getRectangle().getNorth() == Approx(0.6989055782));
+    CHECK(pRegion->getMinimumHeight() == Catch::Approx(0.0));
+    CHECK(pRegion->getMaximumHeight() == Catch::Approx(88.0));
+    CHECK(
+        pRegion->getRectangle().getWest() ==
+        Catch::Approx(-1.3197209591796106));
+    CHECK(
+        pRegion->getRectangle().getEast() ==
+        Catch::Approx(-1.3196390408203893));
+    CHECK(pRegion->getRectangle().getSouth() == Catch::Approx(0.6988424218));
+    CHECK(pRegion->getRectangle().getNorth() == Catch::Approx(0.6989055782));
 
     // check children
     std::array<std::string, 4> expectedUrl{
@@ -289,10 +325,10 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
     auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
-    CHECK(pRootTile->getGeometricError() == Approx(70.0));
+    CHECK(pRootTile->getGeometricError() == Catch::Approx(70.0));
     CHECK(pRootTile->getChildren().size() == 4);
     for (const Tile& child : pRootTile->getChildren()) {
-      CHECK(child.getGeometricError() == Approx(35.0));
+      CHECK(child.getGeometricError() == Catch::Approx(35.0));
     }
 
     // check loader up axis
@@ -308,11 +344,11 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
     auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
-    CHECK(pRootTile->getGeometricError() == Approx(70.0));
+    CHECK(pRootTile->getGeometricError() == Catch::Approx(70.0));
     CHECK(pRootTile->getRefine() == TileRefine::Add);
     CHECK(pRootTile->getChildren().size() == 4);
     for (const Tile& child : pRootTile->getChildren()) {
-      CHECK(child.getGeometricError() == Approx(5.0));
+      CHECK(child.getGeometricError() == Catch::Approx(5.0));
       CHECK(child.getRefine() == TileRefine::Replace);
     }
 
@@ -329,10 +365,10 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
     auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
-    CHECK(pRootTile->getGeometricError() == Approx(210.0));
+    CHECK(pRootTile->getGeometricError() == Catch::Approx(210.0));
     CHECK(pRootTile->getChildren().size() == 4);
     for (const Tile& child : pRootTile->getChildren()) {
-      CHECK(child.getGeometricError() == Approx(15.0));
+      CHECK(child.getGeometricError() == Catch::Approx(15.0));
     }
 
     // check loader up axis
@@ -346,7 +382,7 @@ TEST_CASE("Test creating tileset json loader") {
     REQUIRE(loaderResult.pRootTile);
     REQUIRE(loaderResult.pRootTile->getChildren().size() == 1);
     auto pRootTile = &loaderResult.pRootTile->getChildren()[0];
-    CHECK(pRootTile->getGeometricError() == Approx(70.0));
+    CHECK(pRootTile->getGeometricError() == Catch::Approx(70.0));
     CHECK(pRootTile->getChildren().size() == 1);
 
     const Tile& child = pRootTile->getChildren().front();
@@ -482,7 +518,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
 
     const Tile& parentB3dmTile = children[0];
     CHECK(std::get<std::string>(parentB3dmTile.getTileID()) == "parent.b3dm");
-    CHECK(parentB3dmTile.getGeometricError() == Approx(70.0));
+    CHECK(parentB3dmTile.getGeometricError() == Catch::Approx(70.0));
 
     std::vector<std::string> expectedChildUrls{
         "tileset3/tileset3.json",
@@ -493,7 +529,7 @@ TEST_CASE("Test loading individual tile of tileset json") {
     for (std::size_t i = 0; i < parentB3dmChildren.size(); ++i) {
       const Tile& child = parentB3dmChildren[i];
       CHECK(std::get<std::string>(child.getTileID()) == expectedChildUrls[i]);
-      CHECK(child.getGeometricError() == Approx(0.0));
+      CHECK(child.getGeometricError() == Catch::Approx(0.0));
       CHECK(child.getRefine() == TileRefine::Add);
       CHECK(std::holds_alternative<CesiumGeospatial::BoundingRegion>(
           child.getBoundingVolume()));

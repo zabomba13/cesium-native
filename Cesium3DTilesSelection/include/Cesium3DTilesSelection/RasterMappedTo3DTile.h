@@ -6,9 +6,6 @@
 #include <CesiumGeospatial/Projection.h>
 #include <CesiumRasterOverlays/RasterOverlayTile.h>
 #include <CesiumUtility/IntrusivePointer.h>
-
-#include <memory>
-
 namespace Cesium3DTilesSelection {
 
 class Tile;

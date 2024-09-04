@@ -92,13 +92,11 @@ public:
   /**
    * @brief Returns the current reference count of this instance.
    */
-  std::int32_t getReferenceCount() const noexcept {
-    return this->_referenceCount;
-  }
+  int32_t getReferenceCount() const noexcept { return this->_referenceCount; }
 
 private:
-  using ThreadSafeCounter = std::atomic<std::int32_t>;
-  using NonThreadSafeCounter = std::int32_t;
+  using ThreadSafeCounter = std::atomic<int32_t>;
+  using NonThreadSafeCounter = int32_t;
   using CounterType =
       std::conditional_t<isThreadSafe, ThreadSafeCounter, NonThreadSafeCounter>;
 

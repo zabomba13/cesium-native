@@ -1,8 +1,12 @@
 #include "CesiumGltf/FeatureIdTextureView.h"
 
-#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/FeatureIdTexture.h"
 #include "CesiumGltf/Model.h"
-#include "CesiumGltf/SamplerUtility.h"
+#include "CesiumGltf/TextureView.h"
+
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 namespace CesiumGltf {
 FeatureIdTextureView::FeatureIdTextureView() noexcept

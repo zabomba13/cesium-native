@@ -13,11 +13,9 @@
 #include <glm/common.hpp>
 #include <gsl/span>
 
-#include <atomic>
 #include <limits>
 #include <memory>
 #include <optional>
-#include <string>
 #include <vector>
 
 namespace Cesium3DTilesSelection {

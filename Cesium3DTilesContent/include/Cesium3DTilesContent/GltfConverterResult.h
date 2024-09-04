@@ -8,8 +8,6 @@
 #include <glm/common.hpp>
 
 #include <optional>
-#include <string>
-#include <vector>
 
 namespace Cesium3DTilesContent {
 /**

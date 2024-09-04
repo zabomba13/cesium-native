@@ -14,7 +14,6 @@
 
 #include <gsl/span>
 
-#include <functional>
 #include <memory>
 #include <optional>
 #include <string>

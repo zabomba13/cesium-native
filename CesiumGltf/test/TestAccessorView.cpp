@@ -1,8 +1,15 @@
+#include "CesiumGltf/Accessor.h"
 #include "CesiumGltf/AccessorView.h"
+#include "CesiumGltf/Buffer.h"
+#include "CesiumGltf/BufferView.h"
 #include "CesiumGltf/Model.h"
 
-#include <catch2/catch.hpp>
-#include <glm/vec3.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_float3.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
 
 TEST_CASE("AccessorView construct and read example") {
   auto anyOldFunctionToGetAModel = []() {

@@ -6,7 +6,6 @@
 #include <glm/vec2.hpp>
 
 #include <optional>
-#include <string>
 #include <vector>
 
 namespace CesiumGeospatial {

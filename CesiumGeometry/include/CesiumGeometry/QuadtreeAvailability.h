@@ -3,13 +3,11 @@
 #include "Availability.h"
 #include "Library.h"
 #include "QuadtreeTileID.h"
-#include "TileAvailabilityFlags.h"
 
 #include <gsl/span>
 
-#include <cstddef>
+#include <cstdint>
 #include <memory>
-#include <vector>
 
 namespace CesiumGeometry {
 

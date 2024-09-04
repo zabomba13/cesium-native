@@ -13,7 +13,6 @@
 #include <gsl/span>
 #include <spdlog/fwd.h>
 
-#include <cstddef>
 #include <memory>
 
 namespace Cesium3DTilesSelection {

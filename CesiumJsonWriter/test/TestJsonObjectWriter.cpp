@@ -2,7 +2,7 @@
 #include <CesiumJsonWriter/JsonWriter.h>
 #include <CesiumUtility/JsonValue.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <cstdint>
 #include <string>
@@ -27,8 +27,7 @@ TEST_CASE("TestJsonObjectWriter") {
 
   SECTION("[0,1,2.5]") {
     CesiumJsonWriter::JsonWriter writer;
-    const auto extrasObject =
-        Array{std::int64_t(0), std::uint64_t(1), double(2.5)};
+    const auto extrasObject = Array{int64_t(0), uint64_t(1), double(2.5)};
     writeJsonValue(extrasObject, writer);
     REQUIRE(writer.toStringView() == R"([0,1,2.5])");
   }

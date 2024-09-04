@@ -1,10 +1,21 @@
 #include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Promise.h"
+#include "CesiumAsync/SharedFuture.h"
+#include "CesiumAsync/ThreadPool.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 
-#include <chrono>
+#include <atomic>
+#include <cstdint>
+#include <exception>
+#include <functional>
 #include <memory>
+#include <stdexcept>
 #include <thread>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 
@@ -181,7 +192,8 @@ TEST_CASE("AsyncSystem") {
   SECTION("createFuture promise may resolve later") {
     auto future = asyncSystem.createFuture<int>([](const auto& promise) {
       std::thread([promise]() {
-        using namespace std::chrono_literals;
+        // NOLINTNEXTLINE(misc-include-cleaner)
+        using std::chrono_literals::operator""ms;
         std::this_thread::sleep_for(10ms);
         promise.resolve(42);
       }).detach();
@@ -623,7 +635,8 @@ TEST_CASE("AsyncSystem") {
       Future<void> future =
           asyncSystem.createResolvedFuture()
               .thenInWorkerThread([&called1]() {
-                using namespace std::chrono_literals;
+                // NOLINTNEXTLINE(misc-include-cleaner)
+                using std::chrono_literals::operator""ms;
                 // should be long enough for the main thread to start waiting on
                 // the conditional, without slowing the test down too much.
                 std::this_thread::sleep_for(20ms);
@@ -642,7 +655,8 @@ TEST_CASE("AsyncSystem") {
       Future<void> future =
           asyncSystem.createResolvedFuture()
               .thenInWorkerThread([&called1]() {
-                using namespace std::chrono_literals;
+                // NOLINTNEXTLINE(misc-include-cleaner)
+                using std::chrono_literals::operator""ms;
                 // should be long enough for the main thread to start waiting on
                 // the conditional, without slowing the test down too much.
                 std::this_thread::sleep_for(20ms);
@@ -650,7 +664,8 @@ TEST_CASE("AsyncSystem") {
               })
               .thenInMainThread([&called2]() { called2 = true; })
               .thenInWorkerThread([&called3]() {
-                using namespace std::chrono_literals;
+                // NOLINTNEXTLINE(misc-include-cleaner)
+                using std::chrono_literals::operator""ms;
                 // Sufficient time for the main thread to drop back into waiting
                 // on the conditional again after it was awakened by the
                 // scheduling of the main thread continuation above. It should

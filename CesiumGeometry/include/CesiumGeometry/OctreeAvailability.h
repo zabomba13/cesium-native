@@ -3,13 +3,10 @@
 #include "Availability.h"
 #include "Library.h"
 #include "OctreeTileID.h"
-#include "TileAvailabilityFlags.h"
 
 #include <gsl/span>
 
-#include <cstddef>
 #include <memory>
-#include <vector>
 
 namespace CesiumGeometry {
 

@@ -5,6 +5,7 @@
 #include <CesiumGeospatial/Ellipsoid.h>
 #include <CesiumGltf/Ktx2TranscodeTargets.h>
 
+#include <any>
 #include <functional>
 #include <memory>
 #include <optional>

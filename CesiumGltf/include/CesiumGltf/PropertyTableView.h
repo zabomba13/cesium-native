@@ -1,7 +1,8 @@
 #pragma once
 
-#include "CesiumGltf/ExtensionModelExtStructuralMetadata.h"
+#include "CesiumGltf/Class.h"
 #include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyTable.h"
 #include "CesiumGltf/PropertyTablePropertyView.h"
 #include "CesiumGltf/PropertyType.h"
 

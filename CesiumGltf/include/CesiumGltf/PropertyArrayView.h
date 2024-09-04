@@ -9,7 +9,6 @@
 
 #include <cstddef>
 #include <cstring>
-#include <variant>
 #include <vector>
 
 namespace CesiumGltf {

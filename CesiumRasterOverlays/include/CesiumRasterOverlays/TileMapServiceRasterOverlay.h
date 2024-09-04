@@ -9,7 +9,6 @@
 #include <CesiumGeospatial/GlobeRectangle.h>
 #include <CesiumGeospatial/Projection.h>
 
-#include <functional>
 #include <memory>
 
 namespace CesiumRasterOverlays {

@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <ctime>
-#include <map>
 #include <vector>
 
 namespace CesiumAsync {

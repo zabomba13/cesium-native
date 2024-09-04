@@ -5,7 +5,6 @@
 
 #include <cstdint>
 #include <unordered_map>
-#include <vector>
 
 /**
  * @brief The occlusion state of a tile as reported by the renderer proxy.

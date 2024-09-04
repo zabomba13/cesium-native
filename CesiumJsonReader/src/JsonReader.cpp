@@ -1,8 +1,20 @@
 #include "CesiumJsonReader/JsonReader.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
+#include "CesiumJsonReader/JsonHandler.h"
+
 #include <CesiumUtility/Assert.h>
 
+#include <gsl/span>
+#include <rapidjson/document.h>
+#include <rapidjson/error/error.h>
 #include <rapidjson/reader.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumJsonReader {
 namespace {

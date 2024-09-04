@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CesiumGltf/ImageCesium.h"
-#include "CesiumGltf/KhrTextureTransform.h"
 #include "CesiumGltf/PropertyTextureProperty.h"
 #include "CesiumGltf/PropertyTransformations.h"
 #include "CesiumGltf/PropertyTypeTraits.h"
@@ -11,7 +10,6 @@
 
 #include <CesiumUtility/Assert.h>
 
-#include <array>
 #include <cmath>
 #include <cstdint>
 #include <optional>

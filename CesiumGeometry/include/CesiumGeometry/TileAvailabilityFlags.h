@@ -2,8 +2,6 @@
 
 #include "Library.h"
 
-#include <cstdint>
-
 namespace CesiumGeometry {
 
 enum CESIUMGEOMETRY_API TileAvailabilityFlags {

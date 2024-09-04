@@ -1,3 +1,9 @@
+#include "CesiumAsync/Future.h"
+#include "CesiumGeometry/QuadtreeTileID.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumAsync/IAssetAccessor.h>
 #include <CesiumAsync/IAssetResponse.h>
 #include <CesiumGeospatial/GlobeRectangle.h>
@@ -10,14 +16,20 @@
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumUtility/CreditSystem.h>
 #include <CesiumUtility/JsonHelpers.h>
-#include <CesiumUtility/Log.h>
-#include <CesiumUtility/Math.h>
 #include <CesiumUtility/Uri.h>
 
+#include <fmt/core.h>
+#include <gsl/span>
+#include <nonstd/expected.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/pointer.h>
+#include <spdlog/logger.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -375,7 +387,7 @@ BingMapsRasterOverlay::createTileProvider(
           fmt::format(
               "Error while parsing Bing Maps imagery metadata, error code "
               "{} at byte offset {}",
-              response.GetParseError(),
+              static_cast<int>(response.GetParseError()),
               response.GetErrorOffset())});
     }
 

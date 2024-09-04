@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CacheItem.h"
-#include "IAssetRequest.h"
 #include "Library.h"
 
 #include <cstddef>

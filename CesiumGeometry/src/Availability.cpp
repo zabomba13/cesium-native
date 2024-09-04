@@ -1,6 +1,15 @@
 
 #include "CesiumGeometry/Availability.h"
 
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <optional>
+#include <utility>
+#include <variant>
+#include <vector>
+
 namespace CesiumGeometry {
 
 namespace AvailabilityUtilities {

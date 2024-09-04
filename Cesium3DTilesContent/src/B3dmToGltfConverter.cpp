@@ -1,10 +1,20 @@
 #include "BatchTableToGltfStructuralMetadata.h"
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumGltfReader/GltfReader.h"
 
 #include <Cesium3DTilesContent/B3dmToGltfConverter.h>
 #include <Cesium3DTilesContent/BinaryToGltfConverter.h>
 #include <Cesium3DTilesContent/GltfConverters.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
-#include <CesiumUtility/Log.h>
+
+#include <fmt/core.h>
+#include <gsl/span>
+#include <rapidjson/document.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
 
 namespace Cesium3DTilesContent {
 namespace {
@@ -149,7 +159,7 @@ rapidjson::Document parseFeatureTableJsonData(
     result.errors.emplaceError(fmt::format(
         "Error when parsing feature table JSON, error code {} at byte offset "
         "{}",
-        document.GetParseError(),
+        static_cast<int>(document.GetParseError()),
         document.GetErrorOffset()));
     return document;
   }
@@ -211,7 +221,7 @@ void convertB3dmMetadataToGltfStructuralMetadata(
             "Error when parsing batch table JSON, error code {} at byte "
             "offset "
             "{}. Skip parsing metadata",
-            batchTableJson.GetParseError(),
+            static_cast<int>(batchTableJson.GetParseError()),
             batchTableJson.GetErrorOffset()));
         return;
       }

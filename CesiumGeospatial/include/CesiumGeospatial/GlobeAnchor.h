@@ -6,8 +6,6 @@
 
 #include <glm/mat4x4.hpp>
 
-#include <optional>
-
 namespace CesiumGeospatial {
 
 class LocalHorizontalCoordinateSystem;

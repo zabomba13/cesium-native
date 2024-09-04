@@ -1,8 +1,6 @@
 #pragma once
 
-#include "BoundingVolume.h"
 #include "Library.h"
-#include "TileContent.h"
 #include "TileLoadResult.h"
 #include "TilesetOptions.h"
 
@@ -16,9 +14,7 @@
 
 #include <spdlog/logger.h>
 
-#include <functional>
 #include <memory>
-#include <optional>
 #include <vector>
 
 namespace Cesium3DTilesSelection {

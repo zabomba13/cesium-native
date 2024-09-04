@@ -1,8 +1,20 @@
 #include "CesiumAsync/GunzipAssetAccessor.h"
 
 #include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/HttpHeaders.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumAsync/IAssetRequest.h"
 #include "CesiumAsync/IAssetResponse.h"
 #include "CesiumUtility/Gunzip.h"
+
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace CesiumAsync {
 

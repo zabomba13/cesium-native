@@ -11,7 +11,6 @@
 #include <gsl/span>
 
 #include <array>
-#include <string_view>
 
 namespace CesiumGeospatial {
 

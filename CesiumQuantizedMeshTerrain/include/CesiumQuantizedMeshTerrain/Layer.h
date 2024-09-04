@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Library.h"
-
 #include <CesiumGeometry/QuadtreeTilingScheme.h>
 #include <CesiumGeospatial/BoundingRegion.h>
 #include <CesiumGeospatial/Projection.h>

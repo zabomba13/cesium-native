@@ -1,8 +1,27 @@
+#include "CesiumAsync/AsyncSystem.h"
+#include "CesiumAsync/Future.h"
+#include "CesiumAsync/IAssetAccessor.h"
+#include "CesiumGeospatial/Ellipsoid.h"
+#include "CesiumGltf/ImageCesium.h"
+#include "CesiumRasterOverlays/RasterOverlay.h"
+#include "CesiumUtility/CreditSystem.h"
+#include "CesiumUtility/IntrusivePointer.h"
+
 #include <CesiumGeospatial/GeographicProjection.h>
 #include <CesiumRasterOverlays/DebugColorizeTilesRasterOverlay.h>
 #include <CesiumRasterOverlays/RasterOverlayTile.h>
 #include <CesiumRasterOverlays/RasterOverlayTileProvider.h>
 #include <CesiumUtility/SpanHelper.h>
+
+#include <gsl/span>
+#include <spdlog/logger.h>
+
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
 
 using namespace CesiumRasterOverlays;
 using namespace CesiumGeospatial;

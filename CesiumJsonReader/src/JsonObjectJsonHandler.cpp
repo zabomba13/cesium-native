@@ -1,6 +1,13 @@
 #include "CesiumJsonReader/JsonObjectJsonHandler.h"
 
+#include "CesiumJsonReader/IJsonHandler.h"
+#include "CesiumJsonReader/JsonHandler.h"
+#include "CesiumUtility/JsonValue.h"
+
 #include <cstdint>
+#include <string>
+#include <string_view>
+#include <variant>
 
 namespace CesiumJsonReader {
 namespace {
@@ -37,12 +44,12 @@ IJsonHandler* JsonObjectJsonHandler::readBool(bool b) {
 }
 
 IJsonHandler* JsonObjectJsonHandler::readInt32(int32_t i) {
-  addOrReplace(*this->_stack.back(), std::int64_t(i));
+  addOrReplace(*this->_stack.back(), int64_t(i));
   return this->doneElement();
 }
 
 IJsonHandler* JsonObjectJsonHandler::readUint32(uint32_t i) {
-  addOrReplace(*this->_stack.back(), std::uint64_t(i));
+  addOrReplace(*this->_stack.back(), uint64_t(i));
   return this->doneElement();
 }
 

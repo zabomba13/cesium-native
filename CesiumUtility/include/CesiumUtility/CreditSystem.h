@@ -3,8 +3,6 @@
 #include "Library.h"
 
 #include <string>
-#include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace CesiumUtility {

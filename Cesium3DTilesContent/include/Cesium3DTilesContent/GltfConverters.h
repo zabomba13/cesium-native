@@ -10,7 +10,6 @@
 
 #include <gsl/span>
 
-#include <optional>
 #include <string>
 #include <string_view>
 

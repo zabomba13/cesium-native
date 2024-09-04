@@ -1,18 +1,31 @@
 #include "CesiumAsync/SqliteCache.h"
 
-#include "CesiumAsync/IAssetResponse.h"
+#include "CesiumAsync/CacheItem.h"
+#include "CesiumAsync/HttpHeaders.h"
 
 #include <CesiumAsync/cesium-sqlite3.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <gsl/span>
 #include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <spdlog/logger.h>
 #include <spdlog/spdlog.h>
 #include <sqlite3.h>
+#include <stdio.h>
 
 #include <cstddef>
+#include <cstdint>
+#include <ctime>
+#include <memory>
+#include <mutex>
+#include <optional>
 #include <stdexcept>
+#include <string>
 #include <utility>
+#include <vector>
 
 using namespace CesiumAsync;
 

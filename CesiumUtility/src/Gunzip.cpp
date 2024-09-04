@@ -1,4 +1,10 @@
 #include "CesiumUtility/Gunzip.h"
+
+#include <gsl/span>
+#include <zconf-ng.h>
+
+#include <cstddef>
+#include <vector>
 #define ZLIB_CONST
 #include "zlib-ng.h"
 

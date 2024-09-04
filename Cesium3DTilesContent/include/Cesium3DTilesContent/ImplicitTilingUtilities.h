@@ -4,7 +4,6 @@
 #include <CesiumGeometry/QuadtreeTileID.h>
 #include <CesiumGeospatial/Ellipsoid.h>
 
-#include <array>
 #include <iterator>
 #include <string>
 

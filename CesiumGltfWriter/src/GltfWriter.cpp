@@ -8,6 +8,15 @@
 #include <CesiumUtility/Assert.h>
 #include <CesiumUtility/Tracing.h>
 
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <memory>
+#include <vector>
+
 namespace CesiumGltfWriter {
 
 namespace {

@@ -1,12 +1,35 @@
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/ExtensionKhrTextureTransform.h"
+#include "CesiumGltf/ImageCesium.h"
 #include "CesiumGltf/KhrTextureTransform.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTextureProperty.h"
 #include "CesiumGltf/PropertyTexturePropertyView.h"
+#include "CesiumGltf/PropertyTransformations.h"
+#include "CesiumGltf/PropertyType.h"
+#include "CesiumGltf/PropertyTypeTraits.h"
+#include "CesiumGltf/Sampler.h"
+#include "CesiumGltf/TextureView.h"
+#include "CesiumUtility/JsonValue.h"
 #include "CesiumUtility/Math.h"
 
-#include <catch2/catch.hpp>
-#include <gsl/span>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_double2.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_double4.hpp>
+#include <glm/ext/vector_int2_sized.hpp>
+#include <glm/ext/vector_int3_sized.hpp>
+#include <glm/ext/vector_int4_sized.hpp>
+#include <glm/ext/vector_uint2_sized.hpp>
+#include <glm/ext/vector_uint3_sized.hpp>
+#include <glm/ext/vector_uint4_sized.hpp>
 
 #include <climits>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <optional>
 #include <vector>
 
 using namespace CesiumGltf;

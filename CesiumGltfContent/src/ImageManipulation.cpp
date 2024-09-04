@@ -1,7 +1,9 @@
 #include <CesiumGltf/ImageCesium.h>
 #include <CesiumGltfContent/ImageManipulation.h>
 
+#include <cstddef>
 #include <cstring>
+#include <vector>
 
 namespace Cesium {
 // Use STB resize in our own namespace to avoid conflicts from other libs

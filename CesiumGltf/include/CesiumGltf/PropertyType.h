@@ -2,9 +2,7 @@
 
 #include <glm/common.hpp>
 
-#include <cstdint>
 #include <string>
-#include <string_view>
 
 namespace CesiumGltf {
 enum class PropertyType {

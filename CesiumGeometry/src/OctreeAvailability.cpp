@@ -1,6 +1,17 @@
 #include "CesiumGeometry/OctreeAvailability.h"
 
+#include "CesiumGeometry/Availability.h"
+#include "CesiumGeometry/OctreeTileID.h"
+#include "CesiumGeometry/TileAvailabilityFlags.h"
 #include "CesiumUtility/Assert.h"
+
+#include <gsl/span>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <utility>
 
 namespace CesiumGeometry {
 

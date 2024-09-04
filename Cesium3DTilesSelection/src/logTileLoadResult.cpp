@@ -1,5 +1,13 @@
 #include "logTileLoadResult.h"
 
+#include "CesiumUtility/ErrorList.h"
+
+#include <fmt/core.h>
+#include <spdlog/logger.h>
+
+#include <memory>
+#include <string>
+
 using namespace CesiumUtility;
 
 namespace Cesium3DTilesSelection {

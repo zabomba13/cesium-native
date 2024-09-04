@@ -1,8 +1,18 @@
 #include "BatchTableToGltfStructuralMetadata.h"
+#include "Cesium3DTilesContent/GltfConverterResult.h"
+#include "CesiumGltf/Accessor.h"
+#include "CesiumGltf/Class.h"
+#include "CesiumGltf/ClassProperty.h"
+#include "CesiumGltf/FeatureId.h"
+#include "CesiumGltf/Mesh.h"
+#include "CesiumGltf/MeshPrimitive.h"
+#include "CesiumGltf/Model.h"
+#include "CesiumGltf/PropertyArrayView.h"
+#include "CesiumGltf/PropertyTable.h"
+#include "CesiumGltf/Schema.h"
+#include "CesiumGltfReader/GltfReader.h"
 #include "ConvertTileToGltf.h"
 
-#include <CesiumAsync/AsyncSystem.h>
-#include <CesiumAsync/HttpHeaders.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
 #include <CesiumGltf/ExtensionModelExtStructuralMetadata.h>
@@ -10,13 +20,28 @@
 #include <CesiumGltf/PropertyTableView.h>
 #include <CesiumUtility/Math.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <gsl/span>
 #include <rapidjson/document.h>
+#include <rapidjson/rapidjson.h>
 #include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/spdlog.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <limits>
+#include <memory>
+#include <optional>
 #include <set>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 using namespace CesiumGltf;
 using namespace Cesium3DTilesContent;
@@ -58,7 +83,8 @@ static void checkNonArrayProperty(
         std::is_same_v<PropertyViewType, float> ||
         std::is_same_v<PropertyViewType, double>) {
       REQUIRE(
-          propertyView.getRaw(i) == Approx(expected[static_cast<size_t>(i)]));
+          propertyView.getRaw(i) ==
+          Catch::Approx(expected[static_cast<size_t>(i)]));
     } else {
       REQUIRE(
           static_cast<ExpectedType>(propertyView.getRaw(i)) ==
@@ -110,7 +136,8 @@ static void checkArrayProperty(
       if constexpr (
           std::is_same_v<ExpectedType, float> ||
           std::is_same_v<ExpectedType, double>) {
-        REQUIRE(value[static_cast<int64_t>(j)] == Approx(expected[i][j]));
+        REQUIRE(
+            value[static_cast<int64_t>(j)] == Catch::Approx(expected[i][j]));
       } else {
         REQUIRE(value[static_cast<int64_t>(j)] == expected[i][j]);
       }

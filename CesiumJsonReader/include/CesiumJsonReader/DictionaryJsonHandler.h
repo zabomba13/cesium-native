@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CesiumUtility/Assert.h"
-#include "IntegerJsonHandler.h"
 #include "Library.h"
 #include "ObjectJsonHandler.h"
 

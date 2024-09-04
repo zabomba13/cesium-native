@@ -12,7 +12,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <string_view>
-#include <type_traits>
 
 namespace CesiumGltf {
 /**
