@@ -269,7 +269,7 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the west edge indices
   meshView.westEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.westEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes = size_t(meshView.westEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -281,7 +281,7 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the south edge
   meshView.southEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.southEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes = size_t(meshView.southEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -293,7 +293,7 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the east edge
   meshView.eastEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.eastEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes = size_t(meshView.eastEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -305,7 +305,7 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the north edge
   meshView.northEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = meshView.northEdgeIndicesCount * indexSizeBytes;
+  edgeByteSizes = size_t(meshView.northEdgeIndicesCount * indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -329,12 +329,13 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
 
     if (extensionID == 1) {
       // Oct-encoded per-vertex normals
-      if (readIndex + vertexCount * 2 > data.size()) {
+      if (readIndex + size_t(vertexCount * 2) > data.size()) {
         break;
       }
 
-      meshView.octEncodedNormalBuffer =
-          gsl::span<const std::byte>(data.data() + readIndex, vertexCount * 2);
+      meshView.octEncodedNormalBuffer = gsl::span<const std::byte>(
+          data.data() + readIndex,
+          size_t(vertexCount * 2));
     } else if (enableWaterMask && extensionID == 2) {
       // Water Mask
       if (extensionLength == 1) {
@@ -409,7 +410,7 @@ static void addSkirt(
   const double north = rectangle.getNorth();
 
   size_t newEdgeIndex = currentVertexCount;
-  size_t positionIdx = currentVertexCount * 3;
+  size_t positionIdx = size_t(currentVertexCount * 3);
   size_t indexIdx = currentIndicesCount;
   for (size_t i = 0; i < edgeIndices.size(); ++i) {
     E edgeIdx = edgeIndices[i];
@@ -725,10 +726,10 @@ static std::vector<std::byte> generateNormals(
   // decode position without skirt, but preallocate position buffer to include
   // skirt as well
   std::vector<std::byte> outputPositionsBuffer(
-      (vertexCount + skirtVertexCount) * 3 * sizeof(float));
+      size_t((vertexCount + skirtVertexCount) * 3) * sizeof(float));
   gsl::span<float> outputPositions(
       reinterpret_cast<float*>(outputPositionsBuffer.data()),
-      (vertexCount + skirtVertexCount) * 3);
+      size_t((vertexCount + skirtVertexCount) * 3));
   size_t positionOutputIndex = 0;
 
   const glm::dvec3 center(

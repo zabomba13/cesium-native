@@ -49,7 +49,7 @@ struct CESIUMRASTEROVERLAYS_API RasterOverlayOptions {
    * in memory in case they're needed again soon. This property controls the
    * maximum size of that cache.
    */
-  int64_t subTileCacheBytes = 16 * 1024 * 1024;
+  int64_t subTileCacheBytes = int64_t(16 * 1024 * 1024);
 
   /**
    * @brief The maximum pixel size of raster overlay textures, in either

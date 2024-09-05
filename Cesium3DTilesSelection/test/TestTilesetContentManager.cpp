@@ -125,8 +125,8 @@ CesiumGltf::Model createGlobeGrid(
   glm::dvec3 max = min;
 
   std::vector<glm::dvec3> positions;
-  indices.reserve(6 * (width - 1) * (height - 1));
-  positions.reserve(width * height);
+  indices.reserve(size_t(6 * (width - 1) * (height - 1)));
+  positions.reserve(size_t(width * height));
   for (uint32_t y = 0; y < height; ++y) {
     for (uint32_t x = 0; x < width; ++x) {
       double longitude = beginPoint.longitude + x * dimension;

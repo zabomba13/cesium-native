@@ -805,7 +805,7 @@ TEST_CASE("GltfReader::loadGltf") {
     const CesiumGltf::Image& image = result.model->images[0];
     CHECK(image.cesium.width == 2048);
     CHECK(image.cesium.height == 2048);
-    CHECK(image.cesium.pixelData.size() == 2048 * 2048 * 4);
+    CHECK(image.cesium.pixelData.size() == size_t(2048 * 2048 * 4));
 
     CHECK(!result.model->buffers.empty());
     for (const CesiumGltf::Buffer& buffer : result.model->buffers) {

@@ -33,9 +33,10 @@ time_t internalTimegm(std::tm const* t) {
   const int day_of_year = daysFrom1jan(year, month, day);
   const int days_since_epoch = daysFrom1970(year) + day_of_year;
 
-  const time_t seconds_in_day = 3600 * 24;
-  const time_t result = seconds_in_day * days_since_epoch + 3600 * t->tm_hour +
-                        60 * t->tm_min + t->tm_sec;
+  const time_t seconds_in_day = time_t(3600 * 24);
+  const time_t result = seconds_in_day * days_since_epoch +
+                        time_t(3600 * t->tm_hour) + time_t(60 * t->tm_min) +
+                        t->tm_sec;
 
   return result;
 }

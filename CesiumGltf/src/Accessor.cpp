@@ -75,7 +75,8 @@ Accessor::computeByteStride(const CesiumGltf::Model& model) const noexcept {
   if (pBufferView->byteStride && *pBufferView->byteStride != 0) {
     return *pBufferView->byteStride;
   }
-  return computeNumberOfComponents(this->type) *
-         computeByteSizeOfComponent(this->componentType);
+  return int64_t(
+      computeNumberOfComponents(this->type) *
+      computeByteSizeOfComponent(this->componentType));
 }
 } // namespace CesiumGltf
