@@ -52,8 +52,8 @@ Ellipsoid::cartesianToCartographic(const glm::dvec3& cartesian) const noexcept {
     return std::optional<Cartographic>();
   }
 
-  const glm::dvec3 n = this->geodeticSurfaceNormal(p.value());
-  const glm::dvec3 h = cartesian - p.value();
+  const glm::dvec3 n = this->geodeticSurfaceNormal(*p);
+  const glm::dvec3 h = cartesian - *p;
 
   const double longitude = glm::atan(n.y, n.x);
   const double latitude = glm::asin(n.z);

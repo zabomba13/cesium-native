@@ -295,7 +295,7 @@ WebMapServiceRasterOverlay::createTileProvider(
 
   const std::optional<Credit> credit =
       this->_options.credit ? std::make_optional(pCreditSystem->createCredit(
-                                  this->_options.credit.value()))
+                                  *this->_options.credit))
                             : std::nullopt;
 
   return pAssetAccessor->get(asyncSystem, xmlUrlGetcapabilities, this->_headers)

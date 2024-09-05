@@ -19,9 +19,9 @@ void check(const std::string& input, const std::string& expectedOutput) {
       input.size()));
   REQUIRE(readResult.errors.empty());
   REQUIRE(readResult.warnings.empty());
-  REQUIRE(readResult.value.has_value());
+  REQUIRE(readResult.value);
 
-  Cesium3DTiles::Tileset& tileset = readResult.value.value();
+  Cesium3DTiles::Tileset& tileset = *readResult.value;
 
   Cesium3DTilesWriter::TilesetWriter writer;
   Cesium3DTilesWriter::TilesetWriterResult writeResult =

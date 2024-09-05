@@ -39,11 +39,11 @@ void checkIntersection(
           modelToWorld);
 
   if (shouldHit) {
-    CHECK(hitResult.hit.has_value());
-    if (!hitResult.hit.has_value())
+    CHECK(hitResult.hit);
+    if (!hitResult.hit)
       return;
   } else {
-    CHECK(!hitResult.hit.has_value());
+    CHECK(!hitResult.hit);
     return;
   }
 
@@ -104,9 +104,9 @@ void checkBadUnitCube(const std::string& testModelName, bool shouldHitAnyway) {
 
   // Check for a bad model that is mostly good, and should produce good results
   if (shouldHitAnyway) {
-    CHECK(hitResult.hit.has_value());
+    CHECK(hitResult.hit);
   } else {
-    CHECK(!hitResult.hit.has_value());
+    CHECK(!hitResult.hit);
   }
 }
 

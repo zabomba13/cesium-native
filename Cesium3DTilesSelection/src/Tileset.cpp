@@ -414,7 +414,7 @@ Tileset::updateView(const std::vector<ViewState>& frustums, float deltaTime) {
     for (auto& pTileProvider : overlayCollection.getTileProviders()) {
       const std::optional<Credit>& overlayCredit = pTileProvider->getCredit();
       if (overlayCredit) {
-        pCreditSystem->addCreditToFrame(overlayCredit.value());
+        pCreditSystem->addCreditToFrame(*overlayCredit);
       }
     }
 
@@ -635,7 +635,7 @@ static bool isVisibleFromCamera(
   std::optional<GlobeRectangle> maybeRectangle =
       estimateGlobeRectangle(boundingVolume, ellipsoid);
   if (position && maybeRectangle) {
-    return maybeRectangle->contains(position.value());
+    return maybeRectangle->contains(*position);
   }
   return false;
 }

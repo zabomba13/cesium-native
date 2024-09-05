@@ -97,9 +97,9 @@ TEST_CASE("CesiumGltfReader::GltfReader") {
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
   CHECK(result.errors.empty());
-  REQUIRE(result.model.has_value());
+  REQUIRE(result.model);
 
-  Model& model = result.model.value();
+  Model& model = *result.model;
   REQUIRE(model.accessors.size() == 1);
   CHECK(model.accessors[0].count == 4);
   CHECK(
@@ -198,7 +198,7 @@ TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
     GltfReaderResult result = reader.readGltf(readFile(
         CesiumGltfReader_TEST_DATA_DIR +
         std::string("/DucksMeshopt/Duck.glb")));
-    const Model& model = result.model.value();
+    const Model& model = *result.model;
 
     // These extensions should be removed during the load process.
     CHECK(!model.isExtensionRequired(
@@ -222,7 +222,7 @@ TEST_CASE("Can decompress meshes using EXT_meshopt_compression") {
       GltfReaderResult result = reader.readGltf(data);
       REQUIRE(result.model);
       REQUIRE(result.warnings.empty());
-      const Model& model = result.model.value();
+      const Model& model = *result.model;
       VertexAttributeRange compressedVar = getVertexAttributeRange(model);
       double error = 1.0f / (pow(2, n - 1));
       REQUIRE(epsilonCompare(
@@ -250,7 +250,7 @@ TEST_CASE("Read TriangleWithoutIndices") {
   GltfReaderResult result = reader.readGltf(data);
   REQUIRE(result.model);
 
-  const Model& model = result.model.value();
+  const Model& model = *result.model;
   REQUIRE(model.meshes.size() == 1);
   REQUIRE(model.meshes[0].primitives.size() == 1);
   REQUIRE(model.meshes[0].primitives[0].attributes.size() == 1);
@@ -295,9 +295,9 @@ TEST_CASE("Nested extras deserializes properly") {
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
 
   REQUIRE(result.errors.empty());
-  REQUIRE(result.model.has_value());
+  REQUIRE(result.model);
 
-  Model& model = result.model.value();
+  Model& model = *result.model;
   auto cit = model.extras.find("C");
   REQUIRE(cit != model.extras.end());
 
@@ -348,9 +348,9 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
       options);
 
   REQUIRE(result.errors.empty());
-  REQUIRE(result.model.has_value());
+  REQUIRE(result.model);
 
-  Model& model = result.model.value();
+  Model& model = *result.model;
   REQUIRE(model.meshes.size() == 1);
   REQUIRE(model.meshes[0].primitives.size() == 1);
 
@@ -376,9 +376,9 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
       options);
 
   REQUIRE(result2.errors.empty());
-  REQUIRE(result2.model.has_value());
+  REQUIRE(result2.model);
 
-  Model& model2 = result2.model.value();
+  Model& model2 = *result2.model;
   REQUIRE(model2.meshes.size() == 1);
   REQUIRE(model2.meshes[0].primitives.size() == 1);
 
@@ -411,9 +411,9 @@ TEST_CASE("Can deserialize KHR_draco_mesh_compression") {
       options);
 
   REQUIRE(result3.errors.empty());
-  REQUIRE(result3.model.has_value());
+  REQUIRE(result3.model);
 
-  Model& model3 = result3.model.value();
+  Model& model3 = *result3.model;
   REQUIRE(model3.meshes.size() == 1);
   REQUIRE(model3.meshes[0].primitives.size() == 1);
 
@@ -448,7 +448,7 @@ TEST_CASE("Extensions deserialize to JsonVaue iff "
       options);
 
   REQUIRE(withCustomExtModel.errors.empty());
-  REQUIRE(withCustomExtModel.model.has_value());
+  REQUIRE(withCustomExtModel.model);
 
   REQUIRE(withCustomExtModel.model->extensions.size() == 2);
 
@@ -504,7 +504,7 @@ TEST_CASE("Unknown MIME types are handled") {
 
   // Note: The result.errors will not be empty,
   // because no images could be read.
-  REQUIRE(result.model.has_value());
+  REQUIRE(result.model);
 }
 
 TEST_CASE("Can parse doubles with no fractions as integers") {
@@ -526,7 +526,7 @@ TEST_CASE("Can parse doubles with no fractions as integers") {
       options);
 
   CHECK(result.warnings.empty());
-  Model& model = result.model.value();
+  Model& model = *result.model;
   CHECK(model.accessors[0].count == 4);
   CHECK(
       model.accessors[0].componentType ==
@@ -555,7 +555,7 @@ TEST_CASE("Test KTX2") {
   GltfReaderResult result = reader.readGltf(data);
   REQUIRE(result.model);
 
-  const Model& model = result.model.value();
+  const Model& model = *result.model;
   REQUIRE(model.meshes.size() == 1);
 }
 
@@ -575,8 +575,8 @@ TEST_CASE("Can apply RTC CENTER if model uses Cesium RTC extension") {
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
       options);
-  REQUIRE(result.model.has_value());
-  Model& model = result.model.value();
+  REQUIRE(result.model);
+  Model& model = *result.model;
   const ExtensionCesiumRTC* cesiumRTC =
       model.getExtension<ExtensionCesiumRTC>();
   REQUIRE(cesiumRTC);
@@ -593,7 +593,7 @@ TEST_CASE("Can correctly interpret mipmaps in KTX2 files") {
     std::vector<std::byte> data = readFile(ktx2File.string());
     ImageReaderResult imageResult =
         GltfReader::readImage(data, Ktx2TranscodeTargets{});
-    REQUIRE(imageResult.image.has_value());
+    REQUIRE(imageResult.image);
 
     const ImageCesium& image = *imageResult.image;
     REQUIRE(image.mipPositions.size() == 1);
@@ -613,7 +613,7 @@ TEST_CASE("Can correctly interpret mipmaps in KTX2 files") {
     std::vector<std::byte> data = readFile(ktx2File.string());
     ImageReaderResult imageResult =
         GltfReader::readImage(data, Ktx2TranscodeTargets{});
-    REQUIRE(imageResult.image.has_value());
+    REQUIRE(imageResult.image);
 
     const ImageCesium& image = *imageResult.image;
     REQUIRE(image.mipPositions.size() == 0);
@@ -627,7 +627,7 @@ TEST_CASE("Can correctly interpret mipmaps in KTX2 files") {
     std::vector<std::byte> data = readFile(ktx2File.string());
     ImageReaderResult imageResult =
         GltfReader::readImage(data, Ktx2TranscodeTargets{});
-    REQUIRE(imageResult.image.has_value());
+    REQUIRE(imageResult.image);
 
     const ImageCesium& image = *imageResult.image;
     REQUIRE(image.mipPositions.size() == 9);
@@ -663,7 +663,7 @@ TEST_CASE("Can read unknown properties from a glTF") {
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
       options);
-  REQUIRE(result.model.has_value());
+  REQUIRE(result.model);
 
   auto unknownIt1 = result.model->unknownProperties.find("someUnknownProperty");
   REQUIRE(unknownIt1 != result.model->unknownProperties.end());
@@ -693,7 +693,7 @@ TEST_CASE("Ignores unknown properties if requested") {
   GltfReaderResult result = reader.readGltf(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()),
       options);
-  REQUIRE(result.model.has_value());
+  REQUIRE(result.model);
   CHECK(result.model->unknownProperties.empty());
   CHECK(result.model->asset.unknownProperties.empty());
 }
@@ -706,7 +706,7 @@ TEST_CASE("Decodes images with data uris") {
   REQUIRE(result.warnings.empty());
   REQUIRE(result.errors.empty());
 
-  const Model& model = result.model.value();
+  const Model& model = *result.model;
 
   REQUIRE(model.images.size() == 1);
 
@@ -746,7 +746,7 @@ TEST_CASE("Decode buffer with data URI whose length does match the buffer's "
   REQUIRE(result.errors.empty());
   REQUIRE(result.warnings.size() == 1);
 
-  const Model& model = result.model.value();
+  const Model& model = *result.model;
   REQUIRE(model.buffers.size() == 1);
 
   const Buffer& buffer = model.buffers.front();
@@ -830,7 +830,7 @@ TEST_CASE("GltfReader::loadGltf") {
 
     REQUIRE(result.model->images.size() == 1);
     const CesiumGltf::Image& image = result.model->images[0];
-    CHECK(image.uri.has_value());
+    CHECK(image.uri);
     CHECK(image.cesium.pixelData.empty());
   }
 }

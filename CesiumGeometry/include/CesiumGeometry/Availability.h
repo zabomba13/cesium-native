@@ -102,9 +102,7 @@ public:
   /**
    * @brief Unsafe if isBufferView is false.
    */
-  const std::byte& operator[](size_t i) const {
-    return bufferAccessor.value()[i];
-  }
+  const std::byte& operator[](size_t i) const { return (*bufferAccessor)[i]; }
 
   /**
    * @brief Unsafe if isBufferView is false;

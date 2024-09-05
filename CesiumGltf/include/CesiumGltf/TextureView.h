@@ -175,7 +175,7 @@ public:
    */
   const ImageCesium* getImage() const noexcept {
     if (this->_imageCopy) {
-      return &(this->_imageCopy.value());
+      return &*this->_imageCopy;
     }
     return this->_pImage;
   }

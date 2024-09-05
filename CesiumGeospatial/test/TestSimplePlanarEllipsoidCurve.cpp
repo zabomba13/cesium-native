@@ -48,13 +48,13 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             philadelphiaEcef,
             tokyoEcef);
 
-    CHECK(curve.has_value());
+    CHECK(curve);
     CHECK(Math::equalsEpsilon(
-        curve.value().getPosition(0.0),
+        curve->getPosition(0.0),
         philadelphiaEcef,
         Math::Epsilon6));
     CHECK(Math::equalsEpsilon(
-        curve.value().getPosition(1.0),
+        curve->getPosition(1.0),
         tokyoEcef,
         Math::Epsilon6));
   }
@@ -66,9 +66,9 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             philadelphiaEcef,
             tokyoEcef);
 
-    CHECK(curve.has_value());
+    CHECK(curve);
     // needs three points to form a plane - get midpoint to make third point
-    glm::dvec3 midpoint = curve.value().getPosition(0.5);
+    glm::dvec3 midpoint = curve->getPosition(0.5);
     glm::dvec3 planeNormal = glm::normalize(
         glm::cross(philadelphiaEcef - midpoint, tokyoEcef - midpoint));
 
@@ -76,8 +76,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
 
     for (int i = 0; i <= steps; i++) {
       double time = 1.0 / (double)steps;
-      double dot =
-          glm::abs(glm::dot(curve.value().getPosition(time), planeNormal));
+      double dot = glm::abs(glm::dot(curve->getPosition(time), planeNormal));
       // If the dot product of the point and normal are 0, they're coplanar
       CHECK(Math::equalsEpsilon(dot, 0, Math::Epsilon5));
     }
@@ -90,12 +89,12 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             philadelphiaEcef,
             philadelphiaAntipodeEcef);
 
-    CHECK(curve.has_value());
+    CHECK(curve);
 
     int steps = 100;
     for (int i = 0; i <= steps; i++) {
       double time = 1.0 / (double)steps;
-      glm::dvec3 actualResult = curve.value().getPosition(time);
+      glm::dvec3 actualResult = curve->getPosition(time);
 
       Cartographic cartographicResult =
           Ellipsoid::WGS84.cartesianToCartographic(actualResult)
@@ -112,8 +111,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             philadelphiaEcef,
             tokyoEcef);
 
-    CHECK(forwardCurve.has_value());
-    glm::dvec3 forwardResult = forwardCurve.value().getPosition(0.5);
+    CHECK(forwardCurve);
+    glm::dvec3 forwardResult = forwardCurve->getPosition(0.5);
 
     std::optional<SimplePlanarEllipsoidCurve> reverseCurve =
         SimplePlanarEllipsoidCurve::fromEarthCenteredEarthFixedCoordinates(
@@ -121,8 +120,8 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             tokyoEcef,
             philadelphiaEcef);
 
-    CHECK(reverseCurve.has_value());
-    glm::dvec3 reverseResult = reverseCurve.value().getPosition(0.5);
+    CHECK(reverseCurve);
+    glm::dvec3 reverseResult = reverseCurve->getPosition(0.5);
 
     CHECK(Math::equalsEpsilon(forwardResult, reverseResult, Math::Epsilon6));
   }
@@ -134,13 +133,13 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             philadelphiaEcef,
             philadelphiaEcef);
 
-    CHECK(curve.has_value());
+    CHECK(curve);
 
     // check a whole bunch of points along the curve to make sure it stays the
     // same
     const int steps = 25;
     for (int i = 0; i <= steps; i++) {
-      glm::dvec3 result = curve.value().getPosition(i / (double)steps);
+      glm::dvec3 result = curve->getPosition(i / (double)steps);
       CHECK(Math::equalsEpsilon(result, philadelphiaEcef, Math::Epsilon6));
     }
   }
@@ -155,31 +154,28 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             Cartographic(25.0, 100.0, startHeight),
             Cartographic(25.0, 100.0, endHeight));
 
-    CHECK(flightPath.has_value());
+    CHECK(flightPath);
 
     std::optional<Cartographic> position25Percent =
-        Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.25));
+        Ellipsoid::WGS84.cartesianToCartographic(flightPath->getPosition(0.25));
     std::optional<Cartographic> position50Percent =
-        Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.5));
+        Ellipsoid::WGS84.cartesianToCartographic(flightPath->getPosition(0.5));
     std::optional<Cartographic> position75Percent =
-        Ellipsoid::WGS84.cartesianToCartographic(
-            flightPath.value().getPosition(0.75));
+        Ellipsoid::WGS84.cartesianToCartographic(flightPath->getPosition(0.75));
 
-    CHECK(position25Percent.has_value());
+    CHECK(position25Percent);
     CHECK(Math::equalsEpsilon(
-        position25Percent.value().height,
+        position25Percent->height,
         (endHeight - startHeight) * 0.25 + startHeight,
         Math::Epsilon6));
-    CHECK(position50Percent.has_value());
+    CHECK(position50Percent);
     CHECK(Math::equalsEpsilon(
-        position50Percent.value().height,
+        position50Percent->height,
         (endHeight - startHeight) * 0.5 + startHeight,
         Math::Epsilon6));
-    CHECK(position75Percent.has_value());
+    CHECK(position75Percent);
     CHECK(Math::equalsEpsilon(
-        position75Percent.value().height,
+        position75Percent->height,
         (endHeight - startHeight) * 0.75 + startHeight,
         Math::Epsilon6));
   }
@@ -194,7 +190,7 @@ TEST_CASE("SimplePlanarEllipsoidCurve::getPosition") {
             timesSquareEcef,
             newYorkCityEcef);
 
-    CHECK(curve.has_value());
+    CHECK(curve);
     const double expectedDistance =
         glm::distance(timesSquareEcef, newYorkCityEcef);
     const glm::dvec3 midpoint = curve->getPosition(0.5);
@@ -218,7 +214,7 @@ TEST_CASE(
             philadelphiaEcef,
             glm::dvec3(0, 0, 0));
 
-    CHECK(!curve.has_value());
+    CHECK(!curve);
   }
 }
 
@@ -237,16 +233,16 @@ TEST_CASE("SimplePlanarEllipsoidCurve::fromLongitudeLatitudeHeight") {
             philadelphiaEcef,
             tokyoEcef);
 
-    CHECK(llhCurve.has_value());
-    CHECK(ecefCurve.has_value());
+    CHECK(llhCurve);
+    CHECK(ecefCurve);
 
     int steps = 100;
 
     for (int i = 0; i <= steps; i++) {
       double n = 1.0 / (double)steps;
       CHECK(Math::equalsEpsilon(
-          ecefCurve.value().getPosition(n),
-          llhCurve.value().getPosition(n),
+          ecefCurve->getPosition(n),
+          llhCurve->getPosition(n),
           Math::Epsilon6));
     }
   }

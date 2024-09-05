@@ -217,7 +217,7 @@ GltfReaderResult readBinaryGltf(
   GltfReaderResult result = readJsonGltf(context, jsonChunk);
 
   if (result.model && !binaryChunk.empty()) {
-    Model& model = result.model.value();
+    Model& model = *result.model;
 
     if (model.buffers.empty()) {
       result.errors.emplace_back(
@@ -265,7 +265,7 @@ void postprocess(
     const GltfReader& reader,
     GltfReaderResult& readGltf,
     const GltfReaderOptions& options) {
-  Model& model = readGltf.model.value();
+  Model& model = *readGltf.model;
 
   auto extFeatureMetadataIter = std::find(
       model.extensionsUsed.begin(),
@@ -327,11 +327,11 @@ void postprocess(
           imageResult.errors.begin(),
           imageResult.errors.end());
       if (imageResult.image) {
-        image.cesium = std::move(imageResult.image.value());
+        image.cesium = std::move(*imageResult.image);
       } else {
         if (image.mimeType) {
           readGltf.errors.emplace_back(
-              "Declared image MIME Type: " + image.mimeType.value());
+              "Declared image MIME Type: " + *image.mimeType);
         } else {
           readGltf.errors.emplace_back("Image does not declare a MIME Type");
         }
@@ -626,7 +626,7 @@ ImageReaderResult GltfReader::readImage(
   ImageReaderResult result;
 
   result.image.emplace();
-  ImageCesium& image = result.image.value();
+  ImageCesium& image = *result.image;
 
   if (isKtx(data)) {
     ktxTexture2* pTexture = nullptr;

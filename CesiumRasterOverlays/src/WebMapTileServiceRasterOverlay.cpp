@@ -106,8 +106,8 @@ protected:
 
     std::map<std::string, std::string> urlTemplateMap;
     std::string tileMatrix;
-    if (_labels && level < _labels.value().size()) {
-      tileMatrix = _labels.value()[level];
+    if (_labels && level < _labels->size()) {
+      tileMatrix = (*_labels)[level];
     } else {
       tileMatrix = std::to_string(level);
     }
@@ -215,7 +215,7 @@ WebMapTileServiceRasterOverlay::createTileProvider(
 
   const std::optional<Credit> credit =
       this->_options.credit ? std::make_optional(pCreditSystem->createCredit(
-                                  this->_options.credit.value(),
+                                  *this->_options.credit,
                                   pOwner->getOptions().showCreditsOnScreen))
                             : std::nullopt;
 

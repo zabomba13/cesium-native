@@ -163,7 +163,7 @@ static std::optional<uint32_t> getAttributeUint32(
     const char* attributeName) {
   std::optional<std::string> s = getAttributeString(pElement, attributeName);
   if (s) {
-    return std::stoul(s.value());
+    return std::stoul(*s);
   }
   return std::nullopt;
 }
@@ -173,7 +173,7 @@ static std::optional<double> getAttributeDouble(
     const char* attributeName) {
   std::optional<std::string> s = getAttributeString(pElement, attributeName);
   if (s) {
-    return std::stod(s.value());
+    return std::stod(*s);
   }
   return std::nullopt;
 }
@@ -302,7 +302,7 @@ TileMapServiceRasterOverlay::createTileProvider(
 
   const std::optional<Credit> credit =
       this->_options.credit ? std::make_optional(pCreditSystem->createCredit(
-                                  this->_options.credit.value(),
+                                  *this->_options.credit,
                                   pOwner->getOptions().showCreditsOnScreen))
                             : std::nullopt;
 
@@ -373,7 +373,7 @@ TileMapServiceRasterOverlay::createTileProvider(
             bool isRectangleInDegrees = false;
 
             if (options.projection) {
-              projection = options.projection.value();
+              projection = *options.projection;
             } else {
               std::string projectionName =
                   getAttributeString(pTilesets, "profile").value_or("mercator");
@@ -434,7 +434,7 @@ TileMapServiceRasterOverlay::createTileProvider(
                 projectRectangleSimple(projection, tilingSchemeRectangle);
 
             if (options.coverageRectangle) {
-              coverageRectangle = options.coverageRectangle.value();
+              coverageRectangle = *options.coverageRectangle;
             } else {
               tinyxml2::XMLElement* pBoundingBox =
                   pRoot->FirstChildElement("BoundingBox");
@@ -453,16 +453,13 @@ TileMapServiceRasterOverlay::createTileProvider(
                   coverageRectangle = projectRectangleSimple(
                       projection,
                       CesiumGeospatial::GlobeRectangle::fromDegrees(
-                          west.value(),
-                          south.value(),
-                          east.value(),
-                          north.value()));
+                          *west,
+                          *south,
+                          *east,
+                          *north));
                 } else {
-                  coverageRectangle = CesiumGeometry::Rectangle(
-                      west.value(),
-                      south.value(),
-                      east.value(),
-                      north.value());
+                  coverageRectangle =
+                      CesiumGeometry::Rectangle(*west, *south, *east, *north);
                 }
               }
             }

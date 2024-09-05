@@ -63,7 +63,7 @@ public:
     result.value.emplace();
 
     FinalJsonHandler finalHandler(result.warnings);
-    handler.reset(&finalHandler, &result.value.value());
+    handler.reset(&finalHandler, &*result.value);
 
     JsonReader::internalRead(
         data,
@@ -100,7 +100,7 @@ public:
     result.value.emplace();
 
     FinalJsonHandler finalHandler(result.warnings);
-    handler.reset(&finalHandler, &result.value.value());
+    handler.reset(&finalHandler, &*result.value);
 
     JsonReader::internalRead(
         jsonValue,

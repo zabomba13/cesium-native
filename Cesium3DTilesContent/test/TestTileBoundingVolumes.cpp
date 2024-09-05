@@ -126,11 +126,9 @@ TEST_CASE("TileBoundingVolumes") {
 
   SECTION("invalid") {
     BoundingVolume bv{};
-    CHECK(!TileBoundingVolumes::getOrientedBoundingBox(bv).has_value());
-    CHECK(!TileBoundingVolumes::getBoundingSphere(bv).has_value());
-    CHECK(!TileBoundingVolumes::getBoundingRegion(bv, Ellipsoid::WGS84)
-               .has_value());
-    CHECK(!TileBoundingVolumes::getS2CellBoundingVolume(bv, Ellipsoid::WGS84)
-               .has_value());
+    CHECK(!TileBoundingVolumes::getOrientedBoundingBox(bv));
+    CHECK(!TileBoundingVolumes::getBoundingSphere(bv));
+    CHECK(!TileBoundingVolumes::getBoundingRegion(bv, Ellipsoid::WGS84));
+    CHECK(!TileBoundingVolumes::getS2CellBoundingVolume(bv, Ellipsoid::WGS84));
   }
 }

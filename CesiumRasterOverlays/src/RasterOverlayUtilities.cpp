@@ -174,7 +174,7 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
         std::optional<SkirtMeshMetadata> skirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
         int64_t vertexBegin, vertexEnd;
-        if (skirtMeshMetadata.has_value()) {
+        if (skirtMeshMetadata) {
           vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
           vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
                       skirtMeshMetadata->noSkirtVerticesCount;
@@ -263,18 +263,18 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
 
             // Project it with the raster overlay's projection
             glm::dvec3 projectedPosition =
-                projectPosition(projection, cartographic.value());
+                projectPosition(projection, *cartographic);
 
-            double longitude = cartographic.value().longitude;
-            const double latitude = cartographic.value().latitude;
-            const double ellipsoidHeight = cartographic.value().height;
+            double longitude = cartographic->longitude;
+            const double latitude = cartographic->latitude;
+            const double ellipsoidHeight = cartographic->height;
 
             // If the position is near the anti-meridian and the projected
             // position is outside the expected range, try using the equivalent
             // longitude on the other side of the anti-meridian to see if that
             // gets us closer.
             if (glm::abs(
-                    glm::abs(cartographic.value().longitude) -
+                    glm::abs(cartographic->longitude) -
                     CesiumUtility::Math::OnePi) <
                     CesiumUtility::Math::Epsilon5 &&
                 (projectedPosition.x < rectangle.minimumX ||

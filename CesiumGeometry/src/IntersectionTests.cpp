@@ -125,8 +125,8 @@ std::optional<glm::dvec3> IntersectionTests::rayTriangle(
     bool cullBackFaces) {
   std::optional<double> t =
       rayTriangleParametric(ray, v0, v1, v2, cullBackFaces);
-  if (t && t.value() >= 0)
-    return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
+  if (t && *t >= 0)
+    return std::make_optional<glm::dvec3>(ray.pointFromDistance(*t));
   else
     return std::nullopt;
 }
@@ -187,8 +187,8 @@ std::optional<glm::dvec3>
 IntersectionTests::rayAABB(const Ray& ray, const AxisAlignedBox& aabb) {
   std::optional<double> t = rayAABBParametric(ray, aabb);
 
-  if (t && t.value() >= 0)
-    return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
+  if (t && *t >= 0)
+    return std::make_optional<glm::dvec3>(ray.pointFromDistance(*t));
   else
     return std::nullopt;
 }
@@ -227,8 +227,8 @@ std::optional<double> IntersectionTests::rayAABBParametric(
 std::optional<glm::dvec3>
 IntersectionTests::rayOBB(const Ray& ray, const OrientedBoundingBox& obb) {
   std::optional<double> t = rayOBBParametric(ray, obb);
-  if (t && t.value() >= 0)
-    return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
+  if (t && *t >= 0)
+    return std::make_optional<glm::dvec3>(ray.pointFromDistance(*t));
   else
     return std::nullopt;
 }
@@ -258,8 +258,8 @@ std::optional<double> IntersectionTests::rayOBBParametric(
 std::optional<glm::dvec3>
 IntersectionTests::raySphere(const Ray& ray, const BoundingSphere& sphere) {
   std::optional<double> t = raySphereParametric(ray, sphere);
-  if (t && t.value() >= 0)
-    return std::make_optional<glm::dvec3>(ray.pointFromDistance(t.value()));
+  if (t && *t >= 0)
+    return std::make_optional<glm::dvec3>(ray.pointFromDistance(*t));
   else
     return std::nullopt;
 }

@@ -739,7 +739,7 @@ TokenList tokenListFromJson(const rapidjson::Value& json) {
         continue;
       }
 
-      result.items.emplace_back(std::move(token.value()));
+      result.items.emplace_back(std::move(*token));
     }
   }
 
@@ -900,7 +900,7 @@ CesiumAsync::Future<Response<Token>> Connection::createToken(
   writer.Key("assetIds");
   if (assetIds) {
     writer.StartArray();
-    for (auto asset : assetIds.value()) {
+    for (auto asset : *assetIds) {
       writer.Int64(asset);
     }
     writer.EndArray();
@@ -911,7 +911,7 @@ CesiumAsync::Future<Response<Token>> Connection::createToken(
   writer.Key("allowedUrls");
   if (allowedUrls) {
     writer.StartArray();
-    for (auto& allowedUrl : allowedUrls.value()) {
+    for (auto& allowedUrl : *allowedUrls) {
       writer.String(allowedUrl.c_str(), rapidjson::SizeType(allowedUrl.size()));
     }
     writer.EndArray();
@@ -982,7 +982,7 @@ Future<Response<NoValue>> Connection::modifyToken(
   writer.Key("assetIds");
   if (newAssetIDs) {
     writer.StartArray();
-    for (auto asset : newAssetIDs.value()) {
+    for (auto asset : *newAssetIDs) {
       writer.Int64(asset);
     }
     writer.EndArray();
@@ -1000,7 +1000,7 @@ Future<Response<NoValue>> Connection::modifyToken(
   writer.Key("newAllowedUrls");
   if (newAllowedUrls) {
     writer.StartArray();
-    for (auto& allowedUrl : newAllowedUrls.value()) {
+    for (auto& allowedUrl : *newAllowedUrls) {
       writer.String(allowedUrl.c_str(), rapidjson::SizeType(allowedUrl.size()));
     }
     writer.EndArray();

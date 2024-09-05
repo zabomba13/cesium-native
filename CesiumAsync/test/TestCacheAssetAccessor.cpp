@@ -646,8 +646,7 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(response->contentType() == "app/json");
               REQUIRE(response->data().empty());
               REQUIRE(!ResponseCacheControl::parseFromResponseHeaders(
-                           response->headers())
-                           .has_value());
+                  response->headers()));
             })
         .wait();
   }
@@ -727,7 +726,7 @@ TEST_CASE("Test serving cache item") {
                   ResponseCacheControl::parseFromResponseHeaders(
                       response->headers());
 
-              REQUIRE(cacheControl.has_value());
+              REQUIRE(cacheControl);
               REQUIRE(cacheControl->mustRevalidate() == false);
               REQUIRE(cacheControl->noCache() == false);
               REQUIRE(cacheControl->noStore() == false);
@@ -822,7 +821,7 @@ TEST_CASE("Test serving cache item") {
               std::optional<ResponseCacheControl> cacheControl =
                   ResponseCacheControl::parseFromResponseHeaders(
                       response->headers());
-              REQUIRE(cacheControl.has_value());
+              REQUIRE(cacheControl);
               REQUIRE(cacheControl->mustRevalidate() == true);
               REQUIRE(cacheControl->noCache() == false);
               REQUIRE(cacheControl->noStore() == false);
@@ -907,8 +906,7 @@ TEST_CASE("Test serving cache item") {
               REQUIRE(response->contentType() == "app/json");
               REQUIRE(response->data().empty());
               REQUIRE(!ResponseCacheControl::parseFromResponseHeaders(
-                           response->headers())
-                           .has_value());
+                  response->headers()));
             })
         .wait();
   }

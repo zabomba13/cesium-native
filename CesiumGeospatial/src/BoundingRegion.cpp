@@ -96,7 +96,7 @@ BoundingRegion::BoundingRegion(
       return;
     }
 
-    this->_southwestCornerCartesian = intersection.value();
+    this->_southwestCornerCartesian = *intersection;
     southSurfaceNormal = ellipsoid.geodeticSurfaceNormal(southCenterCartesian);
   } else {
     southSurfaceNormal =
@@ -128,7 +128,7 @@ BoundingRegion::BoundingRegion(
       return;
     }
 
-    this->_northeastCornerCartesian = intersection.value();
+    this->_northeastCornerCartesian = *intersection;
     northSurfaceNormal = ellipsoid.geodeticSurfaceNormal(northCenterCartesian);
   } else {
     northSurfaceNormal =
@@ -152,7 +152,7 @@ double BoundingRegion::computeDistanceSquaredToPosition(
     return this->_boundingBox.computeDistanceSquaredToPosition(position);
   }
 
-  return this->computeDistanceSquaredToPosition(cartographic.value(), position);
+  return this->computeDistanceSquaredToPosition(*cartographic, position);
 }
 
 double BoundingRegion::computeDistanceSquaredToPosition(

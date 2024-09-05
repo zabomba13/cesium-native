@@ -153,7 +153,7 @@ QuadtreeRasterOverlayTileProvider::mapRasterTilesToGeometryTile(
   std::optional<CesiumGeometry::Rectangle> maybeIntersection =
       geometryRectangle.computeIntersection(imageryRectangle);
   if (maybeIntersection) {
-    intersection = maybeIntersection.value();
+    intersection = *maybeIntersection;
   } else {
     // There is no overlap between this terrain tile and this imagery
     // provider.  Unless this is the base layer, no skeletons need to be
@@ -205,8 +205,8 @@ QuadtreeRasterOverlayTileProvider::mapRasterTilesToGeometryTile(
     return result;
   }
 
-  QuadtreeTileID southwestTileCoordinates = southwestTileCoordinatesOpt.value();
-  QuadtreeTileID northeastTileCoordinates = northeastTileCoordinatesOpt.value();
+  QuadtreeTileID southwestTileCoordinates = *southwestTileCoordinatesOpt;
+  QuadtreeTileID northeastTileCoordinates = *northeastTileCoordinatesOpt;
 
   // If the northeast corner of the rectangle lies very close to the south or
   // west side of the northeast tile, we don't actually need the northernmost or
@@ -487,8 +487,7 @@ QuadtreeRasterOverlayTileProvider::loadTileImage(
             images.begin(),
             images.end(),
             [](const LoadedQuadtreeImage& image) {
-              return image.pLoaded->image.has_value() &&
-                     !image.subset.has_value();
+              return image.pLoaded->image && !image.subset;
             });
 
         if (!haveAnyUsefulImageData) {

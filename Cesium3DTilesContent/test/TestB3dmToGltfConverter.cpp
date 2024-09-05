@@ -55,7 +55,7 @@ TEST_CASE("B3dmToGltfConverter") {
         const BufferView& indicesBufferView =
             gltf.bufferViews[size_t(indicesAccessor.bufferView)];
 
-        CHECK(!indicesBufferView.byteStride.has_value());
+        CHECK(!indicesBufferView.byteStride);
         CHECK(
             indicesBufferView.target ==
             BufferView::Target::ELEMENT_ARRAY_BUFFER);

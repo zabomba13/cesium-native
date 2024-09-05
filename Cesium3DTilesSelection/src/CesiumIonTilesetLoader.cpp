@@ -465,7 +465,7 @@ void CesiumIonTilesetLoader::refreshTokenInMainThread(
                 // update cache with new access token
                 auto cacheIt = endpointCache.find(pIonRequest->url());
                 if (cacheIt != endpointCache.end()) {
-                  cacheIt->second.accessToken = accessToken.value();
+                  cacheIt->second.accessToken = *accessToken;
                 }
 
                 this->_refreshTokenState = TokenRefreshState::Done;

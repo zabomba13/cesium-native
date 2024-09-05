@@ -263,7 +263,7 @@ static LoadResult createLoadResultFromLoadedImage(
     const std::shared_ptr<spdlog::logger>& pLogger,
     LoadedRasterOverlayImage&& loadedImage,
     const std::any& rendererOptions) {
-  if (!loadedImage.image.has_value()) {
+  if (!loadedImage.image) {
     SPDLOG_LOGGER_ERROR(
         pLogger,
         "Failed to load image for tile {}:\n- {}",
@@ -284,7 +284,7 @@ static LoadResult createLoadResultFromLoadedImage(
         CesiumUtility::joinToString(loadedImage.warnings, "\n- "));
   }
 
-  CesiumGltf::ImageCesium& image = loadedImage.image.value();
+  CesiumGltf::ImageCesium& image = *loadedImage.image;
 
   const int32_t bytesPerPixel = image.channels * image.bytesPerChannel;
   const int64_t requiredBytes =

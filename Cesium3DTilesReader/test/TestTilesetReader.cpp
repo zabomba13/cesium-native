@@ -26,7 +26,7 @@ TEST_CASE("Reads tileset JSON") {
   auto result = reader.readFromJson(data);
   REQUIRE(result.value);
 
-  const Cesium3DTiles::Tileset& tileset = result.value.value();
+  const Cesium3DTiles::Tileset& tileset = *result.value;
 
   REQUIRE(tileset.asset.version == "1.0");
   REQUIRE(tileset.geometricError == 494.50961650991815);
@@ -139,9 +139,9 @@ TEST_CASE("Reads extras") {
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
   REQUIRE(result.errors.empty());
   REQUIRE(result.warnings.empty());
-  REQUIRE(result.value.has_value());
+  REQUIRE(result.value);
 
-  Cesium3DTiles::Tileset& tileset = result.value.value();
+  Cesium3DTiles::Tileset& tileset = *result.value;
 
   auto ait = tileset.extras.find("A");
   REQUIRE(ait != tileset.extras.end());
@@ -217,9 +217,9 @@ TEST_CASE("Reads 3DTILES_content_gltf") {
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
   REQUIRE(result.errors.empty());
   REQUIRE(result.warnings.empty());
-  REQUIRE(result.value.has_value());
+  REQUIRE(result.value);
 
-  Cesium3DTiles::Tileset& tileset = result.value.value();
+  Cesium3DTiles::Tileset& tileset = *result.value;
   CHECK(tileset.asset.version == "1.0");
 
   const std::vector<std::string> tilesetExtensionUsed{
@@ -266,7 +266,7 @@ TEST_CASE("Reads custom extension") {
   auto withCustomExt = reader.readFromJson(
       gsl::span(reinterpret_cast<const std::byte*>(s.c_str()), s.size()));
   REQUIRE(withCustomExt.errors.empty());
-  REQUIRE(withCustomExt.value.has_value());
+  REQUIRE(withCustomExt.value);
 
   REQUIRE(withCustomExt.value->extensions.size() == 2);
 

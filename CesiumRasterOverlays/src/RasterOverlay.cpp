@@ -45,7 +45,7 @@ RasterOverlay::RasterOverlay(
     : _name(name), _options(options), _destructionCompleteDetails{} {}
 
 RasterOverlay::~RasterOverlay() noexcept {
-  if (this->_destructionCompleteDetails.has_value()) {
+  if (this->_destructionCompleteDetails) {
     this->_destructionCompleteDetails->promise.resolve();
   }
 }
@@ -53,7 +53,7 @@ RasterOverlay::~RasterOverlay() noexcept {
 CesiumAsync::SharedFuture<void>&
 RasterOverlay::getAsyncDestructionCompleteEvent(
     const CesiumAsync::AsyncSystem& asyncSystem) {
-  if (!this->_destructionCompleteDetails.has_value()) {
+  if (!this->_destructionCompleteDetails) {
     auto promise = asyncSystem.createPromise<void>();
     auto sharedFuture = promise.getFuture().share();
     this->_destructionCompleteDetails.emplace(DestructionCompleteDetails{

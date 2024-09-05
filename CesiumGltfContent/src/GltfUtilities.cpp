@@ -252,7 +252,7 @@ GltfUtilities::computeBoundingRegion(
         std::optional<SkirtMeshMetadata> skirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
         int64_t vertexBegin, vertexEnd;
-        if (skirtMeshMetadata.has_value()) {
+        if (skirtMeshMetadata) {
           vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
           vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
                       skirtMeshMetadata->noSkirtVerticesCount;
@@ -495,9 +495,9 @@ void findClosestRayHit(
 
       // Set result to this hit if closer, or the first one
       // Only consider hits in front of the ray
-      bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
-        tClosest = tCurr.value();
+      bool validHit = tCurr && *tCurr >= 0;
+      if (validHit && (tClosest == -1.0 || *tCurr < tClosest))
+        tClosest = *tCurr;
     }
   } else if (primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP) {
     for (int64_t i = 2; i < positionView.size(); ++i) {
@@ -536,9 +536,9 @@ void findClosestRayHit(
           vert2,
           cullBackFaces);
 
-      bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
-        tClosest = tCurr.value();
+      bool validHit = tCurr && *tCurr >= 0;
+      if (validHit && (tClosest == -1.0 || *tCurr < tClosest))
+        tClosest = *tCurr;
     }
   } else {
     assert(primitive.mode == MeshPrimitive::Mode::TRIANGLE_FAN);
@@ -572,9 +572,9 @@ void findClosestRayHit(
           vert2,
           cullBackFaces);
 
-      bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
-        tClosest = tCurr.value();
+      bool validHit = tCurr && *tCurr >= 0;
+      if (validHit && (tClosest == -1.0 || *tCurr < tClosest))
+        tClosest = *tCurr;
     }
   }
   tMinOut = tClosest;
@@ -645,9 +645,9 @@ void findClosestIndexedRayHit(
 
       // Set result to this hit if closer, or the first one
       // Only consider hits in front of the ray
-      bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
-        tClosest = tCurr.value();
+      bool validHit = tCurr && *tCurr >= 0;
+      if (validHit && (tClosest == -1.0 || *tCurr < tClosest))
+        tClosest = *tCurr;
     }
   } else if (primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP) {
     for (int64_t i = 2; i < indicesView.size(); ++i) {
@@ -694,9 +694,9 @@ void findClosestIndexedRayHit(
           vert2,
           cullBackFaces);
 
-      bool validHit = tCurr && tCurr.value() >= 0;
-      if (validHit && (tClosest == -1.0 || tCurr.value() < tClosest))
-        tClosest = tCurr.value();
+      bool validHit = tCurr && *tCurr >= 0;
+      if (validHit && (tClosest == -1.0 || *tCurr < tClosest))
+        tClosest = *tCurr;
     }
   } else {
     assert(primitive.mode == MeshPrimitive::Mode::TRIANGLE_FAN);
@@ -742,9 +742,9 @@ void findClosestIndexedRayHit(
             vert2,
             cullBackFaces);
 
-        bool validHit = tCurr && tCurr.value() >= 0;
+        bool validHit = tCurr && *tCurr >= 0;
         if (validHit && (tCurr < tClosest || tClosest == -1.0))
-          tClosest = tCurr.value();
+          tClosest = *tCurr;
       }
     }
   }
@@ -1468,7 +1468,7 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
             cullBackFaces,
             result.warnings);
 
-        if (!primitiveHitPoint.has_value())
+        if (!primitiveHitPoint)
           return;
 
         // We have a hit, determine if it's the closest one
@@ -1498,7 +1498,7 @@ GltfUtilities::IntersectResult GltfUtilities::intersectRayGltfModel(
         int32_t primitiveId =
             static_cast<int32_t>(&primitive - &mesh.primitives[0]);
 
-        if (!result.hit.has_value()) {
+        if (!result.hit) {
           result.hit = RayGltfHit{
               std::move(*primitiveHitPoint),
               std::move(primitiveToWorld),

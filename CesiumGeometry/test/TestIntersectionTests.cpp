@@ -425,7 +425,7 @@ TEST_CASE("IntersectionTests::raySphere") {
     t = -1.0;
 
   CHECK(CesiumUtility::Math::equalsEpsilon(
-      t.value(),
+      *t,
       testCase.t,
       CesiumUtility::Math::Epsilon6));
 }

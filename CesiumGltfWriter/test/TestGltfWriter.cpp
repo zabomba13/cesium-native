@@ -24,9 +24,9 @@ void check(const std::string& input, const std::string& expectedOutput) {
       input.size()));
   REQUIRE(readResult.errors.empty());
   REQUIRE(readResult.warnings.empty());
-  REQUIRE(readResult.model.has_value());
+  REQUIRE(readResult.model);
 
-  CesiumGltf::Model& model = readResult.model.value();
+  CesiumGltf::Model& model = *readResult.model;
 
   CesiumGltfWriter::GltfWriter writer;
   CesiumGltfWriter::GltfWriterResult writeResult = writer.writeGltf(model);
@@ -552,9 +552,9 @@ TEST_CASE("Writes glb") {
 
   REQUIRE(readResult.errors.empty());
   REQUIRE(readResult.warnings.empty());
-  REQUIRE(readResult.model.has_value());
+  REQUIRE(readResult.model);
 
-  CesiumGltf::Model& readModel = readResult.model.value();
+  CesiumGltf::Model& readModel = *readResult.model;
   const std::vector<std::byte> readModelBuffer =
       readModel.buffers[0].cesium.data;
 

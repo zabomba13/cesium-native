@@ -197,8 +197,7 @@ protected:
            creditAndCoverageAreas.coverageAreas) {
         if (coverageArea.zoomMin <= bingTileLevel &&
             bingTileLevel <= coverageArea.zoomMax &&
-            coverageArea.rectangle.computeIntersection(tileRectangle)
-                .has_value()) {
+            coverageArea.rectangle.computeIntersection(tileRectangle)) {
           tileCredits.push_back(creditAndCoverageAreas.credit);
           break;
         }

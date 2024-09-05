@@ -72,13 +72,13 @@ TEST_CASE(
       options);
 
   REQUIRE(readerResult.errors.empty());
-  REQUIRE(readerResult.model.has_value());
+  REQUIRE(readerResult.model);
 
   ExtensionModelExtStructuralMetadata* pMetadata =
       readerResult.model->getExtension<ExtensionModelExtStructuralMetadata>();
   REQUIRE(pMetadata);
 
-  REQUIRE(pMetadata->schema.has_value());
+  REQUIRE(pMetadata->schema);
   REQUIRE(pMetadata->schema->classes.size() == 1);
 
   auto treesIt = pMetadata->schema->classes.find("tree");
@@ -88,7 +88,7 @@ TEST_CASE(
 
   auto birdCountIt = treesIt->second.properties.find("birdCount");
   REQUIRE(birdCountIt != treesIt->second.properties.end());
-  REQUIRE(!birdCountIt->second.max.has_value());
-  REQUIRE(birdCountIt->second.min.has_value());
+  REQUIRE(!birdCountIt->second.max);
+  REQUIRE(birdCountIt->second.min);
   REQUIRE(birdCountIt->second.min->getSafeNumberOrDefault(-1) == 1);
 }

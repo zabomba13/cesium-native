@@ -199,19 +199,19 @@ TEST_CASE("EarthGravitationalModel1996Grid::fromBuffer") {
   SECTION("Loads a valid WW15MGH.DAC from buffer") {
     auto grid =
         EarthGravitationalModel1996Grid::fromBuffer(readFile(testFilePath));
-    CHECK(grid.has_value());
+    CHECK(grid);
   }
 
   SECTION("Fails on too-short buffer") {
     std::vector<std::byte> buffer(4, zeroByte);
     auto grid = EarthGravitationalModel1996Grid::fromBuffer(buffer);
-    CHECK(!grid.has_value());
+    CHECK(!grid);
   }
 
   SECTION("Loads an arbitrary correctly-formed buffer") {
     std::vector<std::byte> buffer(3000000, zeroByte);
     auto grid = EarthGravitationalModel1996Grid::fromBuffer(buffer);
-    CHECK(grid.has_value());
+    CHECK(grid);
   }
 }
 
@@ -220,7 +220,7 @@ TEST_CASE("EarthGravitationalModel1996Grid::sampleHeight") {
       EarthGravitationalModel1996Grid::fromBuffer(readFile(testFilePath));
 
   SECTION("Correct values at bounds") {
-    REQUIRE(grid.has_value());
+    REQUIRE(grid);
 
     for (const Egm96TestCase& testCase : boundsCases) {
       const double obtainedValue =
@@ -234,7 +234,7 @@ TEST_CASE("EarthGravitationalModel1996Grid::sampleHeight") {
   }
 
   SECTION("Calculates correct height values") {
-    REQUIRE(grid.has_value());
+    REQUIRE(grid);
 
     for (const Egm96TestCase& testCase : testCases) {
       const double obtainedValue =

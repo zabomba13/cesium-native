@@ -483,7 +483,7 @@ TEST_CASE("Converts point cloud with CONSTANT_RGBA") {
   Material& material = gltf.materials[0];
   REQUIRE(material.pbrMetallicRoughness);
   MaterialPBRMetallicRoughness& pbrMetallicRoughness =
-      material.pbrMetallicRoughness.value();
+      *material.pbrMetallicRoughness;
   const auto& baseColorFactor = pbrMetallicRoughness.baseColorFactor;
 
   // Check that CONSTANT_RGBA is stored in the material base color

@@ -695,7 +695,7 @@ TilesetContentManager::TilesetContentManager(
       _userCredit(
           (tilesetOptions.credit && externals.pCreditSystem)
               ? std::optional<Credit>(externals.pCreditSystem->createCredit(
-                    tilesetOptions.credit.value(),
+                    *tilesetOptions.credit,
                     tilesetOptions.showCreditsOnScreen))
               : std::nullopt),
       _tilesetCredits{},
@@ -724,7 +724,7 @@ TilesetContentManager::TilesetContentManager(
       _userCredit(
           (tilesetOptions.credit && externals.pCreditSystem)
               ? std::optional<Credit>(externals.pCreditSystem->createCredit(
-                    tilesetOptions.credit.value(),
+                    *tilesetOptions.credit,
                     tilesetOptions.showCreditsOnScreen))
               : std::nullopt),
       _tilesetCredits{},
@@ -875,7 +875,7 @@ TilesetContentManager::TilesetContentManager(
       _userCredit(
           (tilesetOptions.credit && externals.pCreditSystem)
               ? std::optional<Credit>(externals.pCreditSystem->createCredit(
-                    tilesetOptions.credit.value(),
+                    *tilesetOptions.credit,
                     tilesetOptions.showCreditsOnScreen))
               : std::nullopt),
       _tilesetCredits{},

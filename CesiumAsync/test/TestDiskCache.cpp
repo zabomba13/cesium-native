@@ -81,7 +81,7 @@ TEST_CASE("Test disk cache with Sqlite") {
 
     std::optional<ResponseCacheControl> cacheControl =
         ResponseCacheControl::parseFromResponseHeaders(cacheResponse.headers);
-    REQUIRE(!cacheControl.has_value());
+    REQUIRE(!cacheControl);
   }
 
   SECTION("Test prune") {
@@ -168,7 +168,7 @@ TEST_CASE("Test disk cache with Sqlite") {
 
       std::optional<ResponseCacheControl> cacheControl =
           ResponseCacheControl::parseFromResponseHeaders(cacheResponse.headers);
-      REQUIRE(cacheControl.has_value());
+      REQUIRE(cacheControl);
       REQUIRE(cacheControl->mustRevalidate() == true);
       REQUIRE(cacheControl->noCache() == false);
       REQUIRE(cacheControl->noStore() == true);

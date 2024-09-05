@@ -151,7 +151,7 @@ double ViewState::computeDistanceSquaredToBoundingVolume(
     double operator()(const BoundingRegion& boundingRegion) noexcept {
       if (viewState._positionCartographic) {
         return boundingRegion.computeDistanceSquaredToPosition(
-            viewState._positionCartographic.value(),
+            *viewState._positionCartographic,
             viewState._position);
       }
       return boundingRegion.computeDistanceSquaredToPosition(
@@ -168,7 +168,7 @@ double ViewState::computeDistanceSquaredToBoundingVolume(
         const BoundingRegionWithLooseFittingHeights& boundingRegion) noexcept {
       if (viewState._positionCartographic) {
         return boundingRegion.computeConservativeDistanceSquaredToPosition(
-            viewState._positionCartographic.value(),
+            *viewState._positionCartographic,
             viewState._position);
       }
       return boundingRegion.computeConservativeDistanceSquaredToPosition(

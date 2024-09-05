@@ -24,7 +24,7 @@ protected:
 
     if constexpr (isOptional<TProperty>::value) {
       value.emplace();
-      accessor.reset(this, &value.value());
+      accessor.reset(this, &*value);
     } else {
       accessor.reset(this, &value);
     }

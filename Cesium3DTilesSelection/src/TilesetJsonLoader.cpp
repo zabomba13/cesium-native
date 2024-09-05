@@ -454,14 +454,14 @@ std::optional<Tile> parseTileJsonRecursively(
   }
 
   auto tileBoundingVolume =
-      transformBoundingVolume(tileTransform, boundingVolume.value());
+      transformBoundingVolume(tileTransform, *boundingVolume);
 
   // parse viewer request volume
   std::optional<BoundingVolume> tileViewerRequestVolume =
       getBoundingVolumeProperty(ellipsoid, tileJson, "viewerRequestVolume");
   if (tileViewerRequestVolume) {
     tileViewerRequestVolume =
-        transformBoundingVolume(tileTransform, tileViewerRequestVolume.value());
+        transformBoundingVolume(tileTransform, *tileViewerRequestVolume);
   }
 
   // parse geometric error
@@ -481,7 +481,7 @@ std::optional<Tile> parseTileJsonRecursively(
       glm::length(tileTransform[2]));
   const double maxScaleComponent =
       glm::max(scale.x, glm::max(scale.y, scale.z));
-  double tileGeometricError = geometricError.value() * maxScaleComponent;
+  double tileGeometricError = *geometricError * maxScaleComponent;
 
   // parse refinement
   TileRefine tileRefine = parentRefine;
@@ -579,9 +579,8 @@ std::optional<Tile> parseTileJsonRecursively(
         contentIt->value,
         "boundingVolume");
     if (tileContentBoundingVolume) {
-      tileContentBoundingVolume = transformBoundingVolume(
-          tileTransform,
-          tileContentBoundingVolume.value());
+      tileContentBoundingVolume =
+          transformBoundingVolume(tileTransform, *tileContentBoundingVolume);
     }
   }
 

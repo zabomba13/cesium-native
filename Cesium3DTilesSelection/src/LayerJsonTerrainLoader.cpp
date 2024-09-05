@@ -249,8 +249,7 @@ void generateRasterOverlayUVs(
 
   const BoundingRegion* pParentRegion = nullptr;
   if (result.updatedBoundingVolume) {
-    pParentRegion =
-        std::get_if<BoundingRegion>(&result.updatedBoundingVolume.value());
+    pParentRegion = std::get_if<BoundingRegion>(&*result.updatedBoundingVolume);
   } else {
     pParentRegion = std::get_if<BoundingRegion>(&tileBoundingVolume);
   }

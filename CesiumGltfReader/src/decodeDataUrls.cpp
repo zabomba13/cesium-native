@@ -104,19 +104,19 @@ void decodeDataUrls(
     return;
   }
 
-  CesiumGltf::Model& model = readGltf.model.value();
+  CesiumGltf::Model& model = *readGltf.model;
 
   for (CesiumGltf::Buffer& buffer : model.buffers) {
     if (!buffer.uri) {
       continue;
     }
 
-    std::optional<DecodeResult> decoded = tryDecode(buffer.uri.value());
+    std::optional<DecodeResult> decoded = tryDecode(*buffer.uri);
     if (!decoded) {
       continue;
     }
 
-    buffer.cesium.data = std::move(decoded.value().data);
+    buffer.cesium.data = std::move(decoded->data);
 
     if (options.clearDecodedDataUrls) {
       buffer.uri.reset();
@@ -138,19 +138,19 @@ void decodeDataUrls(
       continue;
     }
 
-    std::optional<DecodeResult> decoded = tryDecode(image.uri.value());
+    std::optional<DecodeResult> decoded = tryDecode(*image.uri);
     if (!decoded) {
       continue;
     }
 
     ImageReaderResult imageResult =
-        reader.readImage(decoded.value().data, options.ktx2TranscodeTargets);
+        reader.readImage(decoded->data, options.ktx2TranscodeTargets);
 
     if (!imageResult.image) {
       continue;
     }
 
-    image.cesium = std::move(imageResult.image.value());
+    image.cesium = std::move(*imageResult.image);
 
     if (options.clearDecodedDataUrls) {
       image.uri.reset();
