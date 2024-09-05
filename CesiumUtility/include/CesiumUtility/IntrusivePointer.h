@@ -71,6 +71,11 @@ public:
    * @brief Assignment operator.
    */
   IntrusivePointer& operator=(const IntrusivePointer& rhs) noexcept {
+    if (this == &rhs) {
+      // This check silences clang-tidy errors
+      return *this;
+    }
+
     if (this->_p != rhs._p) {
       // addReference the new pointer before releaseReference'ing the old.
       T* pOld = this->_p;

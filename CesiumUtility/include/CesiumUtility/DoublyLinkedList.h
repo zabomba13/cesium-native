@@ -30,7 +30,12 @@ public:
    * @brief Assignment operator.
    */
   DoublyLinkedListPointers&
-  operator=(const DoublyLinkedListPointers& /*rhs*/) noexcept {
+  operator=(const DoublyLinkedListPointers& rhs) noexcept {
+    if (this == &rhs) {
+      // This check silences clang-tidy errors
+      return *this;
+    }
+
     return *this;
   }
 
