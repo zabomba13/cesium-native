@@ -244,6 +244,7 @@ static bool validateCapabilities(
       const int numLayers = static_cast<int>(configLayers.size());
       if (numLayers > layerLimit) {
         char buffer[512];
+        // NOLINTNEXTLINE(cert-err33-c)
         std::snprintf(
             buffer,
             512,
