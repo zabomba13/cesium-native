@@ -16,6 +16,7 @@ namespace CesiumRasterOverlays {
 
 class CESIUMRASTEROVERLAYS_API IPrepareRasterOverlayRendererResources {
 public:
+  virtual ~IPrepareRasterOverlayRendererResources() = default;
   /**
    * @brief Prepares a raster overlay tile.
    *

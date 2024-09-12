@@ -40,6 +40,7 @@ enum class CESIUM3DTILESSELECTION_API TileOcclusionState {
  */
 class CESIUM3DTILESSELECTION_API TileOcclusionRendererProxy {
 public:
+  virtual ~TileOcclusionRendererProxy() = default;
   /**
    * @brief Get the occlusion state for this tile. If this is
    * OcclusionUnavailable, the traversal may decide to wait for the occlusion
