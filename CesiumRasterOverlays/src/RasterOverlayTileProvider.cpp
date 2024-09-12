@@ -61,6 +61,7 @@ RasterOverlayTileProvider::RasterOverlayTileProvider(
       _tileDataBytes(0),
       _totalTilesCurrentlyLoading(0),
       _throttledTilesCurrentlyLoading(0) {
+  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
   this->_pPlaceholder = new RasterOverlayTile(*this);
 }
 
