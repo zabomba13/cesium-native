@@ -1349,7 +1349,7 @@ void TilesetContentManager::setTileContent(
     }
 
     if (result.updatedContentBoundingVolume) {
-      tile.setContentBoundingVolume(*result.updatedContentBoundingVolume);
+      tile.setContentBoundingVolume(result.updatedContentBoundingVolume);
     }
 
     auto& content = tile.getContent();
