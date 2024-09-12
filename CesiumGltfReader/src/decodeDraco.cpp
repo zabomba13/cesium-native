@@ -159,7 +159,7 @@ void copyDecodedIndices(
   indicesBufferView.buffer = static_cast<int32_t>(model.buffers.size());
   CesiumGltf::Buffer& indicesBuffer = model.buffers.emplace_back();
 
-  int64_t indexBytes = pIndicesAccessor->computeByteSizeOfComponent();
+  int64_t indexBytes = uint8_t(pIndicesAccessor->computeByteSizeOfComponent());
   const int64_t indicesBytes = pIndicesAccessor->count * indexBytes;
 
   indicesBuffer.cesium.data.resize(static_cast<size_t>(indicesBytes));

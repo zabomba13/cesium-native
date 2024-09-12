@@ -1494,7 +1494,7 @@ void addBatchIdsToGltf(PntsContent& parsedContent, CesiumGltf::Model& gltf) {
       break;
     }
     const int64_t byteStride =
-        Accessor::computeByteSizeOfComponent(componentType);
+        uint8_t(Accessor::computeByteSizeOfComponent(componentType));
     const int64_t byteLength = static_cast<int64_t>(byteStride * count);
 
     int32_t bufferId = createBufferInGltf(gltf, std::move(batchId.data));

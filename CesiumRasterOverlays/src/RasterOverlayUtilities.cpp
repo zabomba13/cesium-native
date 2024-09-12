@@ -881,7 +881,7 @@ bool upsamplePrimitiveForRasterOverlays(
 
     const int64_t accessorByteStride = accessor.computeByteStride(parentModel);
     const int64_t accessorComponentElements =
-        accessor.computeNumberOfComponents();
+        uint8_t(accessor.computeNumberOfComponents());
     if (accessor.componentType != Accessor::ComponentType::FLOAT) {
       // Can only interpolate floating point vertex attributes
       toRemove.push_back(attribute.first);

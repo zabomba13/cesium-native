@@ -589,6 +589,7 @@ void findClosestIndexedRayHit(
     bool cullBackFaces,
     double& tMinOut,
     std::vector<std::string>& warnings) {
+  // NOLINTBEGIN(bugprone-signed-char-misuse)
 
   // Need at least 3 vertices to form a triangle
   if (indicesView.size() < 3) {
@@ -754,6 +755,7 @@ void findClosestIndexedRayHit(
         "Found one or more invalid index values for indexed mesh");
 
   tMinOut = tClosest;
+  // NOLINTEND(bugprone-signed-char-misuse)
 }
 } // namespace
 
