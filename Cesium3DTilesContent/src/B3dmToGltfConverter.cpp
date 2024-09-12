@@ -7,6 +7,7 @@
 #include <CesiumAsync/Future.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltfReader/GltfReader.h>
+#include <CesiumUtility/Assert.h>
 
 #include <fmt/core.h>
 #include <gsl/span>
@@ -170,6 +171,7 @@ rapidjson::Document parseFeatureTableJsonData(
       rtcIt->value[1].IsNumber() && rtcIt->value[2].IsNumber()) {
     // Add the RTC_CENTER value to the glTF as a CESIUM_RTC extension.
     rapidjson::Value& rtcValue = rtcIt->value;
+    CESIUM_ASSERT(result.model);
     auto& cesiumRTC =
         result.model->addExtension<CesiumGltf::ExtensionCesiumRTC>();
     result.model->addExtensionRequired(

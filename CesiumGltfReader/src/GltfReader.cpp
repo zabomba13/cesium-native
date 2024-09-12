@@ -265,6 +265,7 @@ void postprocess(
     const GltfReader& reader,
     GltfReaderResult& readGltf,
     const GltfReaderOptions& options) {
+  CESIUM_ASSERT(readGltf.model);
   Model& model = *readGltf.model;
 
   auto extFeatureMetadataIter = std::find(
@@ -512,6 +513,9 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
   }
 
   auto pResult = std::make_unique<GltfReaderResult>(std::move(result));
+  std::optional<Model>& maybeModel = pResult->model;
+  CESIUM_ASSERT(maybeModel);
+  Model& model = *maybeModel;
 
   struct ExternalBufferLoadResult {
     bool success = false;
@@ -525,7 +529,7 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
   constexpr std::string_view dataPrefix = "data:";
   constexpr size_t dataPrefixLength = dataPrefix.size();
 
-  for (Buffer& buffer : pResult->model->buffers) {
+  for (Buffer& buffer : model.buffers) {
     if (buffer.uri && buffer.uri->substr(0, dataPrefixLength) != dataPrefix) {
       resolvedBuffers.push_back(
           pAssetAccessor
@@ -551,7 +555,7 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
   }
 
   if (options.resolveExternalImages) {
-    for (Image& image : pResult->model->images) {
+    for (Image& image : model.images) {
       if (image.uri && image.uri->substr(0, dataPrefixLength) != dataPrefix) {
         resolvedBuffers.push_back(
             pAssetAccessor

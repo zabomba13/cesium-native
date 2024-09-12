@@ -182,7 +182,12 @@ protected:
     options.rectangle = this->getTilingScheme().tileToRectangle(tileID);
     std::vector<Credit>& tileCredits = options.credits =
         this->getOwner().getCredits();
-    tileCredits.push_back(*this->getCredit());
+
+    const std::optional<Credit>& maybeOverlayCredit = this->getCredit();
+
+    if (maybeOverlayCredit) {
+      tileCredits.push_back(*maybeOverlayCredit);
+    }
 
     const CesiumGeospatial::GlobeRectangle tileRectangle =
         CesiumGeospatial::unprojectRectangleSimple(

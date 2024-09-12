@@ -88,7 +88,9 @@ public:
   /**
    * @brief Value of Max-Age directive that appears in the Cache-Control header.
    */
-  int maxAgeValue() const noexcept { return *_maxAge; }
+  int maxAgeValue() const noexcept {
+    return *_maxAge; // NOLINT(bugprone-unchecked-optional-access)
+  }
 
   /**
    * @brief Existence of S-Maxage directive that appears in the Cache-Control
@@ -100,7 +102,9 @@ public:
    * @brief Value of S-Maxage directive that appears in the Cache-Control
    * header.
    */
-  int sharedMaxAgeValue() const noexcept { return *_sharedMaxAge; }
+  int sharedMaxAgeValue() const noexcept {
+    return *_sharedMaxAge; // NOLINT(bugprone-unchecked-optional-access)
+  }
 
   /**
    * @brief Existence of Stale-While-Revalidate directive that appears in the
@@ -115,7 +119,7 @@ public:
    * Cache-Control header.
    */
   int staleWhileRevalidateValue() const noexcept {
-    return *_staleWhileRevalidate;
+    return *_staleWhileRevalidate; // NOLINT(bugprone-unchecked-optional-access)
   }
 
   /**

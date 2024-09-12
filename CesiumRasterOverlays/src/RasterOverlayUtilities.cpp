@@ -943,8 +943,7 @@ bool upsamplePrimitiveForRasterOverlays(
   int64_t indicesCount = indicesView.size();
   std::optional<SkirtMeshMetadata> parentSkirtMeshMetadata =
       SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-  const bool hasSkirt = (parentSkirtMeshMetadata != std::nullopt) &&
-                        (positionAttributeIndex != -1);
+  const bool hasSkirt = parentSkirtMeshMetadata && positionAttributeIndex != -1;
   if (hasSkirt) {
     indicesBegin = parentSkirtMeshMetadata->noSkirtIndicesBegin;
     indicesCount = parentSkirtMeshMetadata->noSkirtIndicesCount;

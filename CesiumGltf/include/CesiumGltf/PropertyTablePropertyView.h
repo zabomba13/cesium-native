@@ -675,7 +675,8 @@ public:
     }
 
     ElementType value = getRaw(index);
-    if (this->noData() && value == *(this->noData())) {
+    const std::optional<ElementType>& maybeNoData = this->noData();
+    if (maybeNoData && value == *maybeNoData) {
       return propertyValueViewToCopy(this->defaultValue());
     } else if constexpr (IsMetadataScalar<ElementType>::value) {
       return transformValue<NormalizedType>(

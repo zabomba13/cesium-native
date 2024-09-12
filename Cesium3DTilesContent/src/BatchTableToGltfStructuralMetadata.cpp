@@ -67,7 +67,7 @@ struct MaskedType {
   bool isFloat64;
   bool isBool;
 
-  MaskedType() : MaskedType(true){};
+  MaskedType() : MaskedType(true) {};
 
   MaskedType(bool defaultValue)
       : isInt8(defaultValue),
@@ -123,12 +123,12 @@ struct MaskedArrayType {
   uint32_t minArrayCount;
   uint32_t maxArrayCount;
 
-  MaskedArrayType() : MaskedArrayType(true){};
+  MaskedArrayType() : MaskedArrayType(true) {};
 
   MaskedArrayType(bool defaultValue)
       : elementType(defaultValue),
         minArrayCount(std::numeric_limits<uint32_t>::max()),
-        maxArrayCount(std::numeric_limits<uint32_t>::min()){};
+        maxArrayCount(std::numeric_limits<uint32_t>::min()) {};
 
   MaskedArrayType(
       MaskedType inElementType,
@@ -197,10 +197,10 @@ private:
   bool _canUseNullStringSentinel = true;
 
 public:
-  CompatibleTypes() : _type(){};
-  CompatibleTypes(const MaskedType& maskedType) : _type(maskedType){};
+  CompatibleTypes() : _type() {};
+  CompatibleTypes(const MaskedType& maskedType) : _type(maskedType) {};
   CompatibleTypes(const MaskedArrayType& maskedArrayType)
-      : _type(maskedArrayType){};
+      : _type(maskedArrayType) {};
 
   /**
    * Whether this is exclusively compatible with array types. This indicates an
@@ -732,7 +732,8 @@ void updateExtensionWithJsonStringProperty(
       // Because serialized string json will add double quotations in the
       // buffer which is not needed by us, we will manually add the string to
       // the buffer
-      const auto& rapidjsonStr = it->IsNull() ? *noDataValue : it->GetString();
+      const auto& rapidjsonStr =
+          it->IsNull() && noDataValue ? *noDataValue : it->GetString();
       rapidjsonStrBuffer.Reserve(it->GetStringLength());
       for (rapidjson::SizeType j = 0; j < it->GetStringLength(); ++j) {
         rapidjsonStrBuffer.PutUnsafe(rapidjsonStr[j]);
@@ -814,7 +815,7 @@ void updateExtensionWithJsonScalarProperty(
   }
 
   for (int64_t i = 0; i < propertyTable.count; ++i, ++p, ++it) {
-    if (it->IsNull()) {
+    if (it->IsNull() && noDataValue) {
       *p = *noDataValue;
     } else {
       *p = static_cast<T>(it->template Get<TRapidJson>());

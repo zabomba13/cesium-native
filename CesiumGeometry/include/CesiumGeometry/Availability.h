@@ -96,13 +96,15 @@ public:
    * @brief Unsafe is isBufferView is false.
    */
   const gsl::span<const std::byte>& getBufferAccessor() const {
-    return *bufferAccessor;
+    return *bufferAccessor; // NOLINT(bugprone-unchecked-optional-access)
   }
 
   /**
    * @brief Unsafe if isBufferView is false.
    */
-  const std::byte& operator[](size_t i) const { return (*bufferAccessor)[i]; }
+  const std::byte& operator[](size_t i) const {
+    return (*bufferAccessor)[i]; // NOLINT(bugprone-unchecked-optional-access)
+  }
 
   /**
    * @brief Unsafe if isBufferView is false;

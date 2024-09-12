@@ -364,7 +364,7 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
             pBinaryData + *parsedContent.position),
         numInstances);
     decodedInstances.positions.assign(rawPositions.begin(), rawPositions.end());
-  } else {
+  } else if (parsedContent.positionQuantized) {
     gsl::span<const uint16_t[3]> rawQuantizedPositions(
         reinterpret_cast<const uint16_t(*)[3]>(
             pBinaryData + *parsedContent.positionQuantized),

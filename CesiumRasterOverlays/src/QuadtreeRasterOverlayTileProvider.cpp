@@ -541,8 +541,9 @@ void QuadtreeRasterOverlayTileProvider::unloadCachedTiles() {
     // If this is the last use of this data, it will be freed when the shared
     // pointer goes out of scope, so reduce the cachedBytes accordingly.
     if (pImage.use_count() == 1) {
-      if (pImage->image) {
-        this->_cachedBytes -= int64_t(pImage->image->pixelData.size());
+      const std::optional<ImageCesium>& maybeImageCesium = pImage->image;
+      if (maybeImageCesium) {
+        this->_cachedBytes -= int64_t(maybeImageCesium->pixelData.size());
         CESIUM_ASSERT(this->_cachedBytes >= 0);
       }
     }
