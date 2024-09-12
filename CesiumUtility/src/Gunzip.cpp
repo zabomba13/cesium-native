@@ -8,7 +8,7 @@
 #define ZLIB_CONST
 #include "zlib-ng.h"
 
-#define CHUNK 65536
+constexpr uint32_t ChunkSize = 65536;
 
 bool CesiumUtility::isGzip(const gsl::span<const std::byte>& data) {
   if (data.size() < 3) {
@@ -37,9 +37,9 @@ bool CesiumUtility::gunzip(
   strm.next_in = reinterpret_cast<const Bytef*>(data.data());
 
   do {
-    out.resize(index + CHUNK);
+    out.resize(index + ChunkSize);
     strm.next_out = reinterpret_cast<Bytef*>(&out[index]);
-    strm.avail_out = CHUNK;
+    strm.avail_out = ChunkSize;
     ret = zng_inflate(&strm, Z_NO_FLUSH);
     switch (ret) {
     case Z_NEED_DICT:
@@ -50,7 +50,7 @@ bool CesiumUtility::gunzip(
     default:
       break;
     }
-    index += CHUNK - strm.avail_out;
+    index += ChunkSize - strm.avail_out;
   } while (ret != Z_STREAM_END);
 
   zng_inflateEnd(&strm);
