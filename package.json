@@ -7,7 +7,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "format": "clang-format -i \"--glob=@(Cesium*)/**/*.@(cpp|h|hpp)\"",
+    "format": "clang-format -i \"--glob=@(Cesium*)/**/*.@(cpp|h)\"",
     "check-format": "check-clang-format",
     "generate-gltf": "cd tools/generate-classes && npm run generate-gltf && cd ../.. && npm run format",
     "generate-3d-tiles": "cd tools/generate-classes && npm run generate-3d-tiles && cd ../.. && npm run format",
