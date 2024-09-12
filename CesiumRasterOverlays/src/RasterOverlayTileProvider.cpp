@@ -57,13 +57,11 @@ RasterOverlayTileProvider::RasterOverlayTileProvider(
       _projection(CesiumGeospatial::GeographicProjection(ellipsoid)),
       _coverageRectangle(CesiumGeospatial::GeographicProjection::
                              computeMaximumProjectedRectangle(ellipsoid)),
-      _pPlaceholder(),
+      // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
+      _pPlaceholder(new RasterOverlayTile(*this)),
       _tileDataBytes(0),
       _totalTilesCurrentlyLoading(0),
-      _throttledTilesCurrentlyLoading(0) {
-  // NOLINTNEXTLINE(bugprone-unhandled-exception-at-new)
-  this->_pPlaceholder = new RasterOverlayTile(*this);
-}
+      _throttledTilesCurrentlyLoading(0) {}
 
 RasterOverlayTileProvider::RasterOverlayTileProvider(
     const CesiumUtility::IntrusivePointer<const RasterOverlay>& pOwner,

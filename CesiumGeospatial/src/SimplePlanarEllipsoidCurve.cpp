@@ -103,10 +103,12 @@ SimplePlanarEllipsoidCurve::SimplePlanarEllipsoidCurve(
 
   // Calculate difference between lengths instead of length between points -
   // allows for negative source height
+  // NOLINTBEGIN(cppcoreguidelines-prefer-member-initializer)
   this->_sourceHeight =
       glm::length(originalSourceEcef) - glm::length(scaledSourceEcef);
   this->_destinationHeight =
       glm::length(originalDestinationEcef) - glm::length(scaledDestinationEcef);
+  // NOLINTEND(cppcoreguidelines-prefer-member-initializer)
 
   this->_sourceDirection = glm::normalize(originalSourceEcef);
 }
