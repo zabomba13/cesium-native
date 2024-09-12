@@ -68,11 +68,11 @@ public:
     image.pixelData.resize(4);
     gsl::span<uint32_t> pixels =
         reintepretCastSpan<uint32_t>(gsl::span(image.pixelData));
-    // NOLINTBEGIN(cert-msc50-cpp)
+    // NOLINTBEGIN(cert-msc50-cpp,concurrency-mt-unsafe)
     int red = rand() % 255;
     int green = rand() % 255;
     int blue = rand() % 255;
-    // NOLINTEND(cert-msc50-cpp)
+    // NOLINTEND(cert-msc50-cpp,concurrency-mt-unsafe)
     uint32_t color = 0x7F000000;
     color += uint32_t(red) << 16;
     color += uint32_t(green) << 8;
