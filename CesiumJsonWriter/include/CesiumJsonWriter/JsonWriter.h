@@ -15,7 +15,7 @@ namespace CesiumJsonWriter {
 class JsonWriter {
 public:
   JsonWriter();
-  virtual ~JsonWriter() {}
+  virtual ~JsonWriter() = default;
 
   // rapidjson methods
   virtual bool Null();

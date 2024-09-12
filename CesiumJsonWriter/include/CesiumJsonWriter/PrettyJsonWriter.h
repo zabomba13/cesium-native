@@ -19,7 +19,7 @@ class PrettyJsonWriter : public JsonWriter {
 
 public:
   PrettyJsonWriter() noexcept;
-  ~PrettyJsonWriter() {}
+  ~PrettyJsonWriter() = default;
 
   // rapidjson methods
   bool Null() override;

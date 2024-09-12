@@ -88,7 +88,7 @@ public:
         _fileExtension(fileExtension),
         _tileSets(tileSets) {}
 
-  virtual ~TileMapServiceTileProvider() {}
+  virtual ~TileMapServiceTileProvider() = default;
 
 protected:
   virtual CesiumAsync::Future<LoadedRasterOverlayImage> loadQuadtreeTileImage(
@@ -141,7 +141,7 @@ TileMapServiceRasterOverlay::TileMapServiceRasterOverlay(
       _headers(headers),
       _options(tmsOptions) {}
 
-TileMapServiceRasterOverlay::~TileMapServiceRasterOverlay() {}
+TileMapServiceRasterOverlay::~TileMapServiceRasterOverlay() = default;
 
 static std::optional<std::string> getAttributeString(
     const tinyxml2::XMLElement* pElement,

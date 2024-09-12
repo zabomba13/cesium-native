@@ -249,7 +249,7 @@ RasterizedPolygonsOverlay::RasterizedPolygonsOverlay(
       _ellipsoid(ellipsoid),
       _projection(projection) {}
 
-RasterizedPolygonsOverlay::~RasterizedPolygonsOverlay() {}
+RasterizedPolygonsOverlay::~RasterizedPolygonsOverlay() = default;
 
 CesiumAsync::Future<RasterOverlay::CreateTileProviderResult>
 RasterizedPolygonsOverlay::createTileProvider(
