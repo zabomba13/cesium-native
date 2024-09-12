@@ -71,7 +71,7 @@ bool ImageManipulation::blitImage(
     return false;
   }
 
-  size_t bytesPerPixel = size_t(target.bytesPerChannel * target.channels);
+  size_t bytesPerPixel = size_t(target.bytesPerChannel) * size_t(target.channels);
   const size_t bytesPerSourceRow = bytesPerPixel * size_t(source.width);
   size_t bytesPerTargetRow = bytesPerPixel * size_t(target.width);
 

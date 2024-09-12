@@ -657,7 +657,7 @@ void copyVertexAttributes(
       if (vertexIndex < 0) {
         copyVertexAttributes(
             vertexAttributes,
-            complements[static_cast<size_t>(~vertexIndex)],
+            complements[~static_cast<size_t>(vertexIndex)],
             output);
       } else {
         copyVertexAttributes(vertexAttributes, vertexIndex, output);
@@ -671,7 +671,7 @@ void copyVertexAttributes(
       if (vertex.first < 0) {
         copyVertexAttributes(
             vertexAttributes,
-            complements[static_cast<size_t>(~vertex.first)],
+            complements[~static_cast<size_t>(vertex.first)],
             output,
             true);
       } else {
@@ -683,7 +683,7 @@ void copyVertexAttributes(
       if (vertex.second < 0) {
         copyVertexAttributes(
             vertexAttributes,
-            complements[static_cast<size_t>(~vertex.second)],
+            complements[~static_cast<size_t>(vertex.second)],
             output,
             true);
       } else {
@@ -758,7 +758,7 @@ T getVertexValue(
         return getVertexValue(
             accessor,
             complements,
-            complements[static_cast<size_t>(~vertexIndex)]);
+            complements[~static_cast<size_t>(vertexIndex)]);
       }
 
       return accessor[vertexIndex];
@@ -770,7 +770,7 @@ T getVertexValue(
         v0 = getVertexValue(
             accessor,
             complements,
-            complements[static_cast<size_t>(~vertex.first)]);
+            complements[~static_cast<size_t>(vertex.first)]);
       } else {
         v0 = accessor[vertex.first];
       }
@@ -780,7 +780,7 @@ T getVertexValue(
         v1 = getVertexValue(
             accessor,
             complements,
-            complements[static_cast<size_t>(~vertex.second)]);
+            complements[~static_cast<size_t>(vertex.second)]);
       } else {
         v1 = accessor[vertex.second];
       }
@@ -1217,7 +1217,7 @@ uint32_t getOrCreateVertex(
           attributes,
           vertexMap,
           complements,
-          complements[static_cast<size_t>(~(*pIndex))]);
+          complements[~static_cast<size_t>(*pIndex)]);
     }
 
     const uint32_t existingIndex = vertexMap[static_cast<size_t>(*pIndex)];

@@ -269,7 +269,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the west edge indices
   meshView.westEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = size_t(meshView.westEdgeIndicesCount * indexSizeBytes);
+  edgeByteSizes =
+      size_t(meshView.westEdgeIndicesCount) * size_t(indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -281,7 +282,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the south edge
   meshView.southEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = size_t(meshView.southEdgeIndicesCount * indexSizeBytes);
+  edgeByteSizes =
+      size_t(meshView.southEdgeIndicesCount) * size_t(indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -293,7 +295,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the east edge
   meshView.eastEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = size_t(meshView.eastEdgeIndicesCount * indexSizeBytes);
+  edgeByteSizes =
+      size_t(meshView.eastEdgeIndicesCount) * size_t(indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -305,7 +308,8 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   // read the north edge
   meshView.northEdgeIndicesCount = readValue<uint32_t>(data, readIndex, 0);
   readIndex += sizeof(uint32_t);
-  edgeByteSizes = size_t(meshView.northEdgeIndicesCount * indexSizeBytes);
+  edgeByteSizes =
+      size_t(meshView.northEdgeIndicesCount) * size_t(indexSizeBytes);
   if (readIndex + edgeByteSizes > data.size()) {
     return std::nullopt;
   }
@@ -410,7 +414,7 @@ static void addSkirt(
   const double north = rectangle.getNorth();
 
   size_t newEdgeIndex = currentVertexCount;
-  size_t positionIdx = size_t(currentVertexCount * 3);
+  size_t positionIdx = size_t(currentVertexCount) * 3;
   size_t indexIdx = currentIndicesCount;
   for (size_t i = 0; i < edgeIndices.size(); ++i) {
     E edgeIdx = edgeIndices[i];
@@ -434,7 +438,7 @@ static void addSkirt(
     positionMaximums = glm::max(positionMaximums, position);
 
     if (!normals.empty()) {
-      const size_t componentIndex = static_cast<size_t>(3 * edgeIdx);
+      const size_t componentIndex = static_cast<size_t>(edgeIdx) * 3;
       normals[positionIdx] = normals[componentIndex];
       normals[positionIdx + 1] = normals[componentIndex + 1];
       normals[positionIdx + 2] = normals[componentIndex + 2];

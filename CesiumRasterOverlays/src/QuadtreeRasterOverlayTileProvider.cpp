@@ -700,8 +700,9 @@ QuadtreeRasterOverlayTileProvider::combineImages(
   target.channels = measurements.channels;
   target.width = measurements.widthPixels;
   target.height = measurements.heightPixels;
-  target.pixelData.resize(size_t(
-      target.width * target.height * target.channels * target.bytesPerChannel));
+  target.pixelData.resize(
+      size_t(target.width) * size_t(target.height) * size_t(target.channels) *
+      size_t(target.bytesPerChannel));
 
   for (auto it = images.begin(); it != images.end(); ++it) {
     const LoadedRasterOverlayImage& loaded = *it->pLoaded;

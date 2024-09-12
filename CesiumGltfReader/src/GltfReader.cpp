@@ -952,15 +952,19 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
   }
 
   // Byte size of the base image.
-  const size_t imageByteSize = static_cast<size_t>(
-      image.width * image.height * image.channels * image.bytesPerChannel);
+  const size_t imageByteSize = static_cast<size_t>(image.width) *
+                               static_cast<size_t>(image.height) *
+                               static_cast<size_t>(image.channels) *
+                               static_cast<size_t>(image.bytesPerChannel);
 
   image.mipPositions.resize(mipCount);
   image.mipPositions[0].byteOffset = 0;
   image.mipPositions[0].byteSize = imageByteSize;
 
-  image.pixelData.resize(static_cast<size_t>(
-      totalPixelCount * image.channels * image.bytesPerChannel));
+  image.pixelData.resize(
+      static_cast<size_t>(totalPixelCount) *
+      static_cast<size_t>(image.channels) *
+      static_cast<size_t>(image.bytesPerChannel));
 
   mipWidth = image.width;
   mipHeight = image.height;
@@ -982,8 +986,9 @@ std::optional<std::string> GltfReader::generateMipMaps(ImageCesium& image) {
       mipHeight >>= 1;
     }
 
-    byteSize = static_cast<size_t>(
-        mipWidth * mipHeight * image.channels * image.bytesPerChannel);
+    byteSize = static_cast<size_t>(mipWidth) * static_cast<size_t>(mipHeight) *
+               static_cast<size_t>(image.channels) *
+               static_cast<size_t>(image.bytesPerChannel);
 
     image.mipPositions[mipIndex].byteOffset = byteOffset;
     image.mipPositions[mipIndex].byteSize = byteSize;

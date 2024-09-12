@@ -129,10 +129,10 @@ void copyDecodedIndices(
     return;
   }
 
-  if (pIndicesAccessor->count != int64_t(pMesh->num_faces() * 3)) {
+  if (pIndicesAccessor->count != int64_t(pMesh->num_faces()) * 3) {
     readGltf.warnings.emplace_back(
         "indices accessor doesn't match with decoded Draco indices");
-    pIndicesAccessor->count = int64_t(pMesh->num_faces() * 3);
+    pIndicesAccessor->count = int64_t(pMesh->num_faces()) * 3;
   }
 
   draco::PointIndex::ValueType numPoint = pMesh->num_points();

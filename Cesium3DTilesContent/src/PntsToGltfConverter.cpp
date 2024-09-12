@@ -1627,8 +1627,8 @@ void convertPntsContentToGltf(
 
     const gsl::span<const std::byte> featureTableBinaryData =
         pntsBinary.subspan(
-            static_cast<size_t>(
-                headerLength + header.featureTableJsonByteLength),
+            static_cast<size_t>(headerLength) +
+                static_cast<size_t>(header.featureTableJsonByteLength),
             header.featureTableBinaryByteLength);
 
     gsl::span<const std::byte> batchTableBinaryData;

@@ -171,7 +171,7 @@ assembleArrayValue(const gsl::span<uint8_t> bytes) noexcept {
       using UintType = std::make_unsigned_t<T>;
       UintType resultAsUint = static_cast<UintType>(
           static_cast<UintType>(bytes[size_t(b)]) |
-          (static_cast<UintType>(bytes[size_t(b + 1)]) << 8));
+          (static_cast<UintType>(bytes[size_t(b) + 1]) << 8));
       result[size_t(i)] = *reinterpret_cast<T*>(&resultAsUint);
     }
   } else {

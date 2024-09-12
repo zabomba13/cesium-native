@@ -96,7 +96,9 @@ void rasterizePolygons(
   image.height = int32_t(glm::round(textureSize.y));
   image.channels = 1;
   image.bytesPerChannel = 1;
-  image.pixelData.resize(size_t(image.width * image.height), outsideColor);
+  image.pixelData.resize(
+      size_t(image.width) * size_t(image.height),
+      outsideColor);
 
   // TODO: this is naive approach, use line-triangle
   // intersections to rasterize one row at a time
