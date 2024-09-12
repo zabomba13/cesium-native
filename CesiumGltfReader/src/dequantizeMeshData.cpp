@@ -148,6 +148,8 @@ template <size_t N> void dequantizeAccessor(Model& model, Accessor& accessor) {
   case Accessor::ComponentType::UNSIGNED_SHORT:
     dequantizeAccessor<uint16_t, N>(model, accessor);
     break;
+  default:
+    break;
   }
 }
 
@@ -162,6 +164,8 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
     break;
   case 4:
     dequantizeAccessor<4>(model, accessor);
+    break;
+  default:
     break;
   }
 }

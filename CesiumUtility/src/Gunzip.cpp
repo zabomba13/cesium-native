@@ -47,6 +47,8 @@ bool CesiumUtility::gunzip(
     case Z_MEM_ERROR:
       zng_inflateEnd(&strm);
       return false;
+    default:
+      break;
     }
     index += CHUNK - strm.avail_out;
   } while (ret != Z_STREAM_END);

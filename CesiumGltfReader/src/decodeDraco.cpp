@@ -213,6 +213,8 @@ void copyDecodedIndices(
         reinterpret_cast<float*>(indicesBuffer.cesium.data.data()),
         pIndicesAccessor->count);
     break;
+  default:
+    break;
   }
 }
 
