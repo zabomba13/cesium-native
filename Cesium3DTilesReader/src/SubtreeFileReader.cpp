@@ -43,10 +43,12 @@ Future<ReadJsonResult<Cesium3DTiles::Subtree>> SubtreeFileReader::load(
     const std::string& url,
     const std::vector<IAssetAccessor::THeader>& headers) const noexcept {
   return pAssetAccessor->get(asyncSystem, url, headers)
-      .thenInWorkerThread([asyncSystem, pAssetAccessor, this](
-                              std::shared_ptr<IAssetRequest>&& pRequest) {
-        return this->load(asyncSystem, pAssetAccessor, pRequest);
-      });
+      .thenInWorkerThread(
+          [asyncSystem, pAssetAccessor, this](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+              std::shared_ptr<IAssetRequest>&& pRequest) {
+            return this->load(asyncSystem, pAssetAccessor, pRequest);
+          });
 }
 
 Future<ReadJsonResult<Subtree>> SubtreeFileReader::load(
@@ -239,11 +241,12 @@ CesiumAsync::Future<RequestedSubtreeBuffer> requestBuffer(
     const std::shared_ptr<CesiumAsync::IAssetAccessor>& pAssetAccessor,
     const CesiumAsync::AsyncSystem& asyncSystem,
     size_t bufferIdx,
-    std::string&& subtreeUrl,
+    const std::string& subtreeUrl,
     const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders) {
   return pAssetAccessor->get(asyncSystem, subtreeUrl, requestHeaders)
       .thenInWorkerThread(
           [bufferIdx](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
               std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest) {
             const CesiumAsync::IAssetResponse* pResponse =
                 pCompletedRequest->response();
@@ -286,7 +289,7 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
           pAssetAccessor,
           asyncSystem,
           i,
-          std::move(bufferUrl),
+          bufferUrl,
           requestHeaders));
     }
   }
@@ -294,8 +297,10 @@ Future<ReadJsonResult<Subtree>> SubtreeFileReader::postprocess(
   if (!bufferRequests.empty()) {
     return asyncSystem.all(std::move(bufferRequests))
         .thenInMainThread(
+            // NOLINTBEGIN(cppcoreguidelines-rvalue-reference-param-not-moved)
             [loaded = std::move(loaded)](std::vector<RequestedSubtreeBuffer>&&
                                              completedBuffers) mutable {
+              // NOLINTEND(cppcoreguidelines-rvalue-reference-param-not-moved)
               for (RequestedSubtreeBuffer& completedBuffer : completedBuffers) {
                 Buffer& buffer = loaded.value->buffers[completedBuffer.index];
                 if (buffer.byteLength >

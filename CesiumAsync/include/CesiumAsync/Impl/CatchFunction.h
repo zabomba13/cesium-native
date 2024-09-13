@@ -24,6 +24,7 @@ struct CatchFunction {
     } catch (...) {
       // Make an exception_ptr task, then scheduler to a wrapper around f that
       // throws it, catches it, and calls f with a reference to it.
+      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
       auto ptrToException = [f = std::move(f)](std::exception_ptr&& e) {
         try {
           std::rethrow_exception(e);
@@ -55,6 +56,7 @@ struct CatchFunction<Func, void, Scheduler, TaskParameter> {
     } catch (...) {
       // Make an exception_ptr task, then scheduler to a wrapper around f that
       // throws it, catches it, and calls f with a reference to it.
+      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
       auto ptrToException = [f = std::move(f)](std::exception_ptr&& e) {
         try {
           std::rethrow_exception(e);

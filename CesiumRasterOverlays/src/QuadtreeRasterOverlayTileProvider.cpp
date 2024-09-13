@@ -341,6 +341,7 @@ QuadtreeRasterOverlayTileProvider::getQuadtreeTile(
 
   Future<LoadedQuadtreeImage> future =
       this->loadQuadtreeTileImage(tileID)
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           .catchImmediately([](std::exception&& e) {
             // Turn an exception into an error.
             LoadedRasterOverlayImage result;
@@ -669,6 +670,7 @@ QuadtreeRasterOverlayTileProvider::measureCombinedImage(
 QuadtreeRasterOverlayTileProvider::combineImages(
     const Rectangle& targetRectangle,
     const Projection& /* projection */,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::vector<LoadedQuadtreeImage>&& images) {
 
   const CombinedImageMeasurements measurements =

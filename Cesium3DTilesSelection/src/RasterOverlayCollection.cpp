@@ -143,7 +143,8 @@ void RasterOverlayCollection::add(
               pOverlay);
           if (it != pList->overlays.end()) {
             int64_t index = it - pList->overlays.begin();
-            pList->tileProviders[size_t(index)] = *result;
+            // TODO: is it correct to std::move here?
+            pList->tileProviders[size_t(index)] = std::move(*result);
           }
         } else {
           // Report error creating the tile provider.

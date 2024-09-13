@@ -398,6 +398,7 @@ Future<LoadLayersResult> loadLayersRecursive(
              tilingScheme,
              useWaterMask,
              loadLayersResult = std::move(loadLayersResult)](
+                // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
                 std::shared_ptr<IAssetRequest>&& pCompletedRequest) mutable {
               const CesiumAsync::IAssetResponse* pResponse =
                   pCompletedRequest->response();
@@ -570,6 +571,7 @@ LayerJsonTerrainLoader::createLoader(
            asyncSystem = externals.asyncSystem,
            pAssetAccessor = externals.pAssetAccessor,
            useWaterMask](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
               std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest) {
             const CesiumAsync::IAssetResponse* pResponse =
                 pCompletedRequest->response();
@@ -751,28 +753,36 @@ Future<int> loadTileAvailability(
     const std::vector<IAssetAccessor::THeader>& requestHeaders) {
   std::string url = resolveTileUrl(tileID, layer);
   return pAssetAccessor->get(asyncSystem, url, requestHeaders)
-      .thenInWorkerThread([pLogger,
-                           tileID](std::shared_ptr<IAssetRequest>&& pRequest) {
-        const IAssetResponse* pResponse = pRequest->response();
-        if (pResponse) {
-          uint16_t statusCode = pResponse->statusCode();
+      .thenInWorkerThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+          [pLogger, tileID](std::shared_ptr<IAssetRequest>&& pRequest) {
+            const IAssetResponse* pResponse = pRequest->response();
+            if (pResponse) {
+              uint16_t statusCode = pResponse->statusCode();
 
-          if (!(statusCode != 0 && (statusCode < 200 || statusCode >= 300))) {
-            return QuantizedMeshLoader::loadMetadata(pResponse->data(), tileID);
-          }
-        }
+              if (!(statusCode != 0 &&
+                    (statusCode < 200 || statusCode >= 300))) {
+                return QuantizedMeshLoader::loadMetadata(
+                    pResponse->data(),
+                    tileID);
+              }
+            }
 
-        SPDLOG_LOGGER_ERROR(
-            pLogger,
-            "Failed to load availability data from {}",
-            pRequest->url());
-        return QuantizedMeshMetadataResult();
-      })
-      .thenInMainThread([&layer,
-                         tileID](QuantizedMeshMetadataResult&& metadata) {
-        addRectangleAvailabilityToLayer(layer, tileID, metadata.availability);
-        return 0;
-      });
+            SPDLOG_LOGGER_ERROR(
+                pLogger,
+                "Failed to load availability data from {}",
+                pRequest->url());
+            return QuantizedMeshMetadataResult();
+          })
+      .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+          [&layer, tileID](QuantizedMeshMetadataResult&& metadata) {
+            addRectangleAvailabilityToLayer(
+                layer,
+                tileID,
+                metadata.availability);
+            return 0;
+          });
 }
 } // namespace
 

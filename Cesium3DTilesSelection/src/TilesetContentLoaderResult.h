@@ -66,6 +66,7 @@ template <class TilesetContentLoaderType> struct TilesetContentLoaderResult {
                   std::unique_ptr<TilesetContentLoaderType>>,
           int>>
   TilesetContentLoaderResult&
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   operator=(TilesetContentLoaderResult<OtherLoaderType>&& rhs) noexcept {
     using std::swap;
     swap(this->pLoader, rhs.pLoader);

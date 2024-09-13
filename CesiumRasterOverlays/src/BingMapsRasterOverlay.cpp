@@ -468,8 +468,9 @@ BingMapsRasterOverlay::createTileProvider(
 
   return pAssetAccessor->get(asyncSystem, metadataUrl)
       .thenInMainThread(
-          [metadataUrl,
-           handleResponse](std::shared_ptr<IAssetRequest>&& pRequest)
+          [metadataUrl, handleResponse](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+              std::shared_ptr<IAssetRequest>&& pRequest)
               -> CreateTileProviderResult {
             const IAssetResponse* pResponse = pRequest->response();
 

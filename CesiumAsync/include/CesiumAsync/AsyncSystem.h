@@ -201,8 +201,7 @@ public:
    */
   template <typename T>
   Future<std::vector<T>> all(std::vector<Future<T>>&& futures) const {
-    return this->all<T, Future<T>>(
-        std::forward<std::vector<Future<T>>>(futures));
+    return this->all<T, Future<T>>(std::move(futures));
   }
 
   /**
@@ -224,8 +223,7 @@ public:
    */
   template <typename T>
   Future<std::vector<T>> all(std::vector<SharedFuture<T>>&& futures) const {
-    return this->all<T, SharedFuture<T>>(
-        std::forward<std::vector<SharedFuture<T>>>(futures));
+    return this->all<T, SharedFuture<T>>(std::move(futures));
   }
 
   /**
@@ -294,6 +292,7 @@ public:
 private:
   // Common implementation of 'all' for both Future and SharedFuture.
   template <typename T, typename TFutureType>
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   Future<std::vector<T>> all(std::vector<TFutureType>&& futures) const {
     using TTaskType = decltype(TFutureType::_task);
     std::vector<TTaskType> tasks;
@@ -309,6 +308,7 @@ private:
         async::when_all(tasks.begin(), tasks.end())
             .then(
                 async::inline_scheduler(),
+                // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
                 [](std::vector<TTaskType>&& tasks) {
                   // Get all the results. If any tasks rejected, we'll bail with
                   // an exception.
@@ -316,7 +316,7 @@ private:
                   results.reserve(tasks.size());
 
                   for (auto it = tasks.begin(); it != tasks.end(); ++it) {
-                    results.emplace_back(it->get());
+                    results.emplace_back(std::move(it->get()));
                   }
                   return results;
                 });

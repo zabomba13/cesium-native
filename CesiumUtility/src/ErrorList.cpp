@@ -12,6 +12,7 @@ void ErrorList::merge(const ErrorList& errorList) {
       errorList.warnings.end());
 }
 
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 void ErrorList::merge(ErrorList&& errorList) {
   errors.reserve(errors.size() + errorList.errors.size());
   for (auto& error : errorList.errors) {

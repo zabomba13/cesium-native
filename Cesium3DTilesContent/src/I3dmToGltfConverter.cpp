@@ -498,7 +498,7 @@ CesiumAsync::Future<ConvertedI3dm> convertI3dmContent(
               -> CesiumAsync::Future<GltfConverterResult> {
             if (assetFetcherResult.errorList.hasErrors()) {
               GltfConverterResult errorResult;
-              errorResult.errors.merge(assetFetcherResult.errorList);
+              errorResult.errors.merge(std::move(assetFetcherResult.errorList));
               return assetFetcher.asyncSystem.createResolvedFuture(
                   std::move(errorResult));
             }
@@ -856,6 +856,7 @@ CesiumAsync::Future<GltfConverterResult> I3dmToGltfConverter::convert(
              options,
              assetFetcher,
              convertedI3dm)
+      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
       .thenImmediately([](ConvertedI3dm&& convertedI3dm) {
         if (convertedI3dm.gltfResult.model) {
           instantiateGltfInstances(

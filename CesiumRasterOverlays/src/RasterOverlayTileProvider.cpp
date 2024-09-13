@@ -153,6 +153,7 @@ RasterOverlayTileProvider::loadTileImageFromUrl(
           [options = std::move(options),
            Ktx2TranscodeTargets =
                this->getOwner().getOptions().ktx2TranscodeTargets](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
               std::shared_ptr<IAssetRequest>&& pRequest) mutable {
             CESIUM_TRACE("load image");
             const IAssetResponse* pResponse = pRequest->response();

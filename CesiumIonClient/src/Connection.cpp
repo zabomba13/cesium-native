@@ -135,6 +135,7 @@ std::string createAuthorizationErrorHtml(
     int64_t clientID,
     const std::string& redirectPath,
     const std::vector<std::string>& scopes,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::function<void(const std::string&)>&& openUrlCallback,
     const CesiumIonClient::ApplicationData& appData,
     const std::string& ionApiUrl,
@@ -365,6 +366,7 @@ CesiumAsync::Future<Response<Profile>> Connection::me() const {
           {{"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}})
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
@@ -428,48 +430,54 @@ CesiumIonClient::Connection::appData(
           asyncSystem,
           CesiumUtility::Uri::resolve(apiUrl, "/appData"),
           {{"Accept", "application/json"}})
-      .thenImmediately([](std::shared_ptr<CesiumAsync::IAssetRequest>&&
-                              pRequest) {
-        const IAssetResponse* pResponse = pRequest->response();
-        if (!pResponse) {
-          return createEmptyResponse<ApplicationData>();
-        }
+      .thenImmediately(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+          [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
+            const IAssetResponse* pResponse = pRequest->response();
+            if (!pResponse) {
+              return createEmptyResponse<ApplicationData>();
+            }
 
-        if (pResponse->statusCode() < 200 || pResponse->statusCode() >= 300) {
-          return createErrorResponse<ApplicationData>(pResponse);
-        }
+            if (pResponse->statusCode() < 200 ||
+                pResponse->statusCode() >= 300) {
+              return createErrorResponse<ApplicationData>(pResponse);
+            }
 
-        rapidjson::Document d;
-        if (!parseJsonObject(pResponse, d)) {
-          return createJsonErrorResponse<ApplicationData>(pResponse, d);
-        }
-        if (!d.IsObject()) {
-          return createJsonTypeResponse<ApplicationData>(pResponse, "object");
-        }
+            rapidjson::Document d;
+            if (!parseJsonObject(pResponse, d)) {
+              return createJsonErrorResponse<ApplicationData>(pResponse, d);
+            }
+            if (!d.IsObject()) {
+              return createJsonTypeResponse<ApplicationData>(
+                  pResponse,
+                  "object");
+            }
 
-        // There's a lot more properties available on the /appData endpoint, but
-        // we don't need them so we're ignoring them for now.
-        ApplicationData result;
-        std::string authenticationMode =
-            JsonHelpers::getStringOrDefault(d, "applicationMode", "cesium-ion");
-        if (authenticationMode == "single-user") {
-          result.authenticationMode = AuthenticationMode::SingleUser;
-        } else if (authenticationMode == "saml") {
-          result.authenticationMode = AuthenticationMode::Saml;
-        } else {
-          result.authenticationMode = AuthenticationMode::CesiumIon;
-        }
-        result.dataStoreType =
-            JsonHelpers::getStringOrDefault(d, "dataStoreType", "S3");
-        result.attribution =
-            JsonHelpers::getStringOrDefault(d, "attribution", "");
+            // There's a lot more properties available on the /appData endpoint,
+            // but we don't need them so we're ignoring them for now.
+            ApplicationData result;
+            std::string authenticationMode = JsonHelpers::getStringOrDefault(
+                d,
+                "applicationMode",
+                "cesium-ion");
+            if (authenticationMode == "single-user") {
+              result.authenticationMode = AuthenticationMode::SingleUser;
+            } else if (authenticationMode == "saml") {
+              result.authenticationMode = AuthenticationMode::Saml;
+            } else {
+              result.authenticationMode = AuthenticationMode::CesiumIon;
+            }
+            result.dataStoreType =
+                JsonHelpers::getStringOrDefault(d, "dataStoreType", "S3");
+            result.attribution =
+                JsonHelpers::getStringOrDefault(d, "attribution", "");
 
-        return Response<ApplicationData>{
-            std::move(result),
-            pResponse->statusCode(),
-            std::string(),
-            std::string()};
-      });
+            return Response<ApplicationData>{
+                std::move(result),
+                pResponse->statusCode(),
+                std::string(),
+                std::string()};
+          });
 }
 
 namespace {
@@ -517,7 +525,9 @@ CesiumIonClient::Connection::getApiUrl(
     return asyncSystem.createResolvedFuture<std::optional<std::string>>(
         std::nullopt);
   }
-  return pAssetAccessor->get(asyncSystem, configUrl)
+  return pAssetAccessor
+      ->get(asyncSystem, configUrl)
+      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
       .thenImmediately([ionUrl](std::shared_ptr<IAssetRequest>&& pRequest) {
         const IAssetResponse* pResponse = pRequest->response();
         if (pResponse && pResponse->statusCode() >= 200 &&
@@ -615,6 +625,7 @@ Future<Response<Defaults>> Connection::defaults() const {
           {{"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}})
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
@@ -650,6 +661,7 @@ CesiumAsync::Future<Response<Assets>> Connection::assets() const {
           {{"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}})
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
@@ -791,6 +803,7 @@ CesiumAsync::Future<Response<Asset>> Connection::asset(int64_t assetID) const {
           {{"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}})
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
@@ -830,6 +843,7 @@ Connection::token(const std::string& tokenID) const {
           {{"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}})
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
@@ -934,6 +948,7 @@ CesiumAsync::Future<Response<Token>> Connection::createToken(
            {"Authorization", "Bearer " + this->_accessToken}},
           tokenBytes)
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {
@@ -1023,6 +1038,7 @@ Future<Response<NoValue>> Connection::modifyToken(
            {"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}},
           tokenBytes)
+      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
       .thenInMainThread([](std::shared_ptr<IAssetRequest>&& pRequest) {
         const IAssetResponse* pResponse = pRequest->response();
         if (!pResponse) {
@@ -1132,43 +1148,46 @@ Connection::getIdFromToken(const std::string& token) {
           {{"Content-Type", "application/json"},
            {"Accept", "application/json"}},
           payload)
-      .thenInWorkerThread([asyncSystem, pAssetAccessor, ionApiUrl, appData](
-                              std::shared_ptr<IAssetRequest>&& pRequest) {
-        const IAssetResponse* pResponse = pRequest->response();
-        if (!pResponse) {
-          throw std::runtime_error("The server did not return a response.");
-        }
+      .thenInWorkerThread(
+          [asyncSystem, pAssetAccessor, ionApiUrl, appData](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+              std::shared_ptr<IAssetRequest>&& pRequest) {
+            const IAssetResponse* pResponse = pRequest->response();
+            if (!pResponse) {
+              throw std::runtime_error("The server did not return a response.");
+            }
 
-        if (pResponse->statusCode() < 200 || pResponse->statusCode() >= 300) {
-          throw std::runtime_error(
-              "The server returned an error code: " +
-              std::to_string(pResponse->statusCode()));
-        }
+            if (pResponse->statusCode() < 200 ||
+                pResponse->statusCode() >= 300) {
+              throw std::runtime_error(
+                  "The server returned an error code: " +
+                  std::to_string(pResponse->statusCode()));
+            }
 
-        rapidjson::Document d;
-        d.Parse(
-            reinterpret_cast<const char*>(pResponse->data().data()),
-            pResponse->data().size());
-        if (d.HasParseError()) {
-          throw std::runtime_error(
-              std::string("Failed to parse JSON response: ") +
-              rapidjson::GetParseError_En(d.GetParseError()));
-        }
+            rapidjson::Document d;
+            d.Parse(
+                reinterpret_cast<const char*>(pResponse->data().data()),
+                pResponse->data().size());
+            if (d.HasParseError()) {
+              throw std::runtime_error(
+                  std::string("Failed to parse JSON response: ") +
+                  rapidjson::GetParseError_En(d.GetParseError()));
+            }
 
-        std::string accessToken =
-            JsonHelpers::getStringOrDefault(d, "access_token", "");
-        if (accessToken.empty()) {
-          throw std::runtime_error(
-              "Server response does not include a valid token.");
-        }
+            std::string accessToken =
+                JsonHelpers::getStringOrDefault(d, "access_token", "");
+            if (accessToken.empty()) {
+              throw std::runtime_error(
+                  "Server response does not include a valid token.");
+            }
 
-        return Connection(
-            asyncSystem,
-            pAssetAccessor,
-            accessToken,
-            appData,
-            ionApiUrl);
-      });
+            return Connection(
+                asyncSystem,
+                pAssetAccessor,
+                accessToken,
+                appData,
+                ionApiUrl);
+          });
 }
 
 CesiumAsync::Future<Response<TokenList>>
@@ -1180,6 +1199,7 @@ Connection::tokens(const std::string& url) const {
           {{"Accept", "application/json"},
            {"Authorization", "Bearer " + this->_accessToken}})
       .thenInMainThread(
+          // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
           [](std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const IAssetResponse* pResponse = pRequest->response();
             if (!pResponse) {

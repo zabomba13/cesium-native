@@ -66,7 +66,7 @@ namespace CesiumGltf {
 namespace {
 
 template <typename T>
-size_t copyElements(std::vector<T>& to, std::vector<T>& from) {
+size_t moveElements(std::vector<T>& to, std::vector<T>&& from) {
   const size_t out = to.size();
   to.resize(out + from.size());
   for (size_t i = 0; i < from.size(); ++i) {
@@ -85,7 +85,7 @@ void updateIndex(int32_t& index, size_t offset) noexcept {
 
 void mergeSchemas(
     Schema& lhs,
-    Schema& rhs,
+    Schema&& rhs,
     std::map<std::string, std::string>& classNameMap);
 
 } // namespace
@@ -97,13 +97,13 @@ ErrorList Model::merge(Model&& rhs) {
   // it clear which index properties refer to which types of objects.
 
   // Copy all the source data into this instance.
-  copyElements(this->extensionsUsed, rhs.extensionsUsed);
+  moveElements(this->extensionsUsed, std::move(rhs.extensionsUsed));
   std::sort(this->extensionsUsed.begin(), this->extensionsUsed.end());
   this->extensionsUsed.erase(
       std::unique(this->extensionsUsed.begin(), this->extensionsUsed.end()),
       this->extensionsUsed.end());
 
-  copyElements(this->extensionsRequired, rhs.extensionsRequired);
+  moveElements(this->extensionsRequired, std::move(rhs.extensionsRequired));
   std::sort(this->extensionsRequired.begin(), this->extensionsRequired.end());
   this->extensionsRequired.erase(
       std::unique(
@@ -111,20 +111,27 @@ ErrorList Model::merge(Model&& rhs) {
           this->extensionsRequired.end()),
       this->extensionsRequired.end());
 
-  const size_t firstAccessor = copyElements(this->accessors, rhs.accessors);
-  const size_t firstAnimation = copyElements(this->animations, rhs.animations);
-  const size_t firstBuffer = copyElements(this->buffers, rhs.buffers);
+  const size_t firstAccessor =
+      moveElements(this->accessors, std::move(rhs.accessors));
+  const size_t firstAnimation =
+      moveElements(this->animations, std::move(rhs.animations));
+  const size_t firstBuffer =
+      moveElements(this->buffers, std::move(rhs.buffers));
   const size_t firstBufferView =
-      copyElements(this->bufferViews, rhs.bufferViews);
-  const size_t firstCamera = copyElements(this->cameras, rhs.cameras);
-  const size_t firstImage = copyElements(this->images, rhs.images);
-  const size_t firstMaterial = copyElements(this->materials, rhs.materials);
-  const size_t firstMesh = copyElements(this->meshes, rhs.meshes);
-  const size_t firstNode = copyElements(this->nodes, rhs.nodes);
-  const size_t firstSampler = copyElements(this->samplers, rhs.samplers);
-  const size_t firstScene = copyElements(this->scenes, rhs.scenes);
-  const size_t firstSkin = copyElements(this->skins, rhs.skins);
-  const size_t firstTexture = copyElements(this->textures, rhs.textures);
+      moveElements(this->bufferViews, std::move(rhs.bufferViews));
+  const size_t firstCamera =
+      moveElements(this->cameras, std::move(rhs.cameras));
+  const size_t firstImage = moveElements(this->images, std::move(rhs.images));
+  const size_t firstMaterial =
+      moveElements(this->materials, std::move(rhs.materials));
+  const size_t firstMesh = moveElements(this->meshes, std::move(rhs.meshes));
+  const size_t firstNode = moveElements(this->nodes, std::move(rhs.nodes));
+  const size_t firstSampler =
+      moveElements(this->samplers, std::move(rhs.samplers));
+  const size_t firstScene = moveElements(this->scenes, std::move(rhs.scenes));
+  const size_t firstSkin = moveElements(this->skins, std::move(rhs.skins));
+  const size_t firstTexture =
+      moveElements(this->textures, std::move(rhs.textures));
 
   size_t firstPropertyTable = 0;
   size_t firstPropertyTexture = 0;
@@ -143,24 +150,29 @@ ErrorList Model::merge(Model&& rhs) {
       result.emplaceError("Cannot merge EXT_structural_metadata extensions "
                           "with different schemaUris.");
     } else if (pRhsMetadata->schemaUri) {
-      metadata.schemaUri = pRhsMetadata->schemaUri;
+      metadata.schemaUri = std::move(pRhsMetadata->schemaUri);
     }
 
     std::map<std::string, std::string> classNameMap;
 
     if (metadata.schema && pRhsMetadata->schema) {
-      mergeSchemas(*metadata.schema, *pRhsMetadata->schema, classNameMap);
+      mergeSchemas(
+          *metadata.schema,
+          std::move(*pRhsMetadata->schema),
+          classNameMap);
     } else if (pRhsMetadata->schema) {
       metadata.schema = std::move(pRhsMetadata->schema);
     }
 
-    firstPropertyTable =
-        copyElements(metadata.propertyTables, pRhsMetadata->propertyTables);
-    firstPropertyTexture =
-        copyElements(metadata.propertyTextures, pRhsMetadata->propertyTextures);
-    firstPropertyAttribute = copyElements(
+    firstPropertyTable = moveElements(
+        metadata.propertyTables,
+        std::move(pRhsMetadata->propertyTables));
+    firstPropertyTexture = moveElements(
+        metadata.propertyTextures,
+        std::move(pRhsMetadata->propertyTextures));
+    firstPropertyAttribute = moveElements(
         metadata.propertyAttributes,
-        pRhsMetadata->propertyAttributes);
+        std::move(pRhsMetadata->propertyAttributes));
 
     for (size_t i = firstPropertyTable; i < metadata.propertyTables.size();
          ++i) {
@@ -571,13 +583,14 @@ void Model::forEachRootNodeInScene(
     std::function<ForEachRootNodeInSceneCallback>&& callback) {
   return const_cast<const Model*>(this)->forEachRootNodeInScene(
       sceneID,
-      [&callback](const Model& gltf, const Node& node) {
+      [callback = std::move(callback)](const Model& gltf, const Node& node) {
         callback(const_cast<Model&>(gltf), const_cast<Node&>(node));
       });
 }
 
 void Model::forEachRootNodeInScene(
     int32_t sceneID,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::function<ForEachRootNodeInSceneConstCallback>&& callback) const {
   if (sceneID >= 0) {
     // Use the user-specified scene if it exists.
@@ -602,6 +615,7 @@ void Model::forEachRootNodeInScene(
 
 void Model::forEachNodeInScene(
     int32_t sceneID,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::function<ForEachNodeInSceneCallback>&& callback) {
   return const_cast<const Model*>(this)->forEachNodeInScene(
       sceneID,
@@ -625,6 +639,7 @@ void Model::forEachNodeInScene(
 
 void Model::forEachPrimitiveInScene(
     int32_t sceneID,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::function<ForEachPrimitiveInSceneCallback>&& callback) {
   return const_cast<const Model*>(this)->forEachPrimitiveInScene(
       sceneID,
@@ -1011,21 +1026,21 @@ std::string findAvailableName(
 
 void mergeSchemas(
     Schema& lhs,
-    Schema& rhs,
+    Schema&& rhs,
     std::map<std::string, std::string>& classNameMap) {
   if (!lhs.name)
-    lhs.name = rhs.name;
+    lhs.name = std::move(rhs.name);
   else if (rhs.name && *lhs.name != *rhs.name)
     lhs.name.emplace("Merged");
 
   if (!lhs.description)
-    lhs.description = rhs.description;
+    lhs.description = std::move(rhs.description);
   else if (rhs.description && *lhs.description != *rhs.description)
     lhs.description.emplace("This is a merged schema created by combining "
                             "together the schemas from multiple glTFs.");
 
   if (!lhs.version)
-    lhs.version = rhs.version;
+    lhs.version = std::move(rhs.version);
   else if (rhs.version && *lhs.version != *rhs.version)
     lhs.version.reset();
 

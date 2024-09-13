@@ -18,6 +18,7 @@ public:
   void dispatchQueuedContinuations();
   bool dispatchZeroOrOneContinuation();
 
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   template <typename T> T dispatchUntilTaskCompletes(async::task<T>&& task) {
     // Set up a continuation to unblock the blocking dispatch when this task
     // completes.
@@ -47,6 +48,7 @@ public:
     std::atomic<bool> isDone = false;
     async::task<T> unblockTask = task.then(
         async::inline_scheduler(),
+        // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
         [this, &isDone](async::task<T>&& task) {
           isDone = true;
           this->unblock();

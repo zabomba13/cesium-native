@@ -110,6 +110,7 @@ JsonReader::FinalJsonHandler::FinalJsonHandler(
 
 void JsonReader::FinalJsonHandler::reportWarning(
     const std::string& warning,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::vector<std::string>&& context) {
   std::string fullWarning = warning;
   fullWarning += "\n  While parsing: ";

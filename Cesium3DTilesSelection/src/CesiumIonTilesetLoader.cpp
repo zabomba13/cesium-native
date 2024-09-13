@@ -234,6 +234,7 @@ mainThreadLoadLayerJsonFromAssetEndpoint(
 CesiumAsync::Future<TilesetContentLoaderResult<CesiumIonTilesetLoader>>
 mainThreadHandleEndpointResponse(
     const TilesetExternals& externals,
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest,
     int64_t ionAssetID,
     std::string&& ionAccessToken,
@@ -445,8 +446,9 @@ void CesiumIonTilesetLoader::refreshTokenInMainThread(
       this->_ionAssetEndpointUrl);
   pAssetAccessor->get(asyncSystem, url)
       .thenInMainThread(
-          [this,
-           pLogger](std::shared_ptr<CesiumAsync::IAssetRequest>&& pIonRequest) {
+          [this, pLogger](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+              std::shared_ptr<CesiumAsync::IAssetRequest>&& pIonRequest) {
             const CesiumAsync::IAssetResponse* pIonResponse =
                 pIonRequest->response();
 

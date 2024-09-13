@@ -159,6 +159,7 @@ AssetFetcher::get(const std::string& relativeUrl) const {
   return pAssetAccessor->get(asyncSystem, resolvedUrl, requestHeaders)
       .thenImmediately(
           [asyncSystem = asyncSystem](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
               std::shared_ptr<CesiumAsync::IAssetRequest>&& pCompletedRequest) {
             const CesiumAsync::IAssetResponse* pResponse =
                 pCompletedRequest->response();

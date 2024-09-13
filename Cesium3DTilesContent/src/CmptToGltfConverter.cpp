@@ -105,7 +105,7 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
   return assetFetcher.asyncSystem.all(std::move(innerTiles))
       .thenImmediately([](std::vector<GltfConverterResult>&& innerResults) {
         if (innerResults.size() == 1) {
-          return innerResults[0];
+          return std::move(innerResults[0]);
         }
         GltfConverterResult cmptResult;
         for (auto& innerTile : innerResults) {
@@ -116,7 +116,7 @@ CesiumAsync::Future<GltfConverterResult> CmptToGltfConverter::convert(
               cmptResult.model = std::move(innerTile.model);
             }
           }
-          cmptResult.errors.merge(innerTile.errors);
+          cmptResult.errors.merge(std::move(innerTile.errors));
         }
         return cmptResult;
       });

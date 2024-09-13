@@ -850,6 +850,7 @@ TilesetContentManager::TilesetContentManager(
                   std::move(result));
               thiz->_rootTileAvailablePromise.resolve();
             })
+        // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
         .catchInMainThread([thiz](std::exception&& e) {
           thiz->notifyTileDoneLoading(nullptr);
           SPDLOG_LOGGER_ERROR(
@@ -929,6 +930,7 @@ TilesetContentManager::TilesetContentManager(
                   std::move(result));
               thiz->_rootTileAvailablePromise.resolve();
             })
+        // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
         .catchInMainThread([thiz](std::exception&& e) {
           thiz->notifyTileDoneLoading(nullptr);
           SPDLOG_LOGGER_ERROR(
@@ -1089,14 +1091,16 @@ void TilesetContentManager::loadTileContent(
 
         thiz->notifyTileDoneLoading(&tile);
       })
-      .catchInMainThread([pLogger = this->_externals.pLogger, &tile, thiz](
-                             std::exception&& e) {
-        thiz->notifyTileDoneLoading(&tile);
-        SPDLOG_LOGGER_ERROR(
-            pLogger,
-            "An unexpected error occurs when loading tile: {}",
-            e.what());
-      });
+      .catchInMainThread(
+          [pLogger = this->_externals.pLogger, &tile, thiz](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+              std::exception&& e) {
+            thiz->notifyTileDoneLoading(&tile);
+            SPDLOG_LOGGER_ERROR(
+                pLogger,
+                "An unexpected error occurs when loading tile: {}",
+                e.what());
+          });
 }
 
 void TilesetContentManager::updateTileContent(

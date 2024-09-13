@@ -57,6 +57,7 @@ public:
    * @param rhs The pointer.
    */
   template <class U>
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   IntrusivePointer(IntrusivePointer<U>&& rhs) noexcept
       : _p(std::exchange(rhs._p, nullptr)) {
     // Reference count is unchanged

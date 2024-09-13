@@ -424,6 +424,7 @@ CesiumAsync::Future<GltfReaderResult> GltfReader::loadGltf(
   return pAssetAccessor->get(asyncSystem, uri, headers)
       .thenInWorkerThread(
           [this, options, asyncSystem, pAssetAccessor, uri](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
               std::shared_ptr<CesiumAsync::IAssetRequest>&& pRequest) {
             const CesiumAsync::IAssetResponse* pResponse = pRequest->response();
 
@@ -535,8 +536,9 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
           pAssetAccessor
               ->get(asyncSystem, Uri::resolve(baseUrl, *buffer.uri), tHeaders)
               .thenInWorkerThread(
-                  [pBuffer =
-                       &buffer](std::shared_ptr<IAssetRequest>&& pRequest) {
+                  [pBuffer = &buffer](
+                      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+                      std::shared_ptr<IAssetRequest>&& pRequest) {
                     const IAssetResponse* pResponse = pRequest->response();
 
                     std::string bufferUri = *pBuffer->uri;
@@ -563,6 +565,7 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
                 .thenInWorkerThread(
                     [pImage = &image,
                      ktx2TranscodeTargets = options.ktx2TranscodeTargets](
+                        // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
                         std::shared_ptr<IAssetRequest>&& pRequest) {
                       const IAssetResponse* pResponse = pRequest->response();
 
@@ -588,6 +591,7 @@ void CesiumGltfReader::GltfReader::postprocessGltf(
   return asyncSystem.all(std::move(resolvedBuffers))
       .thenInWorkerThread(
           [pResult = std::move(pResult)](
+              // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
               std::vector<ExternalBufferLoadResult>&& loadResults) mutable {
             for (auto& bufferResult : loadResults) {
               if (!bufferResult.success) {

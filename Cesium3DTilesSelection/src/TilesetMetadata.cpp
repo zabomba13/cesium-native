@@ -47,54 +47,56 @@ SharedFuture<void>& TilesetMetadata::loadSchemaUri(
       this->_pLoadingCanceled = pLoadingCanceled;
       this->_loadingFuture =
           pAssetAccessor->get(asyncSystem, *this->schemaUri)
-              .thenInMainThread([pLoadingCanceled, this, asyncSystem](
-                                    std::shared_ptr<IAssetRequest>&& pRequest) {
-                Promise<void> promise = asyncSystem.createPromise<void>();
+              .thenInMainThread(
+                  [pLoadingCanceled, this, asyncSystem](
+                      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+                      std::shared_ptr<IAssetRequest>&& pRequest) {
+                    Promise<void> promise = asyncSystem.createPromise<void>();
 
-                if (*pLoadingCanceled) {
-                  promise.reject(std::runtime_error(fmt::format(
-                      "Loading of schema URI {} was canceled.",
-                      pRequest->url())));
-                  return promise.getFuture();
-                }
+                    if (*pLoadingCanceled) {
+                      promise.reject(std::runtime_error(fmt::format(
+                          "Loading of schema URI {} was canceled.",
+                          pRequest->url())));
+                      return promise.getFuture();
+                    }
 
-                const IAssetResponse* pResponse = pRequest->response();
-                if (!pResponse) {
-                  promise.reject(std::runtime_error(fmt::format(
-                      "Did not receive a valid response for schema URI {}",
-                      pRequest->url())));
-                  return promise.getFuture();
-                }
+                    const IAssetResponse* pResponse = pRequest->response();
+                    if (!pResponse) {
+                      promise.reject(std::runtime_error(fmt::format(
+                          "Did not receive a valid response for schema URI {}",
+                          pRequest->url())));
+                      return promise.getFuture();
+                    }
 
-                uint16_t statusCode = pResponse->statusCode();
-                if (statusCode != 0 &&
-                    (statusCode < 200 || statusCode >= 300)) {
-                  promise.reject(std::runtime_error(fmt::format(
-                      "Received status code {} for schema URI {}.",
-                      statusCode,
-                      pRequest->url())));
-                  return promise.getFuture();
-                }
+                    uint16_t statusCode = pResponse->statusCode();
+                    if (statusCode != 0 &&
+                        (statusCode < 200 || statusCode >= 300)) {
+                      promise.reject(std::runtime_error(fmt::format(
+                          "Received status code {} for schema URI {}.",
+                          statusCode,
+                          pRequest->url())));
+                      return promise.getFuture();
+                    }
 
-                SchemaReader reader;
-                auto result = reader.readFromJson(pResponse->data());
-                if (!result.value) {
-                  std::string errors =
-                      CesiumUtility::joinToString(result.errors, "\n - ");
-                  if (!errors.empty()) {
-                    errors = " Errors:\n - " + errors;
-                  }
-                  promise.reject(std::runtime_error(fmt::format(
-                      "Error reading Schema from {}.{}",
-                      pRequest->url(),
-                      errors)));
-                }
+                    SchemaReader reader;
+                    auto result = reader.readFromJson(pResponse->data());
+                    if (!result.value) {
+                      std::string errors =
+                          CesiumUtility::joinToString(result.errors, "\n - ");
+                      if (!errors.empty()) {
+                        errors = " Errors:\n - " + errors;
+                      }
+                      promise.reject(std::runtime_error(fmt::format(
+                          "Error reading Schema from {}.{}",
+                          pRequest->url(),
+                          errors)));
+                    }
 
-                this->schema = std::move(*result.value);
+                    this->schema = std::move(*result.value);
 
-                promise.resolve();
-                return promise.getFuture();
-              })
+                    promise.resolve();
+                    return promise.getFuture();
+                  })
               .share();
     }
   }

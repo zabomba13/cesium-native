@@ -87,7 +87,7 @@ double EarthGravitationalModel1996Grid::sampleHeight(
 
 EarthGravitationalModel1996Grid::EarthGravitationalModel1996Grid(
     std::vector<int16_t>&& gridValues)
-    : _gridValues(gridValues) {}
+    : _gridValues(std::move(gridValues)) {}
 
 double EarthGravitationalModel1996Grid::getHeightForIndices(
     const size_t horizontal,
