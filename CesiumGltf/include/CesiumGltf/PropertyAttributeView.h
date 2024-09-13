@@ -175,7 +175,7 @@ public:
       const std::string& propertyId,
       Callback&& callback) const {
     if (this->_status != PropertyAttributeViewStatus::Valid) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::
@@ -185,7 +185,7 @@ public:
 
     const ClassProperty* pClassProperty = getClassProperty(propertyId);
     if (!pClassProperty) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorNonexistentProperty));
@@ -193,7 +193,7 @@ public:
     }
 
     if (pClassProperty->array) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorUnsupportedProperty));
@@ -209,7 +209,7 @@ public:
 
     bool normalized = pClassProperty->normalized;
     if (normalized && !isPropertyComponentTypeInteger(componentType)) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorInvalidNormalization));
@@ -277,7 +277,7 @@ public:
       return;
     }
 
-    callback(
+    std::forward<Callback>(callback)(
         propertyId,
         PropertyAttributePropertyView<uint8_t>(
             PropertyAttributePropertyViewStatus::ErrorUnsupportedProperty));
@@ -381,7 +381,7 @@ private:
       Callback&& callback) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<int8_t, Normalized>(
               primitive,
@@ -389,7 +389,7 @@ private:
               classProperty));
       return;
     case PropertyComponentType::Uint8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<uint8_t, Normalized>(
               primitive,
@@ -397,7 +397,7 @@ private:
               classProperty));
       return;
     case PropertyComponentType::Int16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<int16_t, Normalized>(
               primitive,
@@ -405,7 +405,7 @@ private:
               classProperty));
       return;
     case PropertyComponentType::Uint16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<uint16_t, Normalized>(
               primitive,
@@ -413,7 +413,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Float32:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<float, false>(
               primitive,
@@ -421,7 +421,7 @@ private:
               classProperty));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorUnsupportedProperty));
@@ -438,7 +438,7 @@ private:
       Callback&& callback) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, int8_t>, Normalized>(
               primitive,
@@ -446,7 +446,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Uint8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint8_t>, Normalized>(
               primitive,
@@ -454,7 +454,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Int16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, int16_t>, Normalized>(
               primitive,
@@ -462,7 +462,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Uint16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint16_t>, Normalized>(
               primitive,
@@ -470,7 +470,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Float32:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, float>, false>(
               primitive,
@@ -478,7 +478,7 @@ private:
               classProperty));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorUnsupportedProperty));
@@ -521,7 +521,7 @@ private:
           std::forward<Callback>(callback));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorTypeMismatch));
@@ -538,7 +538,7 @@ private:
       Callback&& callback) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, int8_t>, Normalized>(
               primitive,
@@ -546,7 +546,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Uint8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, uint8_t>, Normalized>(
               primitive,
@@ -554,7 +554,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Int16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, int16_t>, Normalized>(
               primitive,
@@ -562,7 +562,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Uint16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, uint16_t>, Normalized>(
               primitive,
@@ -570,7 +570,7 @@ private:
               classProperty));
       break;
     case PropertyComponentType::Float32:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::mat<N, N, float>, false>(
               primitive,
@@ -578,7 +578,7 @@ private:
               classProperty));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorUnsupportedProperty));
@@ -621,7 +621,7 @@ private:
           std::forward<Callback>(callback));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyAttributePropertyView<uint8_t>(
               PropertyAttributePropertyViewStatus::ErrorTypeMismatch));

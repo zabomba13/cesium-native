@@ -69,7 +69,7 @@ public:
     Promise<T> promise(this->_pSchedulers, pEvent);
 
     try {
-      f(promise);
+      std::forward<Func>(f)(promise);
     } catch (...) {
       promise.reject(std::current_exception());
     }

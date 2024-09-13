@@ -374,36 +374,37 @@ createAccessorView(
     const Accessor& accessor,
     TCallback&& callback) {
   if (accessor.type == Accessor::Type::SCALAR) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::SCALAR<TElement>>(model, accessor));
   }
   if (accessor.type == Accessor::Type::VEC2) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC2<TElement>>(model, accessor));
   }
   if (accessor.type == Accessor::Type::VEC3) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC3<TElement>>(model, accessor));
   }
   if (accessor.type == Accessor::Type::VEC4) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC4<TElement>>(model, accessor));
   }
   if (accessor.type == Accessor::Type::MAT2) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::MAT2<TElement>>(model, accessor));
   }
   if (accessor.type == Accessor::Type::MAT3) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::MAT3<TElement>>(model, accessor));
   }
   if (accessor.type == Accessor::Type::MAT4) {
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::MAT4<TElement>>(model, accessor));
   }
   // TODO Print a warning here???
-  return callback(AccessorView<AccessorTypes::SCALAR<TElement>>(
-      AccessorViewStatus::InvalidType));
+  return std::forward<TCallback>(callback)(
+      AccessorView<AccessorTypes::SCALAR<TElement>>(
+          AccessorViewStatus::InvalidType));
 }
 } // namespace CesiumImpl
 
@@ -460,8 +461,9 @@ createAccessorView(
         accessor,
         std::forward<TCallback>(callback));
   default:
-    return callback(AccessorView<AccessorTypes::SCALAR<float>>(
-        AccessorViewStatus::InvalidComponentType));
+    return std::forward<TCallback>(callback)(
+        AccessorView<AccessorTypes::SCALAR<float>>(
+            AccessorViewStatus::InvalidComponentType));
   }
 }
 
@@ -489,10 +491,14 @@ createAccessorView(
     TCallback&& callback) {
   const Accessor* pAccessor = Model::getSafe(&model.accessors, accessorIndex);
   if (!pAccessor) {
-    return callback(AccessorView<AccessorTypes::SCALAR<float>>(
-        AccessorViewStatus::InvalidComponentType));
+    return std::forward<TCallback>(callback)(
+        AccessorView<AccessorTypes::SCALAR<float>>(
+            AccessorViewStatus::InvalidComponentType));
   }
 
-  return createAccessorView(model, *pAccessor, callback);
+  return createAccessorView(
+      model,
+      *pAccessor,
+      std::forward<TCallback>(callback));
 }
 } // namespace CesiumGltf

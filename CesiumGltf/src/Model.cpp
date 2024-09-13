@@ -440,7 +440,7 @@ void forEachPrimitiveInMeshObject(
     const Mesh& mesh,
     TCallback& callback) {
   for (const MeshPrimitive& primitive : mesh.primitives) {
-    callback(model, node, mesh, primitive, transform);
+    std::forward<TCallback>(callback)(model, node, mesh, primitive, transform);
   }
 }
 
@@ -549,7 +549,7 @@ void forEachNode(
   glm::dmat4x4 nodeTransform =
       transform * getNodeTransform(node).value_or(glm::dmat4x4(1.0));
 
-  callback(model, node, nodeTransform);
+  std::forward<TCallback>(callback)(model, node, nodeTransform);
 
   for (const int32_t childNodeId : node.children) {
     if (childNodeId >= 0 && size_t(childNodeId) < model.nodes.size()) {
@@ -572,7 +572,7 @@ void forEachNodeInSceneObject(
     if (!pNode)
       continue;
 
-    callback(model, *pNode);
+    std::forward<TCallback>(callback)(model, *pNode);
   }
 }
 

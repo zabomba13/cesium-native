@@ -165,7 +165,7 @@ public:
       Callback&& callback,
       const TextureViewOptions& propertyOptions = TextureViewOptions()) const {
     if (this->_status != PropertyTextureViewStatus::Valid) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorInvalidPropertyTexture));
@@ -174,7 +174,7 @@ public:
 
     const ClassProperty* pClassProperty = getClassProperty(propertyId);
     if (!pClassProperty) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorNonexistentProperty));
@@ -191,7 +191,7 @@ public:
     bool normalized = pClassProperty->normalized;
     if (normalized && !isPropertyComponentTypeInteger(componentType)) {
       // Only integer components may be normalized.
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorInvalidNormalization));
@@ -259,7 +259,7 @@ public:
       return;
     }
 
-    callback(
+    std::forward<Callback>(callback)(
         propertyId,
         PropertyTexturePropertyView<uint8_t>(
             PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty));
@@ -353,7 +353,7 @@ private:
       const TextureViewOptions& propertyOptions) const {
     // Only scalar arrays are supported.
     if (type != PropertyType::Scalar) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty));
@@ -362,7 +362,7 @@ private:
 
     int64_t count = classProperty.count.value_or(0);
     if (count <= 0 || count > 4) {
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty));
@@ -371,7 +371,7 @@ private:
 
     switch (componentType) {
     case PropertyComponentType::Int8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<int8_t>, Normalized>(
               propertyId,
@@ -379,7 +379,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Uint8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<uint8_t>, Normalized>(
               propertyId,
@@ -387,7 +387,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Int16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<int16_t>, Normalized>(
               propertyId,
@@ -395,7 +395,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Uint16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<PropertyArrayView<uint16_t>, Normalized>(
               propertyId,
@@ -403,7 +403,7 @@ private:
               propertyOptions));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty));
@@ -420,7 +420,7 @@ private:
       const TextureViewOptions& propertyOptions) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<int8_t, Normalized>(
               propertyId,
@@ -428,7 +428,7 @@ private:
               propertyOptions));
       return;
     case PropertyComponentType::Uint8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<uint8_t, Normalized>(
               propertyId,
@@ -436,7 +436,7 @@ private:
               propertyOptions));
       return;
     case PropertyComponentType::Int16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<int16_t, Normalized>(
               propertyId,
@@ -444,7 +444,7 @@ private:
               propertyOptions));
       return;
     case PropertyComponentType::Uint16:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<uint16_t, Normalized>(
               propertyId,
@@ -452,7 +452,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Int32:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<int32_t, Normalized>(
               propertyId,
@@ -460,7 +460,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Uint32:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<uint32_t, Normalized>(
               propertyId,
@@ -468,7 +468,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Float32:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<float, false>(
               propertyId,
@@ -476,7 +476,7 @@ private:
               propertyOptions));
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty));
@@ -493,7 +493,7 @@ private:
       const TextureViewOptions& propertyOptions) const {
     switch (componentType) {
     case PropertyComponentType::Int8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, int8_t>, Normalized>(
               propertyId,
@@ -501,7 +501,7 @@ private:
               propertyOptions));
       break;
     case PropertyComponentType::Uint8:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           getPropertyViewImpl<glm::vec<N, uint8_t>, Normalized>(
               propertyId,
@@ -510,7 +510,7 @@ private:
       break;
     case PropertyComponentType::Int16:
       if constexpr (N == 2) {
-        callback(
+        std::forward<Callback>(callback)(
             propertyId,
             getPropertyViewImpl<glm::vec<N, int16_t>, Normalized>(
                 propertyId,
@@ -521,7 +521,7 @@ private:
       [[fallthrough]];
     case PropertyComponentType::Uint16:
       if constexpr (N == 2) {
-        callback(
+        std::forward<Callback>(callback)(
             propertyId,
             getPropertyViewImpl<glm::vec<N, uint16_t>, Normalized>(
                 propertyId,
@@ -531,7 +531,7 @@ private:
       }
       [[fallthrough]];
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorUnsupportedProperty));
@@ -574,7 +574,7 @@ private:
           propertyOptions);
       break;
     default:
-      callback(
+      std::forward<Callback>(callback)(
           propertyId,
           PropertyTexturePropertyView<uint8_t>(
               PropertyTexturePropertyViewStatus::ErrorTypeMismatch));

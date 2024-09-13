@@ -214,6 +214,7 @@ public:
    */
   template <typename... TPassThrough>
   Future<std::tuple<TPassThrough..., T>>
+  // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
   thenPassThrough(TPassThrough&&... values) && {
     return std::move(*this).thenImmediately(
         [values = std::tuple(std::forward<TPassThrough>(values)...)](

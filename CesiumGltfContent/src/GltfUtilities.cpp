@@ -766,14 +766,15 @@ struct VisitTextureIds {
     // Find textures in materials
     for (Material& material : gltf.materials) {
       if (material.emissiveTexture)
-        callback(material.emissiveTexture->index);
+        std::forward<Func>(callback)(material.emissiveTexture->index);
       if (material.normalTexture)
-        callback(material.normalTexture->index);
+        std::forward<Func>(callback)(material.normalTexture->index);
       if (material.pbrMetallicRoughness) {
         if (material.pbrMetallicRoughness->baseColorTexture)
-          callback(material.pbrMetallicRoughness->baseColorTexture->index);
+          std::forward<Func>(callback)(
+              material.pbrMetallicRoughness->baseColorTexture->index);
         if (material.pbrMetallicRoughness->metallicRoughnessTexture)
-          callback(
+          std::forward<Func>(callback)(
               material.pbrMetallicRoughness->metallicRoughnessTexture->index);
       }
     }
@@ -786,7 +787,7 @@ struct VisitTextureIds {
         if (pMeshFeatures) {
           for (FeatureId& featureId : pMeshFeatures->featureIds) {
             if (featureId.texture)
-              callback(featureId.texture->index);
+              std::forward<Func>(callback)(featureId.texture->index);
           }
         }
       }
@@ -797,7 +798,7 @@ struct VisitTextureIds {
     if (pMetadata) {
       for (PropertyTexture& propertyTexture : pMetadata->propertyTextures) {
         for (auto& pair : propertyTexture.properties) {
-          callback(pair.second.index);
+          std::forward<Func>(callback)(pair.second.index);
         }
       }
     }
@@ -808,7 +809,7 @@ struct VisitSamplerIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     // Find samplers in textures
     for (Texture& texture : gltf.textures) {
-      callback(texture.sampler);
+      std::forward<Func>(callback)(texture.sampler);
     }
   }
 };
@@ -836,17 +837,17 @@ struct VisitImageIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     // Find images in textures
     for (Texture& texture : gltf.textures) {
-      callback(texture.source);
+      std::forward<Func>(callback)(texture.source);
 
       ExtensionKhrTextureBasisu* pBasis =
           texture.getExtension<ExtensionKhrTextureBasisu>();
       if (pBasis)
-        callback(pBasis->source);
+        std::forward<Func>(callback)(pBasis->source);
 
       ExtensionTextureWebp* pWebP =
           texture.getExtension<ExtensionTextureWebp>();
       if (pWebP)
-        callback(pWebP->source);
+        std::forward<Func>(callback)(pWebP->source);
     }
   }
 };
@@ -855,38 +856,38 @@ struct VisitAccessorIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     for (Mesh& mesh : gltf.meshes) {
       for (MeshPrimitive& primitive : mesh.primitives) {
-        callback(primitive.indices);
+        std::forward<Func>(callback)(primitive.indices);
 
         for (auto& pair : primitive.attributes) {
-          callback(pair.second);
+          std::forward<Func>(callback)(pair.second);
         }
 
         ExtensionCesiumTileEdges* pTileEdges =
             primitive.getExtension<ExtensionCesiumTileEdges>();
         if (pTileEdges) {
-          callback(pTileEdges->left);
-          callback(pTileEdges->bottom);
-          callback(pTileEdges->right);
-          callback(pTileEdges->top);
+          std::forward<Func>(callback)(pTileEdges->left);
+          std::forward<Func>(callback)(pTileEdges->bottom);
+          std::forward<Func>(callback)(pTileEdges->right);
+          std::forward<Func>(callback)(pTileEdges->top);
         }
 
         ExtensionCesiumPrimitiveOutline* pPrimitiveOutline =
             primitive.getExtension<ExtensionCesiumPrimitiveOutline>();
         if (pPrimitiveOutline) {
-          callback(pPrimitiveOutline->indices);
+          std::forward<Func>(callback)(pPrimitiveOutline->indices);
         }
       }
     }
 
     for (Animation& animation : gltf.animations) {
       for (AnimationSampler& sampler : animation.samplers) {
-        callback(sampler.input);
-        callback(sampler.output);
+        std::forward<Func>(callback)(sampler.input);
+        std::forward<Func>(callback)(sampler.output);
       }
     }
 
     for (Skin& skin : gltf.skins) {
-      callback(skin.inverseBindMatrices);
+      std::forward<Func>(callback)(skin.inverseBindMatrices);
     }
 
     for (Node& node : gltf.nodes) {
@@ -894,7 +895,7 @@ struct VisitAccessorIds {
           node.getExtension<ExtensionExtMeshGpuInstancing>();
       if (pInstancing) {
         for (auto& pair : pInstancing->attributes) {
-          callback(pair.second);
+          std::forward<Func>(callback)(pair.second);
         }
       }
     }
@@ -904,16 +905,16 @@ struct VisitAccessorIds {
 struct VisitBufferViewIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     for (Accessor& accessor : gltf.accessors) {
-      callback(accessor.bufferView);
+      std::forward<Func>(callback)(accessor.bufferView);
 
       if (accessor.sparse) {
-        callback(accessor.sparse->indices.bufferView);
-        callback(accessor.sparse->values.bufferView);
+        std::forward<Func>(callback)(accessor.sparse->indices.bufferView);
+        std::forward<Func>(callback)(accessor.sparse->values.bufferView);
       }
     }
 
     for (Image& image : gltf.images) {
-      callback(image.bufferView);
+      std::forward<Func>(callback)(image.bufferView);
     }
 
     for (Mesh& mesh : gltf.meshes) {
@@ -921,7 +922,7 @@ struct VisitBufferViewIds {
         ExtensionKhrDracoMeshCompression* pDraco =
             primitive.getExtension<ExtensionKhrDracoMeshCompression>();
         if (pDraco) {
-          callback(pDraco->bufferView);
+          std::forward<Func>(callback)(pDraco->bufferView);
         }
       }
     }
@@ -931,9 +932,9 @@ struct VisitBufferViewIds {
     if (pMetadata) {
       for (PropertyTable& propertyTable : pMetadata->propertyTables) {
         for (auto& pair : propertyTable.properties) {
-          callback(pair.second.values);
-          callback(pair.second.arrayOffsets);
-          callback(pair.second.stringOffsets);
+          std::forward<Func>(callback)(pair.second.values);
+          std::forward<Func>(callback)(pair.second.arrayOffsets);
+          std::forward<Func>(callback)(pair.second.stringOffsets);
         }
       }
     }
@@ -943,12 +944,12 @@ struct VisitBufferViewIds {
 struct VisitBufferIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     for (BufferView& bufferView : gltf.bufferViews) {
-      callback(bufferView.buffer);
+      std::forward<Func>(callback)(bufferView.buffer);
 
       ExtensionBufferViewExtMeshoptCompression* pMeshOpt =
           bufferView.getExtension<ExtensionBufferViewExtMeshoptCompression>();
       if (pMeshOpt) {
-        callback(pMeshOpt->buffer);
+        std::forward<Func>(callback)(pMeshOpt->buffer);
       }
     }
   }
@@ -957,7 +958,7 @@ struct VisitBufferIds {
 struct VisitMeshIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     for (Node& node : gltf.nodes) {
-      callback(node.mesh);
+      std::forward<Func>(callback)(node.mesh);
     }
   }
 };
@@ -966,7 +967,7 @@ struct VisitMaterialIds {
   template <typename Func> void operator()(Model& gltf, Func&& callback) {
     for (Mesh& mesh : gltf.meshes) {
       for (MeshPrimitive& primitive : mesh.primitives) {
-        callback(primitive.material);
+        std::forward<Func>(callback)(primitive.material);
       }
     }
   }
@@ -986,14 +987,16 @@ void removeUnusedElements(
   }
 
   // Determine which elements are used.
-  visitFunction(gltf, [&usedElements](int32_t elementIndex) {
+  std::forward<TVisitFunction>(
+      visitFunction)(gltf, [&usedElements](int32_t elementIndex) {
     if (elementIndex >= 0 && size_t(elementIndex) < usedElements.size())
       usedElements[size_t(elementIndex)] = true;
   });
 
   // Update the element indices based on the unused indices being removed.
   std::vector<int32_t> indexMap = getIndexMap(usedElements);
-  visitFunction(gltf, [&indexMap](int32_t& elementIndex) {
+  std::forward<TVisitFunction>(
+      visitFunction)(gltf, [&indexMap](int32_t& elementIndex) {
     if (elementIndex >= 0 && size_t(elementIndex) < indexMap.size()) {
       int32_t newIndex = indexMap[size_t(elementIndex)];
       CESIUM_ASSERT(newIndex >= 0);
@@ -1265,24 +1268,27 @@ createPositionView(
 
   switch (accessor.componentType) {
   case Accessor::ComponentType::BYTE:
-    return callback(AccessorView<AccessorTypes::VEC3<int8_t>>(model, accessor));
+    return std::forward<TCallback>(callback)(
+        AccessorView<AccessorTypes::VEC3<int8_t>>(model, accessor));
   case Accessor::ComponentType::UNSIGNED_BYTE:
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC3<uint8_t>>(model, accessor));
   case Accessor::ComponentType::SHORT:
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC3<int16_t>>(model, accessor));
   case Accessor::ComponentType::UNSIGNED_SHORT:
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC3<uint16_t>>(model, accessor));
   case Accessor::ComponentType::UNSIGNED_INT:
-    return callback(
+    return std::forward<TCallback>(callback)(
         AccessorView<AccessorTypes::VEC3<uint32_t>>(model, accessor));
   case Accessor::ComponentType::FLOAT:
-    return callback(AccessorView<AccessorTypes::VEC3<float>>(model, accessor));
+    return std::forward<TCallback>(callback)(
+        AccessorView<AccessorTypes::VEC3<float>>(model, accessor));
   default:
-    return callback(AccessorView<AccessorTypes::VEC3<float>>(
-        AccessorViewStatus::InvalidComponentType));
+    return std::forward<TCallback>(callback)(
+        AccessorView<AccessorTypes::VEC3<float>>(
+            AccessorViewStatus::InvalidComponentType));
   }
 }
 

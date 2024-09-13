@@ -35,7 +35,7 @@ void forEachTile(Tile::LoadedLinkedList& list, Function callback) {
   Tile* pCurrent = list.head();
   while (pCurrent) {
     Tile* pNext = list.next(pCurrent);
-    callback(*pCurrent);
+    std::forward<Function>(callback)(*pCurrent);
     pCurrent = pNext;
   }
 }
