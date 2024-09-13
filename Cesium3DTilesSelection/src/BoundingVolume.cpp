@@ -27,6 +27,7 @@ BoundingVolume transformBoundingVolume(
     const glm::dmat4x4& transform,
     const BoundingVolume& boundingVolume) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const glm::dmat4x4& transform;
 
     BoundingVolume operator()(const OrientedBoundingBox& boundingBox) {
@@ -89,6 +90,7 @@ std::optional<GlobeRectangle> estimateGlobeRectangle(
     const BoundingVolume& boundingVolume,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const CesiumGeospatial::Ellipsoid& ellipsoid;
 
     std::optional<GlobeRectangle>
@@ -225,6 +227,7 @@ OrientedBoundingBox getOrientedBoundingBoxFromBoundingVolume(
     const BoundingVolume& boundingVolume,
     const CesiumGeospatial::Ellipsoid& ellipsoid) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const CesiumGeospatial::Ellipsoid& ellipsoid;
 
     OrientedBoundingBox operator()(const BoundingSphere& sphere) const {

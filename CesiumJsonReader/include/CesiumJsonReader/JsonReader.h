@@ -126,6 +126,7 @@ private:
     void setInputStream(rapidjson::MemoryStream* pInputStream) noexcept;
 
   private:
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     std::vector<std::string>& _warnings;
     rapidjson::MemoryStream* _pInputStream;
   };

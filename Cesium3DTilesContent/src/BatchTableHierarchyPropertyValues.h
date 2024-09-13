@@ -36,10 +36,12 @@ public:
   private:
     const rapidjson::Value* getValue(int64_t index) const;
 
+    // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     const std::vector<const rapidjson::Value*>& _propertyInClass;
     const rapidjson::Value& _classIds;
     const rapidjson::Value& _parentIds;
     const std::vector<uint32_t>& _instanceIndices;
+    // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
     int64_t _currentIndex;
     mutable const rapidjson::Value* _pCachedValue;
   };
@@ -91,6 +93,7 @@ public:
 private:
   const_iterator createIterator(int64_t index) const;
 
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   const rapidjson::Value& _batchTableHierarchy;
   int64_t _batchLength;
   const rapidjson::Value* _pClassIDs;

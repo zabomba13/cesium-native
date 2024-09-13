@@ -368,6 +368,7 @@ bool upsamplePrimitiveForRasterOverlays(
     const CesiumGeospatial::Ellipsoid& ellipsoid);
 
 struct FloatVertexAttribute {
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   const std::vector<std::byte>& buffer;
   int64_t offset;
   int64_t stride;
@@ -589,8 +590,10 @@ void copyVertexAttributes(
     std::vector<float>& output,
     bool skipMinMaxUpdate = false) {
   struct Operation {
+    // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     std::vector<FloatVertexAttribute>& vertexAttributes;
     std::vector<float>& output;
+    // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
     bool skipMinMaxUpdate;
 
     void operator()(int vertexIndex) {
@@ -649,9 +652,11 @@ void copyVertexAttributes(
     const CesiumGeometry::TriangleClipVertex& vertex,
     std::vector<float>& output) {
   struct Operation {
+    // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     std::vector<FloatVertexAttribute>& vertexAttributes;
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements;
     std::vector<float>& output;
+    // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
     void operator()(int vertexIndex) {
       if (vertexIndex < 0) {
@@ -730,6 +735,7 @@ T getVertexValue(
     const AccessorView<T>& accessor,
     const CesiumGeometry::TriangleClipVertex& vertex) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const AccessorView<T>& accessor;
 
     T operator()(int vertexIndex) { return accessor[vertexIndex]; }
@@ -750,8 +756,10 @@ T getVertexValue(
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements,
     const CesiumGeometry::TriangleClipVertex& vertex) {
   struct Operation {
+    // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
     const AccessorView<T>& accessor;
     const std::vector<CesiumGeometry::TriangleClipVertex>& complements;
+    // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 
     T operator()(int vertexIndex) {
       if (vertexIndex < 0) {

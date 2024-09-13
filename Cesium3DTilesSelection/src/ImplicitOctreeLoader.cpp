@@ -51,8 +51,10 @@ struct BoundingVolumeSubdivision {
     return ImplicitTilingUtilities::computeBoundingVolume(obb, this->tileID);
   }
 
+  // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
   const CesiumGeometry::OctreeTileID& tileID;
   const CesiumGeospatial::Ellipsoid& ellipsoid;
+  // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 BoundingVolume subdivideBoundingVolume(

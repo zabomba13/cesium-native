@@ -26,6 +26,7 @@ public:
   virtual IJsonHandler* readObjectKey(const std::string_view& str) override;
 
 private:
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   const JsonReaderOptions& _context;
   CesiumUtility::ExtensibleObject* _pObject = nullptr;
   std::string _objectType;

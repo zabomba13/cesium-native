@@ -576,6 +576,7 @@ public:
   int64_t size() const { return this->_propertyValues.Size(); }
 
 private:
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   const rapidjson::Value& _propertyValues;
 };
 

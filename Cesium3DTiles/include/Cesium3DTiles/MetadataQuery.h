@@ -22,6 +22,7 @@ namespace Cesium3DTiles {
  * result in undefined behavior.
  */
 struct CESIUM3DTILES_API FoundMetadataProperty {
+  // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
   /**
    * @brief A reference to the identifier of the class that contains the found
    * property within the {@link Schema}.
@@ -51,6 +52,7 @@ struct CESIUM3DTILES_API FoundMetadataProperty {
    * {@link MetadataEntity}.
    */
   const CesiumUtility::JsonValue& propertyValue;
+  // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 /**

@@ -328,6 +328,7 @@ private:
    * passed on through the traversal.
    */
   struct FrameState {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const std::vector<ViewState>& frustums;
     std::vector<double> fogDensities;
     int32_t lastFrameNumber;

@@ -93,9 +93,6 @@ public:
   }
 
 private:
-  const std::string INVALID_CREDIT_MESSAGE =
-      "Error: Invalid Credit, cannot get HTML string.";
-
   struct HtmlAndLastFrameNumber {
     std::string html;
     bool showOnScreen;

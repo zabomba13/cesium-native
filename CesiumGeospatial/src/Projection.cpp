@@ -21,6 +21,7 @@ namespace CesiumGeospatial {
 glm::dvec3
 projectPosition(const Projection& projection, const Cartographic& position) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const Cartographic& position;
 
     glm::dvec3 operator()(const GeographicProjection& geographic) noexcept {
@@ -38,6 +39,7 @@ projectPosition(const Projection& projection, const Cartographic& position) {
 Cartographic
 unprojectPosition(const Projection& projection, const glm::dvec3& position) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const glm::dvec3& position;
 
     Cartographic operator()(const GeographicProjection& geographic) noexcept {
@@ -56,6 +58,7 @@ CesiumGeometry::Rectangle projectRectangleSimple(
     const Projection& projection,
     const GlobeRectangle& rectangle) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const GlobeRectangle& rectangle;
 
     CesiumGeometry::Rectangle
@@ -76,6 +79,7 @@ GlobeRectangle unprojectRectangleSimple(
     const Projection& projection,
     const CesiumGeometry::Rectangle& rectangle) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const CesiumGeometry::Rectangle& rectangle;
 
     GlobeRectangle operator()(const GeographicProjection& geographic) noexcept {
@@ -230,6 +234,7 @@ double computeApproximateConversionFactorToMetersNearPosition(
     const Projection& projection,
     const glm::dvec2& position) {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const glm::dvec2& position;
 
     double operator()(const GeographicProjection& /*geographic*/) noexcept {

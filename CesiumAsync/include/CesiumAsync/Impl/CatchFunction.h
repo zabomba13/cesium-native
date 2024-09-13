@@ -14,6 +14,7 @@ template <
     typename Scheduler,
     typename TaskParameter = async::task<T>&&>
 struct CatchFunction {
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   Scheduler& scheduler;
   Func f;
 
@@ -43,6 +44,7 @@ struct CatchFunction {
 
 template <typename Func, typename Scheduler, typename TaskParameter>
 struct CatchFunction<Func, void, Scheduler, TaskParameter> {
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   Scheduler& scheduler;
   Func f;
 

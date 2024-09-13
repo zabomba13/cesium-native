@@ -102,6 +102,7 @@ bool ViewState::isBoundingVolumeVisible(
     const BoundingVolume& boundingVolume) const noexcept {
   // TODO: use plane masks
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const ViewState& viewState;
 
     bool operator()(const OrientedBoundingBox& boundingBox) noexcept {
@@ -142,6 +143,7 @@ bool ViewState::isBoundingVolumeVisible(
 double ViewState::computeDistanceSquaredToBoundingVolume(
     const BoundingVolume& boundingVolume) const noexcept {
   struct Operation {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
     const ViewState& viewState;
 
     double operator()(const OrientedBoundingBox& boundingBox) noexcept {

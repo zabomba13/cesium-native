@@ -44,6 +44,7 @@ struct CESIUM3DTILESSELECTION_API TileLoadInput {
       const std::vector<CesiumAsync::IAssetAccessor::THeader>& requestHeaders,
       const CesiumGeospatial::Ellipsoid& ellipsoid CESIUM_DEFAULT_ELLIPSOID);
 
+  // NOLINTBEGIN(cppcoreguidelines-avoid-const-or-ref-data-members)
   /**
    * @brief The tile that the {@link TilesetContentLoader} will request the server for the content.
    */
@@ -79,6 +80,7 @@ struct CESIUM3DTILESSELECTION_API TileLoadInput {
    * @brief The ellipsoid that this tileset uses.
    */
   const CesiumGeospatial::Ellipsoid& ellipsoid;
+  // NOLINTEND(cppcoreguidelines-avoid-const-or-ref-data-members)
 };
 
 /**

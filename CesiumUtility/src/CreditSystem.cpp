@@ -9,6 +9,11 @@
 
 namespace CesiumUtility {
 
+namespace {
+const std::string INVALID_CREDIT_MESSAGE =
+    "Error: Invalid Credit, cannot get HTML string.";
+}
+
 Credit CreditSystem::createCredit(const std::string& html, bool showOnScreen) {
   return this->createCredit(std::string(html), showOnScreen);
 }

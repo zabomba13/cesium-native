@@ -163,18 +163,18 @@ private:
       const std::optional<CesiumGeospatial::Cartographic>& positionCartographic,
       const CesiumGeospatial::Ellipsoid& ellipsoid);
 
-  const glm::dvec3 _position;
-  const glm::dvec3 _direction;
-  const glm::dvec3 _up;
-  const glm::dvec2 _viewportSize;
-  const double _horizontalFieldOfView;
-  const double _verticalFieldOfView;
-  const CesiumGeospatial::Ellipsoid _ellipsoid;
+  glm::dvec3 _position;
+  glm::dvec3 _direction;
+  glm::dvec3 _up;
+  glm::dvec2 _viewportSize;
+  double _horizontalFieldOfView;
+  double _verticalFieldOfView;
+  CesiumGeospatial::Ellipsoid _ellipsoid;
 
-  const double _sseDenominator;
-  const std::optional<CesiumGeospatial::Cartographic> _positionCartographic;
+  double _sseDenominator;
+  std::optional<CesiumGeospatial::Cartographic> _positionCartographic;
 
-  const CullingVolume _cullingVolume;
+  CullingVolume _cullingVolume;
 };
 
 } // namespace Cesium3DTilesSelection
