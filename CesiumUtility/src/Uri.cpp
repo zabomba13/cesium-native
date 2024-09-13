@@ -13,8 +13,11 @@
 #include <vector>
 
 namespace CesiumUtility {
-const char* HTTPS_PREFIX = "https:";
-const char* HTTP_PREFIX = "http:";
+
+namespace {
+const char* const HTTPS_PREFIX = "https:";
+const char* const HTTP_PREFIX = "http:";
+} // namespace
 
 std::string cesiumConformUrl(const std::string& url, bool useHttps) {
   // Prepend protocol to protocol-relative URIs.

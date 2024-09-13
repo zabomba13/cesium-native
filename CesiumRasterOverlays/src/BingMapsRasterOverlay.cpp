@@ -50,6 +50,7 @@ struct CreditAndCoverageAreas {
   std::vector<CoverageArea> coverageAreas;
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 std::unordered_map<std::string, std::vector<std::byte>> sessionCache;
 } // namespace
 

@@ -45,6 +45,7 @@ struct AssetEndpoint {
   std::vector<AssetEndpointAttribution> attributions;
 };
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 std::unordered_map<std::string, AssetEndpoint> endpointCache;
 
 std::string createEndpointResource(
