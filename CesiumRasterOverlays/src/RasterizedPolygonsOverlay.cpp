@@ -40,8 +40,8 @@ void rasterizePolygons(
 
   CesiumGltf::ImageCesium& image = loaded.image.emplace();
 
-  std::byte insideColor;
-  std::byte outsideColor;
+  std::byte insideColor{};
+  std::byte outsideColor{};
 
   if (invertSelection) {
     insideColor = static_cast<std::byte>(0);

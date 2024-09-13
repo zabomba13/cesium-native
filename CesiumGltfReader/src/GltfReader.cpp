@@ -634,9 +634,8 @@ ImageReaderResult GltfReader::readImage(
 
   if (isKtx(data)) {
     ktxTexture2* pTexture = nullptr;
-    KTX_error_code errorCode;
 
-    errorCode = ktxTexture2_CreateFromMemory(
+    KTX_error_code errorCode = ktxTexture2_CreateFromMemory(
         reinterpret_cast<const uint8_t*>(data.data()),
         data.size(),
         KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT,
@@ -784,7 +783,7 @@ ImageReaderResult GltfReader::readImage(
             // Copy over the positions of each mip within the buffer.
             image.mipPositions.resize(pTexture->numLevels);
             for (ktx_uint32_t level = 0; level < pTexture->numLevels; ++level) {
-              ktx_size_t imageOffset;
+              ktx_size_t imageOffset{};
               ktxTexture_GetImageOffset(
                   ktxTexture(pTexture),
                   level,
@@ -850,7 +849,7 @@ ImageReaderResult GltfReader::readImage(
 
   {
     tjhandle tjInstance = tjInitDecompress();
-    int inSubsamp, inColorspace;
+    int inSubsamp{}, inColorspace{};
     if (!tjDecompressHeader3(
             tjInstance,
             reinterpret_cast<const unsigned char*>(data.data()),
@@ -883,7 +882,7 @@ ImageReaderResult GltfReader::readImage(
       image.bytesPerChannel = 1;
       image.channels = 4;
 
-      int channelsInFile;
+      int channelsInFile{};
       stbi_uc* pImage = stbi_load_from_memory(
           reinterpret_cast<const stbi_uc*>(data.data()),
           static_cast<int>(data.size()),

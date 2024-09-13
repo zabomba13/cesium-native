@@ -251,7 +251,7 @@ GltfUtilities::computeBoundingRegion(
 
         std::optional<SkirtMeshMetadata> skirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-        int64_t vertexBegin, vertexEnd;
+        int64_t vertexBegin{}, vertexEnd{};
         if (skirtMeshMetadata) {
           vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
           vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +
@@ -288,9 +288,9 @@ GltfUtilities::parseGltfCopyright(const CesiumGltf::Model& gltf) {
     const std::string_view copyright = *gltf.asset.copyright;
     if (copyright.size() > 0) {
       size_t start = 0;
-      size_t end;
-      size_t ltrim;
-      size_t rtrim;
+      size_t end{};
+      size_t ltrim{};
+      size_t rtrim{};
       do {
         ltrim = copyright.find_first_not_of(" \t", start);
         end = copyright.find(';', ltrim);
@@ -502,8 +502,8 @@ void findClosestRayHit(
   } else if (primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP) {
     for (int64_t i = 2; i < positionView.size(); ++i) {
       int64_t vert0Index = i - 2;
-      int64_t vert1Index;
-      int64_t vert2Index;
+      int64_t vert1Index{};
+      int64_t vert2Index{};
       if (i % 2) {
         vert1Index = i;
         vert2Index = i - 1;
@@ -653,8 +653,8 @@ void findClosestIndexedRayHit(
   } else if (primitive.mode == MeshPrimitive::Mode::TRIANGLE_STRIP) {
     for (int64_t i = 2; i < indicesView.size(); ++i) {
       int64_t vert0Index = static_cast<int64_t>(indicesView[i - 2].value[0]);
-      int64_t vert1Index;
-      int64_t vert2Index;
+      int64_t vert1Index{};
+      int64_t vert2Index{};
       if (i % 2) {
         vert1Index = static_cast<int64_t>(indicesView[i].value[0]);
         vert2Index = static_cast<int64_t>(indicesView[i - 1].value[0]);

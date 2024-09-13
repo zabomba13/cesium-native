@@ -42,7 +42,7 @@ public:
   }
   virtual IJsonHandler* readDouble(double d) override {
     CESIUM_ASSERT(this->_pInteger);
-    double intPart;
+    double intPart{};
     double fractPart = std::modf(d, &intPart);
     if (fractPart != 0) {
       return JsonHandler::readDouble(d);

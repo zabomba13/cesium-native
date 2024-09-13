@@ -1032,7 +1032,7 @@ void TilesetContentManager::loadTileContent(
       tilesetOptions.contentOptions,
       tile};
 
-  TilesetContentLoader* pLoader;
+  TilesetContentLoader* pLoader{};
   if (tile.getLoader() == &this->_upsampler) {
     pLoader = &this->_upsampler;
   } else {

@@ -67,7 +67,7 @@ SkirtMeshMetadata::parseFromGltfExtras(const JsonValue::Object& extras) {
       (*pMeshCenter)[1].getSafeNumberOrDefault<double>(0.0),
       (*pMeshCenter)[2].getSafeNumberOrDefault<double>(0.0));
 
-  double westHeight, southHeight, eastHeight, northHeight;
+  double westHeight{}, southHeight{}, eastHeight{}, northHeight{};
   try {
     westHeight = gltfSkirtMeshMetadata.getSafeNumericalValueForKey<double>(
         "skirtWestHeight");

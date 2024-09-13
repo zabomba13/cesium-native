@@ -173,7 +173,7 @@ RasterOverlayUtilities::createRasterOverlayTextureCoordinates(
 
         std::optional<SkirtMeshMetadata> skirtMeshMetadata =
             SkirtMeshMetadata::parseFromGltfExtras(primitive.extras);
-        int64_t vertexBegin, vertexEnd;
+        int64_t vertexBegin{}, vertexEnd{};
         if (skirtMeshMetadata) {
           vertexBegin = skirtMeshMetadata->noSkirtVerticesBegin;
           vertexEnd = skirtMeshMetadata->noSkirtVerticesBegin +

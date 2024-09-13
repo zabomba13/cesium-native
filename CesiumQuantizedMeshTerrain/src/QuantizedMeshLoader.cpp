@@ -215,7 +215,7 @@ static std::optional<QuantizedMeshView> parseQuantizedMesh(
   }
 
   // parse the indices buffer
-  uint32_t indexSizeBytes;
+  uint32_t indexSizeBytes{};
   if (vertexCount > 65536) {
     // 32-bit indices
     if ((readIndex % 4) != 0) {

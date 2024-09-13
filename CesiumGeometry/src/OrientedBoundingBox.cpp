@@ -72,7 +72,7 @@ double OrientedBoundingBox::computeDistanceSquaredToPosition(
       glm::dot(offset, w));
 
   double distanceSquared = 0.0;
-  double d;
+  double d{};
 
   if (pPrime.x < -uHalf) {
     d = pPrime.x + uHalf;

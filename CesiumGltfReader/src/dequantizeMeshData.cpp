@@ -74,12 +74,9 @@ void dequantizeAccessor(Model& model, Accessor& accessor) {
     return;
   }
 
-  int64_t byteStride;
-  if (pBufferView->byteStride) {
-    byteStride = *pBufferView->byteStride;
-  } else {
-    byteStride = accessor.computeByteStride(model);
-  }
+  int64_t byteStride = pBufferView->byteStride
+                           ? *pBufferView->byteStride
+                           : accessor.computeByteStride(model);
 
   if (static_cast<size_t>(
           pBufferView->byteOffset + accessor.byteOffset +

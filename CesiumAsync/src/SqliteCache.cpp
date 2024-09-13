@@ -160,7 +160,7 @@ using SqliteStatementPtr =
 SqliteStatementPtr prepareStatement(
     const SqliteConnectionPtr& pConnection,
     const std::string& sql) {
-  CESIUM_SQLITE(sqlite3_stmt*) pStmt;
+  CESIUM_SQLITE(sqlite3_stmt*) pStmt{};
   const int status = CESIUM_SQLITE(sqlite3_prepare_v2)(
       pConnection.get(),
       sql.c_str(),
@@ -218,7 +218,7 @@ SqliteCache::SqliteCache(
 }
 
 void SqliteCache::createConnection() const {
-  CESIUM_SQLITE(sqlite3*) pConnection;
+  CESIUM_SQLITE(sqlite3*) pConnection{};
   int status = CESIUM_SQLITE(
       sqlite3_open)(this->_pImpl->_databaseName.c_str(), &pConnection);
   if (status != SQLITE_OK) {

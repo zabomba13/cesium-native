@@ -63,7 +63,6 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
   const double q2 = pow(length(q), 2);
   const double qw = dot(q, w);
 
-  double difference, w2, product, discriminant, temp;
   if (q2 > 1.0) {
     // Outside ellipsoid.
     if (qw >= 0.0) {
@@ -73,9 +72,9 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
 
     // qw < 0.0.
     const double qw2 = qw * qw;
-    difference = q2 - 1.0; // Positively valued.
-    w2 = pow(length(w), 2);
-    product = w2 * difference;
+    double difference = q2 - 1.0; // Positively valued.
+    double w2 = pow(length(w), 2);
+    double product = w2 * difference;
 
     if (qw2 < product) {
       // Imaginary roots (0 intersections).
@@ -83,8 +82,8 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
     }
     if (qw2 > product) {
       // Distinct roots (2 intersections).
-      discriminant = qw * qw - product;
-      temp = -qw + sqrt(discriminant); // Avoid cancellation.
+      double discriminant = qw * qw - product;
+      double temp = -qw + sqrt(discriminant); // Avoid cancellation.
       const double root0 = temp / w2;
       const double root1 = difference / temp;
       if (root0 < root1) {
@@ -99,18 +98,18 @@ std::optional<glm::dvec2> IntersectionTests::rayEllipsoid(
   }
   if (q2 < 1.0) {
     // Inside ellipsoid (2 intersections).
-    difference = q2 - 1.0; // Negatively valued.
-    w2 = pow(length(w), 2);
-    product = w2 * difference; // Negatively valued.
+    double difference = q2 - 1.0; // Negatively valued.
+    double w2 = pow(length(w), 2);
+    double product = w2 * difference; // Negatively valued.
 
-    discriminant = qw * qw - product;
-    temp = -qw + sqrt(discriminant); // Positively valued.
+    double discriminant = qw * qw - product;
+    double temp = -qw + sqrt(discriminant); // Positively valued.
     return glm::dvec2(0.0, temp / w2);
   }
   // q2 == 1.0. On ellipsoid.
   if (qw < 0.0) {
     // Looking inward.
-    w2 = pow(length(w), 2);
+    double w2 = pow(length(w), 2);
     return glm::dvec2(0.0, -qw / w2);
   }
   // qw >= 0.0.  Looking outward or tangent.
@@ -310,7 +309,7 @@ std::optional<double> IntersectionTests::raySphereParametric(
   const double b = 2.0 * glm::dot(direction, diff);
   const double c = glm::dot(diff, diff) - radiusSquared;
 
-  double t0, t1;
+  double t0{}, t1{};
   if (solveQuadratic(1.0, b, c, t0, t1)) {
     return t0 < 0 ? t1 : t0;
   }

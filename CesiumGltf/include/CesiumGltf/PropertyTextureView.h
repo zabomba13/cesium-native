@@ -728,8 +728,8 @@ private:
       const PropertyTextureProperty& propertyTextureProperty,
       size_t elementSize,
       const TextureViewOptions& propertyOptions) const {
-    int32_t samplerIndex;
-    int32_t imageIndex;
+    int32_t samplerIndex{};
+    int32_t imageIndex{};
 
     auto status =
         getTextureSafe(propertyTextureProperty.index, samplerIndex, imageIndex);

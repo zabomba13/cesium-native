@@ -202,8 +202,8 @@ bool isSubtreeLoadedInLayer(
       layer.availabilityLevels > 0 &&
       "Layer needs to support availabilityLevels");
 
-  uint32_t subtreeLevelIdx;
-  uint64_t subtreeMortonIdx;
+  uint32_t subtreeLevelIdx{};
+  uint64_t subtreeMortonIdx{};
   subtreeHash(subtreeID, layer, subtreeLevelIdx, subtreeMortonIdx);
 
   // it doesn't have the subtree exceeds max zooms, so just treat it
@@ -225,8 +225,8 @@ void addRectangleAvailabilityToLayer(
     layer.contentAvailability.addAvailableTileRange(range);
   }
 
-  uint32_t subtreeLevelIdx;
-  uint64_t subtreeMortonIdx;
+  uint32_t subtreeLevelIdx{};
+  uint64_t subtreeMortonIdx{};
   subtreeHash(subtreeID, layer, subtreeLevelIdx, subtreeMortonIdx);
 
   // it doesn't have the subtree exceeds max zooms, so just treat it
@@ -472,7 +472,7 @@ Future<LoadLayersResult> loadLayerJson(
   CesiumGeospatial::Projection projection = WebMercatorProjection(ellipsoid);
   CesiumGeospatial::GlobeRectangle quadtreeRectangleGlobe(0.0, 0.0, 0.0, 0.0);
   CesiumGeometry::Rectangle quadtreeRectangleProjected(0.0, 0.0, 0.0, 0.0);
-  uint32_t quadtreeXTiles;
+  uint32_t quadtreeXTiles{};
 
   // Consistent with CesiumJS behavior, we ignore the "bounds" property.
   // Some non-Cesium terrain tilers seem to provide incorrect bounds.

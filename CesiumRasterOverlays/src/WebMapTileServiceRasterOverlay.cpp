@@ -232,15 +232,10 @@ WebMapTileServiceRasterOverlay::createTileProvider(
   std::optional<std::map<std::string, std::string>> dimensions =
       _options.dimensions;
 
-  bool useKVP;
-
   auto countBracket = std::count(_url.begin(), _url.end(), '{');
-  if (countBracket < 1 ||
-      (countBracket == 1 && _url.find("{s}") != std::string::npos)) {
-    useKVP = true;
-  } else {
-    useKVP = false;
-  }
+
+  bool useKVP = countBracket < 1 ||
+                (countBracket == 1 && _url.find("{s}") != std::string::npos);
 
   CesiumGeospatial::Projection projection =
       _options.projection.value_or(CesiumGeospatial::WebMercatorProjection(

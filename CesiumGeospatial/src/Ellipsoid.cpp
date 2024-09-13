@@ -105,17 +105,17 @@ Ellipsoid::scaleToGeodeticSurface(const glm::dvec3& cartesian) const noexcept {
       ((1.0 - ratio) * glm::length(cartesian)) / (0.5 * glm::length(gradient));
   double correction = 0.0;
 
-  double func;
-  double denominator;
-  double xMultiplier;
-  double yMultiplier;
-  double zMultiplier;
-  double xMultiplier2;
-  double yMultiplier2;
-  double zMultiplier2;
-  double xMultiplier3;
-  double yMultiplier3;
-  double zMultiplier3;
+  double func{};
+  double denominator{};
+  double xMultiplier{};
+  double yMultiplier{};
+  double zMultiplier{};
+  double xMultiplier2{};
+  double yMultiplier2{};
+  double zMultiplier2{};
+  double xMultiplier3{};
+  double yMultiplier3{};
+  double zMultiplier3{};
 
   do {
     lambda -= correction;

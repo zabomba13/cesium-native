@@ -68,7 +68,7 @@ std::string Uri::resolve(
     return relative;
   }
 
-  int charsRequired;
+  int charsRequired{};
   if (uriToStringCharsRequiredA(&resolvedUri, &charsRequired) != URI_SUCCESS) {
     uriFreeUriMembersA(&resolvedUri);
     uriFreeUriMembersA(&relativeUri);
@@ -136,8 +136,8 @@ std::string Uri::getQueryValue(const std::string& url, const std::string& key) {
   if (uriParseSingleUriA(&uri, conformedUrl.c_str(), nullptr) != URI_SUCCESS) {
     return "";
   }
-  UriQueryListA* queryList;
-  int itemCount;
+  UriQueryListA* queryList{};
+  int itemCount{};
   if (uriDissectQueryMallocA(
           &queryList,
           &itemCount,
@@ -169,7 +169,7 @@ std::string Uri::substituteTemplateParameters(
   std::string placeholder;
 
   size_t startPos = 0;
-  size_t nextPos;
+  size_t nextPos{};
 
   // Find the start of a parameter
   while ((nextPos = templateUri.find('{', startPos)) != std::string::npos) {
@@ -410,7 +410,7 @@ std::string Uri::setPath(const std::string& uri, const std::string& newPath) {
     } while (startPos != std::string::npos);
   }
 
-  int charsRequired;
+  int charsRequired{};
   if (uriToStringCharsRequiredA(&parsedUri, &charsRequired) != URI_SUCCESS) {
     uriFreeUriMembersA(&parsedUri);
     return uri;
