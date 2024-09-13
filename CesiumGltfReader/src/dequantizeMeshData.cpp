@@ -23,15 +23,17 @@ namespace {
 
 template <typename T> float intToFloat(T t) = delete;
 
-template <> float intToFloat(int8_t c) { return std::max(c / 127.0f, -1.0f); }
-
-template <> float intToFloat(uint8_t c) { return c / 127.0f; }
-
-template <> float intToFloat(int16_t c) {
-  return std::max(c / 65535.0f, -1.0f);
+template <> float intToFloat(int8_t c) {
+  return std::max(float(c) / 127.0f, -1.0f);
 }
 
-template <> float intToFloat(uint16_t c) { return c / 65535.0f; }
+template <> float intToFloat(uint8_t c) { return float(c) / 127.0f; }
+
+template <> float intToFloat(int16_t c) {
+  return std::max(float(c) / 65535.0f, -1.0f);
+}
+
+template <> float intToFloat(uint16_t c) { return float(c) / 65535.0f; }
 
 template <typename T, size_t N>
 void normalizeQuantized(

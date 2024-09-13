@@ -68,14 +68,17 @@ public:
   static glm::dvec3 decodeRGB565(const uint16_t value) {
     constexpr uint16_t mask5 = (1 << 5) - 1;
     constexpr uint16_t mask6 = (1 << 6) - 1;
-    constexpr float normalize5 = 1.0f / 31.0f; // normalize [0, 31] to [0, 1]
-    constexpr float normalize6 = 1.0f / 63.0f; // normalize [0, 63] to [0, 1]
+    constexpr double normalize5 = 1.0 / 31.0; // normalize [0, 31] to [0, 1]
+    constexpr double normalize6 = 1.0 / 63.0; // normalize [0, 63] to [0, 1]
 
     const uint16_t red = static_cast<uint16_t>(value >> 11);
     const uint16_t green = static_cast<uint16_t>((value >> 5) & mask6);
     const uint16_t blue = value & mask5;
 
-    return glm::dvec3(red * normalize5, green * normalize6, blue * normalize5);
+    return glm::dvec3(
+        double(red) * normalize5,
+        double(green) * normalize6,
+        double(blue) * normalize5);
   };
 };
 

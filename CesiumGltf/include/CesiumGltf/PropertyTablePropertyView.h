@@ -484,7 +484,10 @@ private:
       const gsl::span<const std::byte> buffer(
           _values.data() + offsetBits / 8,
           (nextOffsetBits / 8 - offsetBits / 8 + 1));
-      return PropertyArrayView<bool>(buffer, offsetBits % 8, int64_t(count));
+      return PropertyArrayView<bool>(
+          buffer,
+          int64_t(offsetBits % 8),
+          int64_t(count));
     }
 
     // Handle variable-length arrays
