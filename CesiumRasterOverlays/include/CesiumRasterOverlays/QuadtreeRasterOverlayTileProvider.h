@@ -138,10 +138,10 @@ private:
 
   struct CombinedImageMeasurements {
     CesiumGeometry::Rectangle rectangle;
-    int32_t widthPixels;
-    int32_t heightPixels;
-    int32_t channels;
-    int32_t bytesPerChannel;
+    int32_t widthPixels{};
+    int32_t heightPixels{};
+    int32_t channels{};
+    int32_t bytesPerChannel{};
   };
 
   static CombinedImageMeasurements measureCombinedImage(
@@ -159,6 +159,7 @@ private:
   uint32_t _imageHeight;
   CesiumGeometry::QuadtreeTilingScheme _tilingScheme;
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
   struct CacheEntry {
     CesiumGeometry::QuadtreeTileID tileID;
     CesiumAsync::SharedFuture<LoadedQuadtreeImage> future;

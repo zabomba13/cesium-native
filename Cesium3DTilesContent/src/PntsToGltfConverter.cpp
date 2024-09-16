@@ -802,10 +802,11 @@ void parseDracoExtensionFromBatchTableJson(
       continue;
     }
 
-    DracoMetadataSemantic semantic;
-    semantic.dracoId = dracoPropertyIt->value.GetInt();
-    semantic.componentType = stringToMetadataComponentType.at(componentType);
-    semantic.type = stringToMetadataType.at(type);
+    DracoMetadataSemantic semantic = {
+        dracoPropertyIt->value.GetInt(),
+        stringToMetadataComponentType.at(componentType),
+        stringToMetadataType.at(type),
+    };
 
     parsedContent.dracoMetadataSemantics.insert({name, semantic});
   }

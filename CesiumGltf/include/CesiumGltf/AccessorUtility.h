@@ -177,7 +177,7 @@ struct IndicesForFaceFromAccessor {
       return {-1, -1, -1};
     }
 
-    std::array<int64_t, 3> result;
+    std::array<int64_t, 3> result{};
 
     if (primitiveMode == MeshPrimitive::Mode::TRIANGLE_FAN) {
       result[0] = 0;
@@ -219,7 +219,7 @@ struct IndicesForFaceFromAccessor {
       return {-1, -1, -1};
     }
 
-    std::array<int64_t, 3> result;
+    std::array<int64_t, 3> result{};
 
     if (primitiveMode == MeshPrimitive::Mode::TRIANGLE_FAN) {
       result[0] = value[0];

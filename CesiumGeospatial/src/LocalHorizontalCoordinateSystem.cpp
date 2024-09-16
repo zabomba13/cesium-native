@@ -48,24 +48,7 @@ glm::dvec3 directionToEnuVector(LocalDirection direction) {
   }
 }
 
-} // namespace
-
-LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
-    const Cartographic& origin,
-    LocalDirection xAxisDirection,
-    LocalDirection yAxisDirection,
-    LocalDirection zAxisDirection,
-    double scaleToMeters,
-    const Ellipsoid& ellipsoid)
-    : LocalHorizontalCoordinateSystem(
-          ellipsoid.cartographicToCartesian(origin),
-          xAxisDirection,
-          yAxisDirection,
-          zAxisDirection,
-          scaleToMeters,
-          ellipsoid) {}
-
-LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
+glm::dmat4 computeLocalToEcef(
     const glm::dvec3& originEcef,
     LocalDirection xAxisDirection,
     LocalDirection yAxisDirection,
@@ -90,9 +73,40 @@ LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
       scaleToMeters * directionToEnuVector(yAxisDirection),
       scaleToMeters * directionToEnuVector(zAxisDirection));
 
-  this->_localToEcef = enuToFixed * glm::dmat4(localToEnuAndScale);
-  this->_ecefToLocal = glm::affineInverse(this->_localToEcef);
+  return enuToFixed * glm::dmat4(localToEnuAndScale);
 }
+
+} // namespace
+
+LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
+    const Cartographic& origin,
+    LocalDirection xAxisDirection,
+    LocalDirection yAxisDirection,
+    LocalDirection zAxisDirection,
+    double scaleToMeters,
+    const Ellipsoid& ellipsoid)
+    : LocalHorizontalCoordinateSystem(
+          ellipsoid.cartographicToCartesian(origin),
+          xAxisDirection,
+          yAxisDirection,
+          zAxisDirection,
+          scaleToMeters,
+          ellipsoid) {}
+
+LocalHorizontalCoordinateSystem::LocalHorizontalCoordinateSystem(
+    const glm::dvec3& originEcef,
+    LocalDirection xAxisDirection,
+    LocalDirection yAxisDirection,
+    LocalDirection zAxisDirection,
+    double scaleToMeters,
+    const Ellipsoid& ellipsoid)
+    : LocalHorizontalCoordinateSystem(computeLocalToEcef(
+          originEcef,
+          xAxisDirection,
+          yAxisDirection,
+          zAxisDirection,
+          scaleToMeters,
+          ellipsoid)) {}
 
 CesiumGeospatial::LocalHorizontalCoordinateSystem::
     LocalHorizontalCoordinateSystem(const glm::dmat4& localToEcef)

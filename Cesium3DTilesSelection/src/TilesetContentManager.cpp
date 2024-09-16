@@ -118,7 +118,7 @@ struct ContentKindSetter {
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members)
   TileContent& tileContent;
   std::optional<RasterOverlayDetails> rasterOverlayDetails;
-  void* pRenderResources;
+  void* pRenderResources{};
 };
 
 void unloadTileRecursively(

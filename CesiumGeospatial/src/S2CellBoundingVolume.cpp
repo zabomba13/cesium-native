@@ -119,7 +119,7 @@ computeIntersection(const Plane& p0, const Plane& p1, const Plane& p2) {
 
 std::array<glm::dvec3, 8>
 computeVertices(const std::array<Plane, 6>& boundingPlanes) {
-  std::array<glm::dvec3, 8> vertices;
+  std::array<glm::dvec3, 8> vertices{};
 
   for (size_t i = 0; i < 4; ++i) {
     // Vertices on the top plane.
@@ -332,7 +332,7 @@ glm::dvec3 closestPointPolygon(
 double S2CellBoundingVolume::computeDistanceSquaredToPosition(
     const glm::dvec3& position) const noexcept {
   size_t numSelectedPlanes = 0;
-  std::array<size_t, 6> selectedPlaneIndices;
+  std::array<size_t, 6> selectedPlaneIndices{};
 
   if (this->_boundingPlanes[0].getPointDistance(position) > 0.0) {
     selectedPlaneIndices[numSelectedPlanes++] = 0;

@@ -81,36 +81,39 @@ glm::dvec3 SimplePlanarEllipsoidCurve::getPosition(
   return geocentricPosition + geocentricUp * altitudeOffset;
 }
 
+namespace {
+glm::dquat computeFlyQuat(
+    const glm::dvec3& scaledSourceEcef,
+    const glm::dvec3& scaledDestinationEcef) {
+  // Here we find the center of a circle that passes through both the source and
+  // destination points, and then calculate the angle that we need to move along
+  // that circle to get from point A to B.
+  return glm::rotation(
+      glm::normalize(scaledSourceEcef),
+      glm::normalize(scaledDestinationEcef));
+}
+} // namespace
+
 SimplePlanarEllipsoidCurve::SimplePlanarEllipsoidCurve(
     const Ellipsoid& ellipsoid,
     const glm::dvec3& scaledSourceEcef,
     const glm::dvec3& scaledDestinationEcef,
     const glm::dvec3& originalSourceEcef,
     const glm::dvec3& originalDestinationEcef)
-    : _ellipsoid(ellipsoid),
+    : _totalAngle(
+          glm::angle(computeFlyQuat(scaledSourceEcef, scaledDestinationEcef))),
+      // Calculate difference between lengths instead of length between points -
+      // allows for negative source height
+      _sourceHeight(
+          glm::length(originalSourceEcef) - glm::length(scaledSourceEcef)),
+      _destinationHeight(
+          glm::length(originalDestinationEcef) -
+          glm::length(scaledDestinationEcef)),
+      _ellipsoid(ellipsoid),
+      _sourceDirection(glm::normalize(originalSourceEcef)),
+      _rotationAxis(
+          glm::axis(computeFlyQuat(scaledSourceEcef, scaledDestinationEcef))),
       _sourceEcef(originalSourceEcef),
-      _destinationEcef(originalDestinationEcef) {
-  // Here we find the center of a circle that passes through both the source and
-  // destination points, and then calculate the angle that we need to move along
-  // that circle to get from point A to B.
-
-  glm::dquat flyQuat = glm::rotation(
-      glm::normalize(scaledSourceEcef),
-      glm::normalize(scaledDestinationEcef));
-
-  this->_rotationAxis = glm::axis(flyQuat);
-  this->_totalAngle = glm::angle(flyQuat);
-
-  // Calculate difference between lengths instead of length between points -
-  // allows for negative source height
-  // NOLINTBEGIN(cppcoreguidelines-prefer-member-initializer)
-  this->_sourceHeight =
-      glm::length(originalSourceEcef) - glm::length(scaledSourceEcef);
-  this->_destinationHeight =
-      glm::length(originalDestinationEcef) - glm::length(scaledDestinationEcef);
-  // NOLINTEND(cppcoreguidelines-prefer-member-initializer)
-
-  this->_sourceDirection = glm::normalize(originalSourceEcef);
-}
+      _destinationEcef(originalDestinationEcef) {}
 
 } // namespace CesiumGeospatial

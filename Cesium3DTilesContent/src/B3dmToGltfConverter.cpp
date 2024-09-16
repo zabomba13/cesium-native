@@ -244,7 +244,7 @@ CesiumAsync::Future<GltfConverterResult> B3dmToGltfConverter::convert(
     const CesiumGltfReader::GltfReaderOptions& options,
     const AssetFetcher& assetFetcher) {
   GltfConverterResult result;
-  B3dmHeader header;
+  B3dmHeader header{};
   uint32_t headerLength = 0;
   parseB3dmHeader(b3dmBinary, header, headerLength, result);
   if (result.errors) {

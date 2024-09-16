@@ -43,7 +43,7 @@ namespace CesiumRasterOverlays {
 namespace {
 struct TileMapServiceTileset {
   std::string url;
-  uint32_t level;
+  uint32_t level{};
 };
 } // namespace
 

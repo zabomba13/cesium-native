@@ -66,7 +66,7 @@ public:
 
 private:
   struct RectangleWithLevel {
-    uint32_t level;
+    uint32_t level{};
     Rectangle rectangle;
   };
 
