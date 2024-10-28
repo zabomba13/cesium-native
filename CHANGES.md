@@ -1,10 +1,79 @@
 # Change Log
 
-### ? - ?
+### Not Released Yet
+
+##### Breaking Changes :mega:
+
+- Renamed `CesiumUtility/Gunzip.h` to `CesiumUtility/Gzip.h`.
 
 ##### Additions :tada:
 
+- Added `CesiumUtility::gzip`.
+- Added `CesiumGeometry::Transforms::getUpAxisTransform` to get the transform that converts from one up axis to another.
+
+### v0.40.1 - 2024-10-01
+
+##### Fixes :wrench:
+
+- Fixed a regression in v0.40.0 that could cause tilesets with raster overlays to fail to load in some cases.
+
+### v0.40.0 - 2024-10-01
+
+##### Breaking Changes :mega:
+
+- Renamed `shouldContentContinueUpdating` to `getMightHaveLatentChildren` and `setContentShouldContinueUpdating` to `setMightHaveLatentChildren` on the `Tile` class.
+- `LoadedRasterOverlayImage` now has a single `errorList` property instead of separate `errors` and `warnings` properties.
+
+##### Additions :tada:
+
+- Added `sampleHeightMostDetailed` method to `Tileset`.
+- `AxisAlignedBox` now has `constexpr` constructors.
+
+##### Fixes :wrench:
+
+- Fixed a bug that prevented use of `Tileset` with a nullptr `IPrepareRendererResources`.
+- Fixed a bug in `IntersectionTests::rayOBBParametric` that could cause incorrect results for some oriented bounding boxes.
+- `GltfUtilities::intersectRayGltfModel` now reports a warning when given a model it can't compute the intersection with because it uses required extensions that are not supported.
+- Errors while loading raster overlays are now logged. Previously, they were silently ignored in many cases.
+- A raster overlay image failing to load will no longer completely prevent the geometry tile to which it is attached from rendering. Instead, once the raster overlay fails, the geometry tile will be shown without the raster overlay.
+- Fixed a bug in the various `catchImmediately` and `catchInMainThread` functions in `CesiumAsync` that prevented use of a mutable lambda.
+
+### v0.39.0 - 2024-09-02
+
+##### Breaking Changes :mega:
+
+- Setting the CMake variable `PRIVATE_CESIUM_SQLITE` will no longer automatically rename all of the SQLite symbols. It must also be paired with a vcpkg overlay port that renames the symbols in SQLite itself.
+- `PropertyArrayView` is now exclusively a view, with no ability to own the data it is viewing. The new `PropertyArrayCopy` can be used when an owning view is required.
+
+##### Additions :tada:
+
+- Added `CesiumGltfWriter::SchemaWriter` for serializing schemas in [EXT_structural_metadata](https://github.com/CesiumGS/glTF/tree/3d-tiles-next/extensions/2.0/Vendor/EXT_structural_metadata).
+- Added `resolveExternalImages` flag to `GltfReaderOptions`, which is true by default.
+- Added `removeExtensionUsed` and `removeExtensionRequired` methods to `CesiumGltf::Model`.
+- Added `getFeatureIdAccessorView` overload for retrieving feature IDs from `EXT_instance_features`.
+- Added `CesiumGeospatial::EarthGravitationalModel1996Grid` class to allow transforming heights on a WGS84 ellipsoid into heights above mean sea level using the EGM96 model.
+
+##### Fixes :wrench:
+
+- Fixed a bug in `WebMapTileServiceRasterOverlay` that caused it to compute the `TileRow` incorrectly when used with a tiling scheme with multiple tiles in the Y direction at the root.
+- `KHR_texture_transform` is now removed from `extensionsUsed` and `extensionsRequired` after it is applied by `GltfReader`.
+- Fixed a bug in the i3dm loader that caused glTF with multiple nodes to not be instanced correctly.
+
+### v0.38.0 - 2024-08-01
+
+##### Breaking Changes :mega:
+
+- `AccessorWriter` constructor now takes `std::byte*` instead of `uint8_t*`.
+
+##### Additions :tada:
+
+- Added `rayTriangle` intersection function that returns the intersection point between a ray and a triangle.
+- Added `intersectRayGltfModel` intersection function that returns the first intersection point between a ray and a glTF model.
 - Added `convertAccessorComponentTypeToPropertyComponentType`, which converts integer glTF accessor component types to their best-fitting `PropertyComponentType`.
+
+##### Fixes :wrench:
+
+- Fixed a bug that prevented raster overlays from being correctly applied when a non-standard "glTF up axis" is in use.
 
 ### v0.37.0 - 2024-07-01
 
