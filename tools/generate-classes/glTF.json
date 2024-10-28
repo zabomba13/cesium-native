@@ -132,11 +132,23 @@
     "CESIUM_primitive_outline glTF primitive extension": {
       "overrideName": "ExtensionCesiumPrimitiveOutline"
     },
-    "EXT_implicit_geometry glTF extension": {
-      "overrideName": "ExtensionExtImplicitGeometry"
+    "KHR_implicit_shapes glTF Document Extension": {
+      "overrideName": "ExtensionKhrImplicitShapes"
     },
-    "Geometry in EXT_implicit_geometry": {
-      "overrideName": "Geometry"
+    "KHR_implicit_shapes Shape Resource": {
+      "overrideName": "Shape"
+    },
+    "KHR_implicit_shapes Box Shape": {
+      "overrideName": "Box"
+    },
+    "KHR_implicit_shapes Capsule Shape": {
+      "overrideName": "Capsule"
+    },
+    "KHR_implicit_shapes Cylinder Shape": {
+      "overrideName": "Cylinder"
+    },
+    "KHR_implicit_shapes Sphere Shape": {
+      "overrideName": "Sphere"
     },
     "EXT_primitive_voxels glTF Mesh Primitive extension": {
       "overrideName": "ExtensionExtPrimitiveVoxels"
@@ -239,13 +251,15 @@
       ]
     },
     {
-      "extensionName": "EXT_implicit_geometry",
-      "schema": "Vendor/EXT_implicit_geometry/schema/glTF.EXT_implicit_geometry.schema.json"
+      "extensionName": "KHR_implicit_shapes",
+      "schema": "Khronos/KHR_implicit_shapes/schema/glTF.KHR_implicit_shapes.schema.json",
+      "attachTo": [
+        "glTF"
+      ]
     },
     {
       "extensionName": "EXT_primitive_voxels",
       "schema": "Vendor/EXT_primitive_voxels/schema/mesh.primitive.EXT_primitive_voxels.schema.json"
-      
     }
   ]
 }

@@ -10,14 +10,14 @@
 
 namespace CesiumGltf {
 /**
- * @brief An implicit box centered at the local space origin.
+ * @brief Parameters describing a box shape.
  */
 struct CESIUMGLTF_API Box final : public CesiumUtility::ExtensibleObject {
   static inline constexpr const char* TypeName = "Box";
 
   /**
-   * @brief The size of the box in meters.
+   * @brief The extents of the box in each axis in local space.
    */
-  std::vector<double> size;
+  std::vector<double> size = {1, 1, 1};
 };
 } // namespace CesiumGltf

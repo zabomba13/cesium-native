@@ -18,12 +18,10 @@
 #include <CesiumGltf/Camera.h>
 #include <CesiumGltf/CameraOrthographic.h>
 #include <CesiumGltf/CameraPerspective.h>
+#include <CesiumGltf/Capsule.h>
 #include <CesiumGltf/Class.h>
 #include <CesiumGltf/ClassProperty.h>
 #include <CesiumGltf/Cylinder.h>
-#include <CesiumGltf/CylinderSlice.h>
-#include <CesiumGltf/Ellipsoid.h>
-#include <CesiumGltf/EllipsoidSlice.h>
 #include <CesiumGltf/Enum.h>
 #include <CesiumGltf/EnumValue.h>
 #include <CesiumGltf/ExtensionBufferExtMeshoptCompression.h>
@@ -31,13 +29,13 @@
 #include <CesiumGltf/ExtensionCesiumPrimitiveOutline.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionCesiumTileEdges.h>
-#include <CesiumGltf/ExtensionExtImplicitGeometry.h>
 #include <CesiumGltf/ExtensionExtInstanceFeatures.h>
 #include <CesiumGltf/ExtensionExtInstanceFeaturesFeatureId.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
 #include <CesiumGltf/ExtensionExtPrimitiveVoxels.h>
 #include <CesiumGltf/ExtensionKhrDracoMeshCompression.h>
+#include <CesiumGltf/ExtensionKhrImplicitShapes.h>
 #include <CesiumGltf/ExtensionKhrMaterialsUnlit.h>
 #include <CesiumGltf/ExtensionKhrTextureBasisu.h>
 #include <CesiumGltf/ExtensionKhrTextureTransform.h>
@@ -54,7 +52,6 @@
 #include <CesiumGltf/ExtensionTextureWebp.h>
 #include <CesiumGltf/FeatureId.h>
 #include <CesiumGltf/FeatureIdTexture.h>
-#include <CesiumGltf/Geometry.h>
 #include <CesiumGltf/Image.h>
 #include <CesiumGltf/Material.h>
 #include <CesiumGltf/MaterialNormalTextureInfo.h>
@@ -71,14 +68,12 @@
 #include <CesiumGltf/PropertyTableProperty.h>
 #include <CesiumGltf/PropertyTexture.h>
 #include <CesiumGltf/PropertyTextureProperty.h>
-#include <CesiumGltf/Region.h>
-#include <CesiumGltf/RegionSlice.h>
 #include <CesiumGltf/Sampler.h>
 #include <CesiumGltf/Scene.h>
 #include <CesiumGltf/Schema.h>
+#include <CesiumGltf/Shape.h>
 #include <CesiumGltf/Skin.h>
 #include <CesiumGltf/Sphere.h>
-#include <CesiumGltf/SphereSlice.h>
 #include <CesiumGltf/Texture.h>
 #include <CesiumGltf/TextureInfo.h>
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
@@ -187,7 +182,7 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
 void writeJson(
-    const CesiumGltf::ExtensionExtImplicitGeometry& obj,
+    const CesiumGltf::ExtensionKhrImplicitShapes& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
@@ -202,37 +197,7 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
 void writeJson(
-    const CesiumGltf::Geometry& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::Region& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::RegionSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::Ellipsoid& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::EllipsoidSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::Sphere& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context);
-
-void writeJson(
-    const CesiumGltf::SphereSlice& obj,
+    const CesiumGltf::Shape& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
@@ -242,12 +207,17 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
 void writeJson(
-    const CesiumGltf::CylinderSlice& obj,
+    const CesiumGltf::Capsule& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
 void writeJson(
     const CesiumGltf::Box& obj,
+    CesiumJsonWriter::JsonWriter& jsonWriter,
+    const CesiumJsonWriter::ExtensionWriterContext& context);
+
+void writeJson(
+    const CesiumGltf::Sphere& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context);
 
@@ -1021,14 +991,14 @@ void writeJson(
 }
 
 void writeJson(
-    const CesiumGltf::ExtensionExtImplicitGeometry& obj,
+    const CesiumGltf::ExtensionKhrImplicitShapes& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  if (!obj.geometries.empty()) {
-    jsonWriter.Key("geometries");
-    writeJson(obj.geometries, jsonWriter, context);
+  if (!obj.shapes.empty()) {
+    jsonWriter.Key("shapes");
+    writeJson(obj.shapes, jsonWriter, context);
   }
 
   writeExtensibleObject(obj, jsonWriter, context);
@@ -1084,14 +1054,27 @@ void writeJson(
 }
 
 void writeJson(
-    const CesiumGltf::Geometry& obj,
+    const CesiumGltf::Shape& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
+  jsonWriter.Key("type");
+  writeJson(obj.type, jsonWriter, context);
+
+  if (obj.sphere.has_value()) {
+    jsonWriter.Key("sphere");
+    writeJson(obj.sphere, jsonWriter, context);
+  }
+
   if (obj.box.has_value()) {
     jsonWriter.Key("box");
     writeJson(obj.box, jsonWriter, context);
+  }
+
+  if (obj.capsule.has_value()) {
+    jsonWriter.Key("capsule");
+    writeJson(obj.capsule, jsonWriter, context);
   }
 
   if (obj.cylinder.has_value()) {
@@ -1099,198 +1082,7 @@ void writeJson(
     writeJson(obj.cylinder, jsonWriter, context);
   }
 
-  if (obj.sphere.has_value()) {
-    jsonWriter.Key("sphere");
-    writeJson(obj.sphere, jsonWriter, context);
-  }
-
-  if (obj.ellipsoid.has_value()) {
-    jsonWriter.Key("ellipsoid");
-    writeJson(obj.ellipsoid, jsonWriter, context);
-  }
-
-  if (obj.region.has_value()) {
-    jsonWriter.Key("region");
-    writeJson(obj.region, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::Region& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  jsonWriter.Key("semiMajorAxisRadius");
-  writeJson(obj.semiMajorAxisRadius, jsonWriter, context);
-
-  jsonWriter.Key("semiMinorAxisRadius");
-  writeJson(obj.semiMinorAxisRadius, jsonWriter, context);
-
-  jsonWriter.Key("heightFromSurface");
-  writeJson(obj.heightFromSurface, jsonWriter, context);
-
-  if (obj.slice.has_value()) {
-    jsonWriter.Key("slice");
-    writeJson(obj.slice, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::RegionSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  if (obj.minHeight != 0) {
-    jsonWriter.Key("minHeight");
-    writeJson(obj.minHeight, jsonWriter, context);
-  }
-
-  if (obj.maxHeight != 1) {
-    jsonWriter.Key("maxHeight");
-    writeJson(obj.maxHeight, jsonWriter, context);
-  }
-
-  static const std::vector<double> minAngleDefault = {
-      -3.14159265359,
-      -1.57079632679};
-  if (obj.minAngle != minAngleDefault) {
-    jsonWriter.Key("minAngle");
-    writeJson(obj.minAngle, jsonWriter, context);
-  }
-
-  static const std::vector<double> maxAngleDefault = {
-      3.14159265359,
-      1.57079632679};
-  if (obj.maxAngle != maxAngleDefault) {
-    jsonWriter.Key("maxAngle");
-    writeJson(obj.maxAngle, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::Ellipsoid& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  if (!obj.radii.empty()) {
-    jsonWriter.Key("radii");
-    writeJson(obj.radii, jsonWriter, context);
-  }
-
-  if (obj.slice.has_value()) {
-    jsonWriter.Key("slice");
-    writeJson(obj.slice, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::EllipsoidSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  if (obj.minRadius != 0) {
-    jsonWriter.Key("minRadius");
-    writeJson(obj.minRadius, jsonWriter, context);
-  }
-
-  if (obj.maxRadius != 1) {
-    jsonWriter.Key("maxRadius");
-    writeJson(obj.maxRadius, jsonWriter, context);
-  }
-
-  static const std::vector<double> minAngleDefault = {
-      -3.14159265359,
-      -1.57079632679};
-  if (obj.minAngle != minAngleDefault) {
-    jsonWriter.Key("minAngle");
-    writeJson(obj.minAngle, jsonWriter, context);
-  }
-
-  static const std::vector<double> maxAngleDefault = {
-      3.14159265359,
-      1.57079632679};
-  if (obj.maxAngle != maxAngleDefault) {
-    jsonWriter.Key("maxAngle");
-    writeJson(obj.maxAngle, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::Sphere& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  jsonWriter.Key("radius");
-  writeJson(obj.radius, jsonWriter, context);
-
-  if (obj.slice.has_value()) {
-    jsonWriter.Key("slice");
-    writeJson(obj.slice, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
-
-  jsonWriter.EndObject();
-}
-
-void writeJson(
-    const CesiumGltf::SphereSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  jsonWriter.StartObject();
-
-  if (obj.minRadius != 0) {
-    jsonWriter.Key("minRadius");
-    writeJson(obj.minRadius, jsonWriter, context);
-  }
-
-  if (obj.maxRadius != 1) {
-    jsonWriter.Key("maxRadius");
-    writeJson(obj.maxRadius, jsonWriter, context);
-  }
-
-  static const std::vector<double> minAngleDefault = {
-      -3.14159265359,
-      -1.57079632679};
-  if (obj.minAngle != minAngleDefault) {
-    jsonWriter.Key("minAngle");
-    writeJson(obj.minAngle, jsonWriter, context);
-  }
-
-  static const std::vector<double> maxAngleDefault = {
-      3.14159265359,
-      1.57079632679};
-  if (obj.maxAngle != maxAngleDefault) {
-    jsonWriter.Key("maxAngle");
-    writeJson(obj.maxAngle, jsonWriter, context);
-  }
-
-  writeExtensibleObject(obj, jsonWriter, context);
+  writeNamedObject(obj, jsonWriter, context);
 
   jsonWriter.EndObject();
 }
@@ -1301,15 +1093,19 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  jsonWriter.Key("radius");
-  writeJson(obj.radius, jsonWriter, context);
+  if (obj.height != 0.5) {
+    jsonWriter.Key("height");
+    writeJson(obj.height, jsonWriter, context);
+  }
 
-  jsonWriter.Key("height");
-  writeJson(obj.height, jsonWriter, context);
+  if (obj.radiusBottom != 0.25) {
+    jsonWriter.Key("radiusBottom");
+    writeJson(obj.radiusBottom, jsonWriter, context);
+  }
 
-  if (obj.slice.has_value()) {
-    jsonWriter.Key("slice");
-    writeJson(obj.slice, jsonWriter, context);
+  if (obj.radiusTop != 0.25) {
+    jsonWriter.Key("radiusTop");
+    writeJson(obj.radiusTop, jsonWriter, context);
   }
 
   writeExtensibleObject(obj, jsonWriter, context);
@@ -1318,39 +1114,24 @@ void writeJson(
 }
 
 void writeJson(
-    const CesiumGltf::CylinderSlice& obj,
+    const CesiumGltf::Capsule& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  if (obj.minRadius != 0) {
-    jsonWriter.Key("minRadius");
-    writeJson(obj.minRadius, jsonWriter, context);
+  if (obj.height != 0.5) {
+    jsonWriter.Key("height");
+    writeJson(obj.height, jsonWriter, context);
   }
 
-  if (obj.maxRadius != 1) {
-    jsonWriter.Key("maxRadius");
-    writeJson(obj.maxRadius, jsonWriter, context);
+  if (obj.radiusBottom != 0.25) {
+    jsonWriter.Key("radiusBottom");
+    writeJson(obj.radiusBottom, jsonWriter, context);
   }
 
-  if (obj.minHeight != 0) {
-    jsonWriter.Key("minHeight");
-    writeJson(obj.minHeight, jsonWriter, context);
-  }
-
-  if (obj.maxHeight != 1) {
-    jsonWriter.Key("maxHeight");
-    writeJson(obj.maxHeight, jsonWriter, context);
-  }
-
-  if (obj.minAngle != -3.14159265359) {
-    jsonWriter.Key("minAngle");
-    writeJson(obj.minAngle, jsonWriter, context);
-  }
-
-  if (obj.maxAngle != 3.14159265359) {
-    jsonWriter.Key("maxAngle");
-    writeJson(obj.maxAngle, jsonWriter, context);
+  if (obj.radiusTop != 0.25) {
+    jsonWriter.Key("radiusTop");
+    writeJson(obj.radiusTop, jsonWriter, context);
   }
 
   writeExtensibleObject(obj, jsonWriter, context);
@@ -1364,9 +1145,26 @@ void writeJson(
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   jsonWriter.StartObject();
 
-  if (!obj.size.empty()) {
+  static const std::vector<double> sizeDefault = {1, 1, 1};
+  if (obj.size != sizeDefault) {
     jsonWriter.Key("size");
     writeJson(obj.size, jsonWriter, context);
+  }
+
+  writeExtensibleObject(obj, jsonWriter, context);
+
+  jsonWriter.EndObject();
+}
+
+void writeJson(
+    const CesiumGltf::Sphere& obj,
+    CesiumJsonWriter::JsonWriter& jsonWriter,
+    const CesiumJsonWriter::ExtensionWriterContext& context) {
+  jsonWriter.StartObject();
+
+  if (obj.radius != 0.5) {
+    jsonWriter.Key("radius");
+    writeJson(obj.radius, jsonWriter, context);
   }
 
   writeExtensibleObject(obj, jsonWriter, context);
@@ -2912,8 +2710,8 @@ void ExtensionCesiumPrimitiveOutlineJsonWriter::write(
   writeJson(obj, jsonWriter, context);
 }
 
-void ExtensionExtImplicitGeometryJsonWriter::write(
-    const CesiumGltf::ExtensionExtImplicitGeometry& obj,
+void ExtensionKhrImplicitShapesJsonWriter::write(
+    const CesiumGltf::ExtensionKhrImplicitShapes& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   writeJson(obj, jsonWriter, context);
@@ -2933,50 +2731,8 @@ void PaddingJsonWriter::write(
   writeJson(obj, jsonWriter, context);
 }
 
-void GeometryJsonWriter::write(
-    const CesiumGltf::Geometry& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void RegionJsonWriter::write(
-    const CesiumGltf::Region& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void RegionSliceJsonWriter::write(
-    const CesiumGltf::RegionSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void EllipsoidJsonWriter::write(
-    const CesiumGltf::Ellipsoid& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void EllipsoidSliceJsonWriter::write(
-    const CesiumGltf::EllipsoidSlice& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void SphereJsonWriter::write(
-    const CesiumGltf::Sphere& obj,
-    CesiumJsonWriter::JsonWriter& jsonWriter,
-    const CesiumJsonWriter::ExtensionWriterContext& context) {
-  writeJson(obj, jsonWriter, context);
-}
-
-void SphereSliceJsonWriter::write(
-    const CesiumGltf::SphereSlice& obj,
+void ShapeJsonWriter::write(
+    const CesiumGltf::Shape& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   writeJson(obj, jsonWriter, context);
@@ -2989,8 +2745,8 @@ void CylinderJsonWriter::write(
   writeJson(obj, jsonWriter, context);
 }
 
-void CylinderSliceJsonWriter::write(
-    const CesiumGltf::CylinderSlice& obj,
+void CapsuleJsonWriter::write(
+    const CesiumGltf::Capsule& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   writeJson(obj, jsonWriter, context);
@@ -2998,6 +2754,13 @@ void CylinderSliceJsonWriter::write(
 
 void BoxJsonWriter::write(
     const CesiumGltf::Box& obj,
+    CesiumJsonWriter::JsonWriter& jsonWriter,
+    const CesiumJsonWriter::ExtensionWriterContext& context) {
+  writeJson(obj, jsonWriter, context);
+}
+
+void SphereJsonWriter::write(
+    const CesiumGltf::Sphere& obj,
     CesiumJsonWriter::JsonWriter& jsonWriter,
     const CesiumJsonWriter::ExtensionWriterContext& context) {
   writeJson(obj, jsonWriter, context);

@@ -3,27 +3,19 @@
 #pragma once
 
 #include "CesiumGltf/Library.h"
-#include "CesiumGltf/SphereSlice.h"
 
 #include <CesiumUtility/ExtensibleObject.h>
 
-#include <optional>
-
 namespace CesiumGltf {
 /**
- * @brief An implicit sphere centered at the local space origin.
+ * @brief Parameters describing a sphere shape.
  */
 struct CESIUMGLTF_API Sphere final : public CesiumUtility::ExtensibleObject {
   static inline constexpr const char* TypeName = "Sphere";
 
   /**
-   * @brief The radius of the sphere in local space.
+   * @brief The radius of the sphere.
    */
-  double radius = double();
-
-  /**
-   * @brief The optionally-defined slice of the sphere.
-   */
-  std::optional<CesiumGltf::SphereSlice> slice;
+  double radius = 0.5;
 };
 } // namespace CesiumGltf

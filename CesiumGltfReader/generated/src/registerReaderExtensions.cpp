@@ -8,12 +8,12 @@
 #include "ExtensionCesiumPrimitiveOutlineJsonHandler.h"
 #include "ExtensionCesiumRTCJsonHandler.h"
 #include "ExtensionCesiumTileEdgesJsonHandler.h"
-#include "ExtensionExtImplicitGeometryJsonHandler.h"
 #include "ExtensionExtInstanceFeaturesJsonHandler.h"
 #include "ExtensionExtMeshFeaturesJsonHandler.h"
 #include "ExtensionExtMeshGpuInstancingJsonHandler.h"
 #include "ExtensionExtPrimitiveVoxelsJsonHandler.h"
 #include "ExtensionKhrDracoMeshCompressionJsonHandler.h"
+#include "ExtensionKhrImplicitShapesJsonHandler.h"
 #include "ExtensionKhrMaterialsUnlitJsonHandler.h"
 #include "ExtensionKhrTextureBasisuJsonHandler.h"
 #include "ExtensionKhrTextureTransformJsonHandler.h"
@@ -55,7 +55,7 @@ void registerReaderExtensions(CesiumJsonReader::JsonReaderOptions& options) {
       ExtensionModelMaxarMeshVariantsJsonHandler>();
   options.registerExtension<
       CesiumGltf::Model,
-      ExtensionExtImplicitGeometryJsonHandler>();
+      ExtensionKhrImplicitShapesJsonHandler>();
   options.registerExtension<
       CesiumGltf::MeshPrimitive,
       ExtensionCesiumTileEdgesJsonHandler>();
