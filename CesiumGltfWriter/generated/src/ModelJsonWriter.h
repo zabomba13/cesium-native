@@ -30,6 +30,8 @@ struct ExtensionKhrTextureTransform;
 struct ExtensionTextureWebp;
 struct ExtensionCesiumPrimitiveOutline;
 struct ExtensionKhrImplicitShapes;
+struct ExtensionExtImplicitEllipsoidRegion;
+struct ExtensionExtImplicitCylinderRegion;
 struct ExtensionExtPrimitiveVoxels;
 struct Padding;
 struct Shape;
@@ -305,6 +307,30 @@ struct ExtensionKhrImplicitShapesJsonWriter {
 
   static void write(
       const CesiumGltf::ExtensionKhrImplicitShapes& obj,
+      CesiumJsonWriter::JsonWriter& jsonWriter,
+      const CesiumJsonWriter::ExtensionWriterContext& context);
+};
+
+struct ExtensionExtImplicitEllipsoidRegionJsonWriter {
+  using ValueType = CesiumGltf::ExtensionExtImplicitEllipsoidRegion;
+
+  static inline constexpr const char* ExtensionName =
+      "EXT_implicit_ellipsoid_region";
+
+  static void write(
+      const CesiumGltf::ExtensionExtImplicitEllipsoidRegion& obj,
+      CesiumJsonWriter::JsonWriter& jsonWriter,
+      const CesiumJsonWriter::ExtensionWriterContext& context);
+};
+
+struct ExtensionExtImplicitCylinderRegionJsonWriter {
+  using ValueType = CesiumGltf::ExtensionExtImplicitCylinderRegion;
+
+  static inline constexpr const char* ExtensionName =
+      "EXT_implicit_cylinder_region";
+
+  static void write(
+      const CesiumGltf::ExtensionExtImplicitCylinderRegion& obj,
       CesiumJsonWriter::JsonWriter& jsonWriter,
       const CesiumJsonWriter::ExtensionWriterContext& context);
 };

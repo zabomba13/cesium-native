@@ -8,6 +8,8 @@
 #include "ExtensionCesiumPrimitiveOutlineJsonHandler.h"
 #include "ExtensionCesiumRTCJsonHandler.h"
 #include "ExtensionCesiumTileEdgesJsonHandler.h"
+#include "ExtensionExtImplicitCylinderRegionJsonHandler.h"
+#include "ExtensionExtImplicitEllipsoidRegionJsonHandler.h"
 #include "ExtensionExtInstanceFeaturesJsonHandler.h"
 #include "ExtensionExtMeshFeaturesJsonHandler.h"
 #include "ExtensionExtMeshGpuInstancingJsonHandler.h"
@@ -35,6 +37,7 @@
 #include <CesiumGltf/Model.h>
 #include <CesiumGltf/Node.h>
 #include <CesiumGltf/PropertyTextureProperty.h>
+#include <CesiumGltf/Shape.h>
 #include <CesiumGltf/Texture.h>
 #include <CesiumGltf/TextureInfo.h>
 #include <CesiumJsonReader/JsonReaderOptions.h>
@@ -116,5 +119,11 @@ void registerReaderExtensions(CesiumJsonReader::JsonReaderOptions& options) {
   options.registerExtension<
       CesiumGltf::FeatureIdTexture,
       ExtensionKhrTextureTransformJsonHandler>();
+  options.registerExtension<
+      CesiumGltf::Shape,
+      ExtensionExtImplicitEllipsoidRegionJsonHandler>();
+  options.registerExtension<
+      CesiumGltf::Shape,
+      ExtensionExtImplicitCylinderRegionJsonHandler>();
 }
 } // namespace CesiumGltfReader

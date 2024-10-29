@@ -12,6 +12,8 @@
 #include <CesiumGltf/ExtensionCesiumPrimitiveOutline.h>
 #include <CesiumGltf/ExtensionCesiumRTC.h>
 #include <CesiumGltf/ExtensionCesiumTileEdges.h>
+#include <CesiumGltf/ExtensionExtImplicitCylinderRegion.h>
+#include <CesiumGltf/ExtensionExtImplicitEllipsoidRegion.h>
 #include <CesiumGltf/ExtensionExtInstanceFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshFeatures.h>
 #include <CesiumGltf/ExtensionExtMeshGpuInstancing.h>
@@ -36,6 +38,7 @@
 #include <CesiumGltf/Model.h>
 #include <CesiumGltf/Node.h>
 #include <CesiumGltf/PropertyTextureProperty.h>
+#include <CesiumGltf/Shape.h>
 #include <CesiumGltf/Texture.h>
 #include <CesiumGltf/TextureInfo.h>
 #include <CesiumJsonWriter/ExtensionWriterContext.h>
@@ -117,5 +120,11 @@ void registerWriterExtensions(
   context.registerExtension<
       CesiumGltf::FeatureIdTexture,
       ExtensionKhrTextureTransformJsonWriter>();
+  context.registerExtension<
+      CesiumGltf::Shape,
+      ExtensionExtImplicitEllipsoidRegionJsonWriter>();
+  context.registerExtension<
+      CesiumGltf::Shape,
+      ExtensionExtImplicitCylinderRegionJsonWriter>();
 }
 } // namespace CesiumGltfWriter

@@ -150,6 +150,12 @@
     "KHR_implicit_shapes Sphere Shape": {
       "overrideName": "Sphere"
     },
+    "EXT_implicit_ellipsoid_region extension on KHR_implicit_shapes.shape": {
+      "overrideName": "ExtensionExtImplicitEllipsoidRegion"
+    },
+    "EXT_implicit_cylinder_region extension on KHR_implicit_shapes.shape": {
+      "overrideName": "ExtensionExtImplicitCylinderRegion"
+    },
     "EXT_primitive_voxels glTF Mesh Primitive extension": {
       "overrideName": "ExtensionExtPrimitiveVoxels"
     }
@@ -256,6 +262,14 @@
       "attachTo": [
         "glTF"
       ]
+    },
+    {
+      "extensionName": "EXT_implicit_ellipsoid_region",
+      "schema": "Vendor/EXT_implicit_ellipsoid_region/schema/glTF.KHR_implicit_shapes.shape.EXT_implicit_ellipsoid_region.schema.json"
+    },
+    {
+      "extensionName": "EXT_implicit_cylinder_region",
+      "schema": "Vendor/EXT_implicit_cylinder_region/schema/glTF.KHR_implicit_shapes.shape.EXT_implicit_cylinder_region.schema.json"
     },
     {
       "extensionName": "EXT_primitive_voxels",
